@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./inc/index.css">
+    <title>Lehrer-Planer</title>
+</head>
+
+<body>
+    <nav>
+        <div id="topMenuContainer" class="flex spaceBetween doubleGap">
+            <div>
+                <h1>Lehrer-Planer</h1>
+            </div>
+            <div class="flex alignEnd doubleGap">
+                <div>Platzhalter</div>
+                <div>Einstellungen</div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <div id="timetableContainer">
+            <div class="flex doubleGap spaceBetween" style="margin-bottom: 1rem;">
+                <div id="calenderWeek">
+                    <h2>KW 09</h2>
+                </div>
+                <div class="flex gap">
+                    <button id="weekBackwardButton">&#9664</button>
+                    <div id="dateSpan" class="flex alignEnd">24.02. - 02.03.</div>
+                    <button id="weekBackwardButton">&#9654</button>
+                </div>
+            </div>
+            <div id="weekOverview">
+                <div id="timeslots">
+                    <div></div>
+                    <div class="timeslotLabel">1</div>
+                    <div class="timeslotLabel">2</div>
+                    <div class="timeslotLabel">3</div>
+                    <div class="timeslotLabel">5</div>
+                    <div class="timeslotLabel">4</div>
+                    <div class="timeslotLabel">6</div>
+                    <div class="timeslotLabel">8</div>
+                    <div class="timeslotLabel">7</div>
+                    <div class="timeslotLabel">9</div>
+                </div>
+
+                <div class="weekday">
+                    <div class="weekdayLabel">Mo</div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"><div class="lesson deu" data-taskId="1">7B Deu</div></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                </div>
+
+                <div class="weekday">
+                    <div class="weekdayLabel">Di</div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"><div class="lesson gesch" data-taskId="2">6A Gesch</div></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                </div>
+
+                <div class="weekday">
+                    <div class="weekdayLabel">Mi</div>
+
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                </div>
+
+                <div class="weekday">
+                    <div class="weekdayLabel">Do</div>
+
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"><div class="lesson deu" data-taskId="1">7B Deu</div></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"><div class="lesson gesch" data-taskId="3">7A Gesch</div></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                </div>
+
+                <div class="weekday">
+                    <div class="weekdayLabel">Fr</div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                </div>
+
+                <div class="weekday">
+                    <div class="weekdayLabel">Sa</div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                </div>
+
+                <div class="weekday">
+                    <div class="weekdayLabel">So</div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                    <div class="timeslot"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="taskContainer" class="flex doubleGap">
+        
+            <div id="upcomingTasksContainer">
+                <div style="margin-bottom: 1rem;"><h2>anstehend:</h2></div>
+                <table id="upcomingTasksTable">
+                    <tbody>
+                        <tr data-taskId="1">
+                            <td>7B</td>
+                            <td>Deu</td>
+                            <td class="taskDescription">die Schafe hüten</td>
+                        </tr>
+                        <tr data-taskId="2">
+                            <td>6A</td>
+                            <td>Gesch</td>
+                            <td class="taskDescription">den Klassenraum streichen</td>
+                        </tr>
+                        <tr data-taskId="">
+                            <td>7A</td>
+                            <td>Gesch</td>
+                            <td class="taskDescription">Wetter verloren! Kopfstand auf dem Lehrertisch</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div id="overdueTasksContainer">
+                <div style="margin-bottom: 1rem;"><h2>überfallig:</h2></div>
+                <div>
+                                <table id="upcomingTasksTable">
+                    <tbody>
+                        <tr>
+                            <td>7B</td>
+                            <td>Deu</td>
+                            <td class="taskDescription">Prügel verteilen</td>
+                        </tr>
+                        <tr>
+                            <td>6A</td>
+                            <td>Gesch</td>
+                            <td class="taskDescription">World of Lehrkraft spielen</td>
+                        </tr>
+                        <tr>
+                            <td>n.a.</td>
+                            <td>n.a.</td>
+                            <td class="taskDescription">Not your Mutti auf den Arm tätowieren</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

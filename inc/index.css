@@ -1,0 +1,169 @@
+* {
+    font-family: 'Courier New', Courier, monospace;
+    box-sizing: border-box;
+
+    --bodyBackground: #272932;
+    --topMenuBackgound: #542344;
+    --contentContainerBackground: #F3F5F7;
+    --lightText: #F3F5F7;
+    --matteRed: #F05D5E;
+    --matteGreen: #0F7173;
+}
+
+body {
+    /* min-height: 100vh; */
+    background-color: var(--bodyBackground);
+}
+
+main {}
+
+/* Top Menu */
+
+#topMenuContainer {
+    background-color: var(--topMenuBackgound);
+    color: var(--lightText);
+    padding: 1rem 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Content Containers */
+
+#timetableContainer,
+#taskContainer {
+    background-color: var(--contentContainerBackground);
+    padding: 2rem 2rem;
+    margin-bottom: 1rem;
+}
+
+#timetableContainer {
+    min-height: fit-content;
+}
+
+/* Time Table */
+
+#weekBackwardButton,
+#weekForwardButton {
+    border: none;
+    background-color: var(--contentContainerBackground);
+}
+
+#weekBackwardButton:active,
+#weekForwardButton:active {
+    color: var(--matteRed);
+}
+
+#weekOverview {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr;
+    /* grid-template-rows: 1fr; */
+}
+
+
+#timeslots {
+    display: grid;
+    grid-template-rows: 2rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.timeslotLabel,
+.weekdayLabel {
+    padding: 0.5rem 1rem;
+}
+
+.timeslot,
+.timeslotLabel {
+    display: flex;
+    border-top: solid 1px gray;
+
+}
+
+.weekday {
+    display: grid;
+    border-left: solid 1px gray;
+    grid-template-rows: 2rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+
+}
+
+.lesson {
+    flex-grow: 1;
+    margin: 0.2rem;
+    padding: 0.5rem 0.5rem;
+    border-radius: 5px;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    color: var(--lightText);
+    text-align: center;
+}
+
+/* Task Container */
+
+#upcomingTasksContainer,
+#overdueTasksContainer {
+    flex: 1 1 50%;
+}
+
+#upcomingTasksTable {
+    border-spacing: 0;
+}
+
+#upcomingTasksTable td {
+    padding: 0.5rem 1rem;
+    border-right: solid 1px black;
+}
+
+#upcomingTasksTable .taskDescription {
+    border-right: none;
+}
+
+/* header stylings */
+
+h1,
+h2 {
+    margin: 0;
+    color: var(--matteRed);
+}
+
+
+
+
+/* generic classes */
+
+.flex {
+    display: flex;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.spaceBetween {
+    justify-content: space-between;
+}
+
+.justifyEnd {
+    justify-content: end;
+}
+
+.alignEnd {
+    align-items: end;
+}
+
+.halfGap {
+    gap: 0.5rem;
+}
+
+.gap {
+    gap: 1rem;
+}
+
+.doubleGap {
+    gap: 2rem;
+}
+
+.deu {
+    background-color: var(--matteGreen);
+
+}
+
+.gesch {
+    background-color: var(--topMenuBackgound);
+}
