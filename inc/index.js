@@ -7,11 +7,7 @@ document.querySelectorAll('.lesson').forEach((element) => {
 });
 
 document.querySelectorAll('.timeslot').forEach((element) => {
-    element.addEventListener('mouseover', showAddTaskButton);
-});
-
-document.querySelectorAll('.timeslot').forEach((element) => {
-    element.addEventListener('mouseout', removeAddTaskButton);
+    element.addEventListener('mouseenter', showAddTaskButton);
 });
 
 document.querySelectorAll('.timeslot').forEach((element) => {
@@ -29,6 +25,8 @@ function highlightTask(event) {
             taskRow.style.backgroundColor = "var(--lightergrey)";
         }
     });
+
+    removeAddTaskButton();
 }
 
 function removeTaskHighlight(event) {
@@ -47,34 +45,19 @@ function showAddTaskButton(event) {
         return;
     }
 
-    event.target.innerHTML = '<div class="addTaskButton">+</div>';
+    removeAddTaskButton();
+
+    event.target.innerHTML = '<div class="addTaskButtonWrapper"><div class="addTaskButton">+</div></div>';
+
 }
 
-function removeAddTaskButton(event) {
+function removeAddTaskButton() {
 
-    // does not work, needs a different approch
-
-    let parent = event.target.closest('.timeslot') ?
-        event.target.closest('.timeslot') :
-        event.target;
-
-    let parentPosition = parent.getBoundingClientRect();
-    console.log(parentPosition);
-    document.querySelector('#x').innerHTML = event.pageX;
-    document.querySelector('#y').innerHTML = event.pageY;
-
-    if (event.pageX > parentPosition.left + 1 &&
-        event.pageX < parentPosition.right - 1 &&
-        event.pageY > parentPosition.top + 1 &&
-        event.pageY < parentPosition.bottom - 1
-    ) {
-        return;
-    }
-
-
-    if (event.target.querySelector('.addTaskButton')) {
-        event.target.querySelector('.addTaskButton').remove();
-    }
+    document.querySelectorAll('.timeslot').forEach((timeslot) => {
+        if (timeslot.querySelector('.addTaskButtonWrapper')) {
+            timeslot.querySelector('.addTaskButtonWrapper').remove();
+        }
+    });
 }
 
 

@@ -12,9 +12,14 @@
     --lightergrey: rgb(227, 227, 227);
 }
 
+html {
+    /* width: 100vw; */
+}
+
 body {
-    /* min-height: 100vh; */
     background-color: var(--bodyBackground);
+    display: flex;  
+    flex-direction: column;
 }
 
 main {}
@@ -26,6 +31,7 @@ main {}
     color: var(--lightText);
     padding: 1rem 2rem;
     margin-bottom: 1rem;
+    flex: 1 0 100%
 }
 
 /* Content Containers */
@@ -38,7 +44,7 @@ main {}
 }
 
 #timetableContainer {
-    min-height: fit-content;
+    /* min-height: fit-content; */
 }
 
 /* Time Table */
@@ -95,11 +101,17 @@ main {}
     text-align: center;
 }
 
-.addTaskButton {
+.addTaskButtonWrapper {
     display: flex;
-    justify-content: end;
-    color: var(--matteGreen);
+    flex: 1 1 100%;
+    background-color: var(--lightergrey);
+    justify-content: center;
+    align-items: center;
     text-align: right;
+}
+
+.addTaskButton {
+    color: #0F7173;
 }
 
 /* Task Container */
@@ -175,4 +187,15 @@ h2 {
 
 .gesch {
     background-color: var(--topMenuBackgound);
+}
+
+@media screen and (max-width: 700px) {
+    #weekOverview {
+        overflow-y: scroll;
+    }
+
+    #taskContainer {
+        flex-direction: column;
+    }
+
 }
