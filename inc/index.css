@@ -8,6 +8,8 @@
     --lightText: #F3F5F7;
     --matteRed: #F05D5E;
     --matteGreen: #0F7173;
+    --lightgrey: rgb(184, 184, 184);
+    --lightergrey: rgb(227, 227, 227);
 }
 
 body {
@@ -73,13 +75,12 @@ main {}
 .timeslot,
 .timeslotLabel {
     display: flex;
-    border-top: solid 1px gray;
-
+    border-top: solid 1px var(--lightgrey);
 }
 
 .weekday {
     display: grid;
-    border-left: solid 1px gray;
+    border-left: solid 1px var(--lightgrey);
     grid-template-rows: 2rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 
 }
@@ -92,6 +93,13 @@ main {}
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     color: var(--lightText);
     text-align: center;
+}
+
+.addTaskButton {
+    display: flex;
+    justify-content: end;
+    color: var(--matteGreen);
+    text-align: right;
 }
 
 /* Task Container */
@@ -107,9 +115,10 @@ main {}
 
 #upcomingTasksTable td {
     padding: 0.5rem 1rem;
-    border-right: solid 1px black;
+    border-right: solid 1px var(--lightgrey);
 }
 
+#upcomingTasksTable .taskDone,
 #upcomingTasksTable .taskDescription {
     border-right: none;
 }
