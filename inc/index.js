@@ -1,3 +1,4 @@
+// handlers for lesson fields
 document.querySelectorAll('.lesson').forEach((element) => {
     element.addEventListener('mouseover', highlightTask);
 });
@@ -6,15 +7,28 @@ document.querySelectorAll('.lesson').forEach((element) => {
     element.addEventListener('mouseout', removeTaskHighlight);
 });
 
+// handlers for empty timeslots
+
 document.querySelectorAll('.timeslot').forEach((element) => {
     element.addEventListener('mouseenter', showAddTaskButton);
 });
 
 document.querySelectorAll('.timeslot').forEach((element) => {
-    element.addEventListener('click', addTask);
+    element.addEventListener('click', createTaskForm);
 });
 
+// handlers for switching between weeks
 
+document.querySelector('#weekBackwardButton').addEventListener('click', switchToPreviousWeek);
+document.querySelector('#weekForwardButton').addEventListener('click', switchToNextWeek);
+
+// on ready
+
+document.addEventListener('DOMContentLoaded', setDateForWeekdays);
+
+
+
+//HIGHLIGHTING AND TOGGLING STUFF
 
 function highlightTask(event) {
 
@@ -60,6 +74,62 @@ function removeAddTaskButton() {
     });
 }
 
+function createTaskForm() {
+
+}
+
+
+
+// FIDDLING WITH DATE
+
+function setDateForWeekdays() {
+    let todayUnix = Date.now();
+    let today = new Date;
+
+    document.querySelectorAll('.weekday').forEach((weekday) => {
+        let dateDifference = weekday.dataset.weekday_number - today.getDay();
+        let weekdayDateUnix = todayUnix + (dateDifference * 86400000);    // 86400000 = ms/day
+        let weekdayDateString = new Date(weekdayDateUnix).toDateString();
+
+        weekday.dataset.date = weekdayDateString;
+
+    })
+}
+
+function switchToPreviousWeek() {
+    document.querySelectorAll('.weekday').forEach((weekday) => {
+        let currentDate = new Date(weekday.dataset.date);
+        let newDate = currentDate - 86400000 * 7 // 7 days
+
+        weekday.dataset.date = new Date(newDate).toDateString();
+    });
+
+    resetWeekStartAndEndDate();
+    resetCalenderWeek()
+}
+
+function switchToNextWeek() { }
+
+function resetWeekStartAndEndDate() {
+    let startDateSpan = document.querySelector('#weekStartDate');
+    let endDateSpan = document.querySelector('#weekEndDate');
+    let mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
+    let sundayDate = document.querySelector('.weekday[data-weekday_number="7"]').dataset.date;
+
+    mondayDate = new Date(mondayDate);
+    sundayDate = new Date(sundayDate);
+
+    startDateSpan.innerText = formatDate(mondayDate);
+    endDateSpan.innerText = formatDate(sundayDate);
+
+}
+
+function resetCalenderWeek(){
+    let referenceDate = new Date('1.1.2025')
+    let calenderWeekCounter = document.querySelector('#callenderWeekCounter');
+
+    console.log(referenceDate);
+}
 
 // HELPER FUNCTIONS
 
@@ -78,3 +148,12 @@ function hasLesson(element) {
 
     return bool;
 }
+
+function formatDate(date) {
+    let formatter = new Intl.DateTimeFormat('de-DE', {
+        month: '2-digit',
+        day: '2-digit'
+    });
+
+    return formatter.format(date);
+    }
