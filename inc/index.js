@@ -87,16 +87,20 @@ function createTaskForm() {
 function setCalendarWeek() {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = 1;
-
-    let mondayDate = new Date('12.27.2021').getTime();
+    let currentYear = new Date().getFullYear();
     let referenceDate = new Date().getTime();
-    let sundayDate = new Date('1.2.2022').getTime();
+    let firstThursday = getFirstThirsdayOfTheYear(currentYear);
+    let monday = firstThursday - 86400000 * 3
+    let sunday = firstThursday + 86400000 * 3;
 
-    while (!(referenceDate >= mondayDate && referenceDate <= sundayDate)) {
-        mondayDate += 86400000 * 7; // + 7 days
-        sundayDate += 86400000 * 7; // + 7 days
+    //checks, if the reference date lies in the current week. if not, tests against the next week
+    while (monday < referenceDate && sunday < referenceDate) {
+        console.log(new Date(monday));
+        console.log(new Date(sunday));
+
+        monday += 86400000 * 7; // + 7 days
+        sunday += 86400000 * 7; // + 7 days
         weekCounter++;
-        weekCounter = isChangeOfYear(mondayDate, sundayDate, true) ? 1 : weekCounter;
     }
 
     //check whether the year changes and reset weekcounter, if so
@@ -104,13 +108,13 @@ function setCalendarWeek() {
 }
 
 function setDateForWeekdays() {
-    let todayUnix = Date.now();
+    let todayUnix = new Date().setHours(0, 0, 0);
     let today = new Date;
 
     document.querySelectorAll('.weekday').forEach((weekday) => {
         let dateDifference = weekday.dataset.weekday_number - today.getDay();
         let weekdayDateUnix = todayUnix + (dateDifference * 86400000);    // 86400000 = ms/day
-        let weekdayDateString = new Date(weekdayDateUnix).toDateString();
+        let weekdayDateString = new Date(weekdayDateUnix).toString();
 
         weekday.dataset.date = weekdayDateString;
 
@@ -124,7 +128,7 @@ function switchToPreviousWeek() {
         let currentDate = new Date(weekday.dataset.date).getTime();
         let newDate = currentDate - 86400000 * 7; // -7 days
 
-        weekday.dataset.date = new Date(newDate).toDateString();
+        weekday.dataset.date = new Date(newDate).toString();
     });
 
     resetWeekStartAndEndDate();
@@ -138,8 +142,7 @@ function switchToNextWeek() {
         let currentDate = new Date(weekday.dataset.date).getTime();
         let newDate = currentDate + 86400000 * 7; // +7 days
 
-        console.log(newDate);
-        weekday.dataset.date = new Date(newDate).toDateString();
+        weekday.dataset.date = new Date(newDate).toString();
     });
 
     resetWeekStartAndEndDate();
@@ -163,31 +166,15 @@ function calcCalendarWeek(countUp = true) {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = document.querySelector('#calendarWeekCounter').innerText;
 
+    let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
+    let sundayDate = new Date(document.querySelector('.weekday[data-weekday_number="7"]').dataset.date);
 
-    let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date).getTime();
-    let sundayDate = new Date(document.querySelector('.weekday[data-weekday_number="7"]').dataset.date).getTime();
+    let weeksPerYear = getNumberOfWeeksPerYear(mondayDate.getFullYear());
 
     countUp ? weekCounter++ : weekCounter--;
 
-    //check whether the year changes and reset weekcounter, if so
-    if (calendarWeekCounterDiv.dataset.split_first_week == 'true') {
-        if (countUp) {
-            // weekCounter = 1;
-            calendarWeekCounterDiv.dataset.split_first_week = 'false'
-        } else {
-            weekCounter = 52;
-            calendarWeekCounterDiv.dataset.split_first_week = 'false'
-        }
-    }
-
-    if (isChangeOfYear(mondayDate, sundayDate) && countUp) {
-        weekCounter = 1;
-    }
-
-    if (isChangeOfYear(mondayDate, sundayDate) && !countUp) {
-        if (calendarWeekCounterDiv.dataset.split_first_week == 'false')
-            weekCounter = 52;
-    }
+    if (weekCounter < 1) weekCounter = weeksPerYear;
+    if (weekCounter > weeksPerYear) weekCounter = 1;
 
     calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
 }
@@ -219,38 +206,45 @@ function formatDate(date) {
     return formatter.format(date);
 }
 
-// this function doesnt only check for the change of year, but also, if the thursday of that given week is
-// in the new year. If so, it returns true and resets the weekCounter
 
-function isChangeOfYear(monday, sunday, startedOnLoad = false) {
-    let thursday = new Date(document.querySelector('.weekday[data-weekday_number="4"]').dataset.date);
+function isChangeOfYear(monday, sunday) {
     monday = new Date(monday);
     sunday = new Date(sunday);
 
-    // after loading setCalendarWeek counts up from a reference date how many weeks have passed
-    // if the year changes the counter is reset to one, if the week contains the first thursday of the year
-    // if startedOnLoad is set, this part of the script searches for the thursday of each week
+    if (monday.getFullYear() != sunday.getFullYear()) {
+        return true;
+    }
 
-    if (startedOnLoad) {
-        thursday = monday;
+    return false;
+}
 
-        while (thursday.getDay() != 4) {
-            thursday = thursday.getTime() + 86400000; // + one day
-            thursday = new Date(thursday);
+function getNumberOfWeeksPerYear(year) {
+    let nextNewYear = new Date('1.1.' + (year + 1)).getTime();
+    let firstThursday = getFirstThirsdayOfTheYear(year);
+
+    let weeksPerYear = 0;
+
+    //count up until it is the next year starting with 0 because the first 
+    while (firstThursday < nextNewYear) {
+        firstThursday = firstThursday + 86400000 * 7;
+
+        weeksPerYear++;
+    }
+    console.log(year);
+    console.log(weeksPerYear)
+    return weeksPerYear;
+}
+
+//find the first thursday of the year, which marks the first calendar week
+function getFirstThirsdayOfTheYear(year) {
+    let firstDay = new Date('1.1.' + year);
+
+    if (firstDay.getDay() != 4) {
+        while (firstDay.getDay() != 4) {
+            firstDay = firstDay.getTime() + 86400000;
+            firstDay = new Date(firstDay);
         }
     }
 
-    // is monday the first day in the year?
-    if (formatDate(monday) == formatDate(new Date('1.1.1970'))) {
-        return true;
-    }
-
-    // is thursday of given week a day of the new year?
-    if (monday.getFullYear() != sunday.getFullYear()) {
-        if (thursday.getFullYear() == sunday.getFullYear())
-
-            startedOnLoad ? '' : document.querySelector('#calendarWeekCounter').dataset.split_first_week = 'true';
-
-        return true;
-    }
+    return firstDay.getTime();
 }
