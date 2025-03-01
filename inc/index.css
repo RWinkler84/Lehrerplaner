@@ -18,7 +18,7 @@ html {
 
 body {
     background-color: var(--bodyBackground);
-    display: flex;  
+    display: flex;
     flex-direction: column;
 }
 
@@ -67,7 +67,6 @@ main {}
     /* grid-template-rows: 1fr; */
 }
 
-
 #timeslots {
     display: grid;
     grid-template-rows: 2rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -102,7 +101,7 @@ main {}
 }
 
 .addTaskButtonWrapper {
-    display: flex;
+    display: none;
     flex: 1 1 100%;
     background-color: var(--lightergrey);
     justify-content: center;
@@ -114,20 +113,29 @@ main {}
     color: #0F7173;
 }
 
+#weekOverview:hover .addTaskButtonWrapper {
+    display: flex;
+}
+
 /* Task Container */
 
 #upcomingTasksContainer,
-#overdueTasksContainer {
+#workInProgressTasksContainer {
     flex: 1 1 50%;
 }
 
-#upcomingTasksTable {
+#upcomingTasksTable,
+#workInProgressTasksTable {
     border-spacing: 0;
 }
 
-#upcomingTasksTable td {
+#upcomingTasksTable td,
+#workInProgressTasksTable td,
+#upcomingTasksTable th,
+#workInProgressTasksTable th {
     padding: 0.5rem 1rem;
     border-right: solid 1px var(--lightgrey);
+    cursor: default;
 }
 
 #upcomingTasksTable .taskDone,
@@ -143,7 +151,12 @@ h2 {
     color: var(--matteRed);
 }
 
+#taskContainer th {
+    color: var(--lightgrey);
+    text-align: left;
+    padding: 0.5rem 1rem;
 
+}
 
 
 /* generic classes */

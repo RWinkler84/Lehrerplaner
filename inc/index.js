@@ -1,4 +1,4 @@
-// handlers for lesson fields
+// handlers for lesson fields and weekOverview
 document.querySelectorAll('.lesson').forEach((element) => {
     element.addEventListener('mouseover', highlightTask);
 });
@@ -21,6 +21,12 @@ document.querySelectorAll('.timeslot').forEach((element) => {
 
 document.querySelector('#weekBackwardButton').addEventListener('click', switchToPreviousWeek);
 document.querySelector('#weekForwardButton').addEventListener('click', switchToNextWeek);
+
+// handlers for task tables
+
+document.querySelectorAll('#taskContainer td').forEach((td) => {
+    td.addEventListener('dblclick', makeEditable);
+})
 
 // on ready
 
@@ -57,6 +63,7 @@ function removeTaskHighlight(event) {
 
 function showAddTaskButton(event) {
 
+
     if (hasLesson(event.target)) {
         return;
     }
@@ -77,9 +84,39 @@ function removeAddTaskButton() {
 }
 
 function createTaskForm() {
+    let taskTable = document.querySelector('#upcomingTasksTable tbody');
+
+    let trContent = `
+        <td contenteditable data-class></td>
+        <td contenteditable data-subject></td>
+        <td class="taskDescription" data-taskDescription contenteditable></td>
+        <td class="taskDone">&#x2714;</td>
+        `;
+    
+    let newTableRow = document.createElement('tr');
+
+    taskTable.append(newTableRow);
+
+    let lastChild = taskTable.lastElementChild;
+
+    lastChild.dataset.taskid = '';
+    lastChild.innerHTML = trContent;
+
+    lastChild.firstElementChild.focus();
 
 }
 
+function makeEditable(){
+    console.log(event.target);
+    if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound){
+        return;
+    }
+
+    event.target.setAttribute('contenteditable', '');
+    event.target.focus();
+    window.getSelection().removeAllRanges();
+    event.target.addEventListener('focusout', () => event.target.removeAttribute('contenteditable'));
+}
 
 
 // FIDDLING WITH DATE
@@ -95,8 +132,6 @@ function setCalendarWeek() {
 
     //checks, if the reference date lies in the current week. if not, tests against the next week
     while (monday < referenceDate && sunday < referenceDate) {
-        console.log(new Date(monday));
-        console.log(new Date(sunday));
 
         monday += 86400000 * 7; // + 7 days
         sunday += 86400000 * 7; // + 7 days
@@ -206,18 +241,6 @@ function formatDate(date) {
     return formatter.format(date);
 }
 
-
-function isChangeOfYear(monday, sunday) {
-    monday = new Date(monday);
-    sunday = new Date(sunday);
-
-    if (monday.getFullYear() != sunday.getFullYear()) {
-        return true;
-    }
-
-    return false;
-}
-
 function getNumberOfWeeksPerYear(year) {
     let nextNewYear = new Date('1.1.' + (year + 1)).getTime();
     let firstThursday = getFirstThirsdayOfTheYear(year);
@@ -230,8 +253,7 @@ function getNumberOfWeeksPerYear(year) {
 
         weeksPerYear++;
     }
-    console.log(year);
-    console.log(weeksPerYear)
+
     return weeksPerYear;
 }
 
