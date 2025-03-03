@@ -70,6 +70,12 @@ main {}
     /* grid-template-rows: 1fr; */
 }
 
+#weekOverview {
+    position: relative;
+    left: 0;
+        transition: all 0.3s ease-out;
+}
+
 #timeslots {
     display: grid;
     grid-template-rows: 2rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -84,6 +90,7 @@ main {}
 .timeslotLabel {
     display: flex;
     border-top: solid 1px var(--lightgrey);
+    height: 42px;
 }
 
 .weekday {

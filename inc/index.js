@@ -14,6 +14,7 @@ document.querySelectorAll('.timeslot').forEach((element) => {
 });
 
 document.querySelectorAll('.timeslot').forEach((element) => {
+    if (hasLesson(element)) return;
     element.addEventListener('click', createTaskForm);
 });
 
@@ -205,7 +206,6 @@ function switchToNextWeek() {
     calcCalendarWeek(true)
 }
 
-
 function calcCalendarWeek(countUp = true) {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = document.querySelector('#calendarWeekCounter').innerText;
@@ -225,7 +225,7 @@ function calcCalendarWeek(countUp = true) {
 
 // ANIMATION FUNCTIONS
 
-function runWeekSwitchAnimation(nextWeek = true){
+function runWeekSwitchAnimation(nextWeek = true) {
     let timetableContainer = document.querySelector('#timetableContainer');
     let timetableContainerInitialHeight = timetableContainer.getBoundingClientRect().height;
     let weekOverview = document.querySelector('#weekOverview');
@@ -237,13 +237,13 @@ function runWeekSwitchAnimation(nextWeek = true){
     if (nextWeek == true) verticalOffset = window.innerWidth;
     if (nextWeek == false) verticalOffset = window.innerWidth * -1;
 
-    blankWeekTable.querySelectorAll('.lesson').forEach((lesson) => {
-        lesson.remove();
-    })
+    removeAllLessons(blankWeekTable);
 
+    //setup for the animation
+    weekOverview.style.left = '0px';
     blankWeekTable.style.position = 'relative';
     blankWeekTable.classList.add('blankWeekTable');
-    blankWeekTable.style.top = -1 * weekOverviewPosition.height + 'px'; 
+    blankWeekTable.style.top = -1 * weekOverviewPosition.height + 'px';
     blankWeekTable.style.left = verticalOffset + 'px';
     blankWeekTable.style.width = weekOverviewPosition.width + 'px';
     blankWeekTable.style.height = weekOverviewPosition.height + 'px';
@@ -252,13 +252,21 @@ function runWeekSwitchAnimation(nextWeek = true){
 
     timetableContainer.style.height = timetableContainerInitialHeight + 'px';
 
-    setTimeout(() => { blankWeekTable.style.left = '0px'; }, 10);
-    setTimeout(() => { blankWeekTable.remove() }, 350);
+    setTimeout(() => {
+        blankWeekTable.style.left = '0px';
+        weekOverview.style.left = verticalOffset * -1 + 'px';
+    }, 10);
+    setTimeout(() => {
+        blankWeekTable.remove()
+        weekOverview.style.left = 'auto';
+        removeAllLessons(weekOverview);
+    }, 350);
 }
 
-function cancelWeekSwitchAnimation(){
-    if (document.querySelector('.blankWeekTable')){
-       document.querySelector('.blankWeekTable').remove(); 
+function cancelWeekSwitchAnimation() {
+    if (document.querySelector('.blankWeekTable')) {
+        document.querySelector('.blankWeekTable').remove();
+        document.querySelector('#weekOverview').style.left = 'auto';
     }
 }
 
@@ -317,4 +325,10 @@ function getFirstThirsdayOfTheYear(year) {
     }
 
     return firstDay.getTime();
+}
+
+function removeAllLessons(element){
+        element.querySelectorAll('.lesson').forEach((lesson) => {
+        lesson.remove();
+    })
 }
