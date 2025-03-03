@@ -32,6 +32,7 @@ document.querySelectorAll('#taskContainer td').forEach((td) => {
 
 document.addEventListener('DOMContentLoaded', setDateForWeekdays);
 document.addEventListener('DOMContentLoaded', setCalendarWeek);
+document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
 
 
 
@@ -90,9 +91,10 @@ function createTaskForm() {
         <td contenteditable data-class></td>
         <td contenteditable data-subject></td>
         <td class="taskDescription" data-taskDescription contenteditable></td>
-        <td class="taskDone">&#x2714;</td>
+        <td class="taskDone"><span>&#x2714;</span></td>
+        <td class="taskDone"><span>&#x2718;</span></td>
         `;
-    
+
     let newTableRow = document.createElement('tr');
 
     taskTable.append(newTableRow);
@@ -106,9 +108,9 @@ function createTaskForm() {
 
 }
 
-function makeEditable(){
+function makeEditable() {
     console.log(event.target);
-    if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound){
+    if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) {
         return;
     }
 
@@ -156,35 +158,7 @@ function setDateForWeekdays() {
     })
 }
 
-function switchToPreviousWeek() {
-
-    // iterates over all weekday columns and adjusts date of weekdays
-    document.querySelectorAll('.weekday').forEach((weekday) => {
-        let currentDate = new Date(weekday.dataset.date).getTime();
-        let newDate = currentDate - 86400000 * 7; // -7 days
-
-        weekday.dataset.date = new Date(newDate).toString();
-    });
-
-    resetWeekStartAndEndDate();
-    calcCalendarWeek(false)
-}
-
-function switchToNextWeek() {
-
-    // iterates over all weekday columns and adjusts date of weekdays
-    document.querySelectorAll('.weekday').forEach((weekday) => {
-        let currentDate = new Date(weekday.dataset.date).getTime();
-        let newDate = currentDate + 86400000 * 7; // +7 days
-
-        weekday.dataset.date = new Date(newDate).toString();
-    });
-
-    resetWeekStartAndEndDate();
-    calcCalendarWeek(true)
-}
-
-function resetWeekStartAndEndDate() {
+function setWeekStartAndEndDate() {
     let startDateSpan = document.querySelector('#weekStartDate');
     let endDateSpan = document.querySelector('#weekEndDate');
     let mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
@@ -196,6 +170,41 @@ function resetWeekStartAndEndDate() {
     startDateSpan.innerText = formatDate(mondayDate);
     endDateSpan.innerText = formatDate(sundayDate);
 }
+
+function switchToPreviousWeek() {
+
+    cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
+    runWeekSwitchAnimation(false);
+
+    // iterates over all weekday columns and adjusts date of weekdays
+    document.querySelectorAll('.weekday').forEach((weekday) => {
+        let currentDate = new Date(weekday.dataset.date).getTime();
+        let newDate = currentDate - 86400000 * 7; // -7 days
+
+        weekday.dataset.date = new Date(newDate).toString();
+    });
+
+    setWeekStartAndEndDate();
+    calcCalendarWeek(false)
+}
+
+function switchToNextWeek() {
+
+    cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
+    runWeekSwitchAnimation(true);
+
+    // iterates over all weekday columns and adjusts date of weekdays
+    document.querySelectorAll('.weekday').forEach((weekday) => {
+        let currentDate = new Date(weekday.dataset.date).getTime();
+        let newDate = currentDate + 86400000 * 7; // +7 days
+
+        weekday.dataset.date = new Date(newDate).toString();
+    });
+
+    setWeekStartAndEndDate();
+    calcCalendarWeek(true)
+}
+
 
 function calcCalendarWeek(countUp = true) {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
@@ -212,6 +221,45 @@ function calcCalendarWeek(countUp = true) {
     if (weekCounter > weeksPerYear) weekCounter = 1;
 
     calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
+}
+
+// ANIMATION FUNCTIONS
+
+function runWeekSwitchAnimation(nextWeek = true){
+    let timetableContainer = document.querySelector('#timetableContainer');
+    let timetableContainerInitialHeight = timetableContainer.getBoundingClientRect().height;
+    let weekOverview = document.querySelector('#weekOverview');
+    let weekOverviewPosition = weekOverview.getBoundingClientRect();
+    let blankWeekTable = weekOverview.cloneNode(true);
+    let verticalOffset;
+
+    //should blankWeekTable come in from left or right?
+    if (nextWeek == true) verticalOffset = window.innerWidth;
+    if (nextWeek == false) verticalOffset = window.innerWidth * -1;
+
+    blankWeekTable.querySelectorAll('.lesson').forEach((lesson) => {
+        lesson.remove();
+    })
+
+    blankWeekTable.style.position = 'relative';
+    blankWeekTable.classList.add('blankWeekTable');
+    blankWeekTable.style.top = -1 * weekOverviewPosition.height + 'px'; 
+    blankWeekTable.style.left = verticalOffset + 'px';
+    blankWeekTable.style.width = weekOverviewPosition.width + 'px';
+    blankWeekTable.style.height = weekOverviewPosition.height + 'px';
+
+    timetableContainer.append(blankWeekTable);
+
+    timetableContainer.style.height = timetableContainerInitialHeight + 'px';
+
+    setTimeout(() => { blankWeekTable.style.left = '0px'; }, 10);
+    setTimeout(() => { blankWeekTable.remove() }, 350);
+}
+
+function cancelWeekSwitchAnimation(){
+    if (document.querySelector('.blankWeekTable')){
+       document.querySelector('.blankWeekTable').remove(); 
+    }
 }
 
 // HELPER FUNCTIONS
