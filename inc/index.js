@@ -64,15 +64,14 @@ function removeTaskHighlight(event) {
 }
 
 function showAddTaskButton(event) {
+    lessonNumber = event.target.dataset.lesson_number;
+    date = event.target.parentElement.dataset.date;
 
-
-    if (hasLesson(event.target)) {
-        return;
-    }
+    if (hasLesson(event.target)) return;
 
     removeAddTaskButton();
 
-    event.target.innerHTML = '<div class="addTaskButtonWrapper"><div class="addTaskButton">+</div></div>';
+    event.target.innerHTML = `<div class="addTaskButtonWrapper" data-lesson_number="${lessonNumber}" data-date="${date}"><div class="addTaskButton">+</div></div>`;
 
 }
 
@@ -83,30 +82,6 @@ function removeAddTaskButton() {
             timeslot.querySelector('.addTaskButtonWrapper').remove();
         }
     });
-}
-
-function createTaskForm() {
-    let taskTable = document.querySelector('#upcomingTasksTable tbody');
-
-    let trContent = `
-        <td contenteditable data-class></td>
-        <td contenteditable data-subject></td>
-        <td class="taskDescription" data-taskDescription contenteditable></td>
-        <td class="taskDone"><span>&#x2714;</span></td>
-        <td class="taskDone"><span>&#x2718;</span></td>
-        `;
-
-    let newTableRow = document.createElement('tr');
-
-    taskTable.append(newTableRow);
-
-    let lastChild = taskTable.lastElementChild;
-
-    lastChild.dataset.taskid = '';
-    lastChild.innerHTML = trContent;
-
-    lastChild.firstElementChild.focus();
-
 }
 
 function makeEditable() {
@@ -121,6 +96,91 @@ function makeEditable() {
     event.target.addEventListener('focusout', () => event.target.removeAttribute('contenteditable'));
 }
 
+
+// HANDLING TASKS
+
+function createTaskForm(item) {
+
+    let dataSource = item.target;
+
+    if (item.target.classList.contains('addTaskButton')) dataSource = item.target.parentElement;
+
+    let taskTable = document.querySelector('#upcomingTasksTable tbody');
+
+    let trContent = `
+        <td contenteditable data-class></td>
+        <td contenteditable data-subject></td>
+        <td class="taskDescription" data-taskDescription contenteditable></td>
+        <td class="taskDone"><button id="saveNewTaskButton">&#x2714;</button><button id="discardNewTaskButton">&#x2718;</button></td>
+        `;
+
+    let newTableRow = document.createElement('tr');
+
+    taskTable.append(newTableRow);
+
+    let tr = taskTable.lastElementChild;
+
+    tr.dataset.taskid = '';
+    tr.dataset.date = dataSource.dataset.date;
+    tr.dataset.timeslot = dataSource.dataset.lesson_number;
+    tr.innerHTML = trContent;
+
+    tr.querySelector('#saveNewTaskButton').addEventListener('click', saveNewTask);
+    tr.querySelector('#discardNewTaskButton').addEventListener('click', discardNewTask);
+
+    tr.firstElementChild.focus();
+
+}
+
+function saveNewTask(event) {
+
+    let form = event.target.closest('tr');
+
+    let formData = new FormData();
+    let taskData = {
+        'id': generateTaskId(),
+        'class': form.querySelector('td[data-class]').innerText,
+        'subject': form.querySelector('td[data-subject]').innerText,
+        'date': form.dataset.date,
+        'timeslot': form.dataset.timeslot,
+        'description': form.querySelector('td[data-taskDescription]').innerText
+    }
+
+    Object.entries(taskData).forEach((key, value) => { formData.append(key, value) });
+
+    //send this stuff to the backend via fetch-API
+    //.then => remove discard-button and reasign create-Button to use it as a setDone-Button and add taskid to the saved tr
+
+    addLessonToTimetable(taskData);
+}
+
+function discardNewTask(event) {
+    event.target.closest('tr').remove();
+}
+
+function addLessonToTimetable(lessonData) {
+    let lessonDate = lessonData.date;
+    let lessonNumber = lessonData.timeslot
+
+    if (!isDateInCurrentWeek(lessonDate)) return;
+
+    let weekday;
+    let timeslot;
+    let lessonHTML = `
+        <div class="lesson ${lessonData.subject}" data-taskid="${lessonData.id}">${lessonData.class} ${lessonData.subject}</div>
+    `;
+
+    document.querySelectorAll('.weekday').forEach((day) => {
+        if (day.dataset.date == lessonDate) weekday = day;
+    })
+    weekday.querySelectorAll('.timeslot').forEach((slot) => {
+        if (slot.dataset.lesson_number == lessonNumber) timeslot = slot;
+    });
+
+
+    timeslot.innerHTML = lessonHTML;
+
+}
 
 // FIDDLING WITH DATE
 
@@ -288,6 +348,16 @@ function hasLesson(element) {
     return bool;
 }
 
+function isDateInCurrentWeek(date) {
+    let dateToTest = new Date(date);
+    let monday = new Date(document.querySelector('div[data-weekday_number="1"]').dataset.date);
+    let sunday = new Date(document.querySelector('div[data-weekday_number="7"]').dataset.date);
+
+    if (monday <= dateToTest && dateToTest <= sunday) return true;
+
+    return false;
+}
+
 function formatDate(date) {
     let formatter = new Intl.DateTimeFormat('de-DE', {
         month: '2-digit',
@@ -327,8 +397,20 @@ function getFirstThirsdayOfTheYear(year) {
     return firstDay.getTime();
 }
 
-function removeAllLessons(element){
-        element.querySelectorAll('.lesson').forEach((lesson) => {
+function removeAllLessons(element) {
+    element.querySelectorAll('.lesson').forEach((lesson) => {
         lesson.remove();
     })
+}
+
+function generateTaskId(){
+    let id;
+    let lessons = document.querySelectorAll('.lesson');
+    let lessonIds = [];
+
+    lessons.forEach((lesson) => {
+        lessonIds.push(lesson.dataset.taskid);
+    })
+
+    return Number(Math.max(lessonIds)) + 1; //adds 1 to the highest existing lesson id
 }

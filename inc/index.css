@@ -8,6 +8,8 @@
     --lightText: #F3F5F7;
     --matteRed: #F05D5E;
     --matteGreen: #0F7173;
+    --lightMatteGreen: #17B2B5;
+    --lightMatteRed: #F58F8F;
     --lightgrey: rgb(184, 184, 184);
     --lightergrey: rgb(227, 227, 227);
 }
@@ -73,7 +75,9 @@ main {}
 #weekOverview {
     position: relative;
     left: 0;
-        transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+    cursor: default;
+
 }
 
 #timeslots {
@@ -108,6 +112,10 @@ main {}
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     color: var(--lightText);
     text-align: center;
+}
+
+.lesson:hover {
+    transform: translate(-1px, -1px);
 }
 
 .addTaskButtonWrapper {
@@ -152,13 +160,47 @@ main {}
 #upcomingTasksTable .taskDone,
 #upcomingTasksTable .taskDescription,
 #inProgressTasksTable .taskDone,
-#inProgressTasksTable .taskDescription  {
+#inProgressTasksTable .taskDescription {
     border-right: none;
 }
 
 .taskDone {
     text-align: center;
-    width: 42px;
+    min-width: 125px;
+    /* display: flex; */
+    gap: 0.5rem;
+    justify-content: center;
+    vertical-align: center;
+}
+
+.taskDone button {
+    border: none;
+    padding: 0 1rem;
+    border-radius: 3px;
+    background-color: var(--lightMatteGreen);
+    font-size: 1rem;
+    color: var(--lightText);
+}
+
+.taskDone button:hover {
+    background-color: var(--matteGreen);
+} 
+
+#saveNewTaskButton {
+    background-color: var(--lightMatteGreen);
+    margin-right: 0.5rem;
+}
+
+#discardNewTaskButton {
+    background-color: var(--lightMatteRed);
+}
+
+#saveNewTaskButton:hover {
+    background-color: var(--matteGreen);
+}
+
+#discardNewTaskButton:hover {
+    background-color: var(--matteRed);
 }
 
 #taskContainer th {
@@ -166,6 +208,7 @@ main {}
     text-align: left;
     padding: 0.5rem 1rem;
 }
+
 /* header stylings */
 
 h1,
@@ -227,7 +270,7 @@ h2 {
 
 /* responsiveness */
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 900px) {
     .weekOverview {
         overflow-y: scroll;
     }
