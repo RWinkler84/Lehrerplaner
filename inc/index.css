@@ -162,6 +162,7 @@ main {}
 #inProgressTasksTable .taskDone,
 #inProgressTasksTable .taskDescription {
     border-right: none;
+    transition: all 0.3s ease-out;
 }
 
 .taskDone {
@@ -186,21 +187,31 @@ main {}
     background-color: var(--matteGreen);
 } 
 
-#saveNewTaskButton {
+.lessonSelect {
+    appearance: none;
+    border: none;
+    background-color: var(--contentContainerBackground);
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+}
+
+.saveAndSetTaskDoneButton {
     background-color: var(--lightMatteGreen);
     margin-right: 0.5rem;
 }
 
-#discardNewTaskButton {
-    background-color: var(--lightMatteRed);
+.discardNewTaskButton {
+    background-color: var(--lightMatteRed) !important;
 }
 
-#saveNewTaskButton:hover {
+.saveAndSetTaskDoneButton:hover {
     background-color: var(--matteGreen);
 }
 
-#discardNewTaskButton:hover {
-    background-color: var(--matteRed);
+.discardNewTaskButton:hover {
+    background-color: var(--matteRed) !important; 
 }
 
 #taskContainer th {
@@ -253,13 +264,20 @@ h2 {
     gap: 2rem;
 }
 
-.deu {
+.subjectColorOne {
     background-color: var(--matteGreen);
-
 }
 
-.gesch {
+.subjectColorTwo {
     background-color: var(--topMenuBackgound);
+}
+
+.subjectColorThree {
+    background-color: var(--matteRed);
+}
+
+.subjectColorFour {
+    background-color: var(--bodyBackground);
 }
 
 .blankWeekTable {

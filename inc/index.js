@@ -27,7 +27,16 @@ document.querySelector('#weekForwardButton').addEventListener('click', switchToN
 
 document.querySelectorAll('#taskContainer td').forEach((td) => {
     td.addEventListener('dblclick', makeEditable);
-})
+});
+
+document.querySelectorAll('#taskContainer td').forEach((td) => {
+    td.addEventListener('dblclick', toggleSaveAndDiscardTaskButtons);
+});
+
+document.querySelectorAll('.saveAndSetTaskDoneButton').forEach((button) => {
+    button.addEventListener('click', setTaskDone);
+});
+
 
 // on ready
 
@@ -46,7 +55,8 @@ function highlightTask(event) {
 
     document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
         if (taskRow.dataset.taskid === item.dataset.taskid) {
-            taskRow.style.backgroundColor = "var(--lightergrey)";
+            taskRow.style.backgroundColor = "blue)";
+            // taskRow.style.backgroundColor = "var(--lightergrey)";
         }
     });
 
@@ -64,12 +74,14 @@ function removeTaskHighlight(event) {
 }
 
 function showAddTaskButton(event) {
+    console.log(event.target)
+
     lessonNumber = event.target.dataset.lesson_number;
     date = event.target.parentElement.dataset.date;
 
-    if (hasLesson(event.target)) return;
-
     removeAddTaskButton();
+
+    if (hasLesson(event.target)) return;
 
     event.target.innerHTML = `<div class="addTaskButtonWrapper" data-lesson_number="${lessonNumber}" data-date="${date}"><div class="addTaskButton">+</div></div>`;
 
@@ -84,16 +96,59 @@ function removeAddTaskButton() {
     });
 }
 
-function makeEditable() {
-    console.log(event.target);
-    if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) {
+function toggleSaveAndDiscardTaskButtons(event) {
+
+    let parentTr = event.target.closest('tr');
+    let buttonTd = parentTr.querySelector('.taskDone');
+
+    if (buttonTd.querySelector('.discardNewTaskButton')) {
+        let saveTaskButton = buttonTd.querySelector('.saveAndSetTaskDoneButton');
+
+        buttonTd.querySelector('.discardNewTaskButton').style.display = 'none';
+
+        saveTaskButton.classList.add('saveAndSetTaskDoneButton');
+        saveTaskButton.removeEventListener('click', saveNewTask);
+        saveTaskButton.addEventListener('click', setTaskDone);
+
+    }
+}
+
+function makeEditable(event) {
+    if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
+
+    if (event.target.dataset.subject) {
+        event.target.innerHTML = getSubjectSelectHTML();
+        event.target.style.padding = '0';
+        event.target.addEventListener('focusout', removeEditability);
+
         return;
     }
 
     event.target.setAttribute('contenteditable', '');
     event.target.focus();
     window.getSelection().removeAllRanges();
-    event.target.addEventListener('focusout', () => event.target.removeAttribute('contenteditable'));
+    event.target.addEventListener('focusout', removeEditability);
+}
+
+function removeEditability(event) {
+
+    event.target.closest('tr').querySelectorAll('td').forEach((td) => {
+
+        // removes the lesson select and transforms td to a normal td
+        if (td.dataset.subject || event.target.dataset.subject == '') {
+
+            if (!td.firstElementChild) return;
+
+            let selection = td.firstElementChild.value;
+            td.removeAttribute('style');
+            td.innerHTML = selection;
+        }
+
+        td.removeAttribute('contenteditable');
+    });
+
+    console.log(event.target.classList.contains('saveAndSetTaskDoneButton'))
+    if (event.target.classList.contains('saveAndSetTaskDoneButton')) toggleSaveAndDiscardTaskButtons(event);
 }
 
 
@@ -106,12 +161,13 @@ function createTaskForm(item) {
     if (item.target.classList.contains('addTaskButton')) dataSource = item.target.parentElement;
 
     let taskTable = document.querySelector('#upcomingTasksTable tbody');
+    let subjectSelect = getSubjectSelectHTML();
 
     let trContent = `
         <td contenteditable data-class></td>
-        <td contenteditable data-subject></td>
+        <td data-subject style="padding: 0">${subjectSelect}</td>
         <td class="taskDescription" data-taskDescription contenteditable></td>
-        <td class="taskDone"><button id="saveNewTaskButton">&#x2714;</button><button id="discardNewTaskButton">&#x2718;</button></td>
+        <td class="taskDone"><button class="saveAndSetTaskDoneButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></td>
         `;
 
     let newTableRow = document.createElement('tr');
@@ -125,11 +181,42 @@ function createTaskForm(item) {
     tr.dataset.timeslot = dataSource.dataset.lesson_number;
     tr.innerHTML = trContent;
 
-    tr.querySelector('#saveNewTaskButton').addEventListener('click', saveNewTask);
-    tr.querySelector('#discardNewTaskButton').addEventListener('click', discardNewTask);
+    tr.querySelector('.saveAndSetTaskDoneButton').addEventListener('click', saveNewTask);
+    tr.querySelector('.discardNewTaskButton').addEventListener('click', discardNewTask);
 
     tr.firstElementChild.focus();
 
+}
+
+function getSubjectSelectHTML() {
+    //make an fetch-query to get all subject the teacher is teaching and create an select with those as options
+    //for now it is static
+
+    let allSubjects = [
+        {
+            'id': '1',
+            'subject': 'Gesch',
+            'colorCssClass': 'subjectColorOne'
+        },
+        {
+            'id': '2',
+            'subject': 'Deu',
+            'colorCssClass': 'subjectColorTwo'
+        },
+        {
+            'id': '3',
+            'subject': 'MNT',
+            'colorCssClass': 'subjectColorThree'
+        }
+    ];
+    let optionsHTML = '<option value="-" selected>   -</option>';
+
+    allSubjects.forEach((entry) => {
+        optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
+    });
+
+
+    return `<select class="lessonSelect">${optionsHTML}</select>`;
 }
 
 function saveNewTask(event) {
@@ -140,7 +227,7 @@ function saveNewTask(event) {
     let taskData = {
         'id': generateTaskId(),
         'class': form.querySelector('td[data-class]').innerText,
-        'subject': form.querySelector('td[data-subject]').innerText,
+        'subject': form.querySelector('td[data-subject] select').value,
         'date': form.dataset.date,
         'timeslot': form.dataset.timeslot,
         'description': form.querySelector('td[data-taskDescription]').innerText
@@ -152,10 +239,15 @@ function saveNewTask(event) {
     //.then => remove discard-button and reasign create-Button to use it as a setDone-Button and add taskid to the saved tr
 
     addLessonToTimetable(taskData);
+    removeEditability(event);
 }
 
 function discardNewTask(event) {
     event.target.closest('tr').remove();
+}
+
+function setTaskDone(){
+    console.log('task erledigt')
 }
 
 function addLessonToTimetable(lessonData) {
@@ -179,6 +271,7 @@ function addLessonToTimetable(lessonData) {
 
 
     timeslot.innerHTML = lessonHTML;
+    timeslot.removeEventListener('click', createTaskForm);
 
 }
 
@@ -403,7 +496,7 @@ function removeAllLessons(element) {
     })
 }
 
-function generateTaskId(){
+function generateTaskId() {
     let id;
     let lessons = document.querySelectorAll('.lesson');
     let lessonIds = [];
