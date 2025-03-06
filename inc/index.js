@@ -41,6 +41,23 @@ document.addEventListener('DOMContentLoaded', setCalendarWeek);
 document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
 
 
+const allSubjects = [
+        {
+            'id': '1',
+            'subject': 'Gesch',
+            'colorCssClass': 'subjectColorOne'
+        },
+        {
+            'id': '2',
+            'subject': 'Deu',
+            'colorCssClass': 'subjectColorTwo'
+        },
+        {
+            'id': '3',
+            'subject': 'MNT',
+            'colorCssClass': 'subjectColorThree'
+        }
+    ];
 
 
 //HIGHLIGHTING AND TOGGLING STUFF
@@ -70,7 +87,6 @@ function removeTaskHighlight(event) {
 }
 
 function makeEditable(event) {
-    console.log('called')
     if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
 
     if (event.target.dataset.subject) {
@@ -98,7 +114,6 @@ function removeEditability(item) {
 
     item.closest('tr').querySelectorAll('td').forEach((td) => {
 
-        console.log(td.dataset.subject == "");
         // removes the lesson select and transforms td to a normal td
         if (td.dataset.subject || item.dataset.subject == '') {
 
@@ -148,31 +163,13 @@ function createTaskForm(item) {
 
 function getSubjectSelectHTML() {
     //make an fetch-query to get all subject the teacher is teaching and create an select with those as options
-    //for now it is static
+    //for now it is static and stored in the global const allSubjects
 
-    let allSubjects = [
-        {
-            'id': '1',
-            'subject': 'Gesch',
-            'colorCssClass': 'subjectColorOne'
-        },
-        {
-            'id': '2',
-            'subject': 'Deu',
-            'colorCssClass': 'subjectColorTwo'
-        },
-        {
-            'id': '3',
-            'subject': 'MNT',
-            'colorCssClass': 'subjectColorThree'
-        }
-    ];
     let optionsHTML = '<option value="-" selected>   -</option>';
 
     allSubjects.forEach((entry) => {
         optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
     });
-
 
     return `<select class="lessonSelect">${optionsHTML}</select>`;
 }
@@ -198,9 +195,8 @@ function saveNewTask(item) {
     //send this stuff to the backend via fetch-API
     //.then => remove discard-button and reasign create-Button to use it as a setDone-Button and add taskid to the saved tr
 
-    console.log(classTd);
-
     //apply changes to datasets
+    form.dataset.taskid = taskData.id;
     classTd.dataset.class = form.querySelector('td[data-class]').innerText;
     subjectTd.dataset.subject = subjectTd.querySelector('select').value;
 
@@ -219,8 +215,6 @@ function updateTask(item) {
 
     let classTd = form.querySelector('td[data-class]');
     let subjectTd = form.querySelector('td[data-subject]');
-
-    console.log(classTd);
 
     //apply changes to datasets
     classTd.dataset.class = form.querySelector('td[data-class]').innerText;
@@ -251,7 +245,7 @@ function updateTask(item) {
     removeEditability(item);
     removeDiscardButton(item);
     saveTaskToSetDoneButton(item);
-
+    updateLessonOnTimetable(taskData);
 }
 
 function discardNewTask(item) {
@@ -271,8 +265,9 @@ function addLessonToTimetable(lessonData) {
 
     let weekday;
     let timeslot;
+    let cssClass = getLessonColorCssClass(lessonData);
     let lessonHTML = `
-        <div class="lesson ${lessonData.subject}" data-taskid="${lessonData.id}">${lessonData.class} ${lessonData.subject}</div>
+        <div class="lesson ${cssClass}" data-taskid="${lessonData.id}">${lessonData.class} ${lessonData.subject}</div>
     `;
 
     document.querySelectorAll('.weekday').forEach((day) => {
@@ -284,11 +279,24 @@ function addLessonToTimetable(lessonData) {
 
 
     timeslot.innerHTML = lessonHTML;
+    
     timeslot.removeEventListener('click', createTaskForm);
-
+    timeslot.firstElementChild.addEventListener('mouseover', highlightTask);
+    timeslot.firstElementChild.addEventListener('mouseout', removeTaskHighlight);
 }
 
+function updateLessonOnTimetable(lessonData) {
+    document.querySelectorAll('.lesson').forEach((lesson) => {
+        if (lesson.dataset.taskid == lessonData.id){
+            let cssColorClass = getLessonColorCssClass(lessonData);
 
+            lesson.removeAttribute('class');
+            lesson.classList.add('lesson');
+            lesson.classList.add(cssColorClass);
+            lesson.innerText = `${lessonData.class} ${lessonData.subject}`;
+        }
+    })
+}
 
 // BUTTONS!!!
 
@@ -569,4 +577,14 @@ function generateTaskId() {
     })
 
     return Math.max(...lessonIds) + 1; //adds 1 to the highest existing lesson id
+}
+
+function getLessonColorCssClass(lessonData){
+    let lessonColorCssClass;
+
+    allSubjects.forEach((subject) => {
+        if (subject.subject == lessonData.subject) lessonColorCssClass = subject.colorCssClass;
+    })
+
+    return lessonColorCssClass;
 }
