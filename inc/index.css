@@ -197,20 +197,26 @@ main {}
     font-size: 1rem;
 }
 
-.saveAndSetTaskDoneButton {
+.saveNewTaskButton,
+.updateTaskButton,
+.setTaskDoneButton {
     background-color: var(--lightMatteGreen);
     margin-right: 0.5rem;
 }
 
-.discardNewTaskButton {
+.discardNewTaskButton,
+.discardUpdateTaskButton {
     background-color: var(--lightMatteRed) !important;
 }
 
-.saveAndSetTaskDoneButton:hover {
+.saveNewTaskButton:hover,
+.updateTaskButton:hover
+.setTaskDoneButton:hover {
     background-color: var(--matteGreen);
 }
 
-.discardNewTaskButton:hover {
+.discardNewTaskButton:hover,
+.discardUpdateTaskButton:hover {
     background-color: var(--matteRed) !important; 
 }
 
