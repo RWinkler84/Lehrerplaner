@@ -147,6 +147,11 @@ main {}
     border-spacing: 0;
 }
 
+#upcomingTasksTable tbody tr:hover,
+#inProgressTasksTable tbody tr:hover {
+    background-color: var(--lightergrey);
+}
+
 #upcomingTasksTable td,
 #inProgressTasksTable td,
 #upcomingTasksTable th,

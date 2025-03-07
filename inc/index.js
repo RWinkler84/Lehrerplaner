@@ -1,4 +1,4 @@
-// handlers for lesson fields and weekOverview
+// handlers for highlighting tasks and lessonfields
 document.querySelectorAll('.lesson').forEach((element) => {
     element.addEventListener('mouseover', highlightTask);
 });
@@ -6,6 +6,15 @@ document.querySelectorAll('.lesson').forEach((element) => {
 document.querySelectorAll('.lesson').forEach((element) => {
     element.addEventListener('mouseout', removeTaskHighlight);
 });
+
+document.querySelectorAll('tr[data-taskid]').forEach((element) => {
+    element.addEventListener('mouseover', hightlightLesson);
+});
+
+document.querySelectorAll('tr[data-taskid]').forEach((element) => {
+    element.addEventListener('mouseout', removeLessonHighlight);
+});
+
 
 // handlers for empty timeslots
 
@@ -17,6 +26,7 @@ document.querySelectorAll('.timeslot').forEach((element) => {
     if (hasLesson(element)) return;
     element.addEventListener('click', createTaskForm);
 });
+
 
 // handlers for switching between weeks
 
@@ -42,22 +52,22 @@ document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
 
 
 const allSubjects = [
-        {
-            'id': '1',
-            'subject': 'Gesch',
-            'colorCssClass': 'subjectColorOne'
-        },
-        {
-            'id': '2',
-            'subject': 'Deu',
-            'colorCssClass': 'subjectColorTwo'
-        },
-        {
-            'id': '3',
-            'subject': 'MNT',
-            'colorCssClass': 'subjectColorThree'
-        }
-    ];
+    {
+        'id': '1',
+        'subject': 'Gesch',
+        'colorCssClass': 'subjectColorOne'
+    },
+    {
+        'id': '2',
+        'subject': 'Deu',
+        'colorCssClass': 'subjectColorTwo'
+    },
+    {
+        'id': '3',
+        'subject': 'MNT',
+        'colorCssClass': 'subjectColorThree'
+    }
+];
 
 
 //HIGHLIGHTING AND TOGGLING STUFF
@@ -68,8 +78,7 @@ function highlightTask(event) {
 
     document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
         if (taskRow.dataset.taskid === item.dataset.taskid) {
-            taskRow.style.backgroundColor = "blue)";
-            taskRow.style.backgroundColor = "var(--lightergrey)";
+            taskRow.style.backgroundColor = 'var(--lightergrey)';
         }
     });
 
@@ -84,6 +93,28 @@ function removeTaskHighlight(event) {
             taskRow.style.backgroundColor = "var(--contentContainerBackground)";
         }
     });
+}
+
+function hightlightLesson(event) {
+    let taskId = event.target.closest('tr').dataset.taskid;
+    console.log(taskId);
+
+    document.querySelectorAll('.lesson').forEach((lesson) => {
+
+        if (lesson.dataset.taskid == taskId) {
+            lesson.style.fontWeight = 'bold';
+            lesson.style.translate = '-1px -1px';
+        }
+    })
+}
+
+function removeLessonHighlight(event) {
+    let taskId = event.target.closest('tr').dataset.taskid;
+
+    document.querySelectorAll('.lesson').forEach((lesson) => {
+
+        if (lesson.dataset.taskid == taskId) lesson.removeAttribute('style');
+    })
 }
 
 function makeEditable(event) {
@@ -279,7 +310,7 @@ function addLessonToTimetable(lessonData) {
 
 
     timeslot.innerHTML = lessonHTML;
-    
+
     timeslot.removeEventListener('click', createTaskForm);
     timeslot.firstElementChild.addEventListener('mouseover', highlightTask);
     timeslot.firstElementChild.addEventListener('mouseout', removeTaskHighlight);
@@ -287,7 +318,7 @@ function addLessonToTimetable(lessonData) {
 
 function updateLessonOnTimetable(lessonData) {
     document.querySelectorAll('.lesson').forEach((lesson) => {
-        if (lesson.dataset.taskid == lessonData.id){
+        if (lesson.dataset.taskid == lessonData.id) {
             let cssColorClass = getLessonColorCssClass(lessonData);
 
             lesson.removeAttribute('class');
@@ -579,7 +610,7 @@ function generateTaskId() {
     return Math.max(...lessonIds) + 1; //adds 1 to the highest existing lesson id
 }
 
-function getLessonColorCssClass(lessonData){
+function getLessonColorCssClass(lessonData) {
     let lessonColorCssClass;
 
     allSubjects.forEach((subject) => {
