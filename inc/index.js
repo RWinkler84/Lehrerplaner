@@ -69,6 +69,8 @@ const allSubjects = [
     }
 ];
 
+let taskDataBackupObject = {};
+
 
 //HIGHLIGHTING AND TOGGLING STUFF
 
@@ -90,14 +92,13 @@ function removeTaskHighlight(event) {
 
     document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
         if (taskRow.dataset.taskid === item.dataset.taskid) {
-            taskRow.style.backgroundColor = "var(--contentContainerBackground)";
+            taskRow.removeAttribute('style');
         }
     });
 }
 
 function hightlightLesson(event) {
     let taskId = event.target.closest('tr').dataset.taskid;
-    console.log(taskId);
 
     document.querySelectorAll('.lesson').forEach((lesson) => {
 
@@ -120,23 +121,27 @@ function removeLessonHighlight(event) {
 function makeEditable(event) {
     if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
 
-    if (event.target.dataset.subject) {
-        event.target.innerHTML = getSubjectSelectHTML();
-        event.target.style.padding = '0';
-        event.target.addEventListener('focusout', removeEditability);
+    backUpTaskData(event);
+    
+    let parentTr = event.target.closest('tr');
+
+    parentTr.querySelectorAll('td:not(.taskDone)').forEach((td) => {
+
+    if (td.dataset.subject) {
+        td.innerHTML = getSubjectSelectHTML(event);
+        td.style.padding = '0';
+        // td.addEventListener('focusout', removeEditability);
         createSaveAndDiscardChangesButton(event);
-
-
-        return;
     }
 
-    event.target.setAttribute('contenteditable', '');
+    td.setAttribute('contenteditable', '');
+
     event.target.focus();
+    // td.addEventListener('focusout', removeEditability);
+    });
+
     window.getSelection().removeAllRanges();
-
     createSaveAndDiscardChangesButton(event);
-
-    event.target.addEventListener('focusout', removeEditability);
 }
 
 function removeEditability(item) {
@@ -146,12 +151,15 @@ function removeEditability(item) {
     item.closest('tr').querySelectorAll('td').forEach((td) => {
 
         // removes the lesson select and transforms td to a normal td
+
         if (td.dataset.subject || item.dataset.subject == '') {
+
+            td.removeAttribute('style');
+            td.removeAttribute('contenteditable');
 
             if (!td.firstElementChild) return;
 
             let selection = td.firstElementChild.value;
-            td.removeAttribute('style');
             td.innerHTML = selection;
         }
 
@@ -192,14 +200,26 @@ function createTaskForm(item) {
     tr.firstElementChild.focus();
 }
 
-function getSubjectSelectHTML() {
+function getSubjectSelectHTML(event = undefined) {
     //make an fetch-query to get all subject the teacher is teaching and create an select with those as options
     //for now it is static and stored in the global const allSubjects
+    let previouslySelected;
+    let optionsHTML;
+    let selected = '';
 
-    let optionsHTML = '<option value="-" selected>   -</option>';
+    //was something pre-selected or is it for a new Task form?
+    //if something was preselected, set the corresponding option to selected
+    if (event) previouslySelected = event.target.closest('tr').querySelector('td[data-subject]').dataset.subject;
+
+    previouslySelected == '-'
+        ? optionsHTML = '<option value="-" selected>-</option>'
+        : optionsHTML = '<option value="-">-</option>'; 
+
 
     allSubjects.forEach((entry) => {
-        optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
+        entry.subject == previouslySelected ? selected = 'selected' : selected = '';
+
+        optionsHTML += `<option value="${entry.subject}" ${selected}>${entry.subject}</option>`;
     });
 
     return `<select class="lessonSelect">${optionsHTML}</select>`;
@@ -237,6 +257,8 @@ function saveNewTask(item) {
     saveTaskToSetDoneButton(item);
 
     form.querySelectorAll('td').forEach((td) => { td.addEventListener('dblclick', makeEditable) });
+    form.addEventListener('mouseover', hightlightLesson);
+    form.addEventListener('mouseout', removeLessonHighlight);
 }
 
 function updateTask(item) {
@@ -281,6 +303,17 @@ function updateTask(item) {
 
 function discardNewTask(item) {
     item.closest('tr').remove();
+}
+
+function revertChanges(item) {
+    let parentTr = item.closest('tr');
+    let taskId = parentTr.dataset.taskid;
+
+    parentTr.querySelector('td[data-class]').innerText = taskDataBackupObject[taskId].class;
+    parentTr.querySelector('td[data-subject]').innerText = taskDataBackupObject[taskId].subject;
+    parentTr.querySelector('td[data-taskDescription]').innerText = taskDataBackupObject[taskId].description;
+    removeEditability(item);
+    removeDiscardButton(item);
 }
 
 function setTaskDone(item) {
@@ -366,7 +399,8 @@ function createSaveAndDiscardChangesButton(event) {
 
 function removeDiscardButton(item) {
     item = item.target ? item.target : item;
-    item.nextSibling.remove()
+
+    item.classList.contains('discardUpdateTaskButton') ? item.remove() : item.nextSibling.remove()
 
 }
 
@@ -618,4 +652,26 @@ function getLessonColorCssClass(lessonData) {
     })
 
     return lessonColorCssClass;
+}
+
+function backUpTaskData(event) {
+
+    let parentTr = event.target.closest('tr');
+    let taskId = parentTr.dataset.taskid;
+    let taskClass = parentTr.querySelector('td[data-class]').innerText;
+    let taskDescription = parentTr.querySelector('td[data-taskDescription]').innerText;
+    let taskSubject = parentTr.querySelector('td[data-subject]').innerText;
+
+    
+    if (parentTr.querySelector('td[data-subject] select')){
+        taskSubject = parentTr.querySelector('td[data-subject] select').value;
+    }
+
+    taskDataBackupObject[taskId] = {
+        'class': taskClass,
+        'subject': taskSubject,
+        'description': taskDescription
+    }
+
+    console.log(taskDataBackupObject);
 }

@@ -195,7 +195,7 @@ main {}
 .lessonSelect {
     appearance: none;
     border: none;
-    background-color: var(--contentContainerBackground);
+    background-color: transparent;
     width: 100%;
     height: 100%;
     padding: 0.5rem 1rem;
@@ -294,6 +294,11 @@ h2 {
 .blankWeekTable {
     background-color: var(--contentContainerBackground);
     transition: all 0.3s ease-out;
+}
+
+.undefined {
+    border: solid 1px var(--bodyBackground);
+    color: var(--bodyBackground);
 }
 
 
