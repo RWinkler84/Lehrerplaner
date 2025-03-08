@@ -17,7 +17,6 @@ document.querySelectorAll('.timeslot').forEach((element) => {
 });
 
 document.querySelectorAll('.timeslot').forEach((element) => {
-    if (hasLesson(element)) return;
     element.addEventListener('click', createTaskForm);
 });
 
@@ -309,6 +308,8 @@ function fillTimetableWithLessons() {
     document.querySelectorAll('.lesson').forEach((lesson) => {
         lesson.addEventListener('mouseover', highlightTask);
         lesson.addEventListener('mouseout', removeTaskHighlight);
+        lesson.parentElement.removeEventListener('mouseenter', showAddTaskButton);
+        lesson.parentElement.removeEventListener('click', createTaskForm);
     });
     //synchronize lessons with tasks
 
@@ -337,6 +338,10 @@ function createTaskForm(item) {
     let dataSource = item.target;
 
     if (item.target.classList.contains('addTaskButton')) dataSource = item.target.parentElement;
+
+    console.log(dataSource);
+
+    dataSource.parentElement.removeEventListener('click', createTaskForm); //prevent creation of another task form
 
     let taskTable = document.querySelector('#upcomingTasksTable tbody');
     let subjectSelect = getSubjectSelectHTML();
@@ -464,6 +469,13 @@ function updateTask(item) {
 }
 
 function discardNewTask(item) {
+    let data = {
+        'date': item.closest('tr').dataset.date,
+        'timeslot': item.closest('tr').dataset.timeslot
+    }
+    let timeslot = getTimeslotOfLesson(data);
+
+    timeslot.addEventListener('click', createTaskForm);
     item.closest('tr').remove();
 }
 
