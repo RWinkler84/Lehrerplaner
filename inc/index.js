@@ -1,11 +1,5 @@
 // handlers for highlighting tasks and lessonfields
-document.querySelectorAll('.lesson').forEach((element) => {
-    element.addEventListener('mouseover', highlightTask);
-});
 
-document.querySelectorAll('.lesson').forEach((element) => {
-    element.addEventListener('mouseout', removeTaskHighlight);
-});
 
 document.querySelectorAll('tr[data-taskid]').forEach((element) => {
     element.addEventListener('mouseover', hightlightLesson);
@@ -49,7 +43,9 @@ document.querySelectorAll('#taskContainer td').forEach((td) => {
 document.addEventListener('DOMContentLoaded', setDateForWeekdays);
 document.addEventListener('DOMContentLoaded', setCalendarWeek);
 document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
+document.addEventListener('DOMContentLoaded', fillTimetableWithLessons);
 
+//DATABASE FOR STRUCTURE TESTING
 
 const allSubjects = [
     {
@@ -66,6 +62,119 @@ const allSubjects = [
         'id': '3',
         'subject': 'MNT',
         'colorCssClass': 'subjectColorThree'
+    }
+];
+
+let allTasksArray = [
+    {
+        'id': 1,
+        'date': '',
+        'timeslot': '',
+        'class': '6A',
+        'subject': 'Deu',
+        'description': 'die Schafe hüten',
+        'status': 'open',
+        'fixedTime': false
+    },
+    {
+        'id': 2,
+        'date': '',
+        'timeslot': '',
+        'class': '7B',
+        'subject': 'Deu',
+        'description': 'den Klassenraum streichen',
+        'status': 'open',
+        'fixedTime': false
+    },
+    {
+        'id': 3,
+        'date': '2025-03-04',
+        'timeslot': '3',
+        'class': '6B',
+        'subject': 'Gesch',
+        'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
+        'status': 'open',
+        'fixedTime': true
+    },
+    {
+        'id': 4,
+        'date': '2025-03-06',
+        'timeslot': '5',
+        'class': '7A',
+        'subject': 'Gesch',
+        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+        'status': 'open',
+        'fixedTime': false
+    },
+    {
+        'id': 5,
+        'date': '2025-03-10',
+        'timeslot': '2',
+        'class': '7A',
+        'subject': 'Gesch',
+        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+        'status': 'open',
+        'fixedTime': false
+    },
+    {
+        'id': 6,
+        'date': '2025-03-13',
+        'timeslot': '5',
+        'class': '7A',
+        'subject': 'Gesch',
+        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+        'status': 'open',
+        'fixedTime': true
+    }
+];
+
+let standardTimetable = [
+    {
+        'class': '7B',
+        'subject': 'Deu',
+        'weekdayNumber': 1,
+        'timeslot': 3
+    },
+    {
+        'class': '6A',
+        'subject': 'Gesch',
+        'weekdayNumber': 2,
+        'timeslot': 2
+    },
+    {
+        'class': '7B',
+        'subject': 'Deu',
+        'weekdayNumber': 4,
+        'timeslot': 3
+    }, {
+        'class': '7A',
+        'subject': 'Gesch',
+        'weekdayNumber': 4,
+        'timeslot': 5
+    }
+];
+
+let timetableChanges = [
+    {
+        'date': '2025-03-06',
+        'timeslot': '5',
+        'class': '7A',
+        'subject': 'Gesch',
+        'status': 'canceled',
+    },
+    {
+        'date': '2025-03-7',
+        'timeslot': '5',
+        'class': '5B',
+        'subject': 'MNT',
+        'status': 'sub',
+    },
+    {
+        'date': '2025-03-11',
+        'timeslot': '5',
+        'class': '5B',
+        'subject': 'MNT',
+        'status': 'sub',
     }
 ];
 
@@ -122,22 +231,22 @@ function makeEditable(event) {
     if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
 
     backUpTaskData(event);
-    
+
     let parentTr = event.target.closest('tr');
 
     parentTr.querySelectorAll('td:not(.taskDone)').forEach((td) => {
 
-    if (td.dataset.subject) {
-        td.innerHTML = getSubjectSelectHTML(event);
-        td.style.padding = '0';
+        if (td.dataset.subject) {
+            td.innerHTML = getSubjectSelectHTML(event);
+            td.style.padding = '0';
+            // td.addEventListener('focusout', removeEditability);
+            createSaveAndDiscardChangesButton(event);
+        }
+
+        td.setAttribute('contenteditable', '');
+
+        event.target.focus();
         // td.addEventListener('focusout', removeEditability);
-        createSaveAndDiscardChangesButton(event);
-    }
-
-    td.setAttribute('contenteditable', '');
-
-    event.target.focus();
-    // td.addEventListener('focusout', removeEditability);
     });
 
     window.getSelection().removeAllRanges();
@@ -167,6 +276,59 @@ function removeEditability(item) {
     });
 }
 
+//FILLING THE LESSON AND TASK TABLES
+
+function fillTimetableWithLessons() {
+
+    //add standard lessons
+    standardTimetable.forEach((lesson) => {
+
+        let timeslot = getTimeslotOfLesson(lesson);
+        let cssClass = getLessonColorCssClass(lesson);
+
+        timeslot.innerHTML = `<div class="lesson ${cssClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
+
+    });
+
+    //reflect timetable changes
+    timetableChanges.forEach((lesson) => {
+        if (!isDateInCurrentWeek(lesson.date)) return;
+
+        let timeslot = getTimeslotOfLesson(lesson);
+
+        if (lesson.status == 'sub') {
+            let cssClass = getLessonColorCssClass(lesson);
+            timeslot.innerHTML = `<div class="lesson ${cssClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
+        }
+
+        if (lesson.status == 'canceled'){
+            timeslot.firstElementChild.classList.add('canceled');
+        }
+    })
+
+    document.querySelectorAll('.lesson').forEach((lesson) => {
+        lesson.addEventListener('mouseover', highlightTask);
+        lesson.addEventListener('mouseout', removeTaskHighlight);
+    });
+    //synchronize lessons with tasks
+
+}
+
+function getAllOpenTasks() {
+
+}
+
+function fillUpcomingTasksTable() {
+
+}
+
+function getAllInProgressTasks() {
+
+}
+
+function fillInProgressTaskTable() {
+
+}
 
 // HANDLING TASKS
 
@@ -194,7 +356,7 @@ function createTaskForm(item) {
 
     tr.dataset.taskid = '';
     tr.dataset.date = dataSource.dataset.date;
-    tr.dataset.timeslot = dataSource.dataset.lesson_number;
+    tr.dataset.timeslot = dataSource.dataset.timeslot;
     tr.innerHTML = trContent;
 
     tr.firstElementChild.focus();
@@ -213,7 +375,7 @@ function getSubjectSelectHTML(event = undefined) {
 
     previouslySelected == '-'
         ? optionsHTML = '<option value="-" selected>-</option>'
-        : optionsHTML = '<option value="-">-</option>'; 
+        : optionsHTML = '<option value="-">-</option>';
 
 
     allSubjects.forEach((entry) => {
@@ -323,30 +485,24 @@ function setTaskDone(item) {
 
 function addLessonToTimetable(lessonData) {
     let lessonDate = lessonData.date;
-    let lessonNumber = lessonData.timeslot
+    let timeslot = lessonData.timeslot
 
     if (!isDateInCurrentWeek(lessonDate)) return;
 
-    let weekday;
-    let timeslot;
+    let timetableTimeslot;
     let cssClass = getLessonColorCssClass(lessonData);
     let lessonHTML = `
         <div class="lesson ${cssClass}" data-taskid="${lessonData.id}">${lessonData.class} ${lessonData.subject}</div>
     `;
 
-    document.querySelectorAll('.weekday').forEach((day) => {
-        if (day.dataset.date == lessonDate) weekday = day;
-    })
-    weekday.querySelectorAll('.timeslot').forEach((slot) => {
-        if (slot.dataset.lesson_number == lessonNumber) timeslot = slot;
-    });
+    timetableTimeslot = getTimeslotOfLesson(lessonData);
 
 
-    timeslot.innerHTML = lessonHTML;
+    timetableTimeslot.innerHTML = lessonHTML;
 
-    timeslot.removeEventListener('click', createTaskForm);
-    timeslot.firstElementChild.addEventListener('mouseover', highlightTask);
-    timeslot.firstElementChild.addEventListener('mouseout', removeTaskHighlight);
+    timetableTimeslot.removeEventListener('click', createTaskForm);
+    timetableTimeslot.firstElementChild.addEventListener('mouseover', highlightTask);
+    timetableTimeslot.firstElementChild.addEventListener('mouseout', removeTaskHighlight);
 }
 
 function updateLessonOnTimetable(lessonData) {
@@ -366,14 +522,14 @@ function updateLessonOnTimetable(lessonData) {
 
 function showAddTaskButton(event) {
 
-    lessonNumber = event.target.dataset.lesson_number;
+    timeslot = event.target.dataset.timeslot;
     date = event.target.parentElement.dataset.date;
 
     removeAddTaskButton();
 
     if (hasLesson(event.target)) return;
 
-    event.target.innerHTML = `<div class="addTaskButtonWrapper" data-lesson_number="${lessonNumber}" data-date="${date}"><div class="addTaskButton">+</div></div>`;
+    event.target.innerHTML = `<div class="addTaskButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addTaskButton">+</div></div>`;
 
 }
 
@@ -476,7 +632,7 @@ function switchToPreviousWeek() {
     });
 
     setWeekStartAndEndDate();
-    calcCalendarWeek(false)
+    calcCalendarWeek(false);
 }
 
 function switchToNextWeek() {
@@ -493,7 +649,7 @@ function switchToNextWeek() {
     });
 
     setWeekStartAndEndDate();
-    calcCalendarWeek(true)
+    calcCalendarWeek(true);
 }
 
 function calcCalendarWeek(countUp = true) {
@@ -550,7 +706,23 @@ function runWeekSwitchAnimation(nextWeek = true) {
         blankWeekTable.remove()
         weekOverview.style.left = 'auto';
         removeAllLessons(weekOverview);
+        fillTimetableWithLessons();
+
+        weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
+            lesson.style.opacity = '0';
+            lesson.style.transition = 'all 0.2s ease-out';
+        });
     }, 350);
+
+    setTimeout(() => {weekOverview.querySelectorAll('.lesson').forEach((lesson)=> {
+        lesson.style.opacity = '1';
+    });
+    }, 360 );
+
+    setTimeout(() => {weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
+        lesson.removeAttribute('style');
+    });
+    }, 560);
 }
 
 function cancelWeekSwitchAnimation() {
@@ -559,6 +731,7 @@ function cancelWeekSwitchAnimation() {
         document.querySelector('#weekOverview').style.left = 'auto';
     }
 }
+
 
 // HELPER FUNCTIONS
 
@@ -654,6 +827,32 @@ function getLessonColorCssClass(lessonData) {
     return lessonColorCssClass;
 }
 
+function getTimeslotOfLesson(lessonData) {
+
+    let allWeekdays = document.querySelectorAll('.weekday');
+    let weekday;
+    let timeslot;
+
+    if (!lessonData.date) {
+        allWeekdays.forEach((day) => { if (day.dataset.weekday_number == lessonData.weekdayNumber) weekday = day });
+        weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lessonData.timeslot) timeslot = slot });
+
+        return timeslot;
+    }
+
+    allWeekdays.forEach((day) => {
+        let dateOfWeekday = new Date(day.dataset.date)
+        let dateOfLesson = new Date(lessonData.date);
+        dateOfLesson.setHours(0, 0, 0, 0);
+
+        if (dateOfWeekday.getTime() == dateOfLesson.getTime()) weekday = day;
+    });
+
+    weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lessonData.timeslot) timeslot = slot; });
+
+    return timeslot;
+}
+
 function backUpTaskData(event) {
 
     let parentTr = event.target.closest('tr');
@@ -662,8 +861,8 @@ function backUpTaskData(event) {
     let taskDescription = parentTr.querySelector('td[data-taskDescription]').innerText;
     let taskSubject = parentTr.querySelector('td[data-subject]').innerText;
 
-    
-    if (parentTr.querySelector('td[data-subject] select')){
+
+    if (parentTr.querySelector('td[data-subject] select')) {
         taskSubject = parentTr.querySelector('td[data-subject] select').value;
     }
 
@@ -672,6 +871,4 @@ function backUpTaskData(event) {
         'subject': taskSubject,
         'description': taskDescription
     }
-
-    console.log(taskDataBackupObject);
 }

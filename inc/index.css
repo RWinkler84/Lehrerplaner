@@ -301,6 +301,11 @@ h2 {
     color: var(--bodyBackground);
 }
 
+.canceled {
+    background-color: var(--lightergrey);
+    color: var(--lightgrey);
+}
+
 
 /* responsiveness */
 
