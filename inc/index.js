@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', setDateForWeekdays);
 document.addEventListener('DOMContentLoaded', setCalendarWeek);
 document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
 document.addEventListener('DOMContentLoaded', fillTimetableWithLessons);
+document.addEventListener('DOMContentLoaded', fillUpcomingTasksTable);
 
 //DATABASE FOR STRUCTURE TESTING
 
@@ -316,11 +317,50 @@ function fillTimetableWithLessons() {
 }
 
 function getAllOpenTasks() {
+    let openTasks = [];
 
+    allTasksArray.forEach((task) => {
+        if (task.status == 'open') openTasks.push(task);
+    })
+
+    return openTasks;
 }
 
 function fillUpcomingTasksTable() {
+    let allUpcomingTasks = getAllOpenTasks();
+    let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
+    let taskTrHTML = '';
 
+    if (allUpcomingTasks.length == 0){
+        document.querySelector('td[data-noEntriesFound]').style.display = 'table-cell';
+        return;
+    }
+
+    allUpcomingTasks.forEach((task) => {
+
+        taskTrHTML += `
+            <tr data-taskid="${task.id}">
+                <td data-class="${task.class}">${task.class}</td>
+                <td data-subject="${task.subject}">${task.subject}</td>
+                <td class="taskDescription" data-taskDescription="">${task.description}</td>
+                <td class="taskDone"><button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button></td>
+            </tr>
+        `;
+    });
+
+    upcomingTasksTableBody.innerHTML = taskTrHTML;
+
+    /*
+                        <tr data-taskid="4">
+                            <td data-class="7A">7A</td>
+                            <td data-subject="Gesch">Gesch</td>
+                            <td class="taskDescription" data-taskDescription="">Napoleon war ein kleiner Mann...
+                            </td>
+                            <td class="taskDone"><button class="setTaskDoneButton"
+                                    onclick="setTaskDone(this)">&#x2714;</button></td>
+                        </tr>
+
+    */
 }
 
 function getAllInProgressTasks() {
@@ -586,13 +626,14 @@ function setCalendarWeek() {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = 1;
     let currentYear = new Date().getFullYear();
-    let referenceDate = new Date().getTime();
+    let referenceDate = new Date().setHours(0,0,0,0);
     let firstThursday = getFirstThirsdayOfTheYear(currentYear);
     let monday = firstThursday - 86400000 * 3
     let sunday = firstThursday + 86400000 * 3;
 
     //checks, if the reference date lies in the current week. if not, tests against the next week
     while (monday < referenceDate && sunday < referenceDate) {
+
 
         monday += 86400000 * 7; // + 7 days
         sunday += 86400000 * 7; // + 7 days
@@ -607,8 +648,14 @@ function setDateForWeekdays() {
     let todayUnix = new Date().setHours(0, 0, 0);
     let today = new Date;
 
+     //if sunday, reset date to sunday of previous week to prevent early week change
+    if (today.getDay() == 0) todayUnix -= 86400000 * 7;
+
     document.querySelectorAll('.weekday').forEach((weekday) => {
         let dateDifference = weekday.dataset.weekday_number - today.getDay();
+
+        if (dateDifference == 0) dateDifference = 7;
+
         let weekdayDateUnix = todayUnix + (dateDifference * 86400000);    // 86400000 = ms/day
         let weekdayDateString = new Date(weekdayDateUnix).toString();
 
@@ -621,7 +668,7 @@ function setWeekStartAndEndDate() {
     let startDateSpan = document.querySelector('#weekStartDate');
     let endDateSpan = document.querySelector('#weekEndDate');
     let mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
-    let sundayDate = document.querySelector('.weekday[data-weekday_number="7"]').dataset.date;
+    let sundayDate = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
     mondayDate = new Date(mondayDate);
     sundayDate = new Date(sundayDate);
@@ -668,10 +715,9 @@ function calcCalendarWeek(countUp = true) {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = document.querySelector('#calendarWeekCounter').innerText;
 
-    let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
-    let sundayDate = new Date(document.querySelector('.weekday[data-weekday_number="7"]').dataset.date);
+    let thursdayDate = new Date(document.querySelector('.weekday[data-weekday_number="4"]').dataset.date);
 
-    let weeksPerYear = getNumberOfWeeksPerYear(mondayDate.getFullYear());
+    let weeksPerYear = getNumberOfWeeksPerYear(thursdayDate.getFullYear());
 
     countUp ? weekCounter++ : weekCounter--;
 
@@ -766,7 +812,7 @@ function hasLesson(element) {
 function isDateInCurrentWeek(date) {
     let dateToTest = new Date(date);
     let monday = new Date(document.querySelector('div[data-weekday_number="1"]').dataset.date);
-    let sunday = new Date(document.querySelector('div[data-weekday_number="7"]').dataset.date);
+    let sunday = new Date(document.querySelector('div[data-weekday_number="0"]').dataset.date);
 
     if (monday <= dateToTest && dateToTest <= sunday) return true;
 
