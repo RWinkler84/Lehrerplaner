@@ -1,6 +1,5 @@
 // handlers for highlighting tasks and lessonfields
 
-
 document.querySelectorAll('tr[data-taskid]').forEach((element) => {
     element.addEventListener('mouseover', hightlightLesson);
 });
@@ -13,11 +12,11 @@ document.querySelectorAll('tr[data-taskid]').forEach((element) => {
 // handlers for empty timeslots
 
 document.querySelectorAll('.timeslot').forEach((element) => {
-    element.addEventListener('mouseenter', showAddTaskButton);
+    element.addEventListener('mouseenter', showAddLessonButton);
 });
 
 document.querySelectorAll('.timeslot').forEach((element) => {
-    element.addEventListener('click', createTaskForm);
+    element.addEventListener('click', createLessonForm);
 });
 
 
@@ -47,7 +46,8 @@ document.addEventListener('DOMContentLoaded', fillUpcomingTasksTable);
 
 //DATABASE FOR STRUCTURE TESTING
 
-const allSubjects = [
+
+export const allSubjects = [
     {
         'id': '1',
         'subject': 'Gesch',
@@ -65,120 +65,11 @@ const allSubjects = [
     }
 ];
 
-let allTasksArray = [
-    {
-        'id': 1,
-        'date': '2025-03-11',
-        'timeslot': '2',
-        'class': '6A',
-        'subject': 'Gesch',
-        'description': 'die Schafe hüten',
-        'status': 'open',
-        'fixedTime': false
-    },
-    {
-        'id': 2,
-        'date': '2025-02-10',
-        'timeslot': '3',
-        'class': '7B',
-        'subject': 'Deu',
-        'description': 'den Klassenraum streichen',
-        'status': 'open',
-        'fixedTime': false
-    },
-    {
-        'id': 3,
-        'date': '2025-03-18',
-        'timeslot': '2',
-        'class': '6A',
-        'subject': 'Gesch',
-        'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
-        'status': 'open',
-        'fixedTime': true
-    },
-    {
-        'id': 4,
-        'date': '2025-03-06',
-        'timeslot': '5',
-        'class': '7A',
-        'subject': 'Gesch',
-        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-        'status': 'open',
-        'fixedTime': false
-    },
-    {
-        'id': 5,
-        'date': '2025-03-10',
-        'timeslot': '2',
-        'class': '7A',
-        'subject': 'Gesch',
-        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-        'status': 'open',
-        'fixedTime': false
-    },
-    {
-        'id': 6,
-        'date': '2025-03-13',
-        'timeslot': '5',
-        'class': '7A',
-        'subject': 'Gesch',
-        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-        'status': 'open',
-        'fixedTime': true
-    }
-];
-
-let standardTimetable = [
-    {
-        'class': '7B',
-        'subject': 'Deu',
-        'weekdayNumber': 1,
-        'timeslot': 3
-    },
-    {
-        'class': '6A',
-        'subject': 'Gesch',
-        'weekdayNumber': 2,
-        'timeslot': 2
-    },
-    {
-        'class': '7B',
-        'subject': 'Deu',
-        'weekdayNumber': 4,
-        'timeslot': 3
-    }, {
-        'class': '7A',
-        'subject': 'Gesch',
-        'weekdayNumber': 4,
-        'timeslot': 5
-    }
-];
-
-let timetableChanges = [
-    {
-        'date': '2025-03-06',
-        'timeslot': '5',
-        'class': '7A',
-        'subject': 'Gesch',
-        'status': 'canceled',
-    },
-    {
-        'date': '2025-03-7',
-        'timeslot': '5',
-        'class': '5B',
-        'subject': 'MNT',
-        'status': 'sub',
-    },
-    {
-        'date': '2025-03-11',
-        'timeslot': '5',
-        'class': '5B',
-        'subject': 'MNT',
-        'status': 'sub',
-    }
-];
 
 let taskDataBackupObject = {};
+
+import Lesson from './classes/Lesson.js';
+import Task from './classes/Task.js';
 
 
 //HIGHLIGHTING AND TOGGLING STUFF
@@ -193,11 +84,11 @@ function highlightTask(event) {
         }
     });
 
-    removeAddTaskButton();
+    removeAddLessonButton();
 }
 
 function removeTaskHighlight(event) {
-    item = event.target;
+    let item = event.target;
 
     document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
         if (taskRow.dataset.taskid === item.dataset.taskid) {
@@ -281,27 +172,35 @@ function removeEditability(item) {
 function fillTimetableWithLessons() {
 
     //add standard lessons
-    standardTimetable.forEach((lesson) => {
+    Lesson.getTimetable.forEach((entry) => {
+        let lesson = new Lesson(entry.class, entry.subject);
+        lesson.weekday = entry.weekdayNumber;
+        lesson.timeslot = entry.timeslot;
 
         let timeslot = getTimeslotOfLesson(lesson);
-        let cssClass = getLessonColorCssClass(lesson);
+        // let cssClass = getLessonColorCssClass(lesson);
 
-        timeslot.innerHTML = `<div class="lesson ${cssClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
+        timeslot.innerHTML = `<div class="lesson ${lesson.cssColorClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
 
     });
 
     //reflect timetable changes
-    timetableChanges.forEach((lesson) => {
-        if (!isDateInCurrentWeek(lesson.date)) return;
+    Lesson.getTimetableChanges.forEach((entry) => {
+
+        let lesson = new Lesson(entry.class, entry.subject);
+        lesson.date = entry.date;
+        lesson.timeslot = entry.timeslot;
+        lesson.status = entry.status;
+
+        if (!isDateInCurrentlyDisplayedWeek(lesson.date)) return;
 
         let timeslot = getTimeslotOfLesson(lesson);
 
         if (lesson.status == 'sub') {
-            let cssClass = getLessonColorCssClass(lesson);
-            timeslot.innerHTML = `<div class="lesson ${cssClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
+            timeslot.innerHTML = `<div class="lesson ${lesson.cssColorClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
         }
 
-        if (lesson.status == 'canceled'){
+        if (lesson.status == 'canceled') {
             timeslot.firstElementChild.classList.add('canceled');
         }
     })
@@ -309,30 +208,20 @@ function fillTimetableWithLessons() {
     document.querySelectorAll('.lesson').forEach((lesson) => {
         lesson.addEventListener('mouseover', highlightTask);
         lesson.addEventListener('mouseout', removeTaskHighlight);
-        lesson.parentElement.removeEventListener('mouseenter', showAddTaskButton);
+        lesson.parentElement.removeEventListener('mouseenter', showAddLessonButton);
         lesson.parentElement.removeEventListener('click', createTaskForm);
     });
     //synchronize lessons with tasks
 
 }
 
-function getAllOpenTasks() {
-    let openTasks = [];
-
-    allTasksArray.forEach((task) => {
-        if (task.status == 'open') openTasks.push(task);
-    })
-
-    return openTasks;
-}
-
 function fillUpcomingTasksTable() {
-    let allUpcomingTasks = getAllOpenTasks();
+    let allUpcomingTasks = Task.getAllOpenTasks();
     let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
     let taskTrHTML = '';
-    
 
-    if (allUpcomingTasks.length == 0){
+
+    if (allUpcomingTasks.length == 0) {
         document.querySelector('td[data-noEntriesFound]').style.display = 'table-cell';
         return;
     }
@@ -340,9 +229,9 @@ function fillUpcomingTasksTable() {
     allUpcomingTasks.sort(sortByDate);
 
     allUpcomingTasks.forEach((task) => {
-    let borderLeft = 'style="border-left: 3px solid transparent;"';
+        let borderLeft = 'style="border-left: 3px solid transparent;"';
 
-        if (new Date(task.date) < new Date()){
+        if (new Date(task.date) < new Date()) {
             borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
         }
 
@@ -358,27 +247,72 @@ function fillUpcomingTasksTable() {
 
     upcomingTasksTableBody.innerHTML = taskTrHTML;
 
-    bindTasksToLessons(allUpcomingTasks);
+    bindTasksToLessons();
 }
 
-function getAllInProgressTasks() {
-
-}
 
 function fillInProgressTaskTable() {
 
 }
 
-function bindTasksToLessons(tasksArray){
-    tasksArray.forEach((task) => {
-        // if (new Date())
+function bindTasksToLessons() {
 
-        //wenn aktuelle Woche, alles binden, was älter ist oder in der Woche liegt
-        //wenn vergangene Woche, alles binden, was älter oder in der Woche
-        //wenn kommende Woche, alles binden, was in dieser Woche liegt
+    let allTasks = Task.getAllTasks();
+    let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
+    let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
-    });
+    console.log(allTasks);
+    allTasks.sort(sortByDate);
+
+
+    //if displayed week is the current week, bind everything older and belonging to the current week
+    if (isDateInCurrentWeek(mondayOfDisplayedWeek)) {
+
+        filterTasksByDate(allTasks, sundayOfDisplayedWeek, undefined, true);
+
+    }
+
+
+    //     //wenn vergangene Woche, alles binden, was älter oder in der Woche
+    //     //wenn kommende Woche, alles binden, was in dieser Woche liegt
 }
+
+// HANDLING LESSONS
+
+function createLessonForm(event) {
+
+    console.log(event.target);
+  
+  let addLessonButton = event.target.classList.contains('addLessonButton') ? event.target.parentElement : event.target;
+  let timeslotElement = event.target.closest('tr');
+
+  let lesson = new Lesson(undefined, undefined);
+
+  lesson.date = addLessonButton.dataset.date;
+  lesson.timeslot = addLessonButton.dataset.timeslot
+
+
+}
+
+function addLessonToTimetable(lesson) {
+
+    if (!isDateInCurrentlyDisplayedWeek(lesson.date)) return;
+
+    let timetableTimeslot;
+    let lessonHTML = `
+        <div class="lesson ${lesson.cssColorClass}">${lesson.class} ${lesson.subject}</div>
+    `;
+
+    timetableTimeslot = getTimeslotOfLesson(lesson);
+
+
+    timetableTimeslot.innerHTML = lessonHTML;
+
+    timetableTimeslot.removeEventListener('click', createTaskForm);
+    timetableTimeslot.firstElementChild.addEventListener('mouseover', highlightTask);
+    timetableTimeslot.firstElementChild.addEventListener('mouseout', removeTaskHighlight);
+}
+
 
 // HANDLING TASKS
 
@@ -386,9 +320,7 @@ function createTaskForm(item) {
 
     let dataSource = item.target;
 
-    if (item.target.classList.contains('addTaskButton')) dataSource = item.target.parentElement;
-
-    console.log(dataSource);
+    if (item.target.classList.contains('addLessonButton')) dataSource = item.target.parentElement;
 
     dataSource.parentElement.removeEventListener('click', createTaskForm); //prevent creation of another task form
 
@@ -544,61 +476,27 @@ function setTaskDone(item) {
     console.log(item);
 }
 
-function addLessonToTimetable(lessonData) {
-    let lessonDate = lessonData.date;
-    let timeslot = lessonData.timeslot
-
-    if (!isDateInCurrentWeek(lessonDate)) return;
-
-    let timetableTimeslot;
-    let cssClass = getLessonColorCssClass(lessonData);
-    let lessonHTML = `
-        <div class="lesson ${cssClass}" data-taskid="${lessonData.id}">${lessonData.class} ${lessonData.subject}</div>
-    `;
-
-    timetableTimeslot = getTimeslotOfLesson(lessonData);
-
-
-    timetableTimeslot.innerHTML = lessonHTML;
-
-    timetableTimeslot.removeEventListener('click', createTaskForm);
-    timetableTimeslot.firstElementChild.addEventListener('mouseover', highlightTask);
-    timetableTimeslot.firstElementChild.addEventListener('mouseout', removeTaskHighlight);
-}
-
-function updateLessonOnTimetable(lessonData) {
-    document.querySelectorAll('.lesson').forEach((lesson) => {
-        if (lesson.dataset.taskid == lessonData.id) {
-            let cssColorClass = getLessonColorCssClass(lessonData);
-
-            lesson.removeAttribute('class');
-            lesson.classList.add('lesson');
-            lesson.classList.add(cssColorClass);
-            lesson.innerText = `${lessonData.class} ${lessonData.subject}`;
-        }
-    })
-}
 
 // BUTTONS!!!
 
-function showAddTaskButton(event) {
+function showAddLessonButton(event) {
 
-    timeslot = event.target.dataset.timeslot;
-    date = event.target.parentElement.dataset.date;
+    let timeslot = event.target.dataset.timeslot;
+    let date = event.target.parentElement.dataset.date;
 
-    removeAddTaskButton();
+    removeAddLessonButton();
 
     if (hasLesson(event.target)) return;
 
-    event.target.innerHTML = `<div class="addTaskButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addTaskButton">+</div></div>`;
+    event.target.innerHTML = `<div class="addLessonButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addLessonButton">+</div></div>`;
 
 }
 
-function removeAddTaskButton() {
+function removeAddLessonButton() {
 
     document.querySelectorAll('.timeslot').forEach((timeslot) => {
-        if (timeslot.querySelector('.addTaskButtonWrapper')) {
-            timeslot.querySelector('.addTaskButtonWrapper').remove();
+        if (timeslot.querySelector('.addLessonButtonWrapper')) {
+            timeslot.querySelector('.addLessonButtonWrapper').remove();
         }
     });
 }
@@ -635,15 +533,13 @@ function setCalendarWeek() {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = 1;
     let currentYear = new Date().getFullYear();
-    let referenceDate = new Date().setHours(0,0,0,0);
+    let referenceDate = new Date().setHours(0, 0, 0, 0);
     let firstThursday = getFirstThirsdayOfTheYear(currentYear);
     let monday = firstThursday - 86400000 * 3
     let sunday = firstThursday + 86400000 * 3;
 
     //checks, if the reference date lies in the current week. if not, tests against the next week
     while (monday < referenceDate && sunday < referenceDate) {
-
-
         monday += 86400000 * 7; // + 7 days
         sunday += 86400000 * 7; // + 7 days
         weekCounter++;
@@ -656,8 +552,8 @@ function setCalendarWeek() {
 function setDateForWeekdays() {
     let todayUnix = new Date().setHours(0, 0, 0);
 
-     //go back to monday of given week
-    while (new Date (todayUnix).getDay() != 1) todayUnix -= 86400000;
+    //go back to monday of given week
+    while (new Date(todayUnix).getDay() != 1) todayUnix -= 86400000;
 
     document.querySelectorAll('.weekday').forEach((weekday) => {
 
@@ -695,6 +591,7 @@ function switchToPreviousWeek() {
 
     setWeekStartAndEndDate();
     calcCalendarWeek(false);
+    bindTasksToLessons();
 }
 
 function switchToNextWeek() {
@@ -712,6 +609,7 @@ function switchToNextWeek() {
 
     setWeekStartAndEndDate();
     calcCalendarWeek(true);
+    bindTasksToLessons();
 }
 
 function calcCalendarWeek(countUp = true) {
@@ -721,8 +619,6 @@ function calcCalendarWeek(countUp = true) {
     let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
 
     let weeksPerYear = getNumberOfWeeksPerYear(mondayDate.getFullYear());
-    
-    console.log(weeksPerYear);
 
     countUp ? weekCounter++ : weekCounter--;
 
@@ -777,14 +673,16 @@ function runWeekSwitchAnimation(nextWeek = true) {
         });
     }, 350);
 
-    setTimeout(() => {weekOverview.querySelectorAll('.lesson').forEach((lesson)=> {
-        lesson.style.opacity = '1';
-    });
-    }, 360 );
+    setTimeout(() => {
+        weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
+            lesson.style.opacity = '1';
+        });
+    }, 360);
 
-    setTimeout(() => {weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
-        lesson.removeAttribute('style');
-    });
+    setTimeout(() => {
+        weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
+            lesson.removeAttribute('style');
+        });
     }, 560);
 }
 
@@ -815,6 +713,21 @@ function hasLesson(element) {
 }
 
 function isDateInCurrentWeek(date) {
+    let dateToTest = new Date(date).setHours(0, 0, 0, 0);
+    let today = new Date().setHours(0, 0, 0, 0);
+    let currentWeeksMonday = today;
+    let currentWeeksSunday = today;
+
+    // calculate monday and sunday of current week
+    while (new Date(currentWeeksMonday).getDay() != 1) currentWeeksMonday -= 86400000;
+    while (new Date(currentWeeksSunday).getDay() != 0) currentWeeksSunday += 86400000;
+
+    if (currentWeeksMonday <= dateToTest && dateToTest <= currentWeeksSunday) return true;
+
+    return false;
+}
+
+function isDateInCurrentlyDisplayedWeek(date) {
     let dateToTest = new Date(date);
     let monday = new Date(document.querySelector('div[data-weekday_number="1"]').dataset.date);
     let sunday = new Date(document.querySelector('div[data-weekday_number="0"]').dataset.date);
@@ -880,38 +793,28 @@ function generateTaskId() {
     return Math.max(...lessonIds) + 1; //adds 1 to the highest existing lesson id
 }
 
-function getLessonColorCssClass(lessonData) {
-    let lessonColorCssClass;
-
-    allSubjects.forEach((subject) => {
-        if (subject.subject == lessonData.subject) lessonColorCssClass = subject.colorCssClass;
-    })
-
-    return lessonColorCssClass;
-}
-
-function getTimeslotOfLesson(lessonData) {
+function getTimeslotOfLesson(lesson) {
 
     let allWeekdays = document.querySelectorAll('.weekday');
     let weekday;
     let timeslot;
 
-    if (!lessonData.date) {
-        allWeekdays.forEach((day) => { if (day.dataset.weekday_number == lessonData.weekdayNumber) weekday = day });
-        weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lessonData.timeslot) timeslot = slot });
+    if (!lesson.date) {
+        allWeekdays.forEach((day) => { if (day.dataset.weekday_number == lesson.weekday) weekday = day });
+        weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot });
 
         return timeslot;
     }
 
     allWeekdays.forEach((day) => {
         let dateOfWeekday = new Date(day.dataset.date)
-        let dateOfLesson = new Date(lessonData.date);
+        let dateOfLesson = new Date(lesson.date);
         dateOfLesson.setHours(0, 0, 0, 0);
 
         if (dateOfWeekday.getTime() == dateOfLesson.getTime()) weekday = day;
     });
 
-    weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lessonData.timeslot) timeslot = slot; });
+    weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot; });
 
     return timeslot;
 }
@@ -936,9 +839,41 @@ function backUpTaskData(event) {
     }
 }
 
-function sortByDate(a, b){
+function sortByDate(a, b) {
     if (a.date < b.date) return -1;
     if (a.date == b.date) return 0;
     if (a.date > b.date) return 1;
+
+}
+
+// filters an TaskArray by date, can return any task before and after a given date (including tasks on given date!)
+// or returns all tasks between dates if startDate and endDate are specified
+function filterTasksByDate(tasksArray, startDate, endDate = undefined, beforeStartDate = false) {
+
+    let filteredTasks = [];
+    let start = new Date(startDate);
+    let end = endDate ? new Date(endDate) : undefined;
+
+    if (startDate && endDate) {
+        tasksArray.forEach((task) => {
+            if (start <= new Date(task.date) && new Date(task.date) <= end) {
+                filteredTasks.push(task);
+
+                return filteredTasks;
+            }
+        });
+    }
+
+    if (startDate && beforeStartDate == true) {
+        tasksArray.forEach((task) => {
+            if (start >= new Date(task.date) && new Date(task.date) <= end) {
+                filteredTasks.push(task);
+
+                return filteredTasks;
+            }
+        });
+    }
+
+
 
 }

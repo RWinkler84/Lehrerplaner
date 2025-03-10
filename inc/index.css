@@ -118,7 +118,7 @@ main {}
     transform: translate(-1px, -1px);
 }
 
-.addTaskButtonWrapper {
+.addLessonButtonWrapper {
     display: none;
     flex: 1 1 100%;
     background-color: var(--lightergrey);
@@ -127,11 +127,11 @@ main {}
     text-align: right;
 }
 
-.addTaskButton {
+.addLessonButton {
     color: #0F7173;
 }
 
-.weekOverview:hover .addTaskButtonWrapper {
+.weekOverview:hover .addLessonButtonWrapper {
     display: flex;
 }
 

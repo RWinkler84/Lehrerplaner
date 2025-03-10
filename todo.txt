@@ -1,0 +1,20 @@
+- anlegen von Lessons aus der Mockup-Datenbank (in progress)
+- verhindern, dass mehrere Tasks auf den gleichen Timeslot angelegt werden
+
+erledigt: 
+
+- mouseout für weekOverview, der addTaskButton löscht <- hat so nicht funktioniert.
+bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt, wenn die Maus
+über der WeekOverview hovert
+- anlegen neuer aufgaben
+- animation beim wochenwechsel
+- beim Anlegen einer Aufgabe einen Zeitstempel für die zugehörige Stunden (Slot, Datum) erzeugen
+    -> Zeit und Datum in der createTaskForm aus dem target auslesen und ins tr packen
+- toogleButtons ist kaputt
+- css-Klassen der Lessons im Timetable beim Erzeugen aus den Daten der Datenbank holen
+- Änderungen an den Tasks sollten sich auch im Timetable wiederspiegeln, wenn es Fach und Klasse betrifft
+- edit Task so erweitern, dass Änderungen des Selects in das TD übernommen werden
+- higlighting für Stunden, wenn über aufgaben gehovert wird
+- discardTaskChanges anlegen für den Fall, dass man Änderungen an einer bestehenden Task rückgängig machen will
+- es gibt einen Fehler beim Auslesen des Selects für das Datenbackup, wodurch es gelegentlich auf undefined gesetzt wird
+
