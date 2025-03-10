@@ -68,18 +68,18 @@ const allSubjects = [
 let allTasksArray = [
     {
         'id': 1,
-        'date': '',
-        'timeslot': '',
+        'date': '2025-03-11',
+        'timeslot': '2',
         'class': '6A',
-        'subject': 'Deu',
+        'subject': 'Gesch',
         'description': 'die Schafe hüten',
         'status': 'open',
         'fixedTime': false
     },
     {
         'id': 2,
-        'date': '',
-        'timeslot': '',
+        'date': '2025-02-10',
+        'timeslot': '3',
         'class': '7B',
         'subject': 'Deu',
         'description': 'den Klassenraum streichen',
@@ -88,9 +88,9 @@ let allTasksArray = [
     },
     {
         'id': 3,
-        'date': '2025-03-04',
-        'timeslot': '3',
-        'class': '6B',
+        'date': '2025-03-18',
+        'timeslot': '2',
+        'class': '6A',
         'subject': 'Gesch',
         'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
         'status': 'open',
@@ -330,17 +330,25 @@ function fillUpcomingTasksTable() {
     let allUpcomingTasks = getAllOpenTasks();
     let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
     let taskTrHTML = '';
+    
 
     if (allUpcomingTasks.length == 0){
         document.querySelector('td[data-noEntriesFound]').style.display = 'table-cell';
         return;
     }
 
+    allUpcomingTasks.sort(sortByDate);
+
     allUpcomingTasks.forEach((task) => {
+    let borderLeft = 'style="border-left: 3px solid transparent;"';
+
+        if (new Date(task.date) < new Date()){
+            borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
+        }
 
         taskTrHTML += `
             <tr data-taskid="${task.id}">
-                <td data-class="${task.class}">${task.class}</td>
+                <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                 <td data-subject="${task.subject}">${task.subject}</td>
                 <td class="taskDescription" data-taskDescription="">${task.description}</td>
                 <td class="taskDone"><button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button></td>
@@ -350,17 +358,7 @@ function fillUpcomingTasksTable() {
 
     upcomingTasksTableBody.innerHTML = taskTrHTML;
 
-    /*
-                        <tr data-taskid="4">
-                            <td data-class="7A">7A</td>
-                            <td data-subject="Gesch">Gesch</td>
-                            <td class="taskDescription" data-taskDescription="">Napoleon war ein kleiner Mann...
-                            </td>
-                            <td class="taskDone"><button class="setTaskDoneButton"
-                                    onclick="setTaskDone(this)">&#x2714;</button></td>
-                        </tr>
-
-    */
+    bindTasksToLessons(allUpcomingTasks);
 }
 
 function getAllInProgressTasks() {
@@ -369,6 +367,17 @@ function getAllInProgressTasks() {
 
 function fillInProgressTaskTable() {
 
+}
+
+function bindTasksToLessons(tasksArray){
+    tasksArray.forEach((task) => {
+        // if (new Date())
+
+        //wenn aktuelle Woche, alles binden, was älter ist oder in der Woche liegt
+        //wenn vergangene Woche, alles binden, was älter oder in der Woche
+        //wenn kommende Woche, alles binden, was in dieser Woche liegt
+
+    });
 }
 
 // HANDLING TASKS
@@ -646,21 +655,15 @@ function setCalendarWeek() {
 
 function setDateForWeekdays() {
     let todayUnix = new Date().setHours(0, 0, 0);
-    let today = new Date;
 
-     //if sunday, reset date to sunday of previous week to prevent early week change
-    if (today.getDay() == 0) todayUnix -= 86400000 * 7;
+     //go back to monday of given week
+    while (new Date (todayUnix).getDay() != 1) todayUnix -= 86400000;
 
     document.querySelectorAll('.weekday').forEach((weekday) => {
-        let dateDifference = weekday.dataset.weekday_number - today.getDay();
 
-        if (dateDifference == 0) dateDifference = 7;
+        weekday.dataset.date = new Date(todayUnix).toString();
 
-        let weekdayDateUnix = todayUnix + (dateDifference * 86400000);    // 86400000 = ms/day
-        let weekdayDateString = new Date(weekdayDateUnix).toString();
-
-        weekday.dataset.date = weekdayDateString;
-
+        todayUnix += 86400000;    // 86400000 = ms/day
     })
 }
 
@@ -715,9 +718,11 @@ function calcCalendarWeek(countUp = true) {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = document.querySelector('#calendarWeekCounter').innerText;
 
-    let thursdayDate = new Date(document.querySelector('.weekday[data-weekday_number="4"]').dataset.date);
+    let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
 
-    let weeksPerYear = getNumberOfWeeksPerYear(thursdayDate.getFullYear());
+    let weeksPerYear = getNumberOfWeeksPerYear(mondayDate.getFullYear());
+    
+    console.log(weeksPerYear);
 
     countUp ? weekCounter++ : weekCounter--;
 
@@ -929,4 +934,11 @@ function backUpTaskData(event) {
         'subject': taskSubject,
         'description': taskDescription
     }
+}
+
+function sortByDate(a, b){
+    if (a.date < b.date) return -1;
+    if (a.date == b.date) return 0;
+    if (a.date > b.date) return 1;
+
 }
