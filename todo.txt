@@ -1,5 +1,6 @@
-- anlegen von Lessons aus der Mockup-Datenbank (in progress)
-- verhindern, dass mehrere Tasks auf den gleichen Timeslot angelegt werden
+- Task-Methoden auf OOP umbauen
+- Formular für Lessons implementieren
+- Lessens im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen)
 
 erledigt: 
 
@@ -17,4 +18,5 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - higlighting für Stunden, wenn über aufgaben gehovert wird
 - discardTaskChanges anlegen für den Fall, dass man Änderungen an einer bestehenden Task rückgängig machen will
 - es gibt einen Fehler beim Auslesen des Selects für das Datenbackup, wodurch es gelegentlich auf undefined gesetzt wird
-
+- verhindern, dass mehrere Tasks auf den gleichen Timeslot angelegt werden
+- anlegen von Lessons aus der Mockup-Datenbank (in progress)
