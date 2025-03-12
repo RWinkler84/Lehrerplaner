@@ -1,0 +1,69 @@
+import LessonController from "../Controllers/LessonController.js";
+
+export default class LessonView {
+    #controller
+
+    constructor() {
+        this.#controller = new LessonController();
+    }
+
+    renderLesson() {
+        let monday = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
+        let sunday = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
+
+        let regularLessons = LessonController.getScheduledLessons();
+        let lessonChanges = LessonController.getTimetableChanges(monday, sunday);
+
+        regularLessons.forEach((lesson) => {
+            let timeslot = this.#getTimeslotOfLesson(lesson);
+            timeslot.innerHTML = `<div class="lesson ${lesson.cssColorClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
+
+        })
+
+        //reflect timetable changes
+        lessonChanges.forEach((entry) => {
+
+            let timeslot = this.#getTimeslotOfLesson(lesson);
+
+            if (lesson.status == 'sub') {
+                timeslot.innerHTML = `<div class="lesson ${lesson.cssColorClass}" data-taskid="">${lesson.class} ${lesson.subject}</div>`;
+            }
+
+            if (lesson.status == 'canceled') {
+                timeslot.firstElementChild.classList.add('canceled');
+            }
+        })
+
+    }
+
+    #getTimeslotOfLesson(lesson) {
+
+        let allWeekdays = document.querySelectorAll('.weekday');
+        let weekday;
+        let timeslot;
+
+        if (!lesson.date) {
+            allWeekdays.forEach((day) => { if (day.dataset.weekday_number == lesson.weekday) weekday = day });
+            weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot });
+
+            return timeslot;
+        }
+
+        allWeekdays.forEach((day) => {
+            let dateOfWeekday = new Date(day.dataset.date)
+            let dateOfLesson = new Date(lesson.date).setHours(0, 0, 0, 0);
+
+            if (dateOfWeekday.getTime() == dateOfLesson.getTime()) weekday = day;
+        });
+
+        weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot; });
+
+        return timeslot;
+    }
+
+        #removeAllLessons(element) {
+        element.querySelectorAll('.lesson').forEach((lesson) => {
+            lesson.remove();
+        })
+    }
+}
