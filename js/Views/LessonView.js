@@ -21,7 +21,7 @@ export default class LessonView {
         })
 
         //reflect timetable changes
-        lessonChanges.forEach((entry) => {
+        lessonChanges.forEach((lesson) => {
 
             let timeslot = this.#getTimeslotOfLesson(lesson);
 
@@ -53,7 +53,7 @@ export default class LessonView {
             let dateOfWeekday = new Date(day.dataset.date)
             let dateOfLesson = new Date(lesson.date).setHours(0, 0, 0, 0);
 
-            if (dateOfWeekday.getTime() == dateOfLesson.getTime()) weekday = day;
+            if (dateOfWeekday.getTime() == dateOfLesson) weekday = day;
         });
 
         weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot; });
@@ -61,9 +61,11 @@ export default class LessonView {
         return timeslot;
     }
 
-        #removeAllLessons(element) {
+    #removeAllLessons(element) {
         element.querySelectorAll('.lesson').forEach((lesson) => {
             lesson.remove();
         })
     }
+
+    
 }

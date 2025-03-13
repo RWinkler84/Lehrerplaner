@@ -1,3 +1,6 @@
+import Fn from '../inc/utils.js'
+import { taskBackupArray } from '../index.js'
+
 export default class Task {
 
     // now static, should later be filled from DB
@@ -103,6 +106,8 @@ export default class Task {
             if (task.status == 'open') openTasks.push(new Task(task.id));
         })
 
+        openTasks.sort(Fn.sortByDate);
+
         return openTasks;
     }
 
@@ -135,6 +140,19 @@ export default class Task {
         });
 
         return allTasks;
+    }
+
+    backupData(){
+        taskBackupArray[this.#id] = {
+            'id': this.#id,
+            'class': this.#class,
+            'suject': this.#subject,
+            'date': this.#date,
+            'timeslot': this.#timeslot,
+            'description': this.#description,
+            'fixedTime' : this.#fixedTime
+        }
+        console.log(taskBackupArray);
     }
 
     get id() {

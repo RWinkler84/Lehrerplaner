@@ -16,6 +16,7 @@ export const allSubjects = [
     }
 ];
 
+export let taskBackupArray = [];
 
 let taskDataBackupObject = {};
 
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
 // document.addEventListener('DOMContentLoaded', fillTimetableWithLessons);
 document.addEventListener('DOMContentLoaded',() => lesson.renderLesson());
 
-document.addEventListener('DOMContentLoaded', fillUpcomingTasksTable);
+document.addEventListener('DOMContentLoaded', () => task.renderUpcomingTasks());
 
 //DATABASE FOR STRUCTURE TESTING
 
@@ -122,55 +123,7 @@ function removeLessonHighlight(event) {
     })
 }
 
-function makeEditable(event) {
-    console.log('go')
-    if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
 
-    backUpTaskData(event);
-
-    let parentTr = event.target.closest('tr');
-
-    parentTr.querySelectorAll('td:not(.taskDone)').forEach((td) => {
-
-        if (td.dataset.subject) {
-            td.innerHTML = getSubjectSelectHTML(event);
-            td.style.padding = '0';
-            // td.addEventListener('focusout', removeEditability);
-            createSaveAndDiscardChangesButton(event);
-        }
-
-        td.setAttribute('contenteditable', '');
-
-        event.target.focus();
-        // td.addEventListener('focusout', removeEditability);
-    });
-
-    window.getSelection().removeAllRanges();
-    createSaveAndDiscardChangesButton(event);
-}
-
-function removeEditability(item) {
-
-    item.target ? item = item.target : item;
-
-    item.closest('tr').querySelectorAll('td').forEach((td) => {
-
-        // removes the lesson select and transforms td to a normal td
-
-        if (td.dataset.subject || item.dataset.subject == '') {
-
-            td.removeAttribute('style');
-            td.removeAttribute('contenteditable');
-
-            if (!td.firstElementChild) return;
-
-            let selection = td.firstElementChild.value;
-            td.innerHTML = selection;
-        }
-
-        td.removeAttribute('contenteditable');
-    });
-}
 
 //FILLING THE LESSON AND TASK TABLES
 
@@ -188,75 +141,32 @@ function renderLessons() {
 
 }
 
-function fillUpcomingTasksTable() {
-    let allUpcomingTasks = Task.getAllOpenTasks();
-    let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
-    let taskTrHTML = '';
-
-
-    if (allUpcomingTasks.length == 0) {
-        document.querySelector('td[data-noEntriesFound]').style.display = 'table-cell';
-        return;
-    }
-
-    allUpcomingTasks.sort(sortByDate);
-
-    allUpcomingTasks.forEach((task) => {
-        let borderLeft = 'style="border-left: 3px solid transparent;"';
-
-        if (new Date(task.date) < new Date()) {
-            borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
-        }
-
-        taskTrHTML += `
-            <tr data-taskid="${task.id}">
-                <td ${borderLeft} data-class="${task.class}">${task.class}</td>
-                <td data-subject="${task.subject}">${task.subject}</td>
-                <td class="taskDescription" data-taskDescription="">${task.description}</td>
-                <td class="taskDone"><button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button></td>
-            </tr>
-        `;
-    });
-
-    upcomingTasksTableBody.innerHTML = taskTrHTML;
-
-    document.querySelectorAll('#taskContainer td').forEach((td) => {
-        td.addEventListener('dblclick', makeEditable);
-    });
-
-    document.querySelectorAll('#taskContainer td').forEach((td) => {
-        td.addEventListener('dblclick', createSaveAndDiscardChangesButton);
-    });
-
-    bindTasksToLessons();
-}
-
 
 function fillInProgressTaskTable() {
 
 }
 
-function bindTasksToLessons() {
+// function bindTasksToLessons() {
 
-    let allTasks = Task.getAllTasks();
-    let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
-    let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
+//     let allTasks = Task.getAllTasks();
+//     let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
+//     let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
-    console.log(allTasks);
-    allTasks.sort(sortByDate);
+//     console.log(allTasks);
+//     allTasks.sort(sortByDate);
 
 
-    //if displayed week is the current week, bind everything older and belonging to the current week
-    if (isDateInCurrentWeek(mondayOfDisplayedWeek)) {
+//     //if displayed week is the current week, bind everything older and belonging to the current week
+//     if (isDateInCurrentWeek(mondayOfDisplayedWeek)) {
 
-        filterTasksByDate(allTasks, sundayOfDisplayedWeek, undefined, true);
+//         filterTasksByDate(allTasks, sundayOfDisplayedWeek, undefined, true);
 
-    }
+//     }
 
 
     //     //wenn vergangene Woche, alles binden, was älter oder in der Woche
     //     //wenn kommende Woche, alles binden, was in dieser Woche liegt
-}
+// }
 
 // HANDLING LESSONS
 
@@ -441,21 +351,7 @@ function discardNewTask(item) {
     item.closest('tr').remove();
 }
 
-function revertChanges(item) {
-    let parentTr = item.closest('tr');
-    let taskId = parentTr.dataset.taskid;
 
-    parentTr.querySelector('td[data-class]').innerText = taskDataBackupObject[taskId].class;
-    parentTr.querySelector('td[data-subject]').innerText = taskDataBackupObject[taskId].subject;
-    parentTr.querySelector('td[data-taskDescription]').innerText = taskDataBackupObject[taskId].description;
-    removeEditability(item);
-    removeDiscardButton(item);
-}
-
-function setTaskDone(item) {
-    console.log('task erledigt');
-    console.log(item);
-}
 
 
 // BUTTONS!!!
@@ -467,7 +363,7 @@ function showAddLessonButton(event) {
 
     removeAddLessonButton();
 
-    if (hasLesson(event.target)) return;
+    if (Fn.hasLesson(event.target)) return;
 
     event.target.innerHTML = `<div class="addLessonButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addLessonButton">+</div></div>`;
 
@@ -515,7 +411,7 @@ function setCalendarWeek() {
     let weekCounter = 1;
     let currentYear = new Date().getFullYear();
     let referenceDate = new Date().setHours(0, 0, 0, 0);
-    let firstThursday = getFirstThirsdayOfTheYear(currentYear);
+    let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
     let monday = firstThursday - 86400000 * 3
     let sunday = firstThursday + 86400000 * 3;
 
@@ -553,8 +449,8 @@ function setWeekStartAndEndDate() {
     mondayDate = new Date(mondayDate);
     sundayDate = new Date(sundayDate);
 
-    startDateSpan.innerText = formatDate(mondayDate);
-    endDateSpan.innerText = formatDate(sundayDate);
+    startDateSpan.innerText = Fn.formatDate(mondayDate);
+    endDateSpan.innerText = Fn.formatDate(sundayDate);
 }
 
 function switchToPreviousWeek() {
@@ -676,7 +572,6 @@ function cancelWeekSwitchAnimation() {
 
 
 // HELPER FUNCTIONS
-
 
 
 // filters an TaskArray by date, can return any task before and after a given date (including tasks on given date!)

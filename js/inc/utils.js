@@ -78,26 +78,6 @@ export default class Utils {
         return Math.max(...lessonIds) + 1; //adds 1 to the highest existing lesson id
     }
 
-    static backUpTaskData(event) {
-
-        let parentTr = event.target.closest('tr');
-        let taskId = parentTr.dataset.taskid;
-        let taskClass = parentTr.querySelector('td[data-class]').innerText;
-        let taskDescription = parentTr.querySelector('td[data-taskDescription]').innerText;
-        let taskSubject = parentTr.querySelector('td[data-subject]').innerText;
-
-
-        if (parentTr.querySelector('td[data-subject] select')) {
-            taskSubject = parentTr.querySelector('td[data-subject] select').value;
-        }
-
-        taskDataBackupObject[taskId] = {
-            'class': taskClass,
-            'subject': taskSubject,
-            'description': taskDescription
-        }
-    }
-
     static sortByDate(a, b) {
         if (a.date < b.date) return -1;
         if (a.date == b.date) return 0;
