@@ -1,71 +1,10 @@
 import Fn from '../inc/utils.js'
 import { taskBackupArray } from '../index.js'
+import { allTasksArray } from '../index.js';
 
 export default class Task {
 
     // now static, should later be filled from DB
-    static #allTasksArray = [
-        {
-            'id': 1,
-            'date': '2025-03-11',
-            'timeslot': '2',
-            'class': '6A',
-            'subject': 'Gesch',
-            'description': 'die Schafe hüten',
-            'status': 'open',
-            'fixedTime': false
-        },
-        {
-            'id': 2,
-            'date': '2025-02-10',
-            'timeslot': '3',
-            'class': '7B',
-            'subject': 'Deu',
-            'description': 'den Klassenraum streichen',
-            'status': 'open',
-            'fixedTime': false
-        },
-        {
-            'id': 3,
-            'date': '2025-03-18',
-            'timeslot': '2',
-            'class': '6A',
-            'subject': 'Gesch',
-            'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
-            'status': 'open',
-            'fixedTime': true
-        },
-        {
-            'id': 4,
-            'date': '2025-03-06',
-            'timeslot': '5',
-            'class': '7A',
-            'subject': 'Gesch',
-            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-            'status': 'open',
-            'fixedTime': false
-        },
-        {
-            'id': 5,
-            'date': '2025-03-10',
-            'timeslot': '2',
-            'class': '7A',
-            'subject': 'Gesch',
-            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-            'status': 'open',
-            'fixedTime': false
-        },
-        {
-            'id': 6,
-            'date': '2025-03-13',
-            'timeslot': '5',
-            'class': '7A',
-            'subject': 'Gesch',
-            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-            'status': 'open',
-            'fixedTime': true
-        }
-    ];
 
     #id;
     #class;
@@ -102,7 +41,7 @@ export default class Task {
 
         let openTasks = [];
 
-        this.#allTasksArray.forEach((task) => {
+        allTasksArray.forEach((task) => {
             if (task.status == 'open') openTasks.push(new Task(task.id));
         })
 
@@ -115,8 +54,8 @@ export default class Task {
 
         let inProgressTasks = [];
 
-        this.#allTasksArray.forEach((task) => {
-            if (task.status == 'inprogress') inProgressTasks.push(new Task(task.id));
+        allTasksArray.forEach((task) => {
+            if (task.status == 'inProgress') inProgressTasks.push(new Task(task.id));
         })
 
         return inProgressTasks;
@@ -125,7 +64,7 @@ export default class Task {
     static getAllTasks() {
         let allTasks = [];
 
-        this.#allTasksArray.forEach((element) => {
+        allTasksArray.forEach((element) => {
             let task = new Task();
             task.id = element.id;
             task.class = element.class;
@@ -142,17 +81,30 @@ export default class Task {
         return allTasks;
     }
 
-    backupData(){
+    setBackupData(){
         taskBackupArray[this.#id] = {
             'id': this.#id,
             'class': this.#class,
-            'suject': this.#subject,
+            'subject': this.#subject,
             'date': this.#date,
             'timeslot': this.#timeslot,
             'description': this.#description,
             'fixedTime' : this.#fixedTime
         }
-        console.log(taskBackupArray);
+    }
+
+    getBackupData(){
+        return taskBackupArray[this.#id];
+    }
+
+    update() {
+        allTasksArray.forEach(element => {
+            if (element.id == this.#id){
+                element.class = this.#class;
+                element.subject = this.#subject;
+                element.description = this.#description;
+            }
+        });
     }
 
     get id() {

@@ -38,7 +38,7 @@ export default class Utils {
 
     static getNumberOfWeeksPerYear(year) {
         let nextNewYear = new Date('1.1.' + (year + 1)).getTime();
-        let firstThursday = getFirstThirsdayOfTheYear(year);
+        let firstThursday = Utils.getFirstThirsdayOfTheYear(year);
 
         let weeksPerYear = 0;
 

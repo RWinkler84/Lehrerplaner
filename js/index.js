@@ -16,16 +16,75 @@ export const allSubjects = [
     }
 ];
 
+export let allTasksArray = [
+        {
+            'id': 1,
+            'date': '2025-03-11',
+            'timeslot': '2',
+            'class': '6A',
+            'subject': 'Gesch',
+            'description': 'die Schafe hüten',
+            'status': 'inProgress',
+            'fixedTime': false
+        },
+        {
+            'id': 2,
+            'date': '2025-02-10',
+            'timeslot': '3',
+            'class': '7B',
+            'subject': 'Deu',
+            'description': 'den Klassenraum streichen',
+            'status': 'inProgress',
+            'fixedTime': false
+        },
+        {
+            'id': 3,
+            'date': '2025-03-18',
+            'timeslot': '2',
+            'class': '6A',
+            'subject': 'Gesch',
+            'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
+            'status': 'open',
+            'fixedTime': true
+        },
+        {
+            'id': 4,
+            'date': '2025-03-06',
+            'timeslot': '5',
+            'class': '7A',
+            'subject': 'Gesch',
+            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+            'status': 'open',
+            'fixedTime': false
+        },
+        {
+            'id': 5,
+            'date': '2025-03-10',
+            'timeslot': '2',
+            'class': '7A',
+            'subject': 'Gesch',
+            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+            'status': 'open',
+            'fixedTime': false
+        },
+        {
+            'id': 6,
+            'date': '2025-03-13',
+            'timeslot': '5',
+            'class': '7A',
+            'subject': 'Gesch',
+            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+            'status': 'open',
+            'fixedTime': true
+        }
+    ];
+
 export let taskBackupArray = [];
 
-let taskDataBackupObject = {};
 
-import Task from './Views/TaskView.js';
-import Lesson from './Views/LessonView.js';
+import TaskView from './Views/TaskView.js';
+import LessonView from './Views/LessonView.js';
 import Fn from './inc/utils.js';
-
-let lesson = new Lesson;
-let task = new Task;
 
 
 // handlers for highlighting tasks and lessonfields
@@ -66,9 +125,10 @@ document.addEventListener('DOMContentLoaded', setDateForWeekdays);
 document.addEventListener('DOMContentLoaded', setCalendarWeek);
 document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
 // document.addEventListener('DOMContentLoaded', fillTimetableWithLessons);
-document.addEventListener('DOMContentLoaded',() => lesson.renderLesson());
+document.addEventListener('DOMContentLoaded',() => LessonView.renderLesson());
 
-document.addEventListener('DOMContentLoaded', () => task.renderUpcomingTasks());
+document.addEventListener('DOMContentLoaded', () => TaskView.renderUpcomingTasks());
+document.addEventListener('DOMContentLoaded', () => TaskView.renderInProgressTasks());
 
 //DATABASE FOR STRUCTURE TESTING
 
@@ -239,30 +299,7 @@ function createTaskForm(item) {
     tr.firstElementChild.focus();
 }
 
-function getSubjectSelectHTML(event = undefined) {
-    //make an fetch-query to get all subject the teacher is teaching and create an select with those as options
-    //for now it is static and stored in the global const allSubjects
-    let previouslySelected;
-    let optionsHTML;
-    let selected = '';
 
-    //was something pre-selected or is it for a new Task form?
-    //if something was preselected, set the corresponding option to selected
-    if (event) previouslySelected = event.target.closest('tr').querySelector('td[data-subject]').dataset.subject;
-
-    previouslySelected == '-'
-        ? optionsHTML = '<option value="-" selected>-</option>'
-        : optionsHTML = '<option value="-">-</option>';
-
-
-    allSubjects.forEach((entry) => {
-        entry.subject == previouslySelected ? selected = 'selected' : selected = '';
-
-        optionsHTML += `<option value="${entry.subject}" ${selected}>${entry.subject}</option>`;
-    });
-
-    return `<select class="lessonSelect">${optionsHTML}</select>`;
-}
 
 function saveNewTask(item) {
 
@@ -300,45 +337,7 @@ function saveNewTask(item) {
     form.addEventListener('mouseout', removeLessonHighlight);
 }
 
-function updateTask(item) {
-    let form = item.closest('tr');
-    let formData = new FormData();
-    let taskData = {};
 
-    let classTd = form.querySelector('td[data-class]');
-    let subjectTd = form.querySelector('td[data-subject]');
-
-    //apply changes to datasets
-    classTd.dataset.class = form.querySelector('td[data-class]').innerText;
-    if (subjectTd.querySelector('td[data-subject] select')) {
-        subjectTd.dataset.subject = subjectTd.querySelector('select').value;
-    } else {
-        subjectTd.dataset.subject = subjectTd.innerText;
-    }
-
-
-    taskData = {
-        'id': form.dataset.taskid,
-        'class': form.querySelector('td[data-class]').innerText,
-        'subject': form.querySelector('td[data-subject] select') // select or not?
-            ? form.querySelector('td[data-subject] select').value
-            : form.querySelector('td[data-subject]').innerText,
-        'date': form.dataset.date,
-        'timeslot': form.dataset.timeslot,
-        'description': form.querySelector('td[data-taskDescription]').innerText
-    }
-
-
-    Object.entries(taskData).forEach((key, value) => { formData.append(key, value) });
-
-
-    //send this stuff to the backend via fetch-API
-    //then =>
-    removeEditability(item);
-    removeDiscardButton(item);
-    saveTaskToSetDoneButton(item);
-    updateLessonOnTimetable(taskData);
-}
 
 function discardNewTask(item) {
     let data = {
@@ -378,31 +377,11 @@ function removeAddLessonButton() {
     });
 }
 
-function createSaveAndDiscardChangesButton(event) {
 
-    let parentTr = event.target.closest('tr');
-    let buttonTd = parentTr.querySelector('.taskDone');
 
-    if (buttonTd.querySelector('.setTaskDoneButton')) buttonTd.querySelector('.setTaskDoneButton').remove();
 
-    buttonTd.innerHTML = '<button class="updateTaskButton" onclick="updateTask(this)">&#x2714;</button><button class="discardUpdateTaskButton" onclick="revertChanges(this)">&#x2718;</button>';
 
-}
 
-function removeDiscardButton(item) {
-    item = item.target ? item.target : item;
-
-    item.classList.contains('discardUpdateTaskButton') ? item.remove() : item.nextSibling.remove()
-
-}
-
-function saveTaskToSetDoneButton(item) {
-    item = item.target ? item.target : item;
-    let buttonTd = item.parentElement;
-
-    item.remove();
-    buttonTd.innerHTML = '<button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button>';
-}
 
 // FIDDLING WITH DATE
 
@@ -468,7 +447,6 @@ function switchToPreviousWeek() {
 
     setWeekStartAndEndDate();
     calcCalendarWeek(false);
-    bindTasksToLessons();
 }
 
 function switchToNextWeek() {
@@ -486,7 +464,6 @@ function switchToNextWeek() {
 
     setWeekStartAndEndDate();
     calcCalendarWeek(true);
-    bindTasksToLessons();
 }
 
 function calcCalendarWeek(countUp = true) {
@@ -495,7 +472,7 @@ function calcCalendarWeek(countUp = true) {
 
     let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
 
-    let weeksPerYear = getNumberOfWeeksPerYear(mondayDate.getFullYear());
+    let weeksPerYear = Fn.getNumberOfWeeksPerYear(mondayDate.getFullYear());
 
     countUp ? weekCounter++ : weekCounter--;
 
@@ -519,7 +496,7 @@ function runWeekSwitchAnimation(nextWeek = true) {
     if (nextWeek == true) verticalOffset = window.innerWidth;
     if (nextWeek == false) verticalOffset = window.innerWidth * -1;
 
-    removeAllLessons(blankWeekTable);
+    LessonView.removeAllLessons(blankWeekTable);
 
     //setup for the animation
     weekOverview.style.left = '0px';
@@ -541,8 +518,8 @@ function runWeekSwitchAnimation(nextWeek = true) {
     setTimeout(() => {
         blankWeekTable.remove()
         weekOverview.style.left = 'auto';
-        removeAllLessons(weekOverview);
-        fillTimetableWithLessons();
+        LessonView.removeAllLessons(weekOverview);
+        LessonView.renderLesson();
 
         weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
             lesson.style.opacity = '0';

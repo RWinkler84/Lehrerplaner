@@ -1,18 +1,13 @@
-import LessonController from "../Controllers/LessonController.js";
+import Controller from "../Controllers/LessonController.js";
 
 export default class LessonView {
-    #controller
 
-    constructor() {
-        this.#controller = new LessonController();
-    }
-
-    renderLesson() {
+    static renderLesson() {
         let monday = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         let sunday = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
-        let regularLessons = LessonController.getScheduledLessons();
-        let lessonChanges = LessonController.getTimetableChanges(monday, sunday);
+        let regularLessons = Controller.getScheduledLessons();
+        let lessonChanges = Controller.getTimetableChanges(monday, sunday);
 
         regularLessons.forEach((lesson) => {
             let timeslot = this.#getTimeslotOfLesson(lesson);
@@ -36,7 +31,7 @@ export default class LessonView {
 
     }
 
-    #getTimeslotOfLesson(lesson) {
+    static #getTimeslotOfLesson(lesson) {
 
         let allWeekdays = document.querySelectorAll('.weekday');
         let weekday;
@@ -61,11 +56,11 @@ export default class LessonView {
         return timeslot;
     }
 
-    #removeAllLessons(element) {
+    static removeAllLessons(element) {
         element.querySelectorAll('.lesson').forEach((lesson) => {
             lesson.remove();
         })
     }
 
-    
+
 }

@@ -1,15 +1,20 @@
-import Task from '../Controllers/TaskController.js';
+import AbstractView from './AbstractView.js';
+import Controller from '../Controllers/TaskController.js';
 
-export default class TaskView {
+export default class TaskView extends AbstractView {
 
-    renderUpcomingTasks() {
-        let allUpcomingTasks = Task.getAllOpenTasks();
+    constructor() {
+        super()
+    }
+
+    static renderUpcomingTasks() {
+        let allUpcomingTasks = Controller.getAllOpenTasks();
         let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
         let taskTrHTML = '';
 
 
         if (allUpcomingTasks.length == 0) {
-            document.querySelector('td[data-noEntriesFound]').style.display = 'table-cell';
+            document.querySelector('#upcomingTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
             return;
         }
 
@@ -32,51 +37,98 @@ export default class TaskView {
 
         upcomingTasksTableBody.innerHTML = taskTrHTML;
 
-        document.querySelectorAll('#taskContainer td').forEach((td) => {
-            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
-        });
-
-        document.querySelectorAll('#taskContainer td').forEach((td) => {
-            td.addEventListener('dblclick', createSaveAndDiscardChangesButton);
-        });
-
-        bindTasksToLessons();
+        TaskView.#addEventListenersToTasks();
     }
 
-    renderInProgressTasks() {
+    static renderInProgressTasks() {
+        let allInProgressTasks = Controller.getAllInProgressTasks();
+        let inProgressTasksTableBody = document.querySelector('#inProgressTasksTable tbody');
+        let taskTrHTML = '';
 
+
+        if (allInProgressTasks.length == 0) {
+            document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
+            return;
+        }
+
+        allInProgressTasks.forEach((task) => {
+            let borderLeft = 'style="border-left: 3px solid transparent;"';
+
+            if (new Date(task.date) < new Date()) {
+                borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
+            }
+
+            taskTrHTML += `
+                    <tr data-taskid="${task.id}">
+                        <td ${borderLeft} data-class="${task.class}">${task.class}</td>
+                        <td data-subject="${task.subject}">${task.subject}</td>
+                        <td class="taskDescription" data-taskDescription="">${task.description}</td>
+                        <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+                    </tr>
+                `;
+        });
+
+        inProgressTasksTableBody.innerHTML = taskTrHTML;
+
+        TaskView.#addEventListenersToTasks();
+    }
+
+    static updateTask(event) {
+        let taskTr = event.target.closest('tr');
+        let classTd = taskTr.querySelector('td[data-class]');
+        let subjectTd = taskTr.querySelector('td[data-subject]');
+        
+        let taskData = {
+            'id': taskTr.dataset.taskid,
+            'class': taskTr.querySelector('td[data-class]').innerText,
+            'subject': taskTr.querySelector('td[data-subject] select') // select or not?
+                ? taskTr.querySelector('td[data-subject] select').value
+                : taskTr.querySelector('td[data-subject]').innerText,
+            'description': taskTr.querySelector('td[data-taskdescription]').innerText,
+        }
+
+        //apply changes to datasets
+        classTd.dataset.class = classTd.innerText;
+        if (subjectTd.querySelector('td[data-subject] select')) {
+            subjectTd.dataset.subject = subjectTd.querySelector('select').value;
+        } else {
+            subjectTd.dataset.subject = subjectTd.innerText;
+        }
+
+        Controller.updateTask(taskData);
+        TaskView.#removeEditability(event);
+        TaskView.#removeDiscardButton(event);
+        TaskView.#saveTaskToSetDoneButton(event);
     }
 
     static makeEditable(event) {
 
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
+        if (event.target.isContentEditable) return;
 
-        TaskView.backUpTaskData(event);
+        this.#backupTaskData(event);
 
         let parentTr = event.target.closest('tr');
 
         parentTr.querySelectorAll('td:not(.taskDone)').forEach((td) => {
 
             if (td.dataset.subject) {
-                td.innerHTML = getSubjectSelectHTML(event);
+                td.innerHTML = this.getSubjectSelectHTML(event);
                 td.style.padding = '0';
-                // td.addEventListener('focusout', removeEditability);
-                createSaveAndDiscardChangesButton(event);
             }
 
             td.setAttribute('contenteditable', '');
 
             event.target.focus();
-            // td.addEventListener('focusout', removeEditability);
         });
 
         window.getSelection().removeAllRanges();
-        createSaveAndDiscardChangesButton(event);
+        TaskView.#createSaveAndDiscardChangesButton(event);
     }
 
-    removeEditability(item) {
+    static #removeEditability(itemOrEvent) {
 
-        item.target ? item = item.target : item;
+        let item = itemOrEvent.target ? itemOrEvent.target : itemOrEvent;
 
         item.closest('tr').querySelectorAll('td').forEach((td) => {
 
@@ -97,15 +149,35 @@ export default class TaskView {
         });
     }
 
-    static revertChanges(item) {
-        let parentTr = item.closest('tr');
-        let taskId = parentTr.dataset.taskid;
+    static #createSaveAndDiscardChangesButton(event) {
+        let parentTr = event.target.closest('tr');
+        let buttonTd = parentTr.querySelector('.taskDone');
 
-        parentTr.querySelector('td[data-class]').innerText = taskDataBackupObject[taskId].class;
-        parentTr.querySelector('td[data-subject]').innerText = taskDataBackupObject[taskId].subject;
-        parentTr.querySelector('td[data-taskDescription]').innerText = taskDataBackupObject[taskId].description;
-        removeEditability(item);
-        removeDiscardButton(item);
+        if (buttonTd.querySelector('.setTaskDoneButton')) buttonTd.querySelector('.setTaskDoneButton').remove();
+
+        buttonTd.innerHTML = '<button class="updateTaskButton">&#x2714;</button><button class="discardUpdateTaskButton">&#x2718;</button>';
+        buttonTd.querySelector('.updateTaskButton').addEventListener('click', (event) => { TaskView.updateTask(event) });
+        buttonTd.querySelector('.discardUpdateTaskButton').addEventListener('click', (event) => { TaskView.revertChanges(event) });
+    }
+
+    static #saveTaskToSetDoneButton(item) {
+    item = item.target ? item.target : item;
+    let buttonTd = item.parentElement;
+
+    item.remove();
+    buttonTd.innerHTML = '<button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button>';
+}
+
+    static revertChanges(event) {
+        let parentTr = event.target.closest('tr');
+        let taskId = parentTr.dataset.taskid;
+        let task = Controller.getTaskBackupData(taskId);
+
+        parentTr.querySelector('td[data-class]').innerText = task.class;
+        parentTr.querySelector('td[data-subject]').innerText = task.subject;
+        parentTr.querySelector('td[data-taskDescription]').innerText = task.description;
+        TaskView.#removeEditability(event);
+        TaskView.#removeDiscardButton(event);
     }
 
     static setTaskDone(item) {
@@ -113,11 +185,24 @@ export default class TaskView {
         console.log(item);
     }
 
-    static backUpTaskData(event) {
+    static #backupTaskData(event) {
 
         let parentTr = event.target.closest('tr');
         let taskId = parentTr.dataset.taskid;
 
-        Task.backupTaskData(taskId);
+        Controller.setTaskBackupData(taskId);
+    }
+
+    static #removeDiscardButton(itemOrEvent) {
+        let item = itemOrEvent.target ? itemOrEvent.target : item;
+
+        item.classList.contains('discardUpdateTaskButton') ? item.remove() : item.nextSibling.remove()
+
+    }
+
+    static #addEventListenersToTasks() {
+        document.querySelectorAll('#taskContainer td').forEach((td) => {
+            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        });
     }
 }
