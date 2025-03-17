@@ -1,4 +1,5 @@
 import Task from '../Models/Task.js';
+import TaskView from '../Views/TaskView.js';
 
 export default class TaskController {
 
@@ -22,6 +23,10 @@ export default class TaskController {
         return task.getBackupData();
     }
 
+    static createNewTask(){
+        TaskView.createNewTask();
+    }
+    
     static updateTask(taskData) {
         let task = new Task(taskData.id);
 

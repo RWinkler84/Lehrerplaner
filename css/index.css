@@ -105,6 +105,9 @@ main {}
 }
 
 .lesson {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */
     flex-grow: 1;
     margin: 0.2rem;
     padding: 0.5rem 0.5rem;
@@ -119,12 +122,33 @@ main {}
 }
 
 .lessonOptionsWrapper {
-    position: absolute;
-    top: 0;
-        margin: 0.2rem;
-    padding: 0.4rem 0.2rem;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--lightergrey);
+    margin-top: 0.2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 5px;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
 }
 
+.lessonOption {
+    display: flex;
+    padding: 0.2rem 0.5rem;
+    /* border-top: solid 1px var(--lightgrey);
+    border-bottom: solid 1px var(--lightgrey);
+    margin-bottom: -1px; */
+}
+
+.lessonOption:hover {
+    background-color: rgba(256, 256, 256, 0.1);
+}
+
+.lessonOption button {
+    color: var(--lightText);
+    border: none;
+    flex-grow: 1;
+    background-color: transparent;
+}
 
 .lessonForm {
     position: absolute;
@@ -226,16 +250,16 @@ main {}
 }
 
 .lessonOptionsButton {
-    float: left;
+    color: var(--lightgrey);
+    flex-grow: 1;
     border: none;
     border-radius: 3px;
     padding: 0 0.2em;
-    /* margin-left: 0.5rem; */
-    background-color: var(--contentContainerBackground);
+    background-color: transparent;
 }
 
 .lessonOptionsButton:hover {
-    background-color: var(--lightergrey);
+    background-color: rgba(256, 256, 256, 0.1);
 }
 
 .saveNewTaskButton,

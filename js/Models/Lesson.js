@@ -82,6 +82,7 @@ export default class Lesson {
             lesson.status = entry.status;
             lesson.timeslot = entry.timeslot;
 
+
             if (Fn.isDateInWeek(lesson.date, mondayDate, sundayDate)) changes.push(lesson);
         });
 

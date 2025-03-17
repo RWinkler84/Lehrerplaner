@@ -1,5 +1,6 @@
 import Lesson from '../Models/Lesson.js';
 import View from '../Views/LessonView.js';
+import TaskController from './TaskController.js';
 
 export default class LessonController{
 
@@ -19,5 +20,9 @@ export default class LessonController{
 
         lesson.save();
         View.renderNewLesson(lesson);
+    }
+
+    static addNewTask(){
+        TaskController.createNewTask();
     }
 }
