@@ -1,4 +1,5 @@
 import { allSubjects } from "../index.js";
+import Fn from '../inc/utils.js';
 
 export default class AbstractView {
 
@@ -25,5 +26,50 @@ export default class AbstractView {
         });
 
         return `<select class="lessonSelect">${optionsHTML}</select>`;
+    }
+
+    static showAddLessonButton(event) {
+
+        let timeslot = event.target.dataset.timeslot;
+        let date = event.target.parentElement.dataset.date;
+
+        AbstractView.removeAddLessonButton();
+
+        if (Fn.hasLesson(event.target)) return;
+
+        event.target.innerHTML = `<div class="addLessonButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addLessonButton">+</div></div>`;
+
+    }
+
+    static removeAddLessonButton() {
+
+    document.querySelectorAll('.timeslot').forEach((timeslot) => {
+        if (timeslot.querySelector('.addLessonButtonWrapper')) {
+            timeslot.querySelector('.addLessonButtonWrapper').remove();
+        }
+    });
+}
+
+    static highlightTask(event) {
+
+        let item = event.target;
+
+        document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
+            if (taskRow.dataset.taskid === item.dataset.taskid) {
+                taskRow.style.backgroundColor = 'var(--lightergrey)';
+            }
+        });
+
+        AbstractView.removeAddLessonButton();
+    }
+
+    static removeTaskHighlight(event) {
+        let item = event.target;
+
+        document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
+            if (taskRow.dataset.taskid === item.dataset.taskid) {
+                taskRow.removeAttribute('style');
+            }
+        });
     }
 }

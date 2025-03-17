@@ -118,6 +118,26 @@ main {}
     transform: translate(-1px, -1px);
 }
 
+.lessonOptionsWrapper {
+    position: absolute;
+    top: 0;
+        margin: 0.2rem;
+    padding: 0.4rem 0.2rem;
+}
+
+
+.lessonForm {
+    position: absolute;
+    display: flex;
+    /* flex-direction: column; */
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    background-color: var(--lightergrey);
+    border-radius: 5px;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    padding: 0.5rem 0.5rem;
+}
+
 .addLessonButtonWrapper {
     display: none;
     flex: 1 1 100%;
@@ -173,13 +193,16 @@ main {}
 .taskDone {
     text-align: center;
     min-width: 125px;
-    /* display: flex; */
     gap: 0.5rem;
     justify-content: center;
     vertical-align: center;
 }
 
-.taskDone button {
+/* Buttons */
+
+.taskDone button,
+.discardNewLessonButton,
+.saveNewLessonButton {
     border: none;
     padding: 0 1rem;
     border-radius: 3px;
@@ -202,26 +225,43 @@ main {}
     font-size: 1rem;
 }
 
+.lessonOptionsButton {
+    float: left;
+    border: none;
+    border-radius: 3px;
+    padding: 0 0.2em;
+    /* margin-left: 0.5rem; */
+    background-color: var(--contentContainerBackground);
+}
+
+.lessonOptionsButton:hover {
+    background-color: var(--lightergrey);
+}
+
 .saveNewTaskButton,
 .updateTaskButton,
-.setTaskDoneButton {
+.setTaskDoneButton,
+.saveNewLessonButton {
     background-color: var(--lightMatteGreen);
     margin-right: 0.5rem;
 }
 
 .discardNewTaskButton,
-.discardUpdateTaskButton {
+.discardUpdateTaskButton,
+.discardNewLessonButton {
     background-color: var(--lightMatteRed) !important;
 }
 
 .saveNewTaskButton:hover,
-.updateTaskButton:hover
-.setTaskDoneButton:hover {
+.updateTaskButton:hover,
+.setTaskDoneButton:hover,
+.saveNewLessonButton:hover {
     background-color: var(--matteGreen);
 }
 
 .discardNewTaskButton:hover,
-.discardUpdateTaskButton:hover {
+.discardUpdateTaskButton:hover,
+.discardNewLessonButton:hover {
     background-color: var(--matteRed) !important; 
 }
 

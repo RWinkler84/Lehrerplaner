@@ -1,11 +1,7 @@
 import Lesson from '../Models/Lesson.js';
+import View from '../Views/LessonView.js';
 
 export default class LessonController{
-    lesson;
-
-    constructor(){
-        this.lesson = new Lesson;
-    }
 
     static getScheduledLessons() {
         return Lesson.getScheduledLessons();
@@ -15,4 +11,13 @@ export default class LessonController{
         return Lesson.getTimetableChanges(mondayDate, sundayDate);
     }
 
+    static saveNewLesson(lessonData) {
+
+        let lesson = new Lesson(lessonData.class, lessonData.subject);
+        lesson.date = lessonData.date;
+        lesson.timeslot = lessonData.timeslot;
+
+        lesson.save();
+        View.renderNewLesson(lesson);
+    }
 }

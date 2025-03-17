@@ -79,9 +79,33 @@ export let allTasksArray = [
         }
     ];
 
+export let timetableChanges = [
+        {
+            'date': '2025-03-06',
+            'timeslot': '5',
+            'class': '7A',
+            'subject': 'Gesch',
+            'status': 'canceled',
+        },
+        {
+            'date': '2025-03-7',
+            'timeslot': '5',
+            'class': '5B',
+            'subject': 'MNT',
+            'status': 'sub',
+        },
+        {
+            'date': '2025-03-11',
+            'timeslot': '5',
+            'class': '5B',
+            'subject': 'MNT',
+            'status': 'sub',
+        }
+    ];
+
 export let taskBackupArray = [];
 
-
+import AbstractView from './Views/AbstractView.js';
 import TaskView from './Views/TaskView.js';
 import LessonView from './Views/LessonView.js';
 import Fn from './inc/utils.js';
@@ -101,11 +125,11 @@ document.querySelectorAll('tr[data-taskid]').forEach((element) => {
 // handlers for empty timeslots
 
 document.querySelectorAll('.timeslot').forEach((element) => {
-    element.addEventListener('mouseenter', showAddLessonButton);
+    element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
 });
 
 document.querySelectorAll('.timeslot').forEach((element) => {
-    element.addEventListener('click', createLessonForm);
+    element.addEventListener('click', LessonView.createLessonForm);
 });
 
 
@@ -124,11 +148,10 @@ document.querySelector('#weekForwardButton').addEventListener('click', switchToN
 document.addEventListener('DOMContentLoaded', setDateForWeekdays);
 document.addEventListener('DOMContentLoaded', setCalendarWeek);
 document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
-// document.addEventListener('DOMContentLoaded', fillTimetableWithLessons);
-document.addEventListener('DOMContentLoaded',() => LessonView.renderLesson());
+document.addEventListener('DOMContentLoaded', LessonView.renderLesson);
 
-document.addEventListener('DOMContentLoaded', () => TaskView.renderUpcomingTasks());
-document.addEventListener('DOMContentLoaded', () => TaskView.renderInProgressTasks());
+document.addEventListener('DOMContentLoaded', TaskView.renderUpcomingTasks);
+document.addEventListener('DOMContentLoaded', TaskView.renderInProgressTasks);
 
 //DATABASE FOR STRUCTURE TESTING
 
@@ -138,29 +161,6 @@ document.addEventListener('DOMContentLoaded', () => TaskView.renderInProgressTas
 
 
 //HIGHLIGHTING AND TOGGLING STUFF
-
-function highlightTask(event) {
-
-    let item = event.target;
-
-    document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
-        if (taskRow.dataset.taskid === item.dataset.taskid) {
-            taskRow.style.backgroundColor = 'var(--lightergrey)';
-        }
-    });
-
-    removeAddLessonButton();
-}
-
-function removeTaskHighlight(event) {
-    let item = event.target;
-
-    document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
-        if (taskRow.dataset.taskid === item.dataset.taskid) {
-            taskRow.removeAttribute('style');
-        }
-    });
-}
 
 function hightlightLesson(event) {
     let taskId = event.target.closest('tr').dataset.taskid;
@@ -183,23 +183,6 @@ function removeLessonHighlight(event) {
     })
 }
 
-
-
-//FILLING THE LESSON AND TASK TABLES
-
-function renderLessons() {
-
-    timeTableHTML = Lesson.getTimeTable();
-
-    document.querySelectorAll('.lesson').forEach((lesson) => {
-        lesson.addEventListener('mouseover', highlightTask);
-        lesson.addEventListener('mouseout', removeTaskHighlight);
-        lesson.parentElement.removeEventListener('mouseenter', showAddLessonButton);
-        lesson.parentElement.removeEventListener('click', createTaskForm);
-    });
-    //synchronize lessons with tasks
-
-}
 
 
 function fillInProgressTaskTable() {
@@ -229,40 +212,6 @@ function fillInProgressTaskTable() {
 // }
 
 // HANDLING LESSONS
-
-function createLessonForm(event) {
-
-    console.log(event.target);
-
-    let addLessonButton = event.target.classList.contains('addLessonButton') ? event.target.parentElement : event.target;
-    let timeslotElement = event.target.closest('tr');
-
-    let lesson = new Lesson(undefined, undefined);
-
-    lesson.date = addLessonButton.dataset.date;
-    lesson.timeslot = addLessonButton.dataset.timeslot
-
-
-}
-
-function addLessonToTimetable(lesson) {
-
-    if (!isDateInCurrentlyDisplayedWeek(lesson.date)) return;
-
-    let timetableTimeslot;
-    let lessonHTML = `
-        <div class="lesson ${lesson.cssColorClass}">${lesson.class} ${lesson.subject}</div>
-    `;
-
-    timetableTimeslot = getTimeslotOfLesson(lesson);
-
-
-    timetableTimeslot.innerHTML = lessonHTML;
-
-    timetableTimeslot.removeEventListener('click', createTaskForm);
-    timetableTimeslot.firstElementChild.addEventListener('mouseover', highlightTask);
-    timetableTimeslot.firstElementChild.addEventListener('mouseout', removeTaskHighlight);
-}
 
 
 // HANDLING TASKS
@@ -355,27 +304,9 @@ function discardNewTask(item) {
 
 // BUTTONS!!!
 
-function showAddLessonButton(event) {
 
-    let timeslot = event.target.dataset.timeslot;
-    let date = event.target.parentElement.dataset.date;
 
-    removeAddLessonButton();
 
-    if (Fn.hasLesson(event.target)) return;
-
-    event.target.innerHTML = `<div class="addLessonButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addLessonButton">+</div></div>`;
-
-}
-
-function removeAddLessonButton() {
-
-    document.querySelectorAll('.timeslot').forEach((timeslot) => {
-        if (timeslot.querySelector('.addLessonButtonWrapper')) {
-            timeslot.querySelector('.addLessonButtonWrapper').remove();
-        }
-    });
-}
 
 
 

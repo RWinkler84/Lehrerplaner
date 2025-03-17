@@ -1,4 +1,5 @@
 import { allSubjects } from "../index.js";
+import { timetableChanges } from "../index.js";
 import Fn from '../inc/utils.js';
 
 
@@ -30,29 +31,7 @@ export default class Lesson {
         }
     ];
 
-    static #timetableChanges = [
-        {
-            'date': '2025-03-06',
-            'timeslot': '5',
-            'class': '7A',
-            'subject': 'Gesch',
-            'status': 'canceled',
-        },
-        {
-            'date': '2025-03-7',
-            'timeslot': '5',
-            'class': '5B',
-            'subject': 'MNT',
-            'status': 'sub',
-        },
-        {
-            'date': '2025-03-11',
-            'timeslot': '5',
-            'class': '5B',
-            'subject': 'MNT',
-            'status': 'sub',
-        }
-    ];
+
 
     #class;
     #subject;
@@ -95,18 +74,30 @@ export default class Lesson {
     }
 
     static getTimetableChanges(mondayDate, sundayDate) {
-        let timetableChanges = [];
+        let changes = [];
 
-        this.#timetableChanges.forEach((entry) => {
+        timetableChanges.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
             lesson.date = new Date (entry.date);
             lesson.status = entry.status;
             lesson.timeslot = entry.timeslot;
 
-            if (Fn.isDateInWeek(lesson.date, mondayDate, sundayDate)) timetableChanges.push(lesson);
+            if (Fn.isDateInWeek(lesson.date, mondayDate, sundayDate)) changes.push(lesson);
         });
 
-        return timetableChanges;
+        return changes;
+    }
+
+    save(){
+        let lessonData =         {
+            'date': this.#date,
+            'timeslot': this.#timeslot,
+            'class': this.#class,
+            'subject': this.#subject,
+            'status': 'sub',
+        };
+
+        timetableChanges.push(lessonData);
     }
 
 
