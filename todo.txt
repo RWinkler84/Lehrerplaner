@@ -1,6 +1,8 @@
-- Task-Methoden auf OOP umbauen
-- Formular für Lessons implementieren
-- Lessens im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen)
+
+- Lessons im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen) 
+    -> createTask in der TaskView fehlt
+    -> setLessonCanceled in der LessonView fehlt
+- Farbe und Inhalt des LessonMenus bei gecancelten Lessons ändern (keine Task für Ausfallstunden) 
 
 erledigt: 
 
@@ -19,4 +21,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - discardTaskChanges anlegen für den Fall, dass man Änderungen an einer bestehenden Task rückgängig machen will
 - es gibt einen Fehler beim Auslesen des Selects für das Datenbackup, wodurch es gelegentlich auf undefined gesetzt wird
 - verhindern, dass mehrere Tasks auf den gleichen Timeslot angelegt werden
-- anlegen von Lessons aus der Mockup-Datenbank (in progress)
+- anlegen von Lessons aus der Mockup-Datenbank
+- Formular für Lessons implementieren
+- Task-Methoden auf OOP umbauen

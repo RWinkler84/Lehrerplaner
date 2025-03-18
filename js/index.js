@@ -17,91 +17,117 @@ export const allSubjects = [
 ];
 
 export let allTasksArray = [
-        {
-            'id': 1,
-            'date': '2025-03-11',
-            'timeslot': '2',
-            'class': '6A',
-            'subject': 'Gesch',
-            'description': 'die Schafe hüten',
-            'status': 'inProgress',
-            'fixedTime': false
-        },
-        {
-            'id': 2,
-            'date': '2025-02-10',
-            'timeslot': '3',
-            'class': '7B',
-            'subject': 'Deu',
-            'description': 'den Klassenraum streichen',
-            'status': 'inProgress',
-            'fixedTime': false
-        },
-        {
-            'id': 3,
-            'date': '2025-03-18',
-            'timeslot': '2',
-            'class': '6A',
-            'subject': 'Gesch',
-            'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
-            'status': 'open',
-            'fixedTime': true
-        },
-        {
-            'id': 4,
-            'date': '2025-03-06',
-            'timeslot': '5',
-            'class': '7A',
-            'subject': 'Gesch',
-            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-            'status': 'open',
-            'fixedTime': false
-        },
-        {
-            'id': 5,
-            'date': '2025-03-10',
-            'timeslot': '2',
-            'class': '7A',
-            'subject': 'Gesch',
-            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-            'status': 'open',
-            'fixedTime': false
-        },
-        {
-            'id': 6,
-            'date': '2025-03-13',
-            'timeslot': '5',
-            'class': '7A',
-            'subject': 'Gesch',
-            'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-            'status': 'open',
-            'fixedTime': true
-        }
-    ];
+    {
+        'id': 1,
+        'date': '2025-03-11',
+        'timeslot': '2',
+        'class': '6A',
+        'subject': 'Gesch',
+        'description': 'die Schafe hüten',
+        'status': 'inProgress',
+        'fixedTime': false
+    },
+    {
+        'id': 2,
+        'date': '2025-02-10',
+        'timeslot': '3',
+        'class': '7B',
+        'subject': 'Deu',
+        'description': 'den Klassenraum streichen',
+        'status': 'inProgress',
+        'fixedTime': false
+    },
+    {
+        'id': 3,
+        'date': '2025-03-18',
+        'timeslot': '2',
+        'class': '6A',
+        'subject': 'Gesch',
+        'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
+        'status': 'open',
+        'fixedTime': true
+    },
+    {
+        'id': 4,
+        'date': '2025-03-06',
+        'timeslot': '5',
+        'class': '7A',
+        'subject': 'Gesch',
+        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+        'status': 'open',
+        'fixedTime': false
+    },
+    {
+        'id': 5,
+        'date': '2025-03-10',
+        'timeslot': '2',
+        'class': '7A',
+        'subject': 'Gesch',
+        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+        'status': 'open',
+        'fixedTime': false
+    },
+    {
+        'id': 6,
+        'date': '2025-03-13',
+        'timeslot': '5',
+        'class': '7A',
+        'subject': 'Gesch',
+        'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
+        'status': 'open',
+        'fixedTime': true
+    }
+];
+
+export let standardTimetable = [
+    {
+        'class': '7B',
+        'subject': 'Deu',
+        'weekdayNumber': 1,
+        'timeslot': 3
+    },
+    {
+        'class': '6A',
+        'subject': 'Gesch',
+        'weekdayNumber': 2,
+        'timeslot': 2
+    },
+    {
+        'class': '7B',
+        'subject': 'Deu',
+        'weekdayNumber': 4,
+        'timeslot': 3
+    }, {
+        'class': '7A',
+        'subject': 'Gesch',
+        'weekdayNumber': 4,
+        'timeslot': 5
+    }
+];
 
 export let timetableChanges = [
-        {
-            'date': '2025-03-06',
-            'timeslot': '5',
-            'class': '7A',
-            'subject': 'Gesch',
-            'status': 'canceled',
-        },
-        {
-            'date': '2025-03-7',
-            'timeslot': '5',
-            'class': '5B',
-            'subject': 'MNT',
-            'status': 'sub',
-        },
-        {
-            'date': '2025-03-11',
-            'timeslot': '5',
-            'class': '5B',
-            'subject': 'MNT',
-            'status': 'sub',
-        }
-    ];
+    {
+        'date': '2025-03-06',
+        'timeslot': '5',
+        'class': '7A',
+        'subject': 'Gesch',
+        'status': 'canceled',
+    },
+    {
+        'date': '2025-03-7',
+        'timeslot': '5',
+        'class': '5B',
+        'subject': 'MNT',
+        'status': 'sub',
+    },
+    {
+        'date': '2025-03-11',
+        'timeslot': '5',
+        'class': '5B',
+        'subject': 'MNT',
+        'status': 'sub',
+    }
+];
 
 export let taskBackupArray = [];
 
@@ -207,8 +233,8 @@ function fillInProgressTaskTable() {
 //     }
 
 
-    //     //wenn vergangene Woche, alles binden, was älter oder in der Woche
-    //     //wenn kommende Woche, alles binden, was in dieser Woche liegt
+//     //wenn vergangene Woche, alles binden, was älter oder in der Woche
+//     //wenn kommende Woche, alles binden, was in dieser Woche liegt
 // }
 
 // HANDLING LESSONS

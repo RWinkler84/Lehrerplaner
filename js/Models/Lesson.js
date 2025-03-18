@@ -1,37 +1,10 @@
 import { allSubjects } from "../index.js";
 import { timetableChanges } from "../index.js";
+import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
 
 
 export default class Lesson {
-
-    static #standardTimetable = [
-        {
-            'class': '7B',
-            'subject': 'Deu',
-            'weekdayNumber': 1,
-            'timeslot': 3
-        },
-        {
-            'class': '6A',
-            'subject': 'Gesch',
-            'weekdayNumber': 2,
-            'timeslot': 2
-        },
-        {
-            'class': '7B',
-            'subject': 'Deu',
-            'weekdayNumber': 4,
-            'timeslot': 3
-        }, {
-            'class': '7A',
-            'subject': 'Gesch',
-            'weekdayNumber': 4,
-            'timeslot': 5
-        }
-    ];
-
-
 
     #class;
     #subject;
@@ -62,7 +35,7 @@ export default class Lesson {
     static getScheduledLessons() {
         let regularLessons = [];
 
-        this.#standardTimetable.forEach((entry) => {
+        standardTimetable.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
             lesson.weekday = entry.weekdayNumber;
             lesson.timeslot = entry.timeslot;
@@ -78,7 +51,7 @@ export default class Lesson {
 
         timetableChanges.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
-            lesson.date = new Date (entry.date);
+            lesson.date = new Date(entry.date);
             lesson.status = entry.status;
             lesson.timeslot = entry.timeslot;
 
@@ -89,16 +62,50 @@ export default class Lesson {
         return changes;
     }
 
-    save(){
-        let lessonData =         {
+    //public object methods
+    save() {
+        let lessonData = {
             'date': this.#date,
             'timeslot': this.#timeslot,
             'class': this.#class,
             'subject': this.#subject,
-            'status': 'sub',
+            'status': this.#status,
         };
 
         timetableChanges.push(lessonData);
+    }
+
+    cancel() {
+        let lessonData = {
+            'date': this.#date,
+            'timeslot': this.#timeslot,
+            'class': this.#class,
+            'subject': this.#subject,
+            'status': this.#status,
+        };
+
+        timetableChanges.push(lessonData);
+
+        console.log(timetableChanges);
+    }
+
+    uncancel() {
+        // is uncanceled lesson a regular lesson?
+        standardTimetable.forEach((entry) => {
+            if (entry.weekday == this.#weekday && entry.timeslot == this.#timeslot) {
+                for (let i = 0; i < timetableChanges.length; i++) {
+                    if (timetableChanges[i].date == this.#date && timetableChanges[i].timeslot) {
+                        timetableChanges.splice(i, 1);
+                        
+                        return;
+                    }
+                }
+            }
+        });
+
+        timetableChanges.forEach((entry) => {
+            if (entry.date == this.#date && entry.timeslot == this.#timeslot) entry.status = 'sub';
+        })
     }
 
 

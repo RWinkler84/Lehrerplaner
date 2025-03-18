@@ -23,8 +23,9 @@ export default class TaskController {
         return task.getBackupData();
     }
 
-    static createNewTask(){
-        TaskView.createNewTask();
+    static createNewTask(event){
+        console.log(event.target);
+        TaskView.createNewTask(event);
     }
     
     static updateTask(taskData) {

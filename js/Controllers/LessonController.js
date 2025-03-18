@@ -2,7 +2,7 @@ import Lesson from '../Models/Lesson.js';
 import View from '../Views/LessonView.js';
 import TaskController from './TaskController.js';
 
-export default class LessonController{
+export default class LessonController {
 
     static getScheduledLessons() {
         return Lesson.getScheduledLessons();
@@ -17,12 +17,30 @@ export default class LessonController{
         let lesson = new Lesson(lessonData.class, lessonData.subject);
         lesson.date = lessonData.date;
         lesson.timeslot = lessonData.timeslot;
+        lesson.status = 'sub';
 
         lesson.save();
         View.renderNewLesson(lesson);
     }
 
-    static addNewTask(){
-        TaskController.createNewTask();
+    static setLessonCanceled(lessonData) {
+        let lesson = new Lesson(lessonData.class, lessonData.subject);
+        lesson.date = lessonData.date;
+        lesson.timeslot = lessonData.timeslot;
+        lesson.status = 'canceled';
+
+        lesson.cancel();
+    }
+
+    static setLessonNotCanceled(lessonData) {
+        let lesson = new Lesson(lessonData.class, lessonData.subject);
+        lesson.date = lessonData.date;
+        lesson.timeslot = lessonData.timeslot;
+
+        lesson.uncancel();       
+    }
+
+    static createNewTask(event) {
+        TaskController.createNewTask(event);
     }
 }
