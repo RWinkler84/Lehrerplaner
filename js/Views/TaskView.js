@@ -9,7 +9,7 @@ export default class TaskView extends AbstractView {
 
     static renderUpcomingTasks() {
         let allUpcomingTasks = Controller.getAllOpenTasks();
-        let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
+        let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable .tbody');
         let taskTrHTML = '';
 
 
@@ -24,21 +24,63 @@ export default class TaskView extends AbstractView {
             if (new Date(task.date) < new Date()) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
             }
-
+            
             taskTrHTML += `
-                    <tr data-taskid="${task.id}">
-                        <td ${borderLeft} data-class="${task.class}">${task.class}</td>
-                        <td data-subject="${task.subject}">${task.subject}</td>
-                        <td class="taskDescription" data-taskDescription="">${task.description}</td>
-                        <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
-                    </tr>
-                `;
+                <div class="tr">
+                    <div ${borderLeft} data-class="${task.class}" class="td">${task.class}</div>
+                    <div class="td"data-subject="${task.subject}">${task.subject}</div>
+                    <div class="td taskDescription" data-taskDescription="">${task.description}</div>
+                    <div class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></div>
+                </div>
+            `;
+
+            // taskTrHTML += `
+            //         <tr data-taskid="${task.id}">
+            //             <td ${borderLeft} data-class="${task.class}">${task.class}</td>
+            //             <td data-subject="${task.subject}">${task.subject}</td>
+            //             <td class="taskDescription" data-taskDescription="">${task.description}</td>
+            //             <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+            //         </tr>
+            //     `;
         });
 
         upcomingTasksTableBody.innerHTML = taskTrHTML;
 
         TaskView.#addEventListenersToTasks();
     }
+
+    // static renderUpcomingTasks() {
+    //     let allUpcomingTasks = Controller.getAllOpenTasks();
+    //     let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
+    //     let taskTrHTML = '';
+
+
+    //     if (allUpcomingTasks.length == 0) {
+    //         document.querySelector('#upcomingTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
+    //         return;
+    //     }
+
+    //     allUpcomingTasks.forEach((task) => {
+    //         let borderLeft = 'style="border-left: 3px solid transparent;"';
+
+    //         if (new Date(task.date) < new Date()) {
+    //             borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
+    //         }
+
+    //         taskTrHTML += `
+    //                 <tr data-taskid="${task.id}">
+    //                     <td ${borderLeft} data-class="${task.class}">${task.class}</td>
+    //                     <td data-subject="${task.subject}">${task.subject}</td>
+    //                     <td class="taskDescription" data-taskDescription="">${task.description}</td>
+    //                     <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+    //                 </tr>
+    //             `;
+    //     });
+
+    //     upcomingTasksTableBody.innerHTML = taskTrHTML;
+
+    //     TaskView.#addEventListenersToTasks();
+    // }
 
     static renderInProgressTasks() {
         let allInProgressTasks = Controller.getAllInProgressTasks();
@@ -73,11 +115,77 @@ export default class TaskView extends AbstractView {
         TaskView.#addEventListenersToTasks();
     }
 
+    static createTaskForm(event) {
+
+        console.log(event.target);
+
+        document.querySelectorAll('tbody td').forEach((td) => {
+
+        });
+
+        let taskTable = document.querySelector('#upcomingTasksTable tbody');
+
+        // let trContent = `
+        // <td contenteditable data-class></td>
+        // <td data-subject="" style="padding: 0">${subjectSelect}</td>
+        // <td class="taskDescription" data-taskDescription contenteditable></td>
+        // <td class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></td>
+        // `;
+
+        let trContent = `
+            <div class="tr">
+                <div class="td">7A</div>
+                <div class="td">Deu</div>
+                <div class="td">deine Mutter ihr Rock</div>
+                <div class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></div>
+            </div>
+        `;
+
+        let newTableRow = document.createElement('tr');
+
+        taskTable.append(newTableRow);
+
+        let tr = taskTable.lastElementChild;
+
+        tr.dataset.taskid = '';
+        tr.dataset.date = event.target.closest('.weekday').dataset.date;
+        tr.dataset.timeslot = event.target.closest('.timeslot').dataset.timeslot;
+        tr.innerHTML = trContent;
+
+        tr.firstElementChild.focus();
+
+        tr.querySelector('.saveNewTaskButton').addEventListener('click', TaskView.saveNewTask);
+        tr.querySelector('.discardNewTaskButton').addEventListener('click', TaskView.removeTaskForm);
+    }
+
+    static saveNewTask(event) {
+
+        let form = event.target.closest('tr');
+        let classTd = form.querySelector('td[data-class]');
+        let subjectTd = form.querySelector('td[data-subject]');
+
+        let taskData = {
+            'class': form.querySelector('td[data-class]').innerText,
+            'subject': form.querySelector('td[data-subject] select').value,
+            'date': form.dataset.date,
+            'timeslot': form.dataset.timeslot,
+            'description': form.querySelector('td[data-taskDescription]').innerText
+        }
+
+        TaskView.#removeEditability(event);
+        TaskView.#removeDiscardButton(event);
+        TaskView.#saveTaskToSetDoneButton(event);
+
+        form.querySelector('td').forEach((td) => { td.addEventListener('dblclick', event => TaskView.makeEditable(event)) });
+        // form.addEventListener('mouseover', hightlightLesson);
+        // form.addEventListener('mouseout', removeLessonHighlight);
+    }
+
     static updateTask(event) {
         let taskTr = event.target.closest('tr');
         let classTd = taskTr.querySelector('td[data-class]');
         let subjectTd = taskTr.querySelector('td[data-subject]');
-        
+
         let taskData = {
             'id': taskTr.dataset.taskid,
             'class': taskTr.querySelector('td[data-class]').innerText,
@@ -110,17 +218,8 @@ export default class TaskView extends AbstractView {
 
         let parentTr = event.target.closest('tr');
 
-        parentTr.querySelectorAll('td:not(.taskDone)').forEach((td) => {
-
-            if (td.dataset.subject) {
-                td.innerHTML = this.getSubjectSelectHTML(event);
-                td.style.padding = '0';
-            }
-
-            td.setAttribute('contenteditable', '');
-
-            event.target.focus();
-        });
+        parentTr.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
+        parentTr.querySelector('td[data-taskdescription]').focus();
 
         window.getSelection().removeAllRanges();
         TaskView.#createSaveAndDiscardChangesButton(event);
@@ -149,6 +248,10 @@ export default class TaskView extends AbstractView {
         });
     }
 
+    static removeTaskForm(event) {
+        event.target.closest('tr').remove();
+    }
+
     static #createSaveAndDiscardChangesButton(event) {
         let parentTr = event.target.closest('tr');
         let buttonTd = parentTr.querySelector('.taskDone');
@@ -161,12 +264,12 @@ export default class TaskView extends AbstractView {
     }
 
     static #saveTaskToSetDoneButton(item) {
-    item = item.target ? item.target : item;
-    let buttonTd = item.parentElement;
+        item = item.target ? item.target : item;
+        let buttonTd = item.parentElement;
 
-    item.remove();
-    buttonTd.innerHTML = '<button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button>';
-}
+        item.remove();
+        buttonTd.innerHTML = '<button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button>';
+    }
 
     static revertChanges(event) {
         let parentTr = event.target.closest('tr');

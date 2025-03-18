@@ -140,7 +140,7 @@ main {}
 
 .lessonOption {
     display: flex;
-    padding: 0.2rem 0.5rem;
+    /* padding: 0.2rem 0.5rem; */
 }
 
 .lessonOption:hover {
@@ -241,7 +241,7 @@ main {}
 
 .taskDone button:hover {
     background-color: var(--matteGreen);
-} 
+}
 
 .lessonSelect {
     appearance: none;
@@ -290,7 +290,7 @@ main {}
 .discardNewTaskButton:hover,
 .discardUpdateTaskButton:hover,
 .discardNewLessonButton:hover {
-    background-color: var(--matteRed) !important; 
+    background-color: var(--matteRed) !important;
 }
 
 #taskContainer th {
@@ -390,6 +390,49 @@ h2 {
     color: var(--lightgrey);
 }
 
+
+/* fake table */
+
+.table {
+    display: table;
+    border-spacing: 0;
+}
+
+.thead {
+    display: table-header-group;
+}
+
+.tbody {
+    display: table-row-group;
+}
+
+.tfoot {
+    display: table-footer-group;
+}
+
+.tr {
+    display: table-row;
+}
+
+.th {
+    display: table-cell;
+    color: var(--lightgrey);
+    text-align: left;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+}
+
+.td {
+    display: table-cell;
+}
+
+.th,
+.td {
+    padding: 0.5rem 1rem;
+    border-right: solid 1px var(--lightgrey);
+    user-select: none;
+    cursor: default;
+}
 
 /* responsiveness */
 

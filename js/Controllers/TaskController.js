@@ -24,8 +24,7 @@ export default class TaskController {
     }
 
     static createNewTask(event){
-        console.log(event.target);
-        TaskView.createNewTask(event);
+        TaskView.createTaskForm(event);
     }
     
     static updateTask(taskData) {

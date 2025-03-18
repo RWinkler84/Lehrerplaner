@@ -147,25 +147,27 @@
                 <div style="margin-bottom: 1rem;">
                     <h2>anstehend:</h2>
                 </div>
-                <table id="upcomingTasksTable">
-                    <thead>
-                        <tr>
-                            <th>Kl.</th>
-                            <th>Fach</th>
-                            <th class="taskDescription">Beschreibung</th>
-                            <th class="taskDone"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- open Tasks -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="4" style="border: none; text-align: center; display: none; padding-top: 2rem;"
-                                data-noEntriesFound>Keine Aufgaben gefunden!</td>
-                        </tr>
-                    </tfoot>
-                </table>
+
+                <!-- upcoming tasks table -->
+                <div id="upcomingTasksTable" class="table">
+                    <div class="thead">
+                        <div class="tr">
+                            <div class="th">Kl.</div>
+                            <div class="th">Fach</div>
+                            <div class="th taskDescription">Beschreibung</div>
+                            <div class="th taskDone"></div>
+                        </div>
+                    </div>
+                    <div class="tbody">
+                        <!-- open tasks -->
+                    </div>
+                    <div class="tfoot">
+                        <div class="tr">
+                            <div class="td" style="border: none; text-align: center; display: none; padding-top: 2rem;">
+                                Keine Aufgaben gefunden!</div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
             <div id="inProgressTasksContainer">
@@ -173,6 +175,8 @@
                     <h2>in Arbeit:</h2>
                 </div>
                 <div>
+                    <!-- in progress tasks table -->
+
                     <table id="inProgressTasksTable">
                         <thead>
                             <tr>
@@ -198,13 +202,8 @@
         </div>
     </main>
     <script src="./js/index.js" type="module"></script>
-    <!-- <div class="lessonMenuWrapper">
-        <div><button class="lessonOptionsButton">&#x2630;</button></div>
-        <div class="lessonOptionsWrapper">
-            <div class="lessonOption"><button>neue Aufgabe</button></div>
-            <div class="lessonOption"><button>fällt aus</button></div>
-        </div>
-    </div> -->
+
+
 </body>
 
 </html>

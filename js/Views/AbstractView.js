@@ -3,6 +3,7 @@ import Fn from '../inc/utils.js';
 
 export default class AbstractView {
 
+    // creates the subject select on the task form. if it is a new form, no event is needed
     static getSubjectSelectHTML(event = undefined) {
         //make an fetch-query to get all subject the teacher is teaching and create an select with those as options
         //for now it is static and stored in the global const allSubjects

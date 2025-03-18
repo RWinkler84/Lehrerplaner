@@ -85,8 +85,6 @@ export default class Lesson {
         };
 
         timetableChanges.push(lessonData);
-
-        console.log(timetableChanges);
     }
 
     uncancel() {

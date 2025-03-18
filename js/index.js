@@ -164,11 +164,6 @@ document.querySelectorAll('.timeslot').forEach((element) => {
 document.querySelector('#weekBackwardButton').addEventListener('click', switchToPreviousWeek);
 document.querySelector('#weekForwardButton').addEventListener('click', switchToNextWeek);
 
-// handlers for task tables
-
-
-
-
 // on ready
 
 document.addEventListener('DOMContentLoaded', setDateForWeekdays);
@@ -178,11 +173,6 @@ document.addEventListener('DOMContentLoaded', LessonView.renderLesson);
 
 document.addEventListener('DOMContentLoaded', TaskView.renderUpcomingTasks);
 document.addEventListener('DOMContentLoaded', TaskView.renderInProgressTasks);
-
-//DATABASE FOR STRUCTURE TESTING
-
-
-
 
 
 
@@ -208,134 +198,6 @@ function removeLessonHighlight(event) {
         if (lesson.dataset.taskid == taskId) lesson.removeAttribute('style');
     })
 }
-
-
-
-function fillInProgressTaskTable() {
-
-}
-
-// function bindTasksToLessons() {
-
-//     let allTasks = Task.getAllTasks();
-//     let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
-//     let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
-
-//     console.log(allTasks);
-//     allTasks.sort(sortByDate);
-
-
-//     //if displayed week is the current week, bind everything older and belonging to the current week
-//     if (isDateInCurrentWeek(mondayOfDisplayedWeek)) {
-
-//         filterTasksByDate(allTasks, sundayOfDisplayedWeek, undefined, true);
-
-//     }
-
-
-//     //wenn vergangene Woche, alles binden, was älter oder in der Woche
-//     //wenn kommende Woche, alles binden, was in dieser Woche liegt
-// }
-
-// HANDLING LESSONS
-
-
-// HANDLING TASKS
-
-function createTaskForm(item) {
-
-    let dataSource = item.target;
-
-    if (item.target.classList.contains('addLessonButton')) dataSource = item.target.parentElement;
-
-    dataSource.parentElement.removeEventListener('click', createTaskForm); //prevent creation of another task form
-
-    let taskTable = document.querySelector('#upcomingTasksTable tbody');
-    let subjectSelect = getSubjectSelectHTML();
-
-    let trContent = `
-        <td contenteditable data-class></td>
-        <td data-subject="" style="padding: 0">${subjectSelect}</td>
-        <td class="taskDescription" data-taskDescription contenteditable></td>
-        <td class="taskDone"><button class="saveNewTaskButton" onclick="saveNewTask(this)">&#x2714;</button><button class="discardNewTaskButton" onclick="discardNewTask(this)">&#x2718;</button></td>
-        `;
-
-    let newTableRow = document.createElement('tr');
-
-    taskTable.append(newTableRow);
-
-    let tr = taskTable.lastElementChild;
-
-    tr.dataset.taskid = '';
-    tr.dataset.date = dataSource.dataset.date;
-    tr.dataset.timeslot = dataSource.dataset.timeslot;
-    tr.innerHTML = trContent;
-
-    tr.firstElementChild.focus();
-}
-
-
-
-function saveNewTask(item) {
-
-    let form = item.closest('tr');
-    let classTd = form.querySelector('td[data-class]');
-    let subjectTd = form.querySelector('td[data-subject]');
-
-    let formData = new FormData();
-    let taskData = {
-        'id': generateTaskId(),
-        'class': form.querySelector('td[data-class]').innerText,
-        'subject': form.querySelector('td[data-subject] select').value,
-        'date': form.dataset.date,
-        'timeslot': form.dataset.timeslot,
-        'description': form.querySelector('td[data-taskDescription]').innerText
-    }
-
-    Object.entries(taskData).forEach((key, value) => { formData.append(key, value) });
-
-    //send this stuff to the backend via fetch-API
-    //.then => remove discard-button and reasign create-Button to use it as a setDone-Button and add taskid to the saved tr
-
-    //apply changes to datasets
-    form.dataset.taskid = taskData.id;
-    classTd.dataset.class = form.querySelector('td[data-class]').innerText;
-    subjectTd.dataset.subject = subjectTd.querySelector('select').value;
-
-    addLessonToTimetable(taskData);
-    removeEditability(item);
-    removeDiscardButton(item);
-    saveTaskToSetDoneButton(item);
-
-    form.querySelectorAll('td').forEach((td) => { td.addEventListener('dblclick', makeEditable) });
-    form.addEventListener('mouseover', hightlightLesson);
-    form.addEventListener('mouseout', removeLessonHighlight);
-}
-
-
-
-function discardNewTask(item) {
-    let data = {
-        'date': item.closest('tr').dataset.date,
-        'timeslot': item.closest('tr').dataset.timeslot
-    }
-    let timeslot = getTimeslotOfLesson(data);
-
-    timeslot.addEventListener('click', createTaskForm);
-    item.closest('tr').remove();
-}
-
-
-
-
-// BUTTONS!!!
-
-
-
-
-
-
-
 
 
 

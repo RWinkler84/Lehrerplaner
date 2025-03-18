@@ -2,7 +2,6 @@
 - Lessons im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen) 
     -> createTask in der TaskView fehlt
     -> setLessonCanceled in der LessonView fehlt
-- Farbe und Inhalt des LessonMenus bei gecancelten Lessons ändern (keine Task für Ausfallstunden) 
 
 erledigt: 
 
@@ -24,3 +23,4 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - anlegen von Lessons aus der Mockup-Datenbank
 - Formular für Lessons implementieren
 - Task-Methoden auf OOP umbauen
+- Farbe und Inhalt des LessonMenus bei gecancelten Lessons ändern (keine Task für Ausfallstunden) 
