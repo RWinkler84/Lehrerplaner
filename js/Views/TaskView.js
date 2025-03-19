@@ -24,57 +24,37 @@ export default class TaskView extends AbstractView {
             if (new Date(task.date) < new Date()) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
             }
-            
+
             taskTrHTML += `
                     <tr data-taskid="${task.id}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">${task.subject}</td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
-                        <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+                        <td class="taskDone">
+                            <button class="setTaskDoneButton">&#x2714;</button>
+                            <button class="setTaskInProgressButton">&#x2692;</button>                        
+                        </td>
                     </tr>
                     <tr>
-                        <td class="taskDone responsive" colspan="3"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+                        <td class="taskDone responsive" colspan="3">
+                            <button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button>
+                            <button class="setTaskInProgressButton">&#x2692;</button>                        
+                        </td>
                     </tr>
                 `;
         });
 
         upcomingTasksTableBody.innerHTML = taskTrHTML;
 
-        TaskView.#addEventListenersToTasks();
+        //buttons
+        document.querySelector('.setTaskDoneButton').addEventListener('click', TaskView.setTaskDone);
+        document.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
+
+        //make editable
+        document.querySelectorAll('#taskContainer td').forEach((td) => {
+            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        });
     }
-
-    // static renderUpcomingTasks() {
-    //     let allUpcomingTasks = Controller.getAllOpenTasks();
-    //     let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
-    //     let taskTrHTML = '';
-
-
-    //     if (allUpcomingTasks.length == 0) {
-    //         document.querySelector('#upcomingTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
-    //         return;
-    //     }
-
-    //     allUpcomingTasks.forEach((task) => {
-    //         let borderLeft = 'style="border-left: 3px solid transparent;"';
-
-    //         if (new Date(task.date) < new Date()) {
-    //             borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
-    //         }
-
-    //         taskTrHTML += `
-    //                 <tr data-taskid="${task.id}">
-    //                     <td ${borderLeft} data-class="${task.class}">${task.class}</td>
-    //                     <td data-subject="${task.subject}">${task.subject}</td>
-    //                     <td class="taskDescription" data-taskDescription="">${task.description}</td>
-    //                     <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
-    //                 </tr>
-    //             `;
-    //     });
-
-    //     upcomingTasksTableBody.innerHTML = taskTrHTML;
-
-    //     TaskView.#addEventListenersToTasks();
-    // }
 
     static renderInProgressTasks() {
         let allInProgressTasks = Controller.getAllInProgressTasks();
@@ -105,57 +85,72 @@ export default class TaskView extends AbstractView {
         });
 
         inProgressTasksTableBody.innerHTML = taskTrHTML;
-
-        TaskView.#addEventListenersToTasks();
+        
+        //make editable
+        document.querySelectorAll('#taskContainer td').forEach((td) => {
+            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        });
     }
 
     static createTaskForm(event) {
 
-        console.log(event.target);
+        let lessonElement = event.target.closest('.lesson');
+        let className = lessonElement.dataset.class;
+        let subject = lessonElement.dataset.subject;
+        let date = lessonElement.closest('.weekday').dataset.date;
+        let timeslot = lessonElement.closest('.timeslot').dataset.timeslot;
 
-        let taskTable = document.querySelector('#upcomingTasksTable .tbody');
+        let taskTable = document.querySelector('#upcomingTasksTable tbody');
 
         let trContent = `
-            <td data-class></td>
-                <td data-subject="" style="padding: 0">${subjectSelect}</td>
+            <tr data-date="${date}" data-timeslot="${timeslot}" data-new>
+                <td data-class="${className}">${className}</td>
+                <td data-subject="${subject}">${subject}</td>
                 <td class="taskDescription" data-taskDescription contenteditable></td>
-            <td class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></td>
+                <td class="taskDone">
+                    <button class="saveNewTaskButton">&#x2714;</button>
+                    <button class="discardNewTaskButton">&#x2718;</button><
+                /td>
+            </tr>
+            <tr data-new>
+                <td class="taskDone responsive" colspan="3">
+                    <button class="saveNewTaskButton">&#x2714;</button>
+                    <button class="discardNewTaskButton">&#x2718;</button>
+                </td>
+            </tr>
         `;
 
         taskTable.innerHTML += trContent;
 
-        let tr = taskTable.lastElementChild;
+        // button event listeners
+        let tr = taskTable.querySelectorAll('tr[data-new]').forEach((tr) => {
+            tr.querySelector('.saveNewTaskButton').addEventListener('click', TaskView.saveNewTask);
+            tr.querySelector('.discardNewTaskButton').addEventListener('click', TaskView.removeTaskForm);
+        });
 
-        tr.dataset.taskid = '';
-        tr.dataset.date = event.target.closest('.weekday').dataset.date;
-        tr.dataset.timeslot = event.target.closest('.timeslot').dataset.timeslot;
-        // tr.innerHTML = trContent;
-
-        tr.querySelector('.td[data-taskDescription]').focus();
-
-        tr.querySelector('.saveNewTaskButton').addEventListener('click', TaskView.saveNewTask);
-        tr.querySelector('.discardNewTaskButton').addEventListener('click', TaskView.removeTaskForm);
+        taskTable.querySelector('tr[data-new]').querySelector('td[data-taskDescription]').focus();
     }
 
     static saveNewTask(event) {
 
-        let form = event.target.closest('tr');
-        let classTd = form.querySelector('td[data-class]');
-        let subjectTd = form.querySelector('td[data-subject]');
+        let taskElement = event.target.closest('tbody').querySelector('tr[data-new]');
 
         let taskData = {
-            'class': form.querySelector('td[data-class]').innerText,
-            'subject': form.querySelector('td[data-subject] select').value,
-            'date': form.dataset.date,
-            'timeslot': form.dataset.timeslot,
-            'description': form.querySelector('td[data-taskDescription]').innerText
+            'class': taskElement.querySelector('td[data-class]').dataset.class,
+            'subject': taskElement.querySelector('td[data-subject]').dataset.subject,
+            'date': taskElement.dataset.date,
+            'timeslot': taskElement.dataset.timeslot,
+            'description': taskElement.querySelector('td[data-taskDescription]').innerText
         }
 
         TaskView.#removeEditability(event);
-        TaskView.#removeDiscardButton(event);
-        TaskView.#saveTaskToSetDoneButton(event);
+        TaskView.#createSetDoneOrInProgressButtons(event);
+        // TaskView.#saveTaskToSetDoneButton(event);
 
-        form.querySelector('td').forEach((td) => { td.addEventListener('dblclick', event => TaskView.makeEditable(event)) });
+        //remove 'new' dataset
+        event.target.closest('tbody').querySelectorAll('tr[data-new]').forEach(tr => tr.removeAttribute('data-new'));
+
+        taskElement.querySelectorAll('td').forEach((td) => { td.addEventListener('dblclick', event => TaskView.makeEditable(event)) });
         // form.addEventListener('mouseover', hightlightLesson);
         // form.addEventListener('mouseout', removeLessonHighlight);
     }
@@ -184,8 +179,7 @@ export default class TaskView extends AbstractView {
 
         Controller.updateTask(taskData);
         TaskView.#removeEditability(event);
-        TaskView.#removeDiscardButton(event);
-        TaskView.#saveTaskToSetDoneButton(event);
+        TaskView.#createSetDoneOrInProgressButtons(event);
     }
 
     static makeEditable(event) {
@@ -201,7 +195,7 @@ export default class TaskView extends AbstractView {
         parentTr.querySelector('td[data-taskdescription]').focus();
 
         window.getSelection().removeAllRanges();
-        TaskView.#createSaveAndDiscardChangesButton(event);
+        TaskView.#createSaveOrDiscardChangesButtons(event);
     }
 
     static #removeEditability(itemOrEvent) {
@@ -228,26 +222,7 @@ export default class TaskView extends AbstractView {
     }
 
     static removeTaskForm(event) {
-        event.target.closest('tr').remove();
-    }
-
-    static #createSaveAndDiscardChangesButton(event) {
-        let parentTr = event.target.closest('tr');
-        let buttonTd = parentTr.querySelector('.taskDone');
-
-        if (buttonTd.querySelector('.setTaskDoneButton')) buttonTd.querySelector('.setTaskDoneButton').remove();
-
-        buttonTd.innerHTML = '<button class="updateTaskButton">&#x2714;</button><button class="discardUpdateTaskButton">&#x2718;</button>';
-        buttonTd.querySelector('.updateTaskButton').addEventListener('click', (event) => { TaskView.updateTask(event) });
-        buttonTd.querySelector('.discardUpdateTaskButton').addEventListener('click', (event) => { TaskView.revertChanges(event) });
-    }
-
-    static #saveTaskToSetDoneButton(item) {
-        item = item.target ? item.target : item;
-        let buttonTd = item.parentElement;
-
-        item.remove();
-        buttonTd.innerHTML = '<button class="setTaskDoneButton" onclick="setTaskDone(this)">&#x2714;</button>';
+        event.target.closest('tbody').querySelectorAll('tr[data-new]').forEach(tr => tr.remove());
     }
 
     static revertChanges(event) {
@@ -259,7 +234,11 @@ export default class TaskView extends AbstractView {
         parentTr.querySelector('td[data-subject]').innerText = task.subject;
         parentTr.querySelector('td[data-taskDescription]').innerText = task.description;
         TaskView.#removeEditability(event);
-        TaskView.#removeDiscardButton(event);
+        TaskView.#createSetDoneOrInProgressButtons(event);
+    }
+
+    static setTaskInProgress(event) {
+        console.log('bald in Progress')
     }
 
     static setTaskDone(item) {
@@ -275,16 +254,52 @@ export default class TaskView extends AbstractView {
         Controller.setTaskBackupData(taskId);
     }
 
-    static #removeDiscardButton(itemOrEvent) {
-        let item = itemOrEvent.target ? itemOrEvent.target : item;
 
-        item.classList.contains('discardUpdateTaskButton') ? item.remove() : item.nextSibling.remove()
+    // every Task has two sets of buttons for responsiveness, so both need to be changed
+    static #createSaveOrDiscardChangesButtons(event) {
+        let buttonWrapper = event.target.closest('tr').querySelector('.taskDone');
+        let buttonWrapperSibling = TaskView.#getButtonWrapperSibling(buttonWrapper);
 
+        let buttonHTML = `
+            <button class="updateTaskButton">&#x2714;</button>
+            <button class="discardUpdateTaskButton">&#x2718;</button>
+        `;
+
+        buttonWrapper.innerHTML = buttonHTML;
+        buttonWrapperSibling.innerHTML = buttonHTML;
+
+        buttonWrapper.querySelector('.updateTaskButton').addEventListener('click', TaskView.updateTask);
+        buttonWrapper.querySelector('.discardUpdateTaskButton').addEventListener('click', TaskView.revertChanges);
+
+        buttonWrapperSibling.querySelector('.updateTaskButton').addEventListener('click', TaskView.updateTask);
+        buttonWrapperSibling.querySelector('.discardUpdateTaskButton').addEventListener('click', TaskView.revertChanges);
     }
 
-    static #addEventListenersToTasks() {
-        document.querySelectorAll('#taskContainer td').forEach((td) => {
-            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
-        });
+    static #createSetDoneOrInProgressButtons(event) {
+        let buttonWrapper = event.target.closest('td');
+        let buttonWrapperSibling = TaskView.#getButtonWrapperSibling(buttonWrapper);
+
+        let buttonHTML = `
+            <button class="setTaskDoneButton">&#x2714;</button>
+            <button class="setTaskInProgressButton">&#x2692;</button>
+        `;
+
+        buttonWrapper.innerHTML = buttonHTML;
+        buttonWrapperSibling.innerHTML = buttonHTML;
+
+        buttonWrapper.querySelector('.setTaskDoneButton').addEventListener('click', TaskView.setTaskDone);
+        buttonWrapper.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
+
+        buttonWrapperSibling.querySelector('.setTaskDoneButton').addEventListener('click', TaskView.setTaskDone);
+        buttonWrapperSibling.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
+    }
+
+    static #getButtonWrapperSibling(buttonWrapper) {
+
+        if (buttonWrapper.classList.contains('responsive')) {
+            return buttonWrapper.closest('tr').previousElementSibling.querySelector('.taskDone');
+        } else {
+            return buttonWrapper.closest('tr').nextElementSibling.querySelector('.taskDone');
+        }
     }
 }

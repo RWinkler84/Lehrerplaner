@@ -47,10 +47,8 @@ main {}
 }
 
 #timetableContainer {
-    /* min-height: fit-content; */
-    overflow-x: scroll;
-    /* overflow-y: hidden; */
-
+    overflow-y: hidden;
+    scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
 }
 
 /* Time Table */
@@ -66,19 +64,20 @@ main {}
     color: var(--matteRed);
 }
 
-.weekOverview {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr;
-    /* grid-template-rows: 1fr; */
-    min-width: 900px;
-}
-
-#weekOverview {
+#weekOverviewContainer {
     position: relative;
     left: 0;
     transition: all 0.3s ease-out;
     cursor: default;
+    overflow-x: scroll;
+
+}
+
+.weekOverview {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr;
+    min-width: 900px;
 }
 
 #timeslots {
@@ -227,7 +226,7 @@ main {}
 }
 
 .taskDone {
-    text-align: center;
+    display: flex;
     min-width: 125px;
     gap: 0.5rem;
     justify-content: center;
@@ -236,9 +235,10 @@ main {}
 
 /* Buttons */
 
-.taskDone button,
-.discardNewLessonButton,
-.saveNewLessonButton {
+.taskDone button
+/* .discardNewLessonButton, */
+/* .saveNewLessonButton */
+ {
     border: none;
     padding: 0 1rem;
     border-radius: 3px;
@@ -471,9 +471,11 @@ h2 {
     .taskDone.responsive {
         display: table-cell;
         column-span: 4;
+        justify-content: space-around;
     }
 
-    .taskDone.responsive .setTaskDoneButton {
-        width: 50%;
+    .taskDone.responsive button {
+        width: 48%;
+        margin: 0;
     }
 }

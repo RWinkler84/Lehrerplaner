@@ -1,8 +1,7 @@
+- bugs bei den responsive buttons beheben
 
-- Lessons im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen) 
-    -> createTask in der TaskView fehlt
-    -> setLessonCanceled in der LessonView fehlt
 - eigene Validierungslogik bauen
+
 
 
 erledigt: 
@@ -26,3 +25,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - Formular für Lessons implementieren
 - Task-Methoden auf OOP umbauen
 - Farbe und Inhalt des LessonMenus bei gecancelten Lessons ändern (keine Task für Ausfallstunden) 
+- Lessons im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen) 
+    -> createTask in der TaskView fehlt
+    -> setLessonCanceled in der LessonView fehlt
