@@ -14,8 +14,8 @@ export default class LessonView {
             let timeslot = LessonView.#getTimeslotOfLesson(lesson);
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}">
-                    <div style="display: flex; justify-content: space-between; width: 100%;">
-                        <div style="width: 1.5rem;"></div>
+                     <div class="flex spaceBetween" style="width: 100%;">
+                        <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
@@ -54,8 +54,8 @@ export default class LessonView {
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-class="${lesson.class}" data-subject="${lesson.subject}">
-                    <div style="display: flex; justify-content: space-between; width: 100%;">
-                        <div style="width: 1.5rem;"></div>
+                     <div class="flex spaceBetween" style="width: 100%;">
+                        <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">

@@ -48,8 +48,8 @@ main {}
 
 #timetableContainer {
     /* min-height: fit-content; */
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-x: scroll;
+    /* overflow-y: hidden; */
 
 }
 
@@ -71,6 +71,7 @@ main {}
     display: grid;
     grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr;
     /* grid-template-rows: 1fr; */
+    min-width: 900px;
 }
 
 #weekOverview {
@@ -78,7 +79,6 @@ main {}
     left: 0;
     transition: all 0.3s ease-out;
     cursor: default;
-
 }
 
 #timeslots {
@@ -123,10 +123,14 @@ main {}
 }
 
 .lessonOptionsWrapper {
+    position: absolute;
+    top: 1.6rem;
+    left: 0;
+    right: 0;
+    margin: 0 0.5rem;
     display: flex;
     flex-direction: column;
     background-color: var(--lightergrey);
-    margin-top: 0.2rem;
     padding: 1rem 1.5rem;
     border-radius: 5px;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
@@ -140,7 +144,11 @@ main {}
 
 .lessonOption {
     display: flex;
-    /* padding: 0.2rem 0.5rem; */
+    padding: 0.25rem 0;
+}
+
+.lessonOption:first-child {
+    margin-bottom: 0.25rem;
 }
 
 .lessonOption:hover {
@@ -436,13 +444,36 @@ h2 {
 
 /* responsiveness */
 
-@media screen and (max-width: 900px) {
-    .weekOverview {
-        overflow-y: scroll;
+.responsive {
+    display: none;
+}
+
+@media screen and (max-width: 1100px) {
+    .spacerBlock {
+        display: none;
     }
+
+}
+
+@media screen and (max-width: 900px) {
 
     #taskContainer {
         flex-direction: column;
     }
+}
 
+@media screen and (max-width: 500px) {
+
+    .taskDone {
+        display: none;
+    }
+
+    .taskDone.responsive {
+        display: table-cell;
+        column-span: 4;
+    }
+
+    .taskDone.responsive .setTaskDoneButton {
+        width: 50%;
+    }
 }

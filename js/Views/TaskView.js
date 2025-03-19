@@ -9,7 +9,7 @@ export default class TaskView extends AbstractView {
 
     static renderUpcomingTasks() {
         let allUpcomingTasks = Controller.getAllOpenTasks();
-        let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable .tbody');
+        let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
         let taskTrHTML = '';
 
 
@@ -26,22 +26,16 @@ export default class TaskView extends AbstractView {
             }
             
             taskTrHTML += `
-                <div class="tr">
-                    <div ${borderLeft} data-class="${task.class}" class="td">${task.class}</div>
-                    <div class="td"data-subject="${task.subject}">${task.subject}</div>
-                    <div class="td taskDescription" data-taskDescription="">${task.description}</div>
-                    <div class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></div>
-                </div>
-            `;
-
-            // taskTrHTML += `
-            //         <tr data-taskid="${task.id}">
-            //             <td ${borderLeft} data-class="${task.class}">${task.class}</td>
-            //             <td data-subject="${task.subject}">${task.subject}</td>
-            //             <td class="taskDescription" data-taskDescription="">${task.description}</td>
-            //             <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
-            //         </tr>
-            //     `;
+                    <tr data-taskid="${task.id}">
+                        <td ${borderLeft} data-class="${task.class}">${task.class}</td>
+                        <td data-subject="${task.subject}">${task.subject}</td>
+                        <td class="taskDescription" data-taskDescription="">${task.description}</td>
+                        <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+                    </tr>
+                    <tr>
+                        <td class="taskDone responsive" colspan="3"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+                    </tr>
+                `;
         });
 
         upcomingTasksTableBody.innerHTML = taskTrHTML;
@@ -119,40 +113,25 @@ export default class TaskView extends AbstractView {
 
         console.log(event.target);
 
-        document.querySelectorAll('tbody td').forEach((td) => {
-
-        });
-
-        let taskTable = document.querySelector('#upcomingTasksTable tbody');
-
-        // let trContent = `
-        // <td contenteditable data-class></td>
-        // <td data-subject="" style="padding: 0">${subjectSelect}</td>
-        // <td class="taskDescription" data-taskDescription contenteditable></td>
-        // <td class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></td>
-        // `;
+        let taskTable = document.querySelector('#upcomingTasksTable .tbody');
 
         let trContent = `
-            <div class="tr">
-                <div class="td">7A</div>
-                <div class="td">Deu</div>
-                <div class="td">deine Mutter ihr Rock</div>
-                <div class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></div>
-            </div>
+            <td data-class></td>
+                <td data-subject="" style="padding: 0">${subjectSelect}</td>
+                <td class="taskDescription" data-taskDescription contenteditable></td>
+            <td class="taskDone"><button class="saveNewTaskButton">&#x2714;</button><button class="discardNewTaskButton">&#x2718;</button></td>
         `;
 
-        let newTableRow = document.createElement('tr');
-
-        taskTable.append(newTableRow);
+        taskTable.innerHTML += trContent;
 
         let tr = taskTable.lastElementChild;
 
         tr.dataset.taskid = '';
         tr.dataset.date = event.target.closest('.weekday').dataset.date;
         tr.dataset.timeslot = event.target.closest('.timeslot').dataset.timeslot;
-        tr.innerHTML = trContent;
+        // tr.innerHTML = trContent;
 
-        tr.firstElementChild.focus();
+        tr.querySelector('.td[data-taskDescription]').focus();
 
         tr.querySelector('.saveNewTaskButton').addEventListener('click', TaskView.saveNewTask);
         tr.querySelector('.discardNewTaskButton').addEventListener('click', TaskView.removeTaskForm);

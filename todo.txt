@@ -2,6 +2,8 @@
 - Lessons im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen) 
     -> createTask in der TaskView fehlt
     -> setLessonCanceled in der LessonView fehlt
+- eigene Validierungslogik bauen
+
 
 erledigt: 
 
