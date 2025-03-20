@@ -235,9 +235,9 @@ main {}
 
 /* Buttons */
 
-.taskDone button
-/* .discardNewLessonButton, */
-/* .saveNewLessonButton */
+.taskDone button,
+.discardNewLessonButton,
+.saveNewLessonButton
  {
     border: none;
     padding: 0 1rem;
@@ -462,7 +462,17 @@ h2 {
     }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 600px) {
+
+    body {
+        font-size: 14px;
+    }
+
+    #timetableContainer,
+    #taskContainer {
+    padding: 1rem 0.5rem;
+
+    }
 
     .taskDone {
         display: none;

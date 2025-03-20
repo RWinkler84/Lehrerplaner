@@ -110,7 +110,7 @@ export default class LessonView {
         let timeslotElement = event.target.closest('.timeslot');
 
         let timeslotProps = timeslotElement.getBoundingClientRect()
-        let timetableProps = document.querySelector('#weekOverview').getBoundingClientRect();
+        let timetableProps = document.querySelector('.weekOverview').getBoundingClientRect();
 
         let lessonFormHTML = `
             <form id="lessonForm">

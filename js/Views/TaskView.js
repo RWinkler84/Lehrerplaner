@@ -37,7 +37,7 @@ export default class TaskView extends AbstractView {
                     </tr>
                     <tr>
                         <td class="taskDone responsive" colspan="3">
-                            <button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button>
+                            <button class="setTaskDoneButton">&#x2714;</button>
                             <button class="setTaskInProgressButton">&#x2692;</button>                        
                         </td>
                     </tr>
@@ -47,11 +47,11 @@ export default class TaskView extends AbstractView {
         upcomingTasksTableBody.innerHTML = taskTrHTML;
 
         //buttons
-        document.querySelector('.setTaskDoneButton').addEventListener('click', TaskView.setTaskDone);
-        document.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
+        upcomingTasksTableBody.querySelectorAll('.setTaskDoneButton').forEach(button => button.addEventListener('click', TaskView.setTaskDone));
+        upcomingTasksTableBody.querySelectorAll('.setTaskInProgressButton').forEach(button => button.addEventListener('click', TaskView.setTaskInProgress));
 
         //make editable
-        document.querySelectorAll('#taskContainer td').forEach((td) => {
+        upcomingTasksTableBody.querySelectorAll('#taskContainer td').forEach((td) => {
             td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
         });
     }
@@ -79,12 +79,20 @@ export default class TaskView extends AbstractView {
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">${task.subject}</td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
-                        <td class="taskDone"><button class="setTaskDoneButton" onclick="Task.setTaskDone(this)">&#x2714;</button></td>
+                        <td class="taskDone"><button class="setTaskDoneButton">&#x2714;</button></td>
+                    </tr>
+                    <tr>
+                        <td class="taskDone responsive" colspan="3">
+                            <button class="setTaskDoneButton" style="width: 100%">&#x2714;</button>
+                        </td>
                     </tr>
                 `;
         });
 
         inProgressTasksTableBody.innerHTML = taskTrHTML;
+
+        //buttons
+        inProgressTasksTableBody.querySelectorAll('.setTaskDoneButton').forEach(button => button.addEventListener('click', TaskView.setTaskDone))
         
         //make editable
         document.querySelectorAll('#taskContainer td').forEach((td) => {
@@ -157,6 +165,8 @@ export default class TaskView extends AbstractView {
 
     static updateTask(event) {
         let taskTr = event.target.closest('tr');
+        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling
+
         let classTd = taskTr.querySelector('td[data-class]');
         let subjectTd = taskTr.querySelector('td[data-subject]');
 
@@ -198,27 +208,12 @@ export default class TaskView extends AbstractView {
         TaskView.#createSaveOrDiscardChangesButtons(event);
     }
 
-    static #removeEditability(itemOrEvent) {
+    static #removeEditability(event) {
 
-        let item = itemOrEvent.target ? itemOrEvent.target : itemOrEvent;
+        let taskTr = event.target.closest('tr');
+        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling
 
-        item.closest('tr').querySelectorAll('td').forEach((td) => {
-
-            // removes the lesson select and transforms td to a normal td
-
-            if (td.dataset.subject || item.dataset.subject == '') {
-
-                td.removeAttribute('style');
-                td.removeAttribute('contenteditable');
-
-                if (!td.firstElementChild) return;
-
-                let selection = td.firstElementChild.value;
-                td.innerHTML = selection;
-            }
-
-            td.removeAttribute('contenteditable');
-        });
+        taskTr.querySelector('td[data-taskdescription]').removeAttribute('contenteditable');
     }
 
     static removeTaskForm(event) {
@@ -226,13 +221,15 @@ export default class TaskView extends AbstractView {
     }
 
     static revertChanges(event) {
-        let parentTr = event.target.closest('tr');
-        let taskId = parentTr.dataset.taskid;
+        let taskTr = event.target.closest('tr');
+        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling
+
+        let taskId = taskTr.dataset.taskid;
         let task = Controller.getTaskBackupData(taskId);
 
-        parentTr.querySelector('td[data-class]').innerText = task.class;
-        parentTr.querySelector('td[data-subject]').innerText = task.subject;
-        parentTr.querySelector('td[data-taskDescription]').innerText = task.description;
+        taskTr.querySelector('td[data-class]').innerText = task.class;
+        taskTr.querySelector('td[data-subject]').innerText = task.subject;
+        taskTr.querySelector('td[data-taskDescription]').innerText = task.description;
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);
     }
