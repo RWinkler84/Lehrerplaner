@@ -68,14 +68,14 @@ export default class Utils {
 
 
     static generateTaskId() {
-        let lessons = document.querySelectorAll('.lesson');
-        let lessonIds = [];
+        let tasks = document.querySelectorAll('tr[data-taskid]');
+        let taskIds = [];
 
-        lessons.forEach((lesson) => {
-            lessonIds.push(Number(lesson.dataset.taskid));
+        tasks.forEach((task) => {
+            taskIds.push(Number(task.dataset.taskid));
         })
 
-        return Math.max(...lessonIds) + 1; //adds 1 to the highest existing lesson id
+        return Math.max(...taskIds) + 1; //adds 1 to the highest existing lesson id
     }
 
     static sortByDate(a, b) {
@@ -84,6 +84,4 @@ export default class Utils {
         if (a.date > b.date) return 1;
 
     }
-
-
 }

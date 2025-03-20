@@ -1,5 +1,6 @@
 import AbstractView from './AbstractView.js';
 import Controller from '../Controllers/TaskController.js';
+import Fn from '../inc/utils.js';
 
 export default class TaskView extends AbstractView {
 
@@ -33,6 +34,12 @@ export default class TaskView extends AbstractView {
                         <td class="taskDone">
                             <button class="setTaskDoneButton">&#x2714;</button>
                             <button class="setTaskInProgressButton">&#x2692;</button>                        
+                        </td>
+                    </tr>
+                    <tr data-checkboxTr style="display: none;">
+                        <td colspan="4" style="border-right: none;">
+                            <input type="checkbox" name="fixedDate" value="fixed">
+                            <label>fester Termin?</label>
                         </td>
                     </tr>
                     <tr>
@@ -74,12 +81,18 @@ export default class TaskView extends AbstractView {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
             }
 
-            taskTrHTML += `
+            taskTrHTML = `
                     <tr data-taskid="${task.id}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">${task.subject}</td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
                         <td class="taskDone"><button class="setTaskDoneButton">&#x2714;</button></td>
+                    </tr>
+                    <tr data-checkboxTr style="display: none">
+                        <td colspan="4">
+                            <input type="checkbox" name="fixedDate" value="fixed">
+                            <label>fester Termin?</label>
+                        </td>
                     </tr>
                     <tr>
                         <td class="taskDone responsive" colspan="3">
@@ -89,11 +102,11 @@ export default class TaskView extends AbstractView {
                 `;
         });
 
-        inProgressTasksTableBody.innerHTML = taskTrHTML;
+        inProgressTasksTableBody.innerHTML += taskTrHTML;
 
         //buttons
         inProgressTasksTableBody.querySelectorAll('.setTaskDoneButton').forEach(button => button.addEventListener('click', TaskView.setTaskDone))
-        
+
         //make editable
         document.querySelectorAll('#taskContainer td').forEach((td) => {
             td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
@@ -103,6 +116,7 @@ export default class TaskView extends AbstractView {
     static createTaskForm(event) {
 
         let lessonElement = event.target.closest('.lesson');
+        let id = Fn.generateTaskId();
         let className = lessonElement.dataset.class;
         let subject = lessonElement.dataset.subject;
         let date = lessonElement.closest('.weekday').dataset.date;
@@ -111,14 +125,20 @@ export default class TaskView extends AbstractView {
         let taskTable = document.querySelector('#upcomingTasksTable tbody');
 
         let trContent = `
-            <tr data-date="${date}" data-timeslot="${timeslot}" data-new>
+            <tr data-taskid="${id}" data-date="${date}" data-timeslot="${timeslot}" data-new>
                 <td data-class="${className}">${className}</td>
                 <td data-subject="${subject}">${subject}</td>
                 <td class="taskDescription" data-taskDescription contenteditable></td>
                 <td class="taskDone">
                     <button class="saveNewTaskButton">&#x2714;</button>
-                    <button class="discardNewTaskButton">&#x2718;</button><
-                /td>
+                    <button class="discardNewTaskButton">&#x2718;</button>
+                </td>
+            </tr>
+            <tr data-checkboxTr data-new>
+                <td colspan="4" style="border-right: none;">
+                    <input type="checkbox" name="fixedDate" value="fixed">
+                    <label>fester Termin?</label>
+                </td>
             </tr>
             <tr data-new>
                 <td class="taskDone responsive" colspan="3">
@@ -131,32 +151,44 @@ export default class TaskView extends AbstractView {
         taskTable.innerHTML += trContent;
 
         // button event listeners
-        let tr = taskTable.querySelectorAll('tr[data-new]').forEach((tr) => {
+        taskTable.querySelectorAll('tr[data-new]').forEach((tr) => {
+            if (tr.hasAttribute('data-checkboxTr')) return;
             tr.querySelector('.saveNewTaskButton').addEventListener('click', TaskView.saveNewTask);
             tr.querySelector('.discardNewTaskButton').addEventListener('click', TaskView.removeTaskForm);
         });
 
-        taskTable.querySelector('tr[data-new]').querySelector('td[data-taskDescription]').focus();
+        //make sure that the last task description field added gets the focus
+        let newTaskDescriptionTds = taskTable.querySelectorAll('tr[data-new] td[data-taskDescription]');
+        newTaskDescriptionTds[newTaskDescriptionTds.length - 1].focus();
+
+        //make all tasks editable again
+        document.querySelectorAll('#taskContainer td').forEach((td) => {
+            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        });
     }
 
     static saveNewTask(event) {
 
-        let taskElement = event.target.closest('tbody').querySelector('tr[data-new]');
+        let taskElement = event.target.classList.contains('responsive') 
+            ? event.target.closest('tr').previousElementSibling.previousElementSibling
+            : event.target.closest('tr');
+        let checkBoxElement = taskElement.nextElementSibling;
 
         let taskData = {
+            'id': taskElement.dataset.taskid,
             'class': taskElement.querySelector('td[data-class]').dataset.class,
             'subject': taskElement.querySelector('td[data-subject]').dataset.subject,
             'date': taskElement.dataset.date,
             'timeslot': taskElement.dataset.timeslot,
-            'description': taskElement.querySelector('td[data-taskDescription]').innerText
+            'description': taskElement.querySelector('td[data-taskDescription]').innerText,
+            'fixedTime': checkBoxElement.querySelector('input[type="checkbox"]').checked
         }
 
+        Controller.saveNewTask(taskData);
+
+        TaskView.#removeNewDataset(event);
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);
-        // TaskView.#saveTaskToSetDoneButton(event);
-
-        //remove 'new' dataset
-        event.target.closest('tbody').querySelectorAll('tr[data-new]').forEach(tr => tr.removeAttribute('data-new'));
 
         taskElement.querySelectorAll('td').forEach((td) => { td.addEventListener('dblclick', event => TaskView.makeEditable(event)) });
         // form.addEventListener('mouseover', hightlightLesson);
@@ -165,7 +197,7 @@ export default class TaskView extends AbstractView {
 
     static updateTask(event) {
         let taskTr = event.target.closest('tr');
-        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling
+        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
 
         let classTd = taskTr.querySelector('td[data-class]');
         let subjectTd = taskTr.querySelector('td[data-subject]');
@@ -194,6 +226,8 @@ export default class TaskView extends AbstractView {
 
     static makeEditable(event) {
 
+        console.log('hier')
+
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
         if (event.target.isContentEditable) return;
 
@@ -211,18 +245,45 @@ export default class TaskView extends AbstractView {
     static #removeEditability(event) {
 
         let taskTr = event.target.closest('tr');
-        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling
+        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
 
         taskTr.querySelector('td[data-taskdescription]').removeAttribute('contenteditable');
     }
 
+    static #removeNewDataset(event) {
+        //removes 'new' dataset of the given task form, after it was saved
+
+        let buttonWrapper = event.target.closest('td');
+        let buttonWrapperSibling = TaskView.#getButtonWrapperSibling(buttonWrapper);
+        let fixedDateTr = () => {
+            if (buttonWrapper.classList.contains('responsive')) {
+                return buttonWrapper.closest('tr').previousElementSibling;
+            } else {
+                return buttonWrapper.closest('tr').nextElementSibling;
+            }
+        };
+
+
+        buttonWrapper.closest('tr').removeAttribute('data-new');
+        buttonWrapperSibling.closest('tr').removeAttribute('data-new');
+        fixedDateTr().removeAttribute('data-new');
+        fixedDateTr().style.display = 'none';
+    }
+
     static removeTaskForm(event) {
-        event.target.closest('tbody').querySelectorAll('tr[data-new]').forEach(tr => tr.remove());
+
+        let firstFormTr = event.target.classList.contains('responsive') 
+            ? event.target.closest('tr').previousElementSibling.previousElementSibling
+            : event.target.closest('tr');
+
+        firstFormTr.nextElementSibling.nextElementSibling.remove();
+        firstFormTr.nextElementSibling.remove();
+        firstFormTr.remove();
     }
 
     static revertChanges(event) {
         let taskTr = event.target.closest('tr');
-        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling
+        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
 
         let taskId = taskTr.dataset.taskid;
         let task = Controller.getTaskBackupData(taskId);
@@ -294,9 +355,9 @@ export default class TaskView extends AbstractView {
     static #getButtonWrapperSibling(buttonWrapper) {
 
         if (buttonWrapper.classList.contains('responsive')) {
-            return buttonWrapper.closest('tr').previousElementSibling.querySelector('.taskDone');
+            return buttonWrapper.closest('tr').previousElementSibling.previousElementSibling.querySelector('.taskDone');
         } else {
-            return buttonWrapper.closest('tr').nextElementSibling.querySelector('.taskDone');
+            return buttonWrapper.closest('tr').nextElementSibling.nextElementSibling.querySelector('.taskDone');
         }
     }
 }

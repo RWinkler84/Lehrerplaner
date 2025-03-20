@@ -139,13 +139,13 @@ import Fn from './inc/utils.js';
 
 // handlers for highlighting tasks and lessonfields
 
-document.querySelectorAll('tr[data-taskid]').forEach((element) => {
-    element.addEventListener('mouseover', hightlightLesson);
-});
+// document.querySelectorAll('tr[data-taskid]').forEach((element) => {
+//     element.addEventListener('mouseover', hightlightLesson);
+// });
 
-document.querySelectorAll('tr[data-taskid]').forEach((element) => {
-    element.addEventListener('mouseout', removeLessonHighlight);
-});
+// document.querySelectorAll('tr[data-taskid]').forEach((element) => {
+//     element.addEventListener('mouseout', removeLessonHighlight);
+// });
 
 
 // handlers for empty timeslots

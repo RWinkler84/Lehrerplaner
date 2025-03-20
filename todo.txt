@@ -1,6 +1,6 @@
-- bugs bei den responsive buttons beheben
-
+- task-Formular muss Möglichkeit bieten, sie als fest terminiert auszuweisen
 - eigene Validierungslogik bauen
+- focus bei mehreren Task Forms korrigieren
 
 
 
@@ -28,3 +28,4 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - Lessons im Timetable bearbeitbar machen (auf Ausfall setzen, dazugehörige Tasks anlegen) 
     -> createTask in der TaskView fehlt
     -> setLessonCanceled in der LessonView fehlt
+- bugs bei den responsive buttons beheben

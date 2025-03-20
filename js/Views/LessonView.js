@@ -70,8 +70,8 @@ export default class LessonView {
         })
 
         document.querySelectorAll('.lesson').forEach((lesson) => {
-            lesson.addEventListener('mouseover', AbstractView.highlightTask);
-            lesson.addEventListener('mouseout', AbstractView.removeTaskHighlight);
+            // lesson.addEventListener('mouseover', AbstractView.highlightTask);
+            // lesson.addEventListener('mouseout', AbstractView.removeTaskHighlight);
 
             lesson.querySelector('.lessonOptionsButton').addEventListener('click', LessonView.showLessonOptions);
             lesson.addEventListener('mouseleave', LessonView.hideLessonsOptions);
@@ -198,7 +198,7 @@ export default class LessonView {
             <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
         `;
 
-        optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', event => Controller.createNewTask(event));
+        optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', Controller.createNewTask);
         optionsWrapper.querySelector('button[data-lesson_canceled]').addEventListener('click', LessonView.setLessonCanceled);
     }
 

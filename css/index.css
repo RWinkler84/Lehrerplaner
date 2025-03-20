@@ -233,6 +233,18 @@ main {}
     vertical-align: center;
 }
 
+tr[data-new] {
+    background-color: var(--lightergrey);
+}
+
+tr[data-new] td {
+    border-color: var(--contentContainerBackground) !important;
+}
+
+tr[data-new]:has(td[data-taskDescription]) td {
+    border-top: solid 1px var(--contentContainerBackground);
+}
+
 /* Buttons */
 
 .taskDone button,
@@ -399,48 +411,6 @@ h2 {
 }
 
 
-/* fake table */
-
-.table {
-    display: table;
-    border-spacing: 0;
-}
-
-.thead {
-    display: table-header-group;
-}
-
-.tbody {
-    display: table-row-group;
-}
-
-.tfoot {
-    display: table-footer-group;
-}
-
-.tr {
-    display: table-row;
-}
-
-.th {
-    display: table-cell;
-    color: var(--lightgrey);
-    text-align: left;
-    padding: 0.5rem 1rem;
-    font-weight: 700;
-}
-
-.td {
-    display: table-cell;
-}
-
-.th,
-.td {
-    padding: 0.5rem 1rem;
-    border-right: solid 1px var(--lightgrey);
-    user-select: none;
-    cursor: default;
-}
 
 /* responsiveness */
 

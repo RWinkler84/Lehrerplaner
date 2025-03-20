@@ -23,10 +23,15 @@ export default class TaskController {
         return task.getBackupData();
     }
 
-    static createNewTask(event){
+    static createNewTask(event) {
         TaskView.createTaskForm(event);
     }
-    
+
+    static saveNewTask(taskData) {
+        let task = new Task();
+        console.log(taskData)
+    }
+
     static updateTask(taskData) {
         let task = new Task(taskData.id);
 
