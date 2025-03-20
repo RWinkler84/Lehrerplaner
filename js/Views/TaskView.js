@@ -1,6 +1,7 @@
 import AbstractView from './AbstractView.js';
 import Controller from '../Controllers/TaskController.js';
 import Fn from '../inc/utils.js';
+import { allTasksArray } from '../index.js';
 
 export default class TaskView extends AbstractView {
 
@@ -21,6 +22,7 @@ export default class TaskView extends AbstractView {
 
         allUpcomingTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
+            let checked = task.fixedTime ? 'checked' : '';
 
             if (new Date(task.date) < new Date()) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
@@ -38,7 +40,7 @@ export default class TaskView extends AbstractView {
                     </tr>
                     <tr data-checkboxTr style="display: none;">
                         <td colspan="4" style="border-right: none;">
-                            <input type="checkbox" name="fixedDate" value="fixed">
+                            <input type="checkbox" name="fixedDate" ${checked}>
                             <label>fester Termin?</label>
                         </td>
                     </tr>
@@ -76,12 +78,13 @@ export default class TaskView extends AbstractView {
 
         allInProgressTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
+            let checked = task.fixedTime ? 'checked' : '';
 
             if (new Date(task.date) < new Date()) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
             }
 
-            taskTrHTML = `
+            taskTrHTML += `
                     <tr data-taskid="${task.id}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">${task.subject}</td>
@@ -89,8 +92,8 @@ export default class TaskView extends AbstractView {
                         <td class="taskDone"><button class="setTaskDoneButton">&#x2714;</button></td>
                     </tr>
                     <tr data-checkboxTr style="display: none">
-                        <td colspan="4">
-                            <input type="checkbox" name="fixedDate" value="fixed">
+                        <td colspan="4" style="border-right: none;">
+                            <input type="checkbox" name="fixedDate" ${checked}>
                             <label>fester Termin?</label>
                         </td>
                     </tr>
@@ -102,7 +105,7 @@ export default class TaskView extends AbstractView {
                 `;
         });
 
-        inProgressTasksTableBody.innerHTML += taskTrHTML;
+        inProgressTasksTableBody.innerHTML = taskTrHTML;
 
         //buttons
         inProgressTasksTableBody.querySelectorAll('.setTaskDoneButton').forEach(button => button.addEventListener('click', TaskView.setTaskDone))
@@ -204,11 +207,10 @@ export default class TaskView extends AbstractView {
 
         let taskData = {
             'id': taskTr.dataset.taskid,
-            'class': taskTr.querySelector('td[data-class]').innerText,
-            'subject': taskTr.querySelector('td[data-subject] select') // select or not?
-                ? taskTr.querySelector('td[data-subject] select').value
-                : taskTr.querySelector('td[data-subject]').innerText,
+            'class': classTd.dataset.class,
+            'subject': subjectTd.dataset.subject,
             'description': taskTr.querySelector('td[data-taskdescription]').innerText,
+            'fixedTime': taskTr.nextElementSibling.querySelector('input[type="checkbox"]').checked
         }
 
         //apply changes to datasets
@@ -220,13 +222,13 @@ export default class TaskView extends AbstractView {
         }
 
         Controller.updateTask(taskData);
+        console.log(allTasksArray);
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);
+        taskTr.nextElementSibling.style.display = 'none';
     }
 
     static makeEditable(event) {
-
-        console.log('hier')
 
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
         if (event.target.isContentEditable) return;
@@ -236,6 +238,7 @@ export default class TaskView extends AbstractView {
         let parentTr = event.target.closest('tr');
 
         parentTr.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
+        parentTr.nextElementSibling.style.display = 'table-row';
         parentTr.querySelector('td[data-taskdescription]').focus();
 
         window.getSelection().removeAllRanges();

@@ -70,8 +70,8 @@ export default class LessonView {
         })
 
         document.querySelectorAll('.lesson').forEach((lesson) => {
-            // lesson.addEventListener('mouseover', AbstractView.highlightTask);
-            // lesson.addEventListener('mouseout', AbstractView.removeTaskHighlight);
+            lesson.addEventListener('mouseover', AbstractView.highlightTask);
+            lesson.addEventListener('mouseout', AbstractView.removeTaskHighlight);
 
             lesson.querySelector('.lessonOptionsButton').addEventListener('click', LessonView.showLessonOptions);
             lesson.addEventListener('mouseleave', LessonView.hideLessonsOptions);

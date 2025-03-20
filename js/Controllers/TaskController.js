@@ -29,7 +29,17 @@ export default class TaskController {
 
     static saveNewTask(taskData) {
         let task = new Task();
-        console.log(taskData)
+        
+        task.id = taskData.id;
+        task.class = taskData.class
+        task.subject = taskData.subject
+        task.date = taskData.date
+        task.timeslot = taskData.timeslot
+        task.description = taskData.description
+        task.status = 'open'
+        task.fixedTime = taskData.fixedTime
+        
+        task.save();
     }
 
     static updateTask(taskData) {
@@ -38,6 +48,7 @@ export default class TaskController {
         task.class = taskData.class;
         task.subject = taskData.subject;
         task.description = taskData.description;
+        task.fixedTime = taskData.fixedTime;
 
         task.update();
     }

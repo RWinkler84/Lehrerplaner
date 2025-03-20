@@ -25,7 +25,7 @@ export let allTasksArray = [
         'subject': 'Gesch',
         'description': 'die Schafe hüten',
         'status': 'inProgress',
-        'fixedTime': false
+        'fixedTime': true
     },
     {
         'id': 2,

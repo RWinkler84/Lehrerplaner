@@ -55,11 +55,11 @@ export default class AbstractView {
 
         let item = event.target;
 
-        document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
-            if (taskRow.dataset.taskid === item.dataset.taskid) {
-                taskRow.style.backgroundColor = 'var(--lightergrey)';
-            }
-        });
+        // document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
+        //     if (taskRow.dataset.taskid === item.dataset.taskid) {
+        //         taskRow.style.backgroundColor = 'var(--lightergrey)';
+        //     }
+        // });
 
         AbstractView.removeAddLessonButton();
     }

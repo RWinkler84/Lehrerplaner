@@ -103,9 +103,17 @@ export default class Task {
                 element.class = this.#class;
                 element.subject = this.#subject;
                 element.description = this.#description;
+                element.fixedTime = this.#fixedTime;
             }
         });
     }
+
+    save() {
+    allTasksArray.push(this);
+
+    }
+
+    toObject() {}
 
     get id() {
         return this.#id;

@@ -1,7 +1,6 @@
-- task-Formular muss Möglichkeit bieten, sie als fest terminiert auszuweisen
+- lessons brauchen feld, in dem zugehörige taskids gespeichert werden können
+    -> auch mehrere sollen möglich sein
 - eigene Validierungslogik bauen
-- focus bei mehreren Task Forms korrigieren
-
 
 
 erledigt: 
@@ -29,3 +28,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     -> createTask in der TaskView fehlt
     -> setLessonCanceled in der LessonView fehlt
 - bugs bei den responsive buttons beheben
+- focus bei mehreren ungespeicherten Task Forms korrigieren
+- task-Formular muss Möglichkeit bieten, sie als fest terminiert auszuweisen
+
