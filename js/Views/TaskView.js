@@ -29,7 +29,7 @@ export default class TaskView extends AbstractView {
             }
 
             taskTrHTML += `
-                    <tr data-taskid="${task.id}">
+                    <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">${task.subject}</td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
@@ -85,7 +85,7 @@ export default class TaskView extends AbstractView {
             }
 
             taskTrHTML += `
-                    <tr data-taskid="${task.id}">
+                    <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">${task.subject}</td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
@@ -251,6 +251,7 @@ export default class TaskView extends AbstractView {
         if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
 
         taskTr.querySelector('td[data-taskdescription]').removeAttribute('contenteditable');
+        taskTr.nextElementSibling.style.display = "none";
     }
 
     static #removeNewDataset(event) {

@@ -1,5 +1,4 @@
-- lessons brauchen feld, in dem zugehörige taskids gespeichert werden können
-    -> auch mehrere sollen möglich sein
+- abgleich zwischen angezeigten lessons und tasks
 - eigene Validierungslogik bauen
 
 

@@ -44,31 +44,38 @@ export default class AbstractView {
 
     static removeAddLessonButton() {
 
-    document.querySelectorAll('.timeslot').forEach((timeslot) => {
-        if (timeslot.querySelector('.addLessonButtonWrapper')) {
-            timeslot.querySelector('.addLessonButtonWrapper').remove();
-        }
-    });
-}
+        document.querySelectorAll('.timeslot').forEach((timeslot) => {
+            if (timeslot.querySelector('.addLessonButtonWrapper')) {
+                timeslot.querySelector('.addLessonButtonWrapper').remove();
+            }
+        });
+    }
 
     static highlightTask(event) {
+        console.log(event.target)
 
-        let item = event.target;
+        let taskContainer = document.querySelector('#taskContainer')
 
-        // document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
-        //     if (taskRow.dataset.taskid === item.dataset.taskid) {
-        //         taskRow.style.backgroundColor = 'var(--lightergrey)';
-        //     }
-        // });
+        taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
+
+            if (new Date(taskRow.dataset.date).getTime() == new Date(event.target.dataset.date).getTime() &&
+                taskRow.dataset.timeslot == event.target.dataset.timeslot) 
+            {
+                taskRow.style.backgroundColor = 'var(--lightergrey)';
+            }
+        });
 
         AbstractView.removeAddLessonButton();
     }
 
     static removeTaskHighlight(event) {
-        let item = event.target;
 
-        document.querySelectorAll('#upcomingTasksTable tr').forEach((taskRow) => {
-            if (taskRow.dataset.taskid === item.dataset.taskid) {
+        let taskContainer = document.querySelector('#taskContainer')
+
+        taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
+            if (new Date(taskRow.dataset.date).getTime() == new Date(event.target.dataset.date).getTime() &&
+                taskRow.dataset.timeslot == event.target.dataset.timeslot) 
+            {
                 taskRow.removeAttribute('style');
             }
         });

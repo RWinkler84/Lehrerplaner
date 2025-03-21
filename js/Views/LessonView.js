@@ -12,8 +12,10 @@ export default class LessonView {
 
         regularLessons.forEach((lesson) => {
             let timeslot = LessonView.#getTimeslotOfLesson(lesson);
+            let lessonDate = timeslot.closest('.weekday').dataset.date;
+
             timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}">
+                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
@@ -53,7 +55,7 @@ export default class LessonView {
             }
 
             timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-class="${lesson.class}" data-subject="${lesson.subject}">
+                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
@@ -70,8 +72,8 @@ export default class LessonView {
         })
 
         document.querySelectorAll('.lesson').forEach((lesson) => {
-            lesson.addEventListener('mouseover', AbstractView.highlightTask);
-            lesson.addEventListener('mouseout', AbstractView.removeTaskHighlight);
+            lesson.addEventListener('mouseenter', AbstractView.highlightTask);
+            lesson.addEventListener('mouseleave', AbstractView.removeTaskHighlight);
 
             lesson.querySelector('.lessonOptionsButton').addEventListener('click', LessonView.showLessonOptions);
             lesson.addEventListener('mouseleave', LessonView.hideLessonsOptions);
@@ -82,10 +84,11 @@ export default class LessonView {
     }
 
     static renderNewLesson(lesson) {
+        console.log(lesson);
         let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
         timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}">
+                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
@@ -103,6 +106,8 @@ export default class LessonView {
 
         timeslot.querySelector('.lessonOptionsButton').addEventListener('click', LessonView.showLessonOptions);
         timeslot.querySelector('.lesson').addEventListener('mouseleave', LessonView.hideLessonsOptions);
+        timeslot.querySelector('.lesson').addEventListener('mouseenter', AbstractView.highlightTask);
+        timeslot.querySelector('.lesson').addEventListener('mouseleave', AbstractView.removeTaskHighlight);
     }
 
     static createLessonForm(event) {

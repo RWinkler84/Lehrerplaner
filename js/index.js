@@ -306,7 +306,7 @@ function calcCalendarWeek(countUp = true) {
 function runWeekSwitchAnimation(nextWeek = true) {
     let timetableContainer = document.querySelector('#timetableContainer');
     let timetableContainerInitialHeight = timetableContainer.getBoundingClientRect().height;
-    let weekOverview = document.querySelector('#weekOverview');
+    let weekOverview = document.querySelector('#weekOverviewContainer');
     let weekOverviewPosition = weekOverview.getBoundingClientRect();
     let blankWeekTable = weekOverview.cloneNode(true);
     let verticalOffset;
@@ -362,7 +362,7 @@ function runWeekSwitchAnimation(nextWeek = true) {
 function cancelWeekSwitchAnimation() {
     if (document.querySelector('.blankWeekTable')) {
         document.querySelector('.blankWeekTable').remove();
-        document.querySelector('#weekOverview').style.left = 'auto';
+        document.querySelector('#weekOverviewContainer').style.left = 'auto';
     }
 }
 
