@@ -3,30 +3,16 @@ import Fn from '../inc/utils.js';
 
 export default class AbstractView {
 
-    // creates the subject select on the task form. if it is a new form, no event is needed
     static getSubjectSelectHTML(event = undefined) {
         //make an fetch-query to get all subject the teacher is teaching and create an select with those as options
         //for now it is static and stored in the global const allSubjects
-        let previouslySelected;
-        let optionsHTML;
-        let selected = '';
-
-        //was something pre-selected or is it for a new Task form?
-        //if something was preselected, set the corresponding option to selected
-        if (event) previouslySelected = event.target.closest('tr').querySelector('td[data-subject]').dataset.subject;
-
-        previouslySelected == '-'
-            ? optionsHTML = '<option value="-" selected>-</option>'
-            : optionsHTML = '<option value="-">-</option>';
-
+        let optionsHTML = '<option value="">-</option>';
 
         allSubjects.forEach((entry) => {
-            entry.subject == previouslySelected ? selected = 'selected' : selected = '';
-
-            optionsHTML += `<option value="${entry.subject}" ${selected}>${entry.subject}</option>`;
+            optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
         });
 
-        return `<select class="lessonSelect">${optionsHTML}</select>`;
+        return `<select class="lessonSelect" id="subject" required>${optionsHTML}</select>`;
     }
 
     static showAddLessonButton(event) {
@@ -52,17 +38,18 @@ export default class AbstractView {
     }
 
     static highlightTask(event) {
-        console.log(event.target)
 
         let taskContainer = document.querySelector('#taskContainer')
 
         taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
 
-            if (new Date(taskRow.dataset.date).getTime() == new Date(event.target.dataset.date).getTime() &&
-                taskRow.dataset.timeslot == event.target.dataset.timeslot) 
-            {
-                taskRow.style.backgroundColor = 'var(--lightergrey)';
-            }
+            if (new Date(taskRow.dataset.date).setHours(0, 0, 0, 0) != new Date(event.target.dataset.date).setHours(0, 0, 0, 0)) return;
+            if (taskRow.querySelector('td[data-class]').dataset.class != event.target.dataset.class) return;
+            if (taskRow.querySelector('td[data-subject').dataset.subject != event.target.dataset.subject) return;
+
+            taskRow.style.backgroundColor = 'var(--lightergrey)';
+            taskRow.nextElementSibling.style.backgroundColor = 'var(--lightergrey)';
+            taskRow.nextElementSibling.nextElementSibling.style.backgroundColor = 'var(--lightergrey)';
         });
 
         AbstractView.removeAddLessonButton();
@@ -73,11 +60,16 @@ export default class AbstractView {
         let taskContainer = document.querySelector('#taskContainer')
 
         taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
-            if (new Date(taskRow.dataset.date).getTime() == new Date(event.target.dataset.date).getTime() &&
-                taskRow.dataset.timeslot == event.target.dataset.timeslot) 
-            {
-                taskRow.removeAttribute('style');
-            }
+            if (new Date(taskRow.dataset.date).setHours(0, 0, 0, 0) != new Date(event.target.dataset.date).setHours(0, 0, 0, 0)) return;
+            if (taskRow.querySelector('td[data-class]').dataset.class != event.target.dataset.class) return;
+            if (taskRow.querySelector('td[data-subject').dataset.subject != event.target.dataset.subject) return;
+            
+            taskRow.removeAttribute('style');
+
+            if (taskRow.nextElementSibling.hasAttribute('data-new')) return;
+            taskRow.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
+            taskRow.nextElementSibling.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
+
         });
     }
 }

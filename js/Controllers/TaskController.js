@@ -1,5 +1,5 @@
 import Task from '../Models/Task.js';
-import TaskView from '../Views/TaskView.js';
+import View from '../Views/TaskView.js';
 
 export default class TaskController {
 
@@ -24,7 +24,7 @@ export default class TaskController {
     }
 
     static createNewTask(event) {
-        TaskView.createTaskForm(event);
+        View.createTaskForm(event);
     }
 
     static saveNewTask(taskData) {
@@ -51,5 +51,16 @@ export default class TaskController {
         task.fixedTime = taskData.fixedTime;
 
         task.update();
+    }
+
+    static renderTaskChanges(){
+        console.log('jo!')
+        View.renderUpcomingTasks();
+        View.renderInProgressTasks();
+    }
+
+    static reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled) {
+
+        Task.reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled);
     }
 }

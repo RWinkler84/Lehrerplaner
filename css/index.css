@@ -265,12 +265,14 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .lessonSelect {
     appearance: none;
-    border: none;
-    background-color: transparent;
-    width: 100%;
+    /* border: none; */
+    /* background-color: transparent; */
     height: 100%;
-    padding: 0.5rem 1rem;
     font-size: 1rem;
+}
+
+.lessonSelect option:first-child {
+    text-align: center;
 }
 
 .lessonOptionsButton {

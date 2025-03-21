@@ -1,5 +1,6 @@
-import Fn from '../inc/utils.js'
-import { taskBackupArray } from '../index.js'
+import Fn from '../inc/utils.js';
+import Controller from '../Controllers/TaskController.js';
+import { taskBackupArray } from '../index.js';
 import { allTasksArray } from '../index.js';
 
 export default class Task {
@@ -81,6 +82,28 @@ export default class Task {
         return allTasks;
     }
 
+    static reorderTasks (lesson, timetableChanges, scheduledLessons, lessonCanceled) {
+        
+        // lesson is a substitute lesson
+        // wenn Klasse und Fach der Stunde gleich Klasse und Fach einer Task und Task nicht fixedTime, Task-Datum = Stunden-Datum
+        // 
+        allTasksArray.forEach(entry => {
+            let task = new Task(entry.id);
+
+            if (task.class != lesson.class) return;
+            if (task.subject != lesson.subject) return;
+            if (new Date(task.date).setHours(0,0,0,0) < new Date(lesson.date).setHours(0,0,0,0)) return;
+            if (task.fixedTime == true) return;
+            console.log(task.date);                            
+            task.date = lesson.date;
+            console.log(task.date);                            
+            task.update();
+            Controller.renderTaskChanges();    
+        })
+
+
+    }
+
     setBackupData(){
         taskBackupArray[this.#id] = {
             'id': this.#id,
@@ -100,6 +123,7 @@ export default class Task {
     update() {
         allTasksArray.forEach(element => {
             if (element.id == this.#id){
+                element.date = this.#date;
                 element.class = this.#class;
                 element.subject = this.#subject;
                 element.description = this.#description;
@@ -112,8 +136,6 @@ export default class Task {
     allTasksArray.push(this);
 
     }
-
-    toObject() {}
 
     get id() {
         return this.#id;

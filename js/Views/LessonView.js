@@ -55,7 +55,7 @@ export default class LessonView {
             }
 
             timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
+                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}" data-status="sub">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
@@ -84,11 +84,11 @@ export default class LessonView {
     }
 
     static renderNewLesson(lesson) {
-        console.log(lesson);
+
         let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
         timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
+                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}" data-status="sub">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
@@ -116,17 +116,13 @@ export default class LessonView {
 
         let timeslotProps = timeslotElement.getBoundingClientRect()
         let timetableProps = document.querySelector('.weekOverview').getBoundingClientRect();
+        let subjectSelectHTML = AbstractView.getSubjectSelectHTML()
 
         let lessonFormHTML = `
             <form id="lessonForm">
                 <div class="lessonForm">
                     <input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;" required>
-                    <select name="subject" id="subject" required>
-                        <option value="">-</option>
-                        <option value="Deu">Deu</option>
-                        <option value="Gesch">Gesch</option>
-                        <option value="MNT">MNT</option>
-                    </select>
+                    ${subjectSelectHTML}
                     <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
                     <button class="discardNewLessonButton">&#x2718;</button>
                 </div>
@@ -158,11 +154,13 @@ export default class LessonView {
         let lessonData = {
             'date': timeslotElement.closest('.weekday').dataset.date,
             'timeslot': timeslotElement.dataset.timeslot,
-            'class': timeslotElement.querySelector('#class').value,
-            'subject': timeslotElement.querySelector('#subject').value
+            'class': timeslotElement.querySelector('#class').value.toLowerCase(),
+            'subject': timeslotElement.querySelector('#subject').value,
+            'status': 'sub'
         }
 
         Controller.saveNewLesson(lessonData);
+        Controller.reorderTasks(lessonData, false);
 
         LessonView.removeLessonForm(event);
     }
@@ -274,6 +272,9 @@ export default class LessonView {
 
     static #getLessonDataFromElement(event){
         let lessonElement = event.target.closest('.lesson');
+        let isSubstitute = lessonElement.dataset.status ? 'sub' : 'normal';
+
+        console.log(isSubstitute)
 
         return {
             'class': lessonElement.dataset.class,
@@ -281,6 +282,7 @@ export default class LessonView {
             'date': lessonElement.closest('.weekday').dataset.date,
             'weekday': lessonElement.closest('.weekday').dataset.weekday_number,
             'timeslot': lessonElement.closest('.timeslot').dataset.timeslot,
+            'status': isSubstitute
         }
     }
 }

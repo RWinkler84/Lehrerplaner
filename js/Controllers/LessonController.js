@@ -14,33 +14,44 @@ export default class LessonController {
 
     static saveNewLesson(lessonData) {
 
-        let lesson = new Lesson(lessonData.class, lessonData.subject);
-        lesson.date = lessonData.date;
-        lesson.timeslot = lessonData.timeslot;
-        lesson.status = 'sub';
-
+        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+        
         lesson.save();
         View.renderNewLesson(lesson);
     }
 
     static setLessonCanceled(lessonData) {
-        let lesson = new Lesson(lessonData.class, lessonData.subject);
-        lesson.date = lessonData.date;
-        lesson.timeslot = lessonData.timeslot;
-        lesson.status = 'canceled';
+        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 
         lesson.cancel();
     }
 
     static setLessonNotCanceled(lessonData) {
         let lesson = new Lesson(lessonData.class, lessonData.subject);
-        lesson.date = lessonData.date;
-        lesson.timeslot = lessonData.timeslot;
 
         lesson.uncancel();       
     }
 
     static createNewTask(event) {
         TaskController.createNewTask(event);
+    }
+
+    static reorderTasks(lessonData, lessonCanceled = false){
+        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+        let timetableChanges = Lesson.getTimetableChanges();
+        let scheduledLessons = Lesson.getScheduledLessons()
+        
+        TaskController.reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled);
+    }
+
+    static #lessonDataToLessonObject (lessonData) {
+        let lesson = new Lesson(lessonData.class, lessonData.subject);
+
+        lesson.weekday = lessonData.weekday;
+        lesson.date = lessonData.date;
+        lesson.timeslot = lessonData.timeslot;
+        lesson.status = lessonData.status = undefined ? 'normal' : lessonData.status;
+
+        return lesson;
     }
 }

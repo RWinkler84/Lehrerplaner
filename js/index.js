@@ -19,19 +19,19 @@ export const allSubjects = [
 export let allTasksArray = [
     {
         'id': 1,
-        'date': '2025-03-11',
+        'date': '2025-03-18',
         'timeslot': '2',
-        'class': '6A',
+        'class': '6a',
         'subject': 'Gesch',
         'description': 'die Schafe hüten',
         'status': 'inProgress',
-        'fixedTime': true
+        'fixedTime': false
     },
     {
         'id': 2,
         'date': '2025-02-10',
         'timeslot': '3',
-        'class': '7B',
+        'class': '7b',
         'subject': 'Deu',
         'description': 'den Klassenraum streichen',
         'status': 'inProgress',
@@ -41,7 +41,7 @@ export let allTasksArray = [
         'id': 3,
         'date': '2025-03-18',
         'timeslot': '2',
-        'class': '6A',
+        'class': '6a',
         'subject': 'Gesch',
         'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
         'status': 'open',
@@ -51,7 +51,7 @@ export let allTasksArray = [
         'id': 4,
         'date': '2025-03-06',
         'timeslot': '5',
-        'class': '7A',
+        'class': '7a',
         'subject': 'Gesch',
         'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
         'status': 'open',
@@ -61,7 +61,7 @@ export let allTasksArray = [
         'id': 5,
         'date': '2025-03-10',
         'timeslot': '2',
-        'class': '7A',
+        'class': '7a',
         'subject': 'Gesch',
         'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
         'status': 'open',
@@ -71,7 +71,7 @@ export let allTasksArray = [
         'id': 6,
         'date': '2025-03-13',
         'timeslot': '5',
-        'class': '7A',
+        'class': '7a',
         'subject': 'Gesch',
         'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
         'status': 'open',
@@ -81,24 +81,24 @@ export let allTasksArray = [
 
 export let standardTimetable = [
     {
-        'class': '7B',
+        'class': '7b',
         'subject': 'Deu',
         'weekdayNumber': 1,
         'timeslot': 3
     },
     {
-        'class': '6A',
+        'class': '6a',
         'subject': 'Gesch',
         'weekdayNumber': 2,
         'timeslot': 2
     },
     {
-        'class': '7B',
+        'class': '7b',
         'subject': 'Deu',
         'weekdayNumber': 4,
         'timeslot': 3
     }, {
-        'class': '7A',
+        'class': '7a',
         'subject': 'Gesch',
         'weekdayNumber': 4,
         'timeslot': 5
@@ -109,21 +109,21 @@ export let timetableChanges = [
     {
         'date': '2025-03-06',
         'timeslot': '5',
-        'class': '7A',
+        'class': '7a',
         'subject': 'Gesch',
         'status': 'canceled',
     },
     {
         'date': '2025-03-7',
         'timeslot': '5',
-        'class': '5B',
+        'class': '5b',
         'subject': 'MNT',
         'status': 'sub',
     },
     {
         'date': '2025-03-11',
         'timeslot': '5',
-        'class': '5B',
+        'class': '5b',
         'subject': 'MNT',
         'status': 'sub',
     }

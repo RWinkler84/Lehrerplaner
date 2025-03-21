@@ -172,7 +172,7 @@ export default class TaskView extends AbstractView {
 
     static saveNewTask(event) {
 
-        let taskElement = event.target.classList.contains('responsive') 
+        let taskElement = event.target.closest('td').classList.contains('responsive') 
             ? event.target.closest('tr').previousElementSibling.previousElementSibling
             : event.target.closest('tr');
         let checkBoxElement = taskElement.nextElementSibling;
