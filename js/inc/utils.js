@@ -66,6 +66,19 @@ export default class Utils {
         return firstDay.getTime();
     }
 
+    static getFirstAndLastDayOfWeek(date) {
+        let monday = new Date(date).setHours(0,0,0,0);
+
+        while (new Date(monday).getDay() != 1) monday -= 86400000;
+
+        let sunday = monday + 86400000 * 6;
+
+        return {
+            'monday': new Date(monday),
+            'sunday': new Date(sunday)
+        }
+    }
+
 
     static generateTaskId() {
         let tasks = document.querySelectorAll('tr[data-taskid]');
@@ -79,9 +92,11 @@ export default class Utils {
     }
 
     static sortByDate(a, b) {
-        if (a.date < b.date) return -1;
-        if (a.date == b.date) return 0;
-        if (a.date > b.date) return 1;
+        if (!a.date) {
+            a.date = a;
+            b.date = b;
+        }
 
+        return new Date(a.date).setHours(0, 0, 0, 0) - new Date(b.date).setHours(0, 0, 0, 0);
     }
 }

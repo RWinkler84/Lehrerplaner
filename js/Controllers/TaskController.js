@@ -54,7 +54,6 @@ export default class TaskController {
     }
 
     static renderTaskChanges(){
-        console.log('jo!')
         View.renderUpcomingTasks();
         View.renderInProgressTasks();
     }

@@ -32,7 +32,7 @@ export default class TaskView extends AbstractView {
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">${task.subject}</td>
-                        <td class="taskDescription" data-taskDescription="">${task.description}</td>
+                        <td class="taskDescription" data-taskDescription="">${task.description} Termin: ${task.date}</td>
                         <td class="taskDone">
                             <button class="setTaskDoneButton">&#x2714;</button>
                             <button class="setTaskInProgressButton">&#x2692;</button>                        

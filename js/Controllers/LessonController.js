@@ -38,10 +38,8 @@ export default class LessonController {
 
     static reorderTasks(lessonData, lessonCanceled = false){
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        let timetableChanges = Lesson.getTimetableChanges();
-        let scheduledLessons = Lesson.getScheduledLessons()
         
-        TaskController.reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled);
+        TaskController.reorderTasks(lesson, lessonCanceled);
     }
 
     static #lessonDataToLessonObject (lessonData) {

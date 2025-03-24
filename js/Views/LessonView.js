@@ -170,8 +170,10 @@ export default class LessonView {
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
         let lessonData = LessonView.#getLessonDataFromElement(event);
+        lessonData.status = 'canceled';
 
         Controller.setLessonCanceled(lessonData);
+        Controller.reorderTasks(lessonData, true);
 
         lessonElement.classList.add('canceled');
         optionsWrapper.classList.add('canceled');
@@ -239,10 +241,14 @@ export default class LessonView {
         event.target.closest('.lesson').querySelector('.lessonOptionsWrapper').style.display = 'none';
     }
 
-    static removeAllLessons(element) {
-        element.querySelectorAll('.lesson').forEach((lesson) => {
-            lesson.remove();
-        })
+    static removeAllLessons(weekTable) {
+        weekTable.querySelectorAll('.lesson').forEach((lesson) => {
+            
+            lesson.closest('.timeslot').addEventListener('mouseenter', AbstractView.showAddLessonButton);
+            lesson.closest('.timeslot').addEventListener('click', LessonView.createLessonForm);
+            
+            lesson.remove();          
+        });
     }
 
     static #getTimeslotOfLesson(lesson) {
@@ -259,10 +265,10 @@ export default class LessonView {
         }
 
         allWeekdays.forEach((day) => {
-            let dateOfWeekday = new Date(day.dataset.date)
+            let dateOfWeekday = new Date(day.dataset.date).setHours(0, 0, 0, 0)
             let dateOfLesson = new Date(lesson.date).setHours(0, 0, 0, 0);
 
-            if (dateOfWeekday.getTime() == dateOfLesson) weekday = day;
+            if (dateOfWeekday == dateOfLesson) weekday = day;
         });
 
         weekday.querySelectorAll('.timeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot; });
@@ -273,8 +279,6 @@ export default class LessonView {
     static #getLessonDataFromElement(event){
         let lessonElement = event.target.closest('.lesson');
         let isSubstitute = lessonElement.dataset.status ? 'sub' : 'normal';
-
-        console.log(isSubstitute)
 
         return {
             'class': lessonElement.dataset.class,

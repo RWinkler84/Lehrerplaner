@@ -19,12 +19,12 @@ export const allSubjects = [
 export let allTasksArray = [
     {
         'id': 1,
-        'date': '2025-03-18',
+        'date': '2025-03-25',
         'timeslot': '2',
         'class': '6a',
         'subject': 'Gesch',
         'description': 'die Schafe hüten',
-        'status': 'inProgress',
+        'status': 'open',
         'fixedTime': false
     },
     {
@@ -39,13 +39,13 @@ export let allTasksArray = [
     },
     {
         'id': 3,
-        'date': '2025-03-18',
+        'date': '2025-04-01',
         'timeslot': '2',
         'class': '6a',
         'subject': 'Gesch',
         'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
         'status': 'open',
-        'fixedTime': true
+        'fixedTime': false
     },
     {
         'id': 4,
@@ -76,6 +76,16 @@ export let allTasksArray = [
         'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
         'status': 'open',
         'fixedTime': true
+    },
+    {
+        'id': 7,
+        'date': '2025-04-15',
+        'timeslot': '2',
+        'class': '6a',
+        'subject': 'Gesch',
+        'description': 'hoffentlich eskalieren',
+        'status': 'open',
+        'fixedTime': false
     }
 ];
 
