@@ -2,6 +2,7 @@ import Fn from '../inc/utils.js';
 import Controller from '../Controllers/TaskController.js';
 import { taskBackupArray } from '../index.js';
 import { allTasksArray } from '../index.js';
+import AbstractModel from './AbstractModel.js';
 
 export default class Task {
 
@@ -27,7 +28,7 @@ export default class Task {
                     this.#class = task.class;
                     this.#subject = task.subject;
                     this.#description = task.description;
-                    this.#date = task.date;
+                    this.#date = new Date(task.date);
                     this.#timeslot = task.timeslot;
                     this.#status = task.status;
                     this.fixedTime = task.fixedTime;
@@ -59,6 +60,8 @@ export default class Task {
             if (task.status == 'inProgress') inProgressTasks.push(new Task(task.id));
         })
 
+        inProgressTasks.sort(Fn.sortByDate);
+
         return inProgressTasks;
     }
 
@@ -71,7 +74,7 @@ export default class Task {
             task.class = element.class;
             task.subject = element.subject;
             task.description = element.description;
-            task.date = element.date;
+            task.date = new Date(element.date);
             task.timeslot = element.timeslot;
             task.status = element.status;
             task.fixedTime = element.fixedTime;
@@ -82,29 +85,90 @@ export default class Task {
         return allTasks;
     }
 
-    static reorderTasks (lesson, timetableChanges, scheduledLessons, lessonCanceled) {
-        
-        // lesson is a substitute lesson
-        // wenn Klasse und Fach der Stunde gleich Klasse und Fach einer Task und Task nicht fixedTime, Task-Datum = Stunden-Datum
-        // 
+    static reorderTasks(lesson, lessonCanceled) {
+
+        //new lessons in the past won't be processed
+        if (new Date(lesson.date) < new Date()) return;
+
+        let affectedTasks = Task.#getAllAffectedTasks(lesson);
+        console.log(affectedTasks)
+        //nothing affected? Stop...
+        if (affectedTasks.length == 0) return;
+
+        let lastTaskDate = affectedTasks[affectedTasks.length - 1].date
+        let allLessonDates = AbstractModel.calculateAllLessonDates(lastTaskDate, lesson.class, lesson.subject,);
+
+
+
+        if (!lessonCanceled) {
+
+            //if there is a substitute lesson, all tasks without a fixed date after this lesson will be moved to the date prior
+            affectedTasks.forEach(task => {
+                for (let i = 0; i < allLessonDates.length; i++) {
+
+                    if (task.date.setHours(0, 0, 0, 0) == allLessonDates[i].date.setHours(0, 0, 0, 0)) {
+
+                        let count = 1;
+
+                        while (allLessonDates[i - count].status == 'canceled') {
+                            count++
+                        }
+
+                        task.date = allLessonDates[i - count].date;
+                        task.update()
+                    }
+                }
+            })
+
+            Controller.renderTaskChanges();
+            return;
+        }
+
+        //if a lessons is canceled all task without a fixed date will be shifted to the next possible date
+        affectedTasks.forEach(task => {
+
+            for (let i = 0; i < allLessonDates.length; i++) {
+                if (task.date.setHours(0, 0, 0, 0) == allLessonDates[i].date.setHours(0, 0, 0, 0)) {
+                    let taskCopy = new Task(task.id);
+                    console.log(allLessonDates[i].date)
+                    console.log(task);
+
+                    let count = 1;
+                    while (allLessonDates[i + count].status == 'canceled') {
+                        count++
+                        console.log('count ' + count)
+                    }
+                    console.log(taskCopy)
+                    task.date = allLessonDates[i + count].date;
+                    taskCopy.update()
+                }
+            }
+        })
+
+        Controller.renderTaskChanges();
+        console.log(lesson)
+    }
+
+    static #getAllAffectedTasks(lesson) {
+        let affectedTasks = [];
+
+        allTasksArray.sort(Fn.sortByDate);
+
         allTasksArray.forEach(entry => {
             let task = new Task(entry.id);
 
             if (task.class != lesson.class) return;
             if (task.subject != lesson.subject) return;
-            if (new Date(task.date).setHours(0,0,0,0) < new Date(lesson.date).setHours(0,0,0,0)) return;
+            if (task.date.setHours(0, 0, 0, 0) < new Date(lesson.date).setHours(0, 0, 0, 0)) return;
             if (task.fixedTime == true) return;
-            console.log(task.date);                            
-            task.date = lesson.date;
-            console.log(task.date);                            
-            task.update();
-            Controller.renderTaskChanges();    
+
+            affectedTasks.push(task);
         })
 
-
+        return affectedTasks;
     }
 
-    setBackupData(){
+    setBackupData() {
         taskBackupArray[this.#id] = {
             'id': this.#id,
             'class': this.#class,
@@ -112,17 +176,17 @@ export default class Task {
             'date': this.#date,
             'timeslot': this.#timeslot,
             'description': this.#description,
-            'fixedTime' : this.#fixedTime
+            'fixedTime': this.#fixedTime
         }
     }
 
-    getBackupData(){
+    getBackupData() {
         return taskBackupArray[this.#id];
     }
 
     update() {
         allTasksArray.forEach(element => {
-            if (element.id == this.#id){
+            if (element.id == this.#id) {
                 element.date = this.#date;
                 element.class = this.#class;
                 element.subject = this.#subject;
@@ -133,7 +197,7 @@ export default class Task {
     }
 
     save() {
-    allTasksArray.push(this);
+        allTasksArray.push(this);
 
     }
 
