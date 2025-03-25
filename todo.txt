@@ -1,14 +1,8 @@
-- logik für das zeitliche verschieben von Tasks, wenn Stunden dazukommen oder wegfallen
-    -> erledigt: sammle die betroffenen Tasks, die wandern dürfen, in einem Array
-    -> noch offen: task das gleichen Termins rutschen auf den nächstmöglichen Termin, egal ob Vertretungs- oder reguläre Stunden...
-        -> möglicher Ansatz: Stundentermine bis zur spätesten Task vorberechnen
-            -> funktioniert, muss nur noch Einträge des regulären Stundenplans löschen, wenn diese Stunde in 
-            den Lessonchanges als Ausfall vermert -> Funktion buggt in der if noch herum
-            -> außerdem funktioniert die Berechnung der Tasktermine bei Ausfall noch nicht, Vertretung scheint
-            weitestgehend zu funktionieren
 
+- Stunden sollen auch bearbeitet werden können
 - eigene Validierungslogik bauen
-
+- Datum bei jedem Wochentag angezeigen
+- grüner Marker, wenn aktuelle Woche angezeigt wird
 
 erledigt: 
 
@@ -38,4 +32,11 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - focus bei mehreren ungespeicherten Task Forms korrigieren
 - task-Formular muss Möglichkeit bieten, sie als fest terminiert auszuweisen
 - abgleich zwischen angezeigten lessons und tasks
-
+- logik für das zeitliche verschieben von Tasks, wenn Stunden dazukommen oder wegfallen
+    -> erledigt: sammle die betroffenen Tasks, die wandern dürfen, in einem Array
+    -> noch offen: task das gleichen Termins rutschen auf den nächstmöglichen Termin, egal ob Vertretungs- oder reguläre Stunden...
+        -> möglicher Ansatz: Stundentermine bis zur spätesten Task vorberechnen
+            -> funktioniert, muss nur noch Einträge des regulären Stundenplans löschen, wenn diese Stunde in 
+            den Lessonchanges als Ausfall vermert -> Funktion buggt in der if noch herum
+            -> außerdem funktioniert die Berechnung der Tasktermine bei Ausfall noch nicht, Vertretung scheint
+            weitestgehend zu funktionieren

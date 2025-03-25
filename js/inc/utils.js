@@ -18,7 +18,7 @@ export default class Utils {
     }
 
     static isDateInWeek(date, mondayDate, sundayDate) {
-        let dateToTest = new Date(date).setHours(0, 0, 0, 0);
+        let dateToTest = new Date(date).setHours(12,0,0,0);
         let monday = new Date(mondayDate);
         let sunday = new Date(sundayDate);
 
@@ -67,7 +67,7 @@ export default class Utils {
     }
 
     static getFirstAndLastDayOfWeek(date) {
-        let monday = new Date(date).setHours(0,0,0,0);
+        let monday = new Date(date).setHours(12,0,0,0);
 
         while (new Date(monday).getDay() != 1) monday -= 86400000;
 
@@ -97,6 +97,6 @@ export default class Utils {
             b.date = b;
         }
 
-        return new Date(a.date).setHours(0, 0, 0, 0) - new Date(b.date).setHours(0, 0, 0, 0);
+        return new Date(a.date).setHours(12,0,0,0) - new Date(b.date).setHours(12,0,0,0);
     }
 }

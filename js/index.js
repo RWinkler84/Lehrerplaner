@@ -174,42 +174,20 @@ document.querySelectorAll('.timeslot').forEach((element) => {
 document.querySelector('#weekBackwardButton').addEventListener('click', switchToPreviousWeek);
 document.querySelector('#weekForwardButton').addEventListener('click', switchToNextWeek);
 
+//handler for weekday label
+document.querySelectorAll('.weekdayLabel').forEach(label => {
+    label.addEventListener('mouseenter', AbstractView.removeAddLessonButton);
+})
+
 // on ready
 
 document.addEventListener('DOMContentLoaded', setDateForWeekdays);
 document.addEventListener('DOMContentLoaded', setCalendarWeek);
-document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate)
+document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate);
 document.addEventListener('DOMContentLoaded', LessonView.renderLesson);
 
 document.addEventListener('DOMContentLoaded', TaskView.renderUpcomingTasks);
 document.addEventListener('DOMContentLoaded', TaskView.renderInProgressTasks);
-
-
-
-//HIGHLIGHTING AND TOGGLING STUFF
-
-function hightlightLesson(event) {
-    let taskId = event.target.closest('tr').dataset.taskid;
-
-    document.querySelectorAll('.lesson').forEach((lesson) => {
-
-        if (lesson.dataset.taskid == taskId) {
-            lesson.style.fontWeight = 'bold';
-            lesson.style.translate = '-1px -1px';
-        }
-    })
-}
-
-function removeLessonHighlight(event) {
-    let taskId = event.target.closest('tr').dataset.taskid;
-
-    document.querySelectorAll('.lesson').forEach((lesson) => {
-
-        if (lesson.dataset.taskid == taskId) lesson.removeAttribute('style');
-    })
-}
-
-
 
 
 // FIDDLING WITH DATE
@@ -218,7 +196,7 @@ function setCalendarWeek() {
     let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
     let weekCounter = 1;
     let currentYear = new Date().getFullYear();
-    let referenceDate = new Date().setHours(0, 0, 0, 0);
+    let referenceDate = new Date().setHours(12,0,0,0);
     let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
     let monday = firstThursday - 86400000 * 3
     let sunday = firstThursday + 86400000 * 3;
@@ -235,18 +213,21 @@ function setCalendarWeek() {
 }
 
 function setDateForWeekdays() {
-    let todayUnix = new Date().setHours(0, 0, 0);
+    let todayUnix = new Date().setHours(12,0,0,0);
 
     //go back to monday of given week
     while (new Date(todayUnix).getDay() != 1) todayUnix -= 86400000;
 
     document.querySelectorAll('.weekday').forEach((weekday) => {
-
+ 
         weekday.dataset.date = new Date(todayUnix).toString();
 
         todayUnix += 86400000;    // 86400000 = ms/day
     })
+        AbstractView.setDateOnWeekdayLabel();
+        AbstractView.greyOutPassedDays();
 }
+
 
 function setWeekStartAndEndDate() {
     let startDateSpan = document.querySelector('#weekStartDate');
@@ -268,12 +249,15 @@ function switchToPreviousWeek() {
 
     // iterates over all weekday columns and adjusts date of weekdays
     document.querySelectorAll('.weekday').forEach((weekday) => {
-        let currentDate = new Date(weekday.dataset.date).getTime();
+        let currentDate = new Date(weekday.dataset.date).setHours(12,0,0,0);
         let newDate = currentDate - 86400000 * 7; // -7 days
 
         weekday.dataset.date = new Date(newDate).toString();
     });
 
+    AbstractView.setDateOnWeekdayLabel();
+    AbstractView.greyOutPassedDays();
+    AbstractView.toogleIsCurrentWeekDot();
     setWeekStartAndEndDate();
     calcCalendarWeek(false);
 }
@@ -291,6 +275,9 @@ function switchToNextWeek() {
         weekday.dataset.date = new Date(newDate).toString();
     });
 
+    AbstractView.setDateOnWeekdayLabel();
+    AbstractView.greyOutPassedDays();
+    AbstractView.toogleIsCurrentWeekDot();
     setWeekStartAndEndDate();
     calcCalendarWeek(true);
 }

@@ -23,6 +23,7 @@ export default class AbstractView {
         AbstractView.removeAddLessonButton();
 
         if (Fn.hasLesson(event.target)) return;
+        if (event.target.closest('.weekday').classList.contains('passed')) return;
 
         event.target.innerHTML = `<div class="addLessonButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addLessonButton">+</div></div>`;
 
@@ -43,7 +44,7 @@ export default class AbstractView {
 
         taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
 
-            if (new Date(taskRow.dataset.date).setHours(0, 0, 0, 0) != new Date(event.target.dataset.date).setHours(0, 0, 0, 0)) return;
+            if (new Date(taskRow.dataset.date).setHours(12, 0, 0, 0) != new Date(event.target.dataset.date).setHours(12, 0, 0, 0)) return;
             if (taskRow.querySelector('td[data-class]').dataset.class != event.target.dataset.class) return;
             if (taskRow.querySelector('td[data-subject').dataset.subject != event.target.dataset.subject) return;
 
@@ -60,10 +61,10 @@ export default class AbstractView {
         let taskContainer = document.querySelector('#taskContainer')
 
         taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
-            if (new Date(taskRow.dataset.date).setHours(0, 0, 0, 0) != new Date(event.target.dataset.date).setHours(0, 0, 0, 0)) return;
+            if (new Date(taskRow.dataset.date).setHours(12, 0, 0, 0) != new Date(event.target.dataset.date).setHours(12, 0, 0, 0)) return;
             if (taskRow.querySelector('td[data-class]').dataset.class != event.target.dataset.class) return;
             if (taskRow.querySelector('td[data-subject').dataset.subject != event.target.dataset.subject) return;
-            
+
             taskRow.removeAttribute('style');
 
             if (taskRow.nextElementSibling.hasAttribute('data-new')) return;
@@ -71,5 +72,32 @@ export default class AbstractView {
             taskRow.nextElementSibling.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
 
         });
+    }
+    static greyOutPassedDays() {
+        document.querySelectorAll('.weekday').forEach(weekday => {
+            console.log(weekday);
+            weekday.classList.remove('passed');
+            if (new Date(weekday.dataset.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) weekday.classList.add('passed');
+        })
+    }
+
+    static setDateOnWeekdayLabel() {
+        document.querySelectorAll('.weekday').forEach(weekday => {
+            let dateOfWeekday = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            weekday.querySelector('.smallDate').innerText = Fn.formatDate(dateOfWeekday);
+        })
+    }
+
+    static toogleIsCurrentWeekDot() {
+        let today = new Date();
+        let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"').dataset.date;
+        let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"').dataset.date;
+
+        if (Fn.isDateInWeek(today, mondayOfDisplayedWeek, sundayOfDisplayedWeek)) {
+            document.querySelector('#isCurrentWeekDot').style.display = "block";
+            return;
+        }
+
+        document.querySelector('#isCurrentWeekDot').style.display = "none";
     }
 }

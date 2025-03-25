@@ -265,8 +265,8 @@ export default class LessonView {
         }
 
         allWeekdays.forEach((day) => {
-            let dateOfWeekday = new Date(day.dataset.date).setHours(0, 0, 0, 0)
-            let dateOfLesson = new Date(lesson.date).setHours(0, 0, 0, 0);
+            let dateOfWeekday = new Date(day.dataset.date).setHours(12,0,0,0)
+            let dateOfLesson = new Date(lesson.date).setHours(12,0,0,0);
 
             if (dateOfWeekday == dateOfLesson) weekday = day;
         });

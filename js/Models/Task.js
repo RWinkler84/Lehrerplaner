@@ -88,17 +88,15 @@ export default class Task {
     static reorderTasks(lesson, lessonCanceled) {
 
         //new lessons in the past won't be processed
-        if (new Date(lesson.date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) return;
+        if (new Date(lesson.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
 
         let affectedTasks = Task.#getAllAffectedTasks(lesson);
-        console.log(affectedTasks)
+
         //nothing affected? Stop...
         if (affectedTasks.length == 0) return;
 
         let lastTaskDate = affectedTasks[affectedTasks.length - 1].date
         let allLessonDates = AbstractModel.calculateAllLessonDates(lastTaskDate, lesson.class, lesson.subject,);
-
-
 
         if (!lessonCanceled) {
 
@@ -106,7 +104,7 @@ export default class Task {
             affectedTasks.forEach(task => {
                 for (let i = 0; i < allLessonDates.length; i++) {
 
-                    if (task.date.setHours(0, 0, 0, 0) == allLessonDates[i].date.setHours(0, 0, 0, 0)) {
+                    if (task.date.setHours(12,0,0,0) == allLessonDates[i].date.setHours(12,0,0,0)) {
 
                         let count = 1;
 
@@ -128,16 +126,14 @@ export default class Task {
         affectedTasks.forEach(task => {
 
             for (let i = 0; i < allLessonDates.length; i++) {
-                if (task.date.setHours(0, 0, 0, 0) == allLessonDates[i].date.setHours(0, 0, 0, 0)) {
+                if (task.date.setHours(12,0,0,0) == allLessonDates[i].date.setHours(12,0,0,0)) {
                     let taskCopy = new Task(task.id);
-                    console.log(allLessonDates[i].date)
-                    console.log(task);
-
                     let count = 1;
+                    
                     while (allLessonDates[i + count].status == 'canceled') {
                         count++
-                        console.log('count ' + count)
                     }
+
                     taskCopy.date = allLessonDates[i + count].date;
                     taskCopy.update()
                 }
@@ -145,7 +141,6 @@ export default class Task {
         })
 
         Controller.renderTaskChanges();
-        console.log(lesson)
     }
 
     static #getAllAffectedTasks(lesson) {
@@ -158,7 +153,7 @@ export default class Task {
 
             if (task.class != lesson.class) return;
             if (task.subject != lesson.subject) return;
-            if (task.date.setHours(0, 0, 0, 0) < new Date(lesson.date).setHours(0, 0, 0, 0)) return;
+            if (task.date.setHours(12,0,0,0) < new Date(lesson.date).setHours(12,0,0,0)) return;
             if (task.fixedTime == true) return;
 
             affectedTasks.push(task);
