@@ -88,7 +88,7 @@ export default class Task {
     static reorderTasks(lesson, lessonCanceled) {
 
         //new lessons in the past won't be processed
-        if (new Date(lesson.date) < new Date()) return;
+        if (new Date(lesson.date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) return;
 
         let affectedTasks = Task.#getAllAffectedTasks(lesson);
         console.log(affectedTasks)
@@ -138,8 +138,7 @@ export default class Task {
                         count++
                         console.log('count ' + count)
                     }
-                    console.log(taskCopy)
-                    task.date = allLessonDates[i + count].date;
+                    taskCopy.date = allLessonDates[i + count].date;
                     taskCopy.update()
                 }
             }

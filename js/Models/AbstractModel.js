@@ -84,13 +84,11 @@ export default class AbstractModel {
 
             if (lessonDate.status == 'canceled') {
                 for (let i = 0; i < allLessonDates.length; i++) {
-                    console.log('cleaining')
-                    console.log(allLessonDates[i])
-                    if (new Date(allLessonDates[i].date.setHours(0, 0, 0, 0)) == new Date (lessonDate.date.setHours(0, 0, 0, 0)) &&
-                        allLessonDates[i].timeslot == lessonDate.date.timeslot) {
 
-                            console.log('still cleaning')
-                        allLessonDates[i].slice(i, 1);
+                    if (new Date(allLessonDates[i].date).setHours(0, 0, 0, 0) == new Date (lessonDate.date).setHours(0, 0, 0, 0) &&
+                        allLessonDates[i].timeslot == lessonDate.timeslot) {
+
+                        allLessonDates.splice(i, 1);
                     }
                 }
             }
