@@ -20,6 +20,13 @@ export default class LessonController {
         View.renderNewLesson(lesson);
     }
 
+    static updateLesson(lessonData){
+        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+
+        lesson.update();
+        View.renderNewLesson(lesson);
+    }
+
     static setLessonCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 

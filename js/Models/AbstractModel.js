@@ -68,8 +68,6 @@ export default class AbstractModel {
 
         AbstractModel.#removeCanceledLessons(allLessonDates);
 
-        console.log(allLessonDates);
-
         return allLessonDates;
     }
 

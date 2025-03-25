@@ -75,6 +75,21 @@ export default class Lesson {
         timetableChanges.push(lessonData);
     }
 
+    update() {
+
+        timetableChanges.forEach(entry => {
+            if (new Date(entry.date).setHours(12,0,0,0) != this.date.setHours(12,0,0,0)) return;
+            if (entry.timeslot != this.timeslot) return;
+
+            
+            entry.date = this.#date;
+            entry.timeslot = this.#timeslot;
+            entry.class = this.#class;
+            entry.subject = this.#subject;
+            entry.status = this.#status; 
+        })
+    }
+
     cancel() {
         let lessonData = {
             'date': this.#date,
@@ -83,8 +98,9 @@ export default class Lesson {
             'subject': this.#subject,
             'status': this.#status,
         };
-
+        console.log(timetableChanges);
         timetableChanges.push(lessonData);
+        console.log(timetableChanges);
     }
 
     uncancel() {
@@ -150,7 +166,7 @@ export default class Lesson {
     }
 
     set date(date) {
-        this.#date = date;
+        this.#date = new Date(date);
     }
 
     set timeslot(timeslot) {

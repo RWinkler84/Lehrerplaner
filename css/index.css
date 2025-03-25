@@ -6,7 +6,8 @@
     --topMenuBackgound: #542344;
     --lightMenuBackground: #81366A;
     --contentContainerBackground: #F3F5F7;
-    --lightText: #F3F5F7;
+    --lightText: rgb(164, 164, 164);
+    --lighterText: #F3F5F7;
     --matteRed: #F05D5E;
     --matteGreen: #0F7173;
     --lightMatteGreen: #17B2B5;
@@ -31,7 +32,7 @@ main {}
 
 #topMenuContainer {
     background-color: var(--topMenuBackgound);
-    color: var(--lightText);
+    color: var(--lighterText);
     padding: 1rem 2rem;
     margin-bottom: 1rem;
     flex: 1 0 100%
@@ -113,7 +114,7 @@ main {}
 .smallDate {
     font-weight: normal;
     font-size: 0.8rem;
-    color: initial;
+    color: var(--lightText);
 }
 
 .weekday {
@@ -134,7 +135,7 @@ main {}
     padding: 0.5rem 0.5rem;
     border-radius: 5px;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-    color: var(--lightText);
+    color: var(--lighterText);
     text-align: center;
     transition: all 0.3s ease-out;
 }
@@ -177,7 +178,7 @@ main {}
 }
 
 .lessonOption button {
-    color: var(--lightText);
+    color: var(--lighterText);
     border: none;
     flex-grow: 1;
     background-color: transparent;
@@ -186,7 +187,6 @@ main {}
 .lessonForm {
     position: absolute;
     display: flex;
-    /* flex-direction: column; */
     flex-wrap: nowrap;
     gap: 0.5rem;
     background-color: var(--lightergrey);
@@ -277,7 +277,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     border-radius: 3px;
     background-color: var(--lightMatteGreen);
     font-size: 1rem;
-    color: var(--lightText);
+    color: var(--lighterText);
 }
 
 .taskDone button:hover {

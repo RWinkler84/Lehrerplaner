@@ -1,4 +1,5 @@
 import Controller from "../Controllers/LessonController.js";
+import Lesson from "../Models/Lesson.js";
 import AbstractView from "./AbstractView.js";
 
 export default class LessonView {
@@ -26,6 +27,7 @@ export default class LessonView {
                         </div>
                     </div>
                     <div style="display: none;" class="${lesson.cssColorClass} light lessonOptionsWrapper">
+                        <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
                         <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
                         <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
                     </div>    
@@ -42,6 +44,7 @@ export default class LessonView {
             let canceled = '';
             let optionsColorClass = 'light';
             let lessonOptionsHTML = `
+                    <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
                     <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
                     <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
             `;
@@ -99,6 +102,7 @@ export default class LessonView {
                         </div>
                     </div>
                     <div style="display: none;" class="${lesson.cssColorClass} light lessonOptionsWrapper">
+                        <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
                         <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
                         <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
                     </div>    
@@ -110,9 +114,11 @@ export default class LessonView {
         timeslot.querySelector('.lesson').addEventListener('mouseleave', AbstractView.removeTaskHighlight);
     }
 
-    static createLessonForm(event) {
+    static createLessonForm(event, oldLessonData = undefined) {
 
         let timeslotElement = event.target.closest('.timeslot');
+
+        if (timeslotElement.closest('.weekday').classList.contains('passed')) return;
 
         let timeslotProps = timeslotElement.getBoundingClientRect()
         let timetableProps = document.querySelector('.weekOverview').getBoundingClientRect();
@@ -138,10 +144,19 @@ export default class LessonView {
             lessonForm.style.transform = `translateX(-${offset}px)`;
         }
 
-        timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
+        //form button event handlers
+        if (oldLessonData) {
+            timeslotElement.querySelector('#lessonForm').addEventListener('submit', (event) => {
+                console.log(oldLessonData)
+                LessonView.saveLessonUpdate(event, oldLessonData)});
+        } else {
+            timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
+        }
+
         timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => LessonView.removeLessonForm(event, true));
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
 
+        //timeslot event handlers
         timeslotElement.removeEventListener('click', LessonView.createLessonForm);
         timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
@@ -165,8 +180,47 @@ export default class LessonView {
         LessonView.removeLessonForm(event);
     }
 
+    static updateLesson(event) {
+
+        let lessonElement = event.target.closest('.lesson');
+
+        let oldLessonData = {
+            'date': lessonElement.dataset.date,
+            'timeslot': lessonElement.dataset.timeslot,
+            'class': lessonElement.dataset.class,
+            'subject': lessonElement.dataset.subject,
+            'status': 'canceled'
+        }
+
+        LessonView.createLessonForm(event, oldLessonData);
+
+    }
+
+    static saveLessonUpdate(event, oldLessonData) {
+        event.preventDefault();
+
+        console.log(oldLessonData);
+
+        let timeslotElement = event.target.closest('.timeslot');
+
+        let newLessonData = {
+            'date': timeslotElement.closest('.weekday').dataset.date,
+            'timeslot': timeslotElement.dataset.timeslot,
+            'class': timeslotElement.querySelector('#class').value.toLowerCase(),
+            'subject': timeslotElement.querySelector('#subject').value,
+            'status': 'sub'
+        }
+
+        Controller.setLessonCanceled(oldLessonData);
+        Controller.reorderTasks(oldLessonData, true);
+        Controller.updateLesson(newLessonData);
+        Controller.reorderTasks(newLessonData, false);
+
+        LessonView.removeLessonForm(event); 
+    }
+
     static setLessonCanceled(event) {
-        
+
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
         let lessonData = LessonView.#getLessonDataFromElement(event);
@@ -180,12 +234,12 @@ export default class LessonView {
         optionsWrapper.classList.remove('light');
 
         // change the menu options
-        optionsWrapper.style.display = 'none';            
+        optionsWrapper.style.display = 'none';
         optionsWrapper.innerHTML = '<div class="lessonOption"><button data-lesson_uncanceled>findet statt</button></div>'
         optionsWrapper.querySelector('button[data-lesson_uncanceled]').addEventListener('click', LessonView.setLessonNotCanceled);
     }
 
-    static setLessonNotCanceled(event){
+    static setLessonNotCanceled(event) {
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
         let lessonData = LessonView.#getLessonDataFromElement(event);
@@ -197,12 +251,14 @@ export default class LessonView {
         optionsWrapper.classList.add('light');
 
         // change the menu options
-        optionsWrapper.style.display = 'none';            
+        optionsWrapper.style.display = 'none';
         optionsWrapper.innerHTML = `
+            <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
             <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
             <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
         `;
 
+        optionsWrapper.querySelector('button[data-update_lesson]').addEventListener('click', LessonView.createLessonForm);
         optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', Controller.createNewTask);
         optionsWrapper.querySelector('button[data-lesson_canceled]').addEventListener('click', LessonView.setLessonCanceled);
     }
@@ -227,6 +283,7 @@ export default class LessonView {
         if (optionsWrapper.style.display == 'none') {
             optionsWrapper.style.display = 'block';
 
+            if (optionsWrapper.querySelector('button[data-update_lesson]')) optionsWrapper.querySelector('button[data-update_lesson]').addEventListener('click', LessonView.updateLesson);
             if (optionsWrapper.querySelector('button[data-add_new_task]')) optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', Controller.createNewTask);
             if (optionsWrapper.querySelector('button[data-lesson_canceled]')) optionsWrapper.querySelector('button[data-lesson_canceled]').addEventListener('click', LessonView.setLessonCanceled);
             if (optionsWrapper.querySelector('button[data-lesson_uncanceled]')) optionsWrapper.querySelector('button[data-lesson_uncanceled]').addEventListener('click', LessonView.setLessonNotCanceled);
@@ -243,11 +300,11 @@ export default class LessonView {
 
     static removeAllLessons(weekTable) {
         weekTable.querySelectorAll('.lesson').forEach((lesson) => {
-            
+
             lesson.closest('.timeslot').addEventListener('mouseenter', AbstractView.showAddLessonButton);
             lesson.closest('.timeslot').addEventListener('click', LessonView.createLessonForm);
-            
-            lesson.remove();          
+
+            lesson.remove();
         });
     }
 
@@ -265,8 +322,8 @@ export default class LessonView {
         }
 
         allWeekdays.forEach((day) => {
-            let dateOfWeekday = new Date(day.dataset.date).setHours(12,0,0,0)
-            let dateOfLesson = new Date(lesson.date).setHours(12,0,0,0);
+            let dateOfWeekday = new Date(day.dataset.date).setHours(0, 0, 0, 0)
+            let dateOfLesson = new Date(lesson.date).setHours(0, 0, 0, 0);
 
             if (dateOfWeekday == dateOfLesson) weekday = day;
         });
@@ -276,7 +333,7 @@ export default class LessonView {
         return timeslot;
     }
 
-    static #getLessonDataFromElement(event){
+    static #getLessonDataFromElement(event) {
         let lessonElement = event.target.closest('.lesson');
         let isSubstitute = lessonElement.dataset.status ? 'sub' : 'normal';
 

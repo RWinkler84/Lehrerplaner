@@ -61,8 +61,8 @@ export let allTasksArray = [
         'id': 5,
         'date': '2025-03-10',
         'timeslot': '2',
-        'class': '7a',
-        'subject': 'Gesch',
+        'class': '7b',
+        'subject': 'Deu',
         'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
         'status': 'open',
         'fixedTime': false
@@ -71,8 +71,8 @@ export let allTasksArray = [
         'id': 6,
         'date': '2025-03-13',
         'timeslot': '5',
-        'class': '7a',
-        'subject': 'Gesch',
+        'class': '8b',
+        'subject': 'MNT',
         'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
         'status': 'open',
         'fixedTime': true
@@ -157,9 +157,17 @@ import Fn from './inc/utils.js';
 //     element.addEventListener('mouseout', removeLessonHighlight);
 // });
 
+// on ready
+document.addEventListener('DOMContentLoaded', setDateForWeekdays);
+document.addEventListener('DOMContentLoaded', setCalendarWeek);
+document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate);
+document.addEventListener('DOMContentLoaded', LessonView.renderLesson);
+
+document.addEventListener('DOMContentLoaded', TaskView.renderUpcomingTasks);
+document.addEventListener('DOMContentLoaded', TaskView.renderInProgressTasks);
+
 
 // handlers for empty timeslots
-
 document.querySelectorAll('.timeslot').forEach((element) => {
     element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
 });
@@ -170,7 +178,6 @@ document.querySelectorAll('.timeslot').forEach((element) => {
 
 
 // handlers for switching between weeks
-
 document.querySelector('#weekBackwardButton').addEventListener('click', switchToPreviousWeek);
 document.querySelector('#weekForwardButton').addEventListener('click', switchToNextWeek);
 
@@ -179,15 +186,6 @@ document.querySelectorAll('.weekdayLabel').forEach(label => {
     label.addEventListener('mouseenter', AbstractView.removeAddLessonButton);
 })
 
-// on ready
-
-document.addEventListener('DOMContentLoaded', setDateForWeekdays);
-document.addEventListener('DOMContentLoaded', setCalendarWeek);
-document.addEventListener('DOMContentLoaded', setWeekStartAndEndDate);
-document.addEventListener('DOMContentLoaded', LessonView.renderLesson);
-
-document.addEventListener('DOMContentLoaded', TaskView.renderUpcomingTasks);
-document.addEventListener('DOMContentLoaded', TaskView.renderInProgressTasks);
 
 
 // FIDDLING WITH DATE

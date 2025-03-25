@@ -23,6 +23,7 @@ export default class TaskView extends AbstractView {
         allUpcomingTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
             let checked = task.fixedTime ? 'checked' : '';
+            let subjectDate = Fn.formatDate(task.date);
 
             if (new Date(task.date) < new Date()) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
@@ -31,8 +32,11 @@ export default class TaskView extends AbstractView {
             taskTrHTML += `
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
-                        <td data-subject="${task.subject}">${task.subject}</td>
-                        <td class="taskDescription" data-taskDescription="">${task.description} Termin: ${task.date}</td>
+                        <td data-subject="${task.subject}">
+                            <div>${task.subject}</div>
+                            <div class="smallDate">${subjectDate}</div>
+                        </td>
+                        <td class="taskDescription" data-taskDescription="">${task.description}</td>
                         <td class="taskDone">
                             <button class="setTaskDoneButton">&#x2714;</button>
                             <button class="setTaskInProgressButton">&#x2692;</button>                        
@@ -79,6 +83,7 @@ export default class TaskView extends AbstractView {
         allInProgressTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
             let checked = task.fixedTime ? 'checked' : '';
+            let subjectDate = Fn.formatDate(task.date);
 
             if (new Date(task.date) < new Date()) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
@@ -87,7 +92,10 @@ export default class TaskView extends AbstractView {
             taskTrHTML += `
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
-                        <td data-subject="${task.subject}">${task.subject}</td>
+                        <td data-subject="${task.subject}">
+                            <div>${task.subject}</div>
+                            <div class="smallDate">${subjectDate}</div>
+                        </td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
                         <td class="taskDone"><button class="setTaskDoneButton">&#x2714;</button></td>
                     </tr>
@@ -192,10 +200,9 @@ export default class TaskView extends AbstractView {
         TaskView.#removeNewDataset(event);
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);
+        TaskView.renderUpcomingTasks();
 
         taskElement.querySelectorAll('td').forEach((td) => { td.addEventListener('dblclick', event => TaskView.makeEditable(event)) });
-        // form.addEventListener('mouseover', hightlightLesson);
-        // form.addEventListener('mouseout', removeLessonHighlight);
     }
 
     static updateTask(event) {
