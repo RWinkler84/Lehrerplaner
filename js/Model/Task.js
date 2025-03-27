@@ -1,5 +1,5 @@
 import Fn from '../inc/utils.js';
-import Controller from '../Controllers/TaskController.js';
+import Controller from '../Controller/TaskController.js';
 import { taskBackupArray } from '../index.js';
 import { allTasksArray } from '../index.js';
 import AbstractModel from './AbstractModel.js';

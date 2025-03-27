@@ -1,5 +1,4 @@
-import Controller from "../Controllers/LessonController.js";
-import Lesson from "../Models/Lesson.js";
+import Controller from "../Controller/LessonController.js";
 import AbstractView from "./AbstractView.js";
 
 export default class LessonView {
@@ -14,6 +13,18 @@ export default class LessonView {
         regularLessons.forEach((lesson) => {
             let timeslot = LessonView.#getTimeslotOfLesson(lesson);
             let lessonDate = timeslot.closest('.weekday').dataset.date;
+            let lessonOptionsHTML = `
+                        <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
+                        <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
+                        <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
+            `;
+
+            if (timeslot.closest('.weekday').classList.contains('passed')) {
+                lessonOptionsHTML = `
+                    <div class="lessonOption lessonPastMessage"><button>Stunde hat bereits stattgefunden.</button></div>
+                    <div class="lessonOption lessonPastMessage responsive"><button>Stunde hat bereits statt-gefunden.</button></div>
+                `;
+            }
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
@@ -27,10 +38,8 @@ export default class LessonView {
                         </div>
                     </div>
                     <div style="display: none;" class="${lesson.cssColorClass} light lessonOptionsWrapper">
-                        <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
-                        <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
-                        <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
-                    </div>    
+                        ${lessonOptionsHTML}
+                    </div>   
                 </div>`;
 
         })
@@ -54,6 +63,13 @@ export default class LessonView {
                 optionsColorClass = ''
                 lessonOptionsHTML = `
                     <div class="lessonOption"><button data-lesson_uncanceled>findet statt</button></div>
+                `;
+            }
+
+            if (timeslot.closest('.weekday').classList.contains('passed')) {
+                lessonOptionsHTML = `
+                        <div class="lessonOption lessonPastMessage"><button>Stunde hat bereits stattgefunden.</button></div>
+                        <div class="lessonOption lessonPastMessage responsive"><button>Stunde hat bereits statt-gefunden.</button></div>
                 `;
             }
 
@@ -147,8 +163,8 @@ export default class LessonView {
         //form button event handlers
         if (oldLessonData) {
             timeslotElement.querySelector('#lessonForm').addEventListener('submit', (event) => {
-                console.log(oldLessonData)
-                LessonView.saveLessonUpdate(event, oldLessonData)});
+                LessonView.saveLessonUpdate(event, oldLessonData)
+            });
         } else {
             timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
         }
@@ -199,8 +215,6 @@ export default class LessonView {
     static saveLessonUpdate(event, oldLessonData) {
         event.preventDefault();
 
-        console.log(oldLessonData);
-
         let timeslotElement = event.target.closest('.timeslot');
 
         let newLessonData = {
@@ -216,7 +230,7 @@ export default class LessonView {
         Controller.updateLesson(newLessonData);
         Controller.reorderTasks(newLessonData, false);
 
-        LessonView.removeLessonForm(event); 
+        LessonView.removeLessonForm(event);
     }
 
     static setLessonCanceled(event) {
@@ -282,6 +296,19 @@ export default class LessonView {
 
         if (optionsWrapper.style.display == 'none') {
             optionsWrapper.style.display = 'block';
+
+            let weekContainerProperties = document.querySelector('.weekOverview').getBoundingClientRect();
+            let optionsWrapperProperties = optionsWrapper.getBoundingClientRect();
+            let verticalOffset = (optionsWrapperProperties.height + 20) * -1;
+            console.log(verticalOffset);
+
+            if (optionsWrapperProperties.bottom > weekContainerProperties.bottom) {
+                console.log('jo');
+                optionsWrapper.style.translate = `0 ${verticalOffset}px`;
+            }
+
+            console.log(weekContainerProperties);
+            console.log(optionsWrapperProperties);
 
             if (optionsWrapper.querySelector('button[data-update_lesson]')) optionsWrapper.querySelector('button[data-update_lesson]').addEventListener('click', LessonView.updateLesson);
             if (optionsWrapper.querySelector('button[data-add_new_task]')) optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', Controller.createNewTask);

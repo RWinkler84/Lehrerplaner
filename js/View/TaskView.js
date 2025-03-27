@@ -1,7 +1,6 @@
 import AbstractView from './AbstractView.js';
-import Controller from '../Controllers/TaskController.js';
+import Controller from '../Controller/TaskController.js';
 import Fn from '../inc/utils.js';
-import { allTasksArray } from '../index.js';
 
 export default class TaskView extends AbstractView {
 
@@ -16,6 +15,7 @@ export default class TaskView extends AbstractView {
 
 
         if (allUpcomingTasks.length == 0) {
+            document.querySelector('#upcomingTasksTable thead').style.display = 'none';
             document.querySelector('#upcomingTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
             return;
         }
@@ -76,6 +76,7 @@ export default class TaskView extends AbstractView {
 
 
         if (allInProgressTasks.length == 0) {
+            document.querySelector('#inProgressTasksTable thead').style.display = 'none';
             document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
             return;
         }
@@ -160,6 +161,10 @@ export default class TaskView extends AbstractView {
         `;
 
         taskTable.innerHTML += trContent;
+        if (taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
+            taskTable.parentElement.querySelector('thead').removeAttribute('style');
+            taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display = 'none';
+        }
 
         // button event listeners
         taskTable.querySelectorAll('tr[data-new]').forEach((tr) => {
@@ -180,7 +185,7 @@ export default class TaskView extends AbstractView {
 
     static saveNewTask(event) {
 
-        let taskElement = event.target.closest('td').classList.contains('responsive') 
+        let taskElement = event.target.closest('td').classList.contains('responsive')
             ? event.target.closest('tr').previousElementSibling.previousElementSibling
             : event.target.closest('tr');
         let checkBoxElement = taskElement.nextElementSibling;
@@ -229,7 +234,6 @@ export default class TaskView extends AbstractView {
         }
 
         Controller.updateTask(taskData);
-        console.log(allTasksArray);
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);
         taskTr.nextElementSibling.style.display = 'none';
@@ -283,7 +287,7 @@ export default class TaskView extends AbstractView {
 
     static removeTaskForm(event) {
 
-        let firstFormTr = event.target.classList.contains('responsive') 
+        let firstFormTr = event.target.classList.contains('responsive')
             ? event.target.closest('tr').previousElementSibling.previousElementSibling
             : event.target.closest('tr');
 
@@ -308,6 +312,11 @@ export default class TaskView extends AbstractView {
 
     static setTaskInProgress(event) {
         console.log('bald in Progress')
+
+        // if (taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
+        //     taskTable.parentElement.querySelector('thead').removeAttribute('style');
+        //     taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display = 'none';
+        // }
     }
 
     static setTaskDone(item) {

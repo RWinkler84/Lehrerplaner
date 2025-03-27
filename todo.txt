@@ -1,5 +1,23 @@
 
 - eigene Validierungslogik bauen
+- wenn eine Stunde im Timeslot 
+
+
+- persistente Datenschicht aufbauen:
+    - Ajax-query-funktion
+    - php-MVC zur Durchleitung der Daten
+        - Controller für Task und Lesson
+        - Model für Task und Lesson
+    - PHP-Datenbank-Connector per PDO
+- Ajax-Anbindung für CRUD-Funktionen in den Models
+- automatisierte Sicherung von Lesson- und Taskdaten alle X Minuten
+
+- Einstellungsmenu: 
+    - Stundenplan anlegen
+    - Fächer anlegen
+        - Farben für Fächer auswählen
+
+- perspektivisch: Arbeitszeitracker einbauen
 
 erledigt: 
 
@@ -43,3 +61,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - Tasks werden nach dem Erstellen einer neuen Aufgabe neu sortiert
 - Datumsanzeige bei Tasks einbauen
 - Stunden sollen auch bearbeitet werden können
+
+- Funktionen für Lessons deaktivieren, die in der Vergangenheit liegen
+

@@ -1,5 +1,5 @@
-import Task from '../Models/Task.js';
-import View from '../Views/TaskView.js';
+import Task from '../Model/Task.js';
+import View from '../View/TaskView.js';
 
 export default class TaskController {
 

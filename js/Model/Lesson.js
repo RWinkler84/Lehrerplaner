@@ -2,9 +2,10 @@ import { allSubjects } from "../index.js";
 import { timetableChanges } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
+import AbstractModel from "./AbstractModel.js";
 
 
-export default class Lesson {
+export default class Lesson extends AbstractModel{
 
     #class;
     #subject;
@@ -13,8 +14,12 @@ export default class Lesson {
     #date = undefined;
     #timeslot = undefined;
     #status = 'normal'; //can also be canceled or sub for substitute lessons
+    
+    #controller = 'lesson';
 
     constructor(className, subject) {
+        super();
+
         this.#class = className;
         this.#subject = subject;
         this.#cssColorClass = this.getCssColorClass()
@@ -73,6 +78,9 @@ export default class Lesson {
         };
 
         timetableChanges.push(lessonData);
+        
+        this.makeAjaxQuery(this.#controller, 'save', lessonData);
+
     }
 
     update() {
@@ -81,7 +89,7 @@ export default class Lesson {
             if (new Date(entry.date).setHours(12,0,0,0) != this.date.setHours(12,0,0,0)) return;
             if (entry.timeslot != this.timeslot) return;
 
-            
+
             entry.date = this.#date;
             entry.timeslot = this.#timeslot;
             entry.class = this.#class;
@@ -98,9 +106,8 @@ export default class Lesson {
             'subject': this.#subject,
             'status': this.#status,
         };
-        console.log(timetableChanges);
+        
         timetableChanges.push(lessonData);
-        console.log(timetableChanges);
     }
 
     uncancel() {

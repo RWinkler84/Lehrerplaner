@@ -1,5 +1,5 @@
-import Lesson from '../Models/Lesson.js';
-import View from '../Views/LessonView.js';
+import Lesson from '../Model/Lesson.js';
+import View from '../View/LessonView.js';
 import TaskController from './TaskController.js';
 
 export default class LessonController {
