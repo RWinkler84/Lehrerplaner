@@ -191,6 +191,7 @@ export default class Task {
     }
 
     save() {
+        console.log(this);
         allTasksArray.push(this);
 
     }

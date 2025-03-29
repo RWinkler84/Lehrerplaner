@@ -10,7 +10,28 @@ export default class LessonView {
         let regularLessons = Controller.getScheduledLessons();
         let lessonChanges = Controller.getTimetableChanges(monday, sunday);
 
+        let timetableValidDates = [];
+        let validDateOfTimetableDisplayed;
+        let counter = 1;
+
+        //get the correct timetable for the displayed week
+        regularLessons.forEach(lesson => {
+            if (!timetableValidDates.includes(lesson.validFrom)) timetableValidDates.push(lesson.validFrom);
+        })
+
+        validDateOfTimetableDisplayed = timetableValidDates[timetableValidDates.length - counter];
+
+        //and count back until the validity date of the timetable is smaller than the currently displayed sunday
+        while (new Date(validDateOfTimetableDisplayed).setHours(12,0,0,0) > new Date(sunday).setHours(12,0,0,0)){
+            counter += 1;
+        validDateOfTimetableDisplayed = timetableValidDates[timetableValidDates.length - counter];
+        }
+
+        //now render the lessons with the correct validity date
         regularLessons.forEach((lesson) => {
+
+            if (lesson.validFrom != validDateOfTimetableDisplayed) return;
+
             let timeslot = LessonView.#getTimeslotOfLesson(lesson);
             let lessonDate = timeslot.closest('.weekday').dataset.date;
             let lessonOptionsHTML = `

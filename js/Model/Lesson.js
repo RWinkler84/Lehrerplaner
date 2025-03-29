@@ -14,6 +14,7 @@ export default class Lesson extends AbstractModel{
     #date = undefined;
     #timeslot = undefined;
     #status = 'normal'; //can also be canceled or sub for substitute lessons
+    #validFrom = undefined; //date a regular lesson was added to to the schuduled timetable
     
     #controller = 'lesson';
 
@@ -44,6 +45,7 @@ export default class Lesson extends AbstractModel{
             let lesson = new Lesson(entry.class, entry.subject);
             lesson.weekday = entry.weekdayNumber;
             lesson.timeslot = entry.timeslot;
+            lesson.validFrom = entry.validFrom;
 
             regularLessons.push(lesson);
         });
@@ -159,6 +161,10 @@ export default class Lesson extends AbstractModel{
         return this.#cssColorClass;
     }
 
+    get validFrom() {
+        return this.#validFrom;
+    }
+
     // generic setters
     set class(className) {
         this.#class = className;
@@ -182,5 +188,9 @@ export default class Lesson extends AbstractModel{
 
     set status(status) {
         this.#status = status;
+    }
+
+    set validFrom(added) {
+        this.#validFrom = added;
     }
 }

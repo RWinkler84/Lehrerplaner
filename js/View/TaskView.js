@@ -287,6 +287,7 @@ export default class TaskView extends AbstractView {
 
     static removeTaskForm(event) {
 
+        let tableBody = event.target.closest('tbody');
         let firstFormTr = event.target.classList.contains('responsive')
             ? event.target.closest('tr').previousElementSibling.previousElementSibling
             : event.target.closest('tr');
@@ -294,6 +295,12 @@ export default class TaskView extends AbstractView {
         firstFormTr.nextElementSibling.nextElementSibling.remove();
         firstFormTr.nextElementSibling.remove();
         firstFormTr.remove();
+
+        if (tableBody.querySelectorAll('td').length == 0 ){
+            tableBody.previousElementSibling.style.display = 'none';
+            tableBody.nextElementSibling.querySelector('td[data-noentriesfound]').style.display = 'table-cell';
+            return;
+        }
     }
 
     static revertChanges(event) {

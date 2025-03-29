@@ -88,6 +88,8 @@ export default class Utils {
             taskIds.push(Number(task.dataset.taskid));
         })
 
+        if (taskIds.length == 0) taskIds = [0];
+
         return Math.max(...taskIds) + 1; //adds 1 to the highest existing lesson id
     }
 

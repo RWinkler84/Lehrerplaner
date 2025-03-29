@@ -1,14 +1,11 @@
 
 - eigene Validierungslogik bauen
-- wenn eine Stunde im Timeslot 
+- wenn eine Stunde im Timeslot
+- wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt
 
 
 - persistente Datenschicht aufbauen:
-    - Ajax-query-funktion
-    - php-MVC zur Durchleitung der Daten
-        - Controller für Task und Lesson
-        - Model für Task und Lesson
-    - PHP-Datenbank-Connector per PDO
+
 - Ajax-Anbindung für CRUD-Funktionen in den Models
 - automatisierte Sicherung von Lesson- und Taskdaten alle X Minuten
 
@@ -64,3 +61,9 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 
 - Funktionen für Lessons deaktivieren, die in der Vergangenheit liegen
 
+- persistente Datenschicht aufbauen:
+   - Ajax-query-funktion
+    - php-MVC zur Durchleitung der Daten
+        - Controller für Task und Lesson
+        - Model für Task und Lesson
+    - PHP-Datenbank-Connector per PDO
