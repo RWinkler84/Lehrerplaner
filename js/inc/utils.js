@@ -1,3 +1,5 @@
+import { allTasksArray, timetableChanges } from "../index.js";
+
 export default class Utils {
 
 
@@ -81,10 +83,10 @@ export default class Utils {
 
 
     static generateTaskId() {
-        let tasks = document.querySelectorAll('tr[data-taskid]');
+        // let tasks = document.querySelectorAll('tr[data-taskid]');
         let taskIds = [];
 
-        tasks.forEach((task) => {
+        allTasksArray.forEach((task) => {
             taskIds.push(Number(task.dataset.taskid));
         })
 

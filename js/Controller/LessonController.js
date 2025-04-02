@@ -12,6 +12,10 @@ export default class LessonController {
         return Lesson.getTimetableChanges(mondayDate, sundayDate);
     }
 
+    static getLessonById(id){
+        return Lesson.getLessonById(id);
+    }
+
     static saveNewLesson(lessonData) {
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
@@ -31,10 +35,13 @@ export default class LessonController {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 
         lesson.cancel();
+        
+        return lesson.id;
     }
 
     static setLessonNotCanceled(lessonData) {
         let lesson = new Lesson(lessonData.class, lessonData.subject);
+        console.log(lessonData);
 
         lesson.uncancel();       
     }
@@ -51,11 +58,12 @@ export default class LessonController {
 
     static #lessonDataToLessonObject (lessonData) {
         let lesson = new Lesson(lessonData.class, lessonData.subject);
-
+        lesson.id = lessonData.id;
         lesson.weekday = lessonData.weekday;
         lesson.date = lessonData.date;
         lesson.timeslot = lessonData.timeslot;
         lesson.status = lessonData.status = undefined ? 'normal' : lessonData.status;
+        lesson.initialStatus = lessonData.initialStatus = undefined ? 'normal' : lessonData.initialStatus;
 
         return lesson;
     }

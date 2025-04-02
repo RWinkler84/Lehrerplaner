@@ -1,5 +1,6 @@
 import Controller from "../Controller/LessonController.js";
 import AbstractView from "./AbstractView.js";
+import Fn from '../inc/utils.js'
 
 export default class LessonView {
 
@@ -22,9 +23,9 @@ export default class LessonView {
         validDateOfTimetableDisplayed = timetableValidDates[timetableValidDates.length - counter];
 
         //and count back until the validity date of the timetable is smaller than the currently displayed sunday
-        while (new Date(validDateOfTimetableDisplayed).setHours(12,0,0,0) > new Date(sunday).setHours(12,0,0,0)){
+        while (new Date(validDateOfTimetableDisplayed).setHours(12, 0, 0, 0) > new Date(sunday).setHours(12, 0, 0, 0)) {
             counter += 1;
-        validDateOfTimetableDisplayed = timetableValidDates[timetableValidDates.length - counter];
+            validDateOfTimetableDisplayed = timetableValidDates[timetableValidDates.length - counter];
         }
 
         //now render the lessons with the correct validity date
@@ -95,7 +96,7 @@ export default class LessonView {
             }
 
             timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}" data-status="sub">
+                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
@@ -124,11 +125,10 @@ export default class LessonView {
     }
 
     static renderNewLesson(lesson) {
-
         let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
         timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}" data-status="sub">
+                <div class="lesson ${lesson.cssColorClass}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
@@ -208,7 +208,8 @@ export default class LessonView {
             'timeslot': timeslotElement.dataset.timeslot,
             'class': timeslotElement.querySelector('#class').value.toLowerCase(),
             'subject': timeslotElement.querySelector('#subject').value,
-            'status': 'sub'
+            'status': 'sub',
+            'initialStatus': 'sub'
         }
 
         Controller.saveNewLesson(lessonData);
@@ -217,20 +218,29 @@ export default class LessonView {
         LessonView.removeLessonForm(event);
     }
 
-    static updateLesson(event) {
+    /* The lesson update function only updates a lesson, if it already is a substitue lesson (has an Id, which scheduled lessons do not have).
+    * In other cases, the original lesson gets stored in timetableChanges as canceled and the new lesson
+    * is added as a substitute lesson. Both is necessary to ensure, tasks are correctly assigned and shown in the right order. */ 
+    static prepareLessonUpdate(event) {
 
         let lessonElement = event.target.closest('.lesson');
+        let oldLessonData;
 
-        let oldLessonData = {
-            'date': lessonElement.dataset.date,
-            'timeslot': lessonElement.dataset.timeslot,
-            'class': lessonElement.dataset.class,
-            'subject': lessonElement.dataset.subject,
-            'status': 'canceled'
+        //if lesson has an Id, it is already stored in lessonChanges and data can be retrieved from there
+        if (lessonElement.dataset.id) {
+            oldLessonData = Controller.getLessonById(lessonElement.dataset.id);
+        } else {
+            oldLessonData = {
+                'date': lessonElement.dataset.date,
+                'timeslot': lessonElement.dataset.timeslot,
+                'class': lessonElement.dataset.class,
+                'subject': lessonElement.dataset.subject,
+                'status': 'canceled',
+                'initialStatus': 'normal'
+            }
         }
 
         LessonView.createLessonForm(event, oldLessonData);
-
     }
 
     static saveLessonUpdate(event, oldLessonData) {
@@ -243,7 +253,14 @@ export default class LessonView {
             'timeslot': timeslotElement.dataset.timeslot,
             'class': timeslotElement.querySelector('#class').value.toLowerCase(),
             'subject': timeslotElement.querySelector('#subject').value,
-            'status': 'sub'
+            'status': 'sub',
+            'initialStatus': 'sub'
+        }
+
+        //if the old lesson already has an id, it was a substitue class that can be updated by id
+        //and doesn't need to be stored again in db
+        if (oldLessonData.id != undefined){
+            newLessonData.id = oldLessonData.id;
         }
 
         Controller.setLessonCanceled(oldLessonData);
@@ -258,13 +275,16 @@ export default class LessonView {
 
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
-        let lessonData = LessonView.#getLessonDataFromElement(event);
+        let lessonData = lessonElement.dataset.id == undefined ? LessonView.#getLessonDataFromElement(event) : Controller.getLessonById(lessonElement.dataset.id);
+        console.log(lessonData);
+        lessonData.initialStatus = lessonData.status
         lessonData.status = 'canceled';
 
-        Controller.setLessonCanceled(lessonData);
+        let lessonId = Controller.setLessonCanceled(lessonData);
         Controller.reorderTasks(lessonData, true);
-
+        
         lessonElement.classList.add('canceled');
+        lessonElement.dataset.id = lessonId;
         optionsWrapper.classList.add('canceled');
         optionsWrapper.classList.remove('light');
 
@@ -321,17 +341,12 @@ export default class LessonView {
             let weekContainerProperties = document.querySelector('.weekOverview').getBoundingClientRect();
             let optionsWrapperProperties = optionsWrapper.getBoundingClientRect();
             let verticalOffset = (optionsWrapperProperties.height + 20) * -1;
-            console.log(verticalOffset);
 
             if (optionsWrapperProperties.bottom > weekContainerProperties.bottom) {
-                console.log('jo');
                 optionsWrapper.style.translate = `0 ${verticalOffset}px`;
             }
 
-            console.log(weekContainerProperties);
-            console.log(optionsWrapperProperties);
-
-            if (optionsWrapper.querySelector('button[data-update_lesson]')) optionsWrapper.querySelector('button[data-update_lesson]').addEventListener('click', LessonView.updateLesson);
+            if (optionsWrapper.querySelector('button[data-update_lesson]')) optionsWrapper.querySelector('button[data-update_lesson]').addEventListener('click', LessonView.prepareLessonUpdate);
             if (optionsWrapper.querySelector('button[data-add_new_task]')) optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', Controller.createNewTask);
             if (optionsWrapper.querySelector('button[data-lesson_canceled]')) optionsWrapper.querySelector('button[data-lesson_canceled]').addEventListener('click', LessonView.setLessonCanceled);
             if (optionsWrapper.querySelector('button[data-lesson_uncanceled]')) optionsWrapper.querySelector('button[data-lesson_uncanceled]').addEventListener('click', LessonView.setLessonNotCanceled);
@@ -339,7 +354,6 @@ export default class LessonView {
         } else {
             LessonView.hideLessonsOptions(event);
         }
-
     }
 
     static hideLessonsOptions(event) {
@@ -383,7 +397,12 @@ export default class LessonView {
 
     static #getLessonDataFromElement(event) {
         let lessonElement = event.target.closest('.lesson');
-        let isSubstitute = lessonElement.dataset.status ? 'sub' : 'normal';
+        let isSubstitute = 'normal';
+        
+        if (lessonElement.dataset.id){
+            let lessonData = Controller.getLessonById(lessonElement.dataset.id);
+            isSubstitute = lessonData.initialStatus;
+        }
 
         return {
             'class': lessonElement.dataset.class,

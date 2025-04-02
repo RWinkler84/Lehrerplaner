@@ -1,6 +1,5 @@
 
 - eigene Validierungslogik bauen
-- wenn eine Stunde im Timeslot
 - wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt
 
 
@@ -8,6 +7,10 @@
 
 - Ajax-Anbindung für CRUD-Funktionen in den Models
 - automatisierte Sicherung von Lesson- und Taskdaten alle X Minuten
+
+    -> sitze gerade an der cancel, uncancel-Funktion. uncancel wird im Backend zwei Wege haben
+        -> bei scheduled lessons, werden diese über delete (by Id) aus den LessonChanges gelöscht
+        -> bei Vertretung wird der Status auf sub gesetzt
 
 - Einstellungsmenu: 
     - Stundenplan anlegen
@@ -67,3 +70,5 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
         - Controller für Task und Lesson
         - Model für Task und Lesson
     - PHP-Datenbank-Connector per PDO
+- Bugfix: Task-Id wird infinity, wenn vorher keine Task angelegt ist
+- sollten mehrere Stundenpläne in der Datenbank sein, können diese entsprechend ihres Gültigkeitsdatums dargestellt werden

@@ -137,6 +137,8 @@ async function loadData() {
 async function startApp() {
     await loadData();
 
+    document.addEventListener('change', () => console.log(timetableChanges));
+
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
         element.addEventListener('mouseenter', AbstractView.showAddLessonButton);

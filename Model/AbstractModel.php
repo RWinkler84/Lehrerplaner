@@ -1,54 +1,101 @@
 <?php
 
 namespace Model;
+
+use Exception;
 use PDO;
+use DateTime;
 
 class AbstractModel
 {
 
-    private function read($query, $params)
+    protected function read($query, $params)
     {
         global $db;
-        
+
         $stmt = $db->prepare($query);
 
-        if (count($params) > 0){
-        $stmt->bindParam(...$params);
+        if (count($params) > 0) {
+            $stmt->bindParam(...$params);
         }
- 
+
         $stmt->execute();
 
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        error_log(print_r($result,true));
 
         return $result;
     }
 
-    public function getSubjects() {
-        $query = 'select * from subjects';
+    protected function write($query, $params)
+    {
+        global $db;
+
+        try {
+            $stmt = $db->prepare($query);
+
+            foreach ($params as $key => $value) {
+                if ($key == 'date') {
+                    $date = new DateTime($value);
+                    $value = $date->format('Y-m-d');
+                }
+                $stmt->bindValue($key, $value);
+            }
+
+            $stmt->execute();
+        } catch (Exception $e) {
+            error_log('Fehler beim Speichern der Daten: ' . $e);
+            http_response_code(500);
+        }
+
+        return ['message' => 'Data saved sucessfully'];
+    }
+
+    public function getSubjects()
+    {
+        $query = 'SELECT * FROM subjects';
         $params = [];
-        
+
         return $this->read($query, $params);
     }
 
-    public function getTimetable() {
-        $query = 'select * from timetable';
+    public function getTimetable()
+    {
+        $query = 'SELECT * FROM timetable';
         $params = [];
 
         return $this->read($query, $params);
     }
 
-    public function getTimetableChanges() {
-        $query = 'select * from timetableChanges';
+    public function getTimetableChanges()
+    {
+        $query = 'SELECT * FROM timetableChanges';
         $params = [];
 
         return $this->read($query, $params);
     }
 
-    public function getAllTasks() {
-        $query = 'select * from tasks';
+    public function getAllTasks()
+    {
+        $query = 'SELECT * FROM tasks';
         $params = [];
 
         return $this->read($query, $params);
     }
+
+    // protected function arrayToQueryParams($arrayToProcess) {
+    //     $paramsArray = [];
+
+    //     foreach ($arrayToProcess As $key => $value) {
+
+    //         if ($key == 'date'){
+    //             $date = new DateTime($value);
+    //             $value = '';
+    //             $value = $date->format('Y-m-d');
+    //         }
+
+    //         $paramsArray[':' . $key] = $value;
+    //     };
+
+    //     return $paramsArray;
+    // }
 }
