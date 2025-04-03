@@ -136,7 +136,6 @@ async function loadData() {
 
 async function startApp() {
     await loadData();
-
     document.addEventListener('change', () => console.log(timetableChanges));
 
     // handlers for empty timeslots

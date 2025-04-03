@@ -50,6 +50,26 @@ class AbstractModel
         return ['message' => 'Data saved sucessfully'];
     }
 
+    protected function delete($query, $params)
+    {
+        global $db;
+
+        try {
+            $stmt = $db->prepare($query);
+
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+
+            $stmt->execute();
+        } catch (Exception $e) {
+            error_log('Fehler beim Löschen der Daten: ' . $e);
+            http_response_code(500);
+        }
+
+        return ['message' => 'Lesson deleted sucessfully'];
+    }
+
     public function getSubjects()
     {
         $query = 'SELECT * FROM subjects';
@@ -81,21 +101,4 @@ class AbstractModel
 
         return $this->read($query, $params);
     }
-
-    // protected function arrayToQueryParams($arrayToProcess) {
-    //     $paramsArray = [];
-
-    //     foreach ($arrayToProcess As $key => $value) {
-
-    //         if ($key == 'date'){
-    //             $date = new DateTime($value);
-    //             $value = '';
-    //             $value = $date->format('Y-m-d');
-    //         }
-
-    //         $paramsArray[':' . $key] = $value;
-    //     };
-
-    //     return $paramsArray;
-    // }
 }

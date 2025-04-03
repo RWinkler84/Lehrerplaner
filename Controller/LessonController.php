@@ -33,7 +33,7 @@ class LessonController extends AbstractController
 
         error_log('update: ' . print_r($lessonData, true));
 
-        $result = $this->model->update($lessonData);
+        $result = $this->model->save($lessonData);
 
         echo json_encode($result);
     }
@@ -42,10 +42,7 @@ class LessonController extends AbstractController
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
 
-        error_log('cancle: ' . print_r($lessonData, true));
-
-
-        $result = $this->model->update($lessonData);
+        $result = $this->model->save($lessonData);
 
         echo json_encode($result);
     }
@@ -54,10 +51,8 @@ class LessonController extends AbstractController
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
 
-        $result = $this->model->update($lessonData);
+        $result = $this->model->uncancel($lessonData);
 
         echo json_encode($result);
     }
-
-    public function delete() {}
 }

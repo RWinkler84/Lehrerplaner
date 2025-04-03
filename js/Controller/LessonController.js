@@ -40,8 +40,7 @@ export default class LessonController {
     }
 
     static setLessonNotCanceled(lessonData) {
-        let lesson = new Lesson(lessonData.class, lessonData.subject);
-        console.log(lessonData);
+        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 
         lesson.uncancel();       
     }

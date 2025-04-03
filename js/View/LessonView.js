@@ -125,6 +125,7 @@ export default class LessonView {
     }
 
     static renderNewLesson(lesson) {
+        console.log(lesson);
         let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
         timeslot.innerHTML = `
@@ -182,13 +183,48 @@ export default class LessonView {
         }
 
         //form button event handlers
-        if (oldLessonData) {
-            timeslotElement.querySelector('#lessonForm').addEventListener('submit', (event) => {
-                LessonView.saveLessonUpdate(event, oldLessonData)
-            });
-        } else {
-            timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
+
+        timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
+
+        timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => LessonView.removeLessonForm(event, true));
+        timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
+
+        //timeslot event handlers
+        timeslotElement.removeEventListener('click', LessonView.createLessonForm);
+        timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
+    }
+
+    static createUpdateLessonForm(event, oldLessonData) {
+        let timeslotElement = event.target.closest('.timeslot');
+
+        let timeslotProps = timeslotElement.getBoundingClientRect()
+        let timetableProps = document.querySelector('.weekOverview').getBoundingClientRect();
+        let subjectSelectHTML = AbstractView.getSubjectSelectHTML()
+
+        let lessonFormHTML = `
+            <form id="lessonForm">
+                <div class="lessonForm">
+                    <input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;" value="${oldLessonData.class}" required>
+                    ${subjectSelectHTML}
+                    <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
+                    <button class="discardNewLessonButton">&#x2718;</button>
+                </div>
+            </form>
+        `;
+
+        timeslotElement.innerHTML = lessonFormHTML;
+        let lessonForm = timeslotElement.querySelector('.lessonForm');
+        let lessonFormProps = lessonForm.getBoundingClientRect()
+
+        if (lessonFormProps.right > timetableProps.right) {
+            let offset = lessonFormProps.width - timeslotProps.width;
+            lessonForm.style.transform = `translateX(-${offset}px)`;
         }
+
+        //form button event handlers
+        timeslotElement.querySelector('#lessonForm').addEventListener('submit', (event) => {
+            LessonView.saveLessonUpdate(event, oldLessonData)
+        });
 
         timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => LessonView.removeLessonForm(event, true));
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
@@ -218,29 +254,24 @@ export default class LessonView {
         LessonView.removeLessonForm(event);
     }
 
-    /* The lesson update function only updates a lesson, if it already is a substitue lesson (has an Id, which scheduled lessons do not have).
-    * In other cases, the original lesson gets stored in timetableChanges as canceled and the new lesson
-    * is added as a substitute lesson. Both is necessary to ensure, tasks are correctly assigned and shown in the right order. */ 
+    /* The lesson update function doesn't really update the lesson, but stores a new on end sets the old one canceled.
+   Both is necessary to ensure, tasks are correctly assigned and shown in the right order. */
     static prepareLessonUpdate(event) {
 
         let lessonElement = event.target.closest('.lesson');
         let oldLessonData;
 
-        //if lesson has an Id, it is already stored in lessonChanges and data can be retrieved from there
-        if (lessonElement.dataset.id) {
-            oldLessonData = Controller.getLessonById(lessonElement.dataset.id);
-        } else {
-            oldLessonData = {
-                'date': lessonElement.dataset.date,
-                'timeslot': lessonElement.dataset.timeslot,
-                'class': lessonElement.dataset.class,
-                'subject': lessonElement.dataset.subject,
-                'status': 'canceled',
-                'initialStatus': 'normal'
-            }
+        oldLessonData = {
+            'date': lessonElement.dataset.date,
+            'timeslot': lessonElement.dataset.timeslot,
+            'class': lessonElement.dataset.class,
+            'subject': lessonElement.dataset.subject,
+            'status': 'canceled',
+            'initialStatus': 'normal'
         }
 
-        LessonView.createLessonForm(event, oldLessonData);
+
+        LessonView.createUpdateLessonForm(event, oldLessonData);
     }
 
     static saveLessonUpdate(event, oldLessonData) {
@@ -255,12 +286,6 @@ export default class LessonView {
             'subject': timeslotElement.querySelector('#subject').value,
             'status': 'sub',
             'initialStatus': 'sub'
-        }
-
-        //if the old lesson already has an id, it was a substitue class that can be updated by id
-        //and doesn't need to be stored again in db
-        if (oldLessonData.id != undefined){
-            newLessonData.id = oldLessonData.id;
         }
 
         Controller.setLessonCanceled(oldLessonData);
@@ -282,7 +307,7 @@ export default class LessonView {
 
         let lessonId = Controller.setLessonCanceled(lessonData);
         Controller.reorderTasks(lessonData, true);
-        
+
         lessonElement.classList.add('canceled');
         lessonElement.dataset.id = lessonId;
         optionsWrapper.classList.add('canceled');
@@ -398,10 +423,12 @@ export default class LessonView {
     static #getLessonDataFromElement(event) {
         let lessonElement = event.target.closest('.lesson');
         let isSubstitute = 'normal';
-        
-        if (lessonElement.dataset.id){
+
+        if (lessonElement.dataset.id) {
             let lessonData = Controller.getLessonById(lessonElement.dataset.id);
             isSubstitute = lessonData.initialStatus;
+
+            return lessonData;
         }
 
         return {
