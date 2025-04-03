@@ -7,10 +7,8 @@ export default class AbstractModel {
 
     async makeAjaxQuery(controller, action, content = '') {
         let response;
-
-        // console.log(controller);
-        // console.log(action);
         
+        console.log(content);
         try {
             response = await fetch(`index.php?c=${controller}&a=${action}`,
                 {
@@ -108,4 +106,10 @@ export default class AbstractModel {
             }
         })
     }
+
+    formatDate(dateToFormat) {
+        let date = new Date(dateToFormat);
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`; 
+    }
+
 }

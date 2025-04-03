@@ -112,14 +112,13 @@ export default class Lesson extends AbstractModel {
     save() {
 
         let lessonData = {
-            'date': this.date,
+            'date': this.formatDate(this.date),
             'timeslot': this.timeslot,
             'class': this.class,
             'subject': this.subject,
             'status': this.status,
             'initialStatus': this.initialStatus
         };
-
 
         this.id = Lesson.#generateLessonId();
         lessonData.id = this.id;
@@ -131,7 +130,7 @@ export default class Lesson extends AbstractModel {
     update() {
 
         let lessonData = {
-            'date': this.date,
+            'date': this.formatDate(this.date),
             'timeslot': this.timeslot,
             'class': this.class,
             'subject': this.subject,
@@ -149,7 +148,7 @@ export default class Lesson extends AbstractModel {
     cancel() {
 
         let lessonData = {
-            'date': this.date,
+            'date': this.formatDate(this.date),
             'timeslot': this.timeslot,
             'class': this.class,
             'subject': this.subject,
@@ -171,14 +170,11 @@ export default class Lesson extends AbstractModel {
 
         for (let i = 0; i < timetableChanges.length; i++) {
             if (timetableChanges[i].id == this.id) {
-
-                console.log(timetableChanges[i]);
                 timetableChanges.splice(i, 1);
             }
         }
 
         this.makeAjaxQuery('lesson', 'uncancel', {'id' : this.id})
-
     }
 
 

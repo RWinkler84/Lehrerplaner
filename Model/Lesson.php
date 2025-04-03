@@ -8,7 +8,6 @@ use Model\AbstractModel;
 class Lesson extends AbstractModel
 {
 
-
     public function save($lessonData)
     {
         $query = 'INSERT INTO timetableChanges (id, date, timeslot, class, subject, status, initialStatus) VALUES (:id, :date, :timeslot, :class, :subject, :status, :initialStatus)';

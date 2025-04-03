@@ -87,7 +87,7 @@ export default class Utils {
         let taskIds = [];
 
         allTasksArray.forEach((task) => {
-            taskIds.push(Number(task.dataset.taskid));
+            taskIds.push(Number(task.id));
         })
 
         if (taskIds.length == 0) taskIds = [0];

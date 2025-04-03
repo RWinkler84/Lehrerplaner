@@ -115,7 +115,7 @@ async function loadData() {
     let subjects = await abstCtrl.getSubjects();
     let timetable = await abstCtrl.getTimetable();
     let changes = await abstCtrl.getTimetableChanges();
-    // let tasks = await abstCtrl.getTasks();
+    let tasks = await abstCtrl.getAllTasks();
 
     subjects.forEach(entry => {
         allSubjects.push(entry)
@@ -129,9 +129,9 @@ async function loadData() {
         timetableChanges.push(entry);
     });
 
-    // tasks.forEach(entry => {
-    //     allTasksArray.push(entry);
-    // })
+    tasks.forEach(entry => {
+        allTasksArray.push(entry);
+    })
 }
 
 async function startApp() {

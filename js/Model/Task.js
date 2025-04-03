@@ -4,7 +4,7 @@ import { taskBackupArray } from '../index.js';
 import { allTasksArray } from '../index.js';
 import AbstractModel from './AbstractModel.js';
 
-export default class Task {
+export default class Task extends AbstractModel {
 
     // now static, should later be filled from DB
 
@@ -18,7 +18,7 @@ export default class Task {
     #fixedTime = false;
 
     constructor(id = undefined) {
-
+        super()
         if (id == undefined) {
             this.#id = id;
         } else {
@@ -192,8 +192,19 @@ export default class Task {
 
     save() {
         console.log(this);
-        allTasksArray.push(this);
+        let taskData = {
+            'id': this.id,
+            'class': this.class,
+            'subject': this.subject,
+            'date': this.formatDate(this.date),
+            'timeslot': this.timeslot,
+            'description': this.description,
+            'status': this.status,
+            'fixedTime': this.fixedTime
+        }
 
+        allTasksArray.push(this);
+        this.makeAjaxQuery('task', 'save', taskData);
     }
 
     get id() {

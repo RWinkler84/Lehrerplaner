@@ -35,6 +35,7 @@ class AbstractModel
 
             foreach ($params as $key => $value) {
                 if ($key == 'date') {
+                    error_log($value);
                     $date = new DateTime($value);
                     $value = $date->format('Y-m-d');
                 }

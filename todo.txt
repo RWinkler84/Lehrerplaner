@@ -1,5 +1,6 @@
 
 - eigene Validierungslogik bauen
+- setTaskInProgress-Funktion
 - wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt
 
 
@@ -9,6 +10,8 @@
 - persistente Datenschicht aufbauen:
 
 - Ajax-Anbindung für CRUD-Funktionen in den Models
+    - TaskModel
+
 - automatisierte Sicherung von Lesson- und Taskdaten alle X Minuten
 
 - Einstellungsmenu: 
