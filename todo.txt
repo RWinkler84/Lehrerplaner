@@ -1,6 +1,7 @@
 
 - eigene Validierungslogik bauen
 - setTaskInProgress-Funktion
+- setDone
 - wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt
 
 
@@ -11,8 +12,8 @@
 
 - Ajax-Anbindung für CRUD-Funktionen in den Models
     - TaskModel
-
-- automatisierte Sicherung von Lesson- und Taskdaten alle X Minuten
+        - task in Progress setzen
+        - task erledigt setzen
 
 - Einstellungsmenu: 
     - Stundenplan anlegen
@@ -79,5 +80,8 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - gecancelte Lessons bekommen keine Id im Frontend
     - bei Lesson Update kommen gecancelte und geänderte Lessons in der falschen Reihenfolge an (Logik angepasst, Frontend legt Id und damit die Reihenfolge in
     Datenbank fest)
+    - Inkonsistenzen beim Datumsformat behoben, das JS ans Backend schickt -> formatDate-Funktion eingeführt
 - Ajax-Anbindung für CRUD-Funktionen in den Models:
     - Lesson fertig (vorerst...)
+    - Tasks lassen sich Speichern
+    - Tasks lassen sich updaten

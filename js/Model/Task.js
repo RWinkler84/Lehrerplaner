@@ -37,6 +37,60 @@ export default class Task extends AbstractModel {
         }
     }
 
+    //class methods
+
+        update() {
+        allTasksArray.forEach(element => {
+            if (element.id == this.id) {
+                element.date = this.date;
+                element.class = this.class;
+                element.subject = this.subject;
+                element.description = this.description;
+                element.fixedTime = this.fixedTime;
+            }
+        });
+
+        let taskData = {
+            'id': this.id,
+            'class': this.class,
+            'subject': this.subject,
+            'date': this.formatDate(this.date),
+            'timeslot': this.timeslot,
+            'description': this.description,
+            'status': this.status,
+            'fixedTime': this.fixedTime
+        }
+
+        this.makeAjaxQuery('task', 'update', taskData);
+    }
+
+    save() {
+        console.log(this);
+        let taskData = {
+            'id': this.id,
+            'class': this.class,
+            'subject': this.subject,
+            'date': this.formatDate(this.date),
+            'timeslot': this.timeslot,
+            'description': this.description,
+            'status': this.status,
+            'fixedTime': this.fixedTime
+        }
+
+        allTasksArray.push(this);
+        this.makeAjaxQuery('task', 'save', taskData);
+    }
+
+    setInProgress() {
+        allTasksArray.forEach(entry => {
+            if (entry.id != this.id) return;
+            entry.status = 'inProgress';
+        });
+
+        this.makeAjaxQuery('task', 'setInProgress', {'id' : this.id});
+    }
+
+
     // Getter
 
     static getAllOpenTasks() {
@@ -65,6 +119,18 @@ export default class Task extends AbstractModel {
         return inProgressTasks;
     }
 
+    static getTaskById(id) {
+
+        let task;
+
+        allTasksArray.forEach(entry => {
+            if (entry.id != id) return;
+            task = new Task(id);
+        })
+
+        return task;
+    }
+
     static getAllTasks() {
         let allTasks = [];
 
@@ -88,7 +154,7 @@ export default class Task extends AbstractModel {
     static reorderTasks(lesson, lessonCanceled) {
 
         //new lessons in the past won't be processed
-        if (new Date(lesson.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
+        if (new Date(lesson.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) return;
 
         let affectedTasks = Task.#getAllAffectedTasks(lesson);
 
@@ -104,7 +170,7 @@ export default class Task extends AbstractModel {
             affectedTasks.forEach(task => {
                 for (let i = 0; i < allLessonDates.length; i++) {
 
-                    if (task.date.setHours(12,0,0,0) == allLessonDates[i].date.setHours(12,0,0,0)) {
+                    if (task.date.setHours(12, 0, 0, 0) == allLessonDates[i].date.setHours(12, 0, 0, 0)) {
 
                         let count = 1;
 
@@ -126,10 +192,10 @@ export default class Task extends AbstractModel {
         affectedTasks.forEach(task => {
 
             for (let i = 0; i < allLessonDates.length; i++) {
-                if (task.date.setHours(12,0,0,0) == allLessonDates[i].date.setHours(12,0,0,0)) {
+                if (task.date.setHours(12, 0, 0, 0) == allLessonDates[i].date.setHours(12, 0, 0, 0)) {
                     let taskCopy = new Task(task.id);
                     let count = 1;
-                    
+
                     while (allLessonDates[i + count].status == 'canceled') {
                         count++
                     }
@@ -153,7 +219,7 @@ export default class Task extends AbstractModel {
 
             if (task.class != lesson.class) return;
             if (task.subject != lesson.subject) return;
-            if (task.date.setHours(12,0,0,0) < new Date(lesson.date).setHours(12,0,0,0)) return;
+            if (task.date.setHours(12, 0, 0, 0) < new Date(lesson.date).setHours(12, 0, 0, 0)) return;
             if (task.fixedTime == true) return;
 
             affectedTasks.push(task);
@@ -178,34 +244,6 @@ export default class Task extends AbstractModel {
         return taskBackupArray[this.#id];
     }
 
-    update() {
-        allTasksArray.forEach(element => {
-            if (element.id == this.#id) {
-                element.date = this.#date;
-                element.class = this.#class;
-                element.subject = this.#subject;
-                element.description = this.#description;
-                element.fixedTime = this.#fixedTime;
-            }
-        });
-    }
-
-    save() {
-        console.log(this);
-        let taskData = {
-            'id': this.id,
-            'class': this.class,
-            'subject': this.subject,
-            'date': this.formatDate(this.date),
-            'timeslot': this.timeslot,
-            'description': this.description,
-            'status': this.status,
-            'fixedTime': this.fixedTime
-        }
-
-        allTasksArray.push(this);
-        this.makeAjaxQuery('task', 'save', taskData);
-    }
 
     get id() {
         return this.#id;

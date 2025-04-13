@@ -16,6 +16,7 @@ export default class TaskView extends AbstractView {
 
         if (allUpcomingTasks.length == 0) {
             document.querySelector('#upcomingTasksTable thead').style.display = 'none';
+            document.querySelector('#upcomingTasksTable tbody').innerHTML = '';
             document.querySelector('#upcomingTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
             return;
         }
@@ -77,8 +78,14 @@ export default class TaskView extends AbstractView {
 
         if (allInProgressTasks.length == 0) {
             document.querySelector('#inProgressTasksTable thead').style.display = 'none';
+            document.querySelector('#inProgressTasksTable tbody').innerHTML = '';
             document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
             return;
+        }
+
+        if (document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'table-cell') {
+            document.querySelector('#inProgressTasksTable thead').style.display = 'table-row-group  ';
+            document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'none';
         }
 
         allInProgressTasks.forEach((task) => {
@@ -296,7 +303,7 @@ export default class TaskView extends AbstractView {
         firstFormTr.nextElementSibling.remove();
         firstFormTr.remove();
 
-        if (tableBody.querySelectorAll('td').length == 0 ){
+        if (tableBody.querySelectorAll('td').length == 0) {
             tableBody.previousElementSibling.style.display = 'none';
             tableBody.nextElementSibling.querySelector('td[data-noentriesfound]').style.display = 'table-cell';
             return;
@@ -318,12 +325,25 @@ export default class TaskView extends AbstractView {
     }
 
     static setTaskInProgress(event) {
+
+        let upcomingTasksTable = document.querySelector('#upcomingTasksTable');
+        let inProgressTasksTable = document.querySelector('inProgressTasksTable');
+
+        let taskId = event.target.closest('tr').dataset.taskid;
         console.log('bald in Progress')
 
-        // if (taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
-        //     taskTable.parentElement.querySelector('thead').removeAttribute('style');
-        //     taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display = 'none';
+        Controller.setTaskInProgress(taskId);
+        TaskView.renderUpcomingTasks();
+        TaskView.renderInProgressTasks();
+
+        // //removes no Entries message from inProgress table, if it was empty
+        // if (inProgressTasksTable.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
+        //     inProgressTasksTable.querySelector('thead').removeAttribute('style');
+        //     inProgressTasksTable.querySelector('td[data-noentriesfound]').style.display = 'none';
         // }
+
+        // //shows no Entries message on openTasks table, if it is empty now
+
     }
 
     static setTaskDone(item) {
@@ -369,14 +389,19 @@ export default class TaskView extends AbstractView {
             <button class="setTaskInProgressButton">&#x2692;</button>
         `;
 
+        if (event.target.closest('table').getAttribute('id') == 'inProgressTasksTable') {
+            buttonHTML = '<button class="setTaskDoneButton">&#x2714;</button>'
+
+        }
+
         buttonWrapper.innerHTML = buttonHTML;
         buttonWrapperSibling.innerHTML = buttonHTML;
 
         buttonWrapper.querySelector('.setTaskDoneButton').addEventListener('click', TaskView.setTaskDone);
-        buttonWrapper.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
+        if (buttonWrapper.querySelector('.setTaskInProgressButton')) buttonWrapper.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
 
         buttonWrapperSibling.querySelector('.setTaskDoneButton').addEventListener('click', TaskView.setTaskDone);
-        buttonWrapperSibling.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
+        if (buttonWrapperSibling.querySelector('.setTaskInProgressButton')) buttonWrapperSibling.querySelector('.setTaskInProgressButton').addEventListener('click', TaskView.setTaskInProgress);
     }
 
     static #getButtonWrapperSibling(buttonWrapper) {
