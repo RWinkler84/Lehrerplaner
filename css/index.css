@@ -296,11 +296,24 @@ tr[data-new]:has(td[data-taskDescription]) td {
     color: var(--labelgrey);
 }
 
+#createSubjectContainer {
+    flex: 1 1 50%;
+}
+
+#existingSubjectsContainer {
+    flex: 1 1 50%;
+}
+
+#subjectsListContainer {
+    flex-wrap: wrap;
+}
+
 .colorSelectionBox {
     box-sizing: content-box;
     width: 3rem;
     height: 1.5rem;
     border: solid 2px var(--contentContainerBackground);
+    border-radius: 3px;
 }
 
 .colorSelectionBox:hover {
@@ -311,13 +324,14 @@ tr[data-new]:has(td[data-taskDescription]) td {
     border: solid 2px var(--lightMatteGreen);
 }
 
-.settingsSubjectListItem {
-    padding: 0.25rem 1rem;
-    
+.subjectListItem {
+    padding: 0.5rem 0.5rem;
+    border-radius: 3px;
+    color: var(--lighterText);
+    width: 150px;
 }
 
 /* Buttons */
-
 .taskDone button,
 .discardNewLessonButton,
 .saveNewLessonButton {
@@ -359,16 +373,18 @@ tr[data-new]:has(td[data-taskDescription]) td {
     text-align: center;
 }
 
-.lessonOptionsButton {
+.lessonOptionsButton,
+.deleteSubjectButton {
     color: var(--lightgrey);
-    flex-grow: 1;
+    /* flex-grow: 1; */
     border: none;
     border-radius: 3px;
     padding: 0 0.2em;
     background-color: transparent;
 }
 
-.lessonOptionsButton:hover {
+.lessonOptionsButton:hover,
+.deleteSubjectButton:hover {
     background-color: rgba(256, 256, 256, 0.1);
 }
 

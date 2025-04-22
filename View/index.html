@@ -217,7 +217,7 @@
                 <h3>Einstellungen</h3>
             </div>
 
-            <div id="settingsSubjectsContainer" class="flex">
+            <div id="settingsSubjectsContainer" class="flex doubleGap">
             <!-- create subjects and select their colors -->
                 <div id="createSubjectContainer">
                     <div class="flex gap">
@@ -238,7 +238,10 @@
                 </div>
             
             <!-- existing subjects list -->
-                <div id="existingSubjectsContainer" class="flex gap"></div>
+                <div id="existingSubjectsContainer" class="flex gap column">
+                <div><label>Fachübersicht</label></div>
+                <div id="subjectsListContainer" class="flex gap"></div>
+                </div>
             </div>
 
             <div id="settingsTimetableContainer"></div>

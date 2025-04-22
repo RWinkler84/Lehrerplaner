@@ -103,8 +103,6 @@ export default class Lesson extends AbstractModel {
 
         if (lessonIds.length == 0) lessonIds = [0];
 
-        console.log(lessonIds);
-
         return Math.max(...lessonIds) + 1; //adds 1 to the highest existing lesson id
     }
 

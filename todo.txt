@@ -1,3 +1,5 @@
+- deleteSubject braucht serverseitige Logik
+- Subjects können noch gar nicht erzeugt werden
 
 - eigene Validierungslogik bauen
 

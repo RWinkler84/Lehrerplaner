@@ -1,4 +1,5 @@
 import { allSubjects } from "../index.js";
+import Controller from "../Controller/SettingsController.js";
 
 export default class SettingsView {
 
@@ -41,16 +42,27 @@ export default class SettingsView {
     }
 
     static renderExistingSubjects(){
-        let subjectsContainer = document.querySelector('#existingSubjectsContainer');
+        let subjectsContainer = document.querySelector('#subjectsListContainer');
         let subjectsHTML = '';
 
         allSubjects.forEach(entry => {
-            console.log(entry);
             subjectsHTML += `
-                <div class="settingsSubjectListItem ${entry.colorCssClass}">${entry.subject}</div>
+                <div class="subjectListItem ${entry.colorCssClass} flex spaceBetween" data-id="${entry.id}">
+                ${entry.subject}
+                <button class="deleteSubjectButton" style="width: 1.5rem">&#215;</button>
+                </div>
             `;
         });
 
         subjectsContainer.innerHTML = subjectsHTML;
+
+        subjectsContainer.querySelectorAll('.deleteSubjectButton').forEach(element => element.addEventListener('click', SettingsView.deleteSubject));
+
+    }
+
+    static deleteSubject(event){
+        let subjectId = event.target.closest('.subjectListItem').dataset.id;
+        
+        Controller.deleteSubject(subjectId);
     }
 }
