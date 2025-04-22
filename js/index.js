@@ -62,6 +62,10 @@ async function startApp() {
         label.addEventListener('mouseenter', AbstractView.removeAddLessonButton);
     })
 
+    //handlers for settings
+    document.querySelector('#createSubjectButton').addEventListener('click', SettingsView.saveSubject);
+
+
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();

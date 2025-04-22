@@ -308,6 +308,11 @@ tr[data-new]:has(td[data-taskDescription]) td {
     flex-wrap: wrap;
 }
 
+#colourSelection {
+    border: solid 3px var(--contentContainerBackground);
+    flex-wrap: wrap;
+}
+
 .colorSelectionBox {
     box-sizing: content-box;
     width: 3rem;
@@ -347,7 +352,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--matteGreen);
 }
 
-#settingsCreateSubjectButton {
+#createSubjectButton {
     background-color: var(--matteGreen);
     border: solid 2px var(--contentContainerBackground);
     padding: 0.25rem 1rem;
@@ -357,7 +362,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     color: var(--lighterText);
 }
 
-#settingsCreateSubjectButton:hover {
+#createSubjectButton:hover {
     background-color: var(--matteGreen);
 }
 
@@ -528,6 +533,32 @@ h3 {
 .canceled {
     background-color: var(--lightergrey);
     color: var(--lightgrey);
+}
+
+.validationError {
+    /* box-sizing: content-box; */
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 3px;
+    animation-name: redFlash;
+    animation-duration: 0.3s;
+}
+
+.alertRing {
+    border: solid 3px rgba(0, 0, 0, 0);
+}
+
+@keyframes redFlash {
+    0% {
+        border-color: var(--matteRed);
+    }
+    50% {
+        border-color: var(--matteRed);
+    }
+    100% {
+        border-color: var(--contentContainerBackground);
+    }
+
 }
 
 
