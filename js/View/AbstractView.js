@@ -99,4 +99,12 @@ export default class AbstractView {
 
         document.querySelector('#isCurrentWeekDot').style.display = "none";
     }
+
+    static openSettings(){
+
+    }
+
+    static closeSettings(){
+        
+    }
 }

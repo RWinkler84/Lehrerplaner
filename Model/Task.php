@@ -34,4 +34,10 @@ class Task extends AbstractModel
 
         return $this->write($query, $taskId);
     }
+
+    public function setDone($taskId) {
+        $query = 'UPDATE tasks SET status="done" WHERE id=:id';
+
+        return $this->write($query, $taskId);
+    }
 }

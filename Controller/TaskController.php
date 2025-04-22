@@ -36,8 +36,15 @@ class TaskController extends AbstractController {
     public function setInProgress() {
         $taskId = json_decode(file_get_contents('php://input'), true);
 
-        error_log(print_r($taskId, true));
         $result = $this->model->setInProgress($taskId);
+
+        echo json_encode($result);
+    }
+
+    public function setDone() {
+        $taskId = json_decode(file_get_contents('php://input'), true);
+
+        $result = $this->model->setDone($taskId);
 
         echo json_encode($result);
     }

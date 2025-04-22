@@ -1,19 +1,9 @@
 
 - eigene Validierungslogik bauen
-- setTaskInProgress-Funktion
-- setDone
-- wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt
 
 
-- unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement
-
-
-- persistente Datenschicht aufbauen:
-
-- Ajax-Anbindung für CRUD-Funktionen in den Models
-    - TaskModel
-        - task in Progress setzen
-        - task erledigt setzen
+- unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement -> kein Showstopper
+ 
 
 - Einstellungsmenu: 
     - Stundenplan anlegen
@@ -85,3 +75,7 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - Lesson fertig (vorerst...)
     - Tasks lassen sich Speichern
     - Tasks lassen sich updaten
+    - task in Progress setzen
+    - setDone
+
+- wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt

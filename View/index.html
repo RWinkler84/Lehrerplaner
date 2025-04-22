@@ -23,7 +23,8 @@
         <div id="timetableContainer">
             <div class="flex doubleGap spaceBetween" style="margin-bottom: 1rem;">
                 <div id="calendarWeek" class="flex alignCenter">
-                    <h2>KW <span id="calendarWeekCounter" data-split_first_week="false">-</span></h2><div id="isCurrentWeekDot"></div>
+                    <h2>KW <span id="calendarWeekCounter" data-split_first_week="false">-</span></h2>
+                    <div id="isCurrentWeekDot"></div>
                 </div>
                 <div class="flex gap">
                     <button id="weekBackwardButton">&#9664</button>
@@ -48,7 +49,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="1" data-date="">
-                        <div class="weekdayLabel">Mo<div class="smallDate"></div></div>
+                        <div class="weekdayLabel">Mo<div class="smallDate"></div>
+                        </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
                         <div class="timeslot" data-timeslot="3"></div>
@@ -61,7 +63,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="2" data-date="">
-                        <div class="weekdayLabel">Di<div class="smallDate"></div></div>
+                        <div class="weekdayLabel">Di<div class="smallDate"></div>
+                        </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
                         <div class="timeslot" data-timeslot="3"></div>
@@ -74,7 +77,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="3" data-date="">
-                        <div class="weekdayLabel">Mi<div class="smallDate"></div></div>
+                        <div class="weekdayLabel">Mi<div class="smallDate"></div>
+                        </div>
 
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -88,7 +92,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="4" data-date="">
-                        <div class="weekdayLabel">Do<div class="smallDate"></div></div>
+                        <div class="weekdayLabel">Do<div class="smallDate"></div>
+                        </div>
 
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -102,7 +107,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="5" data-date="">
-                        <div class="weekdayLabel">Fr<div class="smallDate"></div></div>
+                        <div class="weekdayLabel">Fr<div class="smallDate"></div>
+                        </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
                         <div class="timeslot" data-timeslot="3"></div>
@@ -115,7 +121,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="6" data-date="">
-                        <div class="weekdayLabel">Sa<div class="smallDate"></div></div>
+                        <div class="weekdayLabel">Sa<div class="smallDate"></div>
+                        </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
                         <div class="timeslot" data-timeslot="3"></div>
@@ -128,7 +135,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="0" data-date="">
-                        <div class="weekdayLabel">So<div class="smallDate"></div></div>
+                        <div class="weekdayLabel">So<div class="smallDate"></div>
+                        </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
                         <div class="timeslot" data-timeslot="3"></div>
@@ -202,6 +210,39 @@
                 </div>
             </div>
         </div>
+
+        <!-- Settings Menu -->
+        <div id="settingsContainer">
+            <div id="settingsTitleBar">
+                <h3>Einstellungen</h3>
+            </div>
+
+            <div id="settingsSubjectsContainer" class="flex">
+            <!-- create subjects and select their colors -->
+                <div id="createSubjectContainer">
+                    <div class="flex gap">
+                        <div class="flex gap column">
+                            <div>
+                                <label for="subjectName">Fach anlegen:</label>
+                                <input type="text" name="subjectName" id="subjectName" max="4">
+                            </div>
+                            <div>
+                                <label>Farbe wählen:</label>
+                                <div id="settingsColourSelection" class="flex halfGap"></div>
+                            </div>
+                        </div>
+                        <div class="flex alignEnd">
+                            <div><button id="settingsCreateSubjectButton">Anlegen</button></div>
+                        </div>
+                    </div>
+                </div>
+            
+            <!-- existing subjects list -->
+                <div id="existingSubjectsContainer" class="flex gap"></div>
+            </div>
+
+            <div id="settingsTimetableContainer"></div>
+
     </main>
     <script src="./js/index.js" type="module"></script>
 </body>

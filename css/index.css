@@ -14,6 +14,7 @@
     --lightMatteRed: #F58F8F;
     --lightgrey: rgb(184, 184, 184);
     --lightergrey: rgb(227, 227, 227);
+    --labelgrey: rgb(106, 106, 106);
 }
 
 html {
@@ -30,7 +31,8 @@ main {}
 
 /* Top Menu */
 
-#topMenuContainer {
+#topMenuContainer,
+#settingsTitleBar {
     background-color: var(--topMenuBackgound);
     color: var(--lighterText);
     padding: 1rem 2rem;
@@ -40,11 +42,24 @@ main {}
 
 /* Content Containers */
 
+#settingsSubjectsContainer,
+#settingsTimetableContainer,
 #timetableContainer,
 #taskContainer {
     background-color: var(--contentContainerBackground);
     padding: 2rem 2rem;
     margin-bottom: 1rem;
+}
+
+#settingsContainer {
+    position: absolute;
+    background-color: var(--bodyBackground);
+    padding: 0.5rem;
+    top: 2rem;
+    left: 2rem;
+    right: 2rem;
+    bottom: 2rem;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
 }
 
 #timetableContainer {
@@ -109,7 +124,7 @@ main {}
 
 .weekdayLabel {
     font-weight: bold;
-    color: rgb(106, 106, 106);
+    color: var(--labelgrey);
 }
 
 .smallDate {
@@ -274,6 +289,33 @@ tr[data-new]:has(td[data-taskDescription]) td {
     border-top: solid 1px var(--contentContainerBackground);
 }
 
+/* Settingscontainer */
+#settingsContainer label {
+    display: block;
+    font-weight: bold;
+    color: var(--labelgrey);
+}
+
+.colorSelectionBox {
+    box-sizing: content-box;
+    width: 3rem;
+    height: 1.5rem;
+    border: solid 2px var(--contentContainerBackground);
+}
+
+.colorSelectionBox:hover {
+    border: solid 2px var(--lightMatteGreen);
+}
+
+.colorSelectionBox.selected {
+    border: solid 2px var(--lightMatteGreen);
+}
+
+.settingsSubjectListItem {
+    padding: 0.25rem 1rem;
+    
+}
+
 /* Buttons */
 
 .taskDone button,
@@ -288,6 +330,20 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 .taskDone button:hover {
+    background-color: var(--matteGreen);
+}
+
+#settingsCreateSubjectButton {
+    background-color: var(--matteGreen);
+    border: solid 2px var(--contentContainerBackground);
+    padding: 0.25rem 1rem;
+    border-radius: 3px;
+    background-color: var(--lightMatteGreen);
+    font-size: 1rem;
+    color: var(--lighterText);
+}
+
+#settingsCreateSubjectButton:hover {
     background-color: var(--matteGreen);
 }
 
@@ -361,7 +417,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 /* header stylings */
 
 h1,
-h2 {
+h2,
+h3 {
     margin: 0;
     color: var(--matteRed);
 }
@@ -420,6 +477,10 @@ h2 {
 
 .subjectColorFour {
     background-color: var(--bodyBackground);
+}
+
+.subjectColorFive {
+    background-color: #C7F2A7;
 }
 
 .subjectColorOne.light {

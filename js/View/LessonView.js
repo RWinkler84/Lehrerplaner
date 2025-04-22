@@ -270,7 +270,6 @@ export default class LessonView {
             'initialStatus': 'normal'
         }
 
-
         LessonView.createUpdateLessonForm(event, oldLessonData);
     }
 
@@ -351,7 +350,10 @@ export default class LessonView {
 
         createLessonForm.remove();
 
+
         if (discardedLesson) {
+            LessonView.renderLesson();
+
             timeslotElement.addEventListener('click', LessonView.createLessonForm);
             timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
         }

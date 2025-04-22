@@ -346,9 +346,12 @@ export default class TaskView extends AbstractView {
 
     }
 
-    static setTaskDone(item) {
-        console.log('task erledigt');
-        console.log(item);
+    static setTaskDone(event) {
+        let taskId = event.target.closest('tr').dataset.taskid;
+
+        Controller.setTaskDone(taskId);
+        TaskView.renderInProgressTasks();
+        TaskView.renderUpcomingTasks();
     }
 
     static #backupTaskData(event) {

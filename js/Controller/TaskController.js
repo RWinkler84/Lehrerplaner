@@ -59,6 +59,12 @@ export default class TaskController {
         task.setInProgress();
     }
 
+    static setTaskDone(id) {
+        let task = Task.getTaskById(id);
+
+        task.setDone();
+    } 
+
     static renderTaskChanges(){
         View.renderUpcomingTasks();
         View.renderInProgressTasks();

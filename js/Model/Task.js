@@ -90,6 +90,15 @@ export default class Task extends AbstractModel {
         this.makeAjaxQuery('task', 'setInProgress', {'id' : this.id});
     }
 
+    setDone(){
+        allTasksArray.forEach(entry => {
+            if (entry.id != this.id) return;
+
+            entry.status = 'done';
+        })
+
+        this.makeAjaxQuery('task', 'setDone', {'id': this.id});
+    }
 
     // Getter
 

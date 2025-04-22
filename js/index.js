@@ -1,6 +1,7 @@
 import AbstractView from './View/AbstractView.js';
 import TaskView from './View/TaskView.js';
 import LessonView from './View/LessonView.js';
+import SettingsView from './View/SettingsView.js';
 import Fn from './inc/utils.js';
 import AbstractController from './Controller/AbstractController.js';
 
@@ -8,105 +9,11 @@ let abstCtrl = new AbstractController();
 
 export let allSubjects = [];
 
-export let allTasksArray = [
-    // {
-    //     'id': 1,
-    //     'date': '2025-03-25',
-    //     'timeslot': '2',
-    //     'class': '6a',
-    //     'subject': 'Gesch',
-    //     'description': 'die Schafe hüten',
-    //     'status': 'open',
-    //     'fixedTime': false
-    // },
-    // {
-    //     'id': 2,
-    //     'date': '2025-02-10',
-    //     'timeslot': '3',
-    //     'class': '7b',
-    //     'subject': 'Deu',
-    //     'description': 'den Klassenraum streichen',
-    //     'status': 'inProgress',
-    //     'fixedTime': false
-    // },
-    // {
-    //     'id': 3,
-    //     'date': '2025-04-01',
-    //     'timeslot': '2',
-    //     'class': '6a',
-    //     'subject': 'Gesch',
-    //     'description': 'Wette verloren! Kopfstand auf dem Lehrertisch',
-    //     'status': 'open',
-    //     'fixedTime': false
-    // },
-    // {
-    //     'id': 4,
-    //     'date': '2025-03-06',
-    //     'timeslot': '5',
-    //     'class': '7a',
-    //     'subject': 'Gesch',
-    //     'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-    //     'status': 'open',
-    //     'fixedTime': false
-    // },
-    // {
-    //     'id': 5,
-    //     'date': '2025-03-10',
-    //     'timeslot': '2',
-    //     'class': '7b',
-    //     'subject': 'Deu',
-    //     'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-    //     'status': 'open',
-    //     'fixedTime': false
-    // },
-    // {
-    //     'id': 6,
-    //     'date': '2025-03-13',
-    //     'timeslot': '5',
-    //     'class': '8b',
-    //     'subject': 'MNT',
-    //     'description': 'Napoleon war ein kleiner Mann und hatte rote Röcke an',
-    //     'status': 'open',
-    //     'fixedTime': true
-    // },
-    // {
-    //     'id': 7,
-    //     'date': '2025-04-15',
-    //     'timeslot': '2',
-    //     'class': '6a',
-    //     'subject': 'Gesch',
-    //     'description': 'hoffentlich eskalieren',
-    //     'status': 'open',
-    //     'fixedTime': false
-    // }
-];
+export let allTasksArray = [];
 
-export let standardTimetable = [
-];
+export let standardTimetable = [];
 
-export let timetableChanges = [
-    // {
-    //     'date': '2025-03-06',
-    //     'timeslot': '5',
-    //     'class': '7a',
-    //     'subject': 'Gesch',
-    //     'status': 'canceled',
-    // },
-    // {
-    //     'date': '2025-03-7',
-    //     'timeslot': '5',
-    //     'class': '5b',
-    //     'subject': 'MNT',
-    //     'status': 'sub',
-    // },
-    // {
-    //     'date': '2025-03-11',
-    //     'timeslot': '5',
-    //     'class': '5b',
-    //     'subject': 'MNT',
-    //     'status': 'sub',
-    // }
-];
+export let timetableChanges = [];
 
 export let taskBackupArray = [];
 
@@ -136,7 +43,6 @@ async function loadData() {
 
 async function startApp() {
     await loadData();
-    document.addEventListener('change', () => console.log(timetableChanges));
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
@@ -146,7 +52,6 @@ async function startApp() {
     document.querySelectorAll('.timeslot').forEach((element) => {
         element.addEventListener('click', LessonView.createLessonForm);
     });
-
 
     // handlers for switching between weeks
     document.querySelector('#weekBackwardButton').addEventListener('click', switchToPreviousWeek);
@@ -165,6 +70,8 @@ async function startApp() {
     TaskView.renderUpcomingTasks();
     TaskView.renderInProgressTasks();
 
+    SettingsView.renderSelectableLessonColors();
+    SettingsView.renderExistingSubjects();
 
     // FIDDLING WITH DATE
 
