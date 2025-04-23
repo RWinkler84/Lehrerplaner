@@ -6,7 +6,7 @@ export default class SettingsController {
     static saveSubject(subject) {
         let model = new Settings;
 
-        if (subject.name == '') {
+        if (subject.subject == '') {
             View.alertSubjectNameInput();
 
             return;
@@ -20,6 +20,8 @@ export default class SettingsController {
 
         model.saveSubject(subject);
 
+        View.renderExistingSubjects();
+        View.renderSelectableLessonColors();
     }
 
     static deleteSubject(id) {

@@ -136,7 +136,6 @@ export default class TaskView extends AbstractView {
     static createTaskForm(event) {
 
         let lessonElement = event.target.closest('.lesson');
-        // let id = Fn.generateTaskId();
         let id = Fn.generateId(allTasksArray);
         let className = lessonElement.dataset.class;
         let subject = lessonElement.dataset.subject;

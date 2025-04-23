@@ -73,11 +73,14 @@ export default class SettingsView {
             : undefined;
 
         let subject = {
-            'name': document.querySelector('#subjectName').value,
+            'subject': document.querySelector('#subjectName').value,
             'colorCssClass': colorCssClass
         };
 
         Controller.saveSubject(subject);
+
+        document.querySelector('#subjectName').value = '';
+        
     }
 
     //validation functions

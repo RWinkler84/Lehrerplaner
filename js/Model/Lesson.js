@@ -144,7 +144,6 @@ export default class Lesson extends AbstractModel {
         };
 
 
-        // this.id = Lesson.#generateLessonId();
         this.id = Fn.generateId(timetableChanges);
         lessonData.id = this.id;
 

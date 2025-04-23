@@ -7,8 +7,10 @@ require_once 'config.php';
 require_once './Controller/AbstractController.php';
 require_once './Controller/LessonController.php';
 require_once './Controller/TaskController.php';
+require_once './Controller/SettingsController.php';
 
 //Models
 require_once './Model/AbstractModel.php';
 require_once './Model/Lesson.php';
 require_once './Model/Task.php';
+require_once './Model/Settings.php';

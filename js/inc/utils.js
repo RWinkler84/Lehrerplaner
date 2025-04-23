@@ -81,20 +81,6 @@ export default class Utils {
         }
     }
 
-
-    // static generateTaskId() {
-    //     // let tasks = document.querySelectorAll('tr[data-taskid]');
-    //     let taskIds = [];
-
-    //     allTasksArray.forEach((task) => {
-    //         taskIds.push(Number(task.id));
-    //     })
-
-    //     if (taskIds.length == 0) taskIds = [0];
-
-    //     return Math.max(...taskIds) + 1; //adds 1 to the highest existing lesson id
-    // }
-
     static generateId(baseArray) {
         let allIds = [];
 

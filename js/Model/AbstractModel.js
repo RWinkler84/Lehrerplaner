@@ -8,7 +8,6 @@ export default class AbstractModel {
     async makeAjaxQuery(controller, action, content = '') {
         let response;
         
-        console.log(content);
         try {
             response = await fetch(`index.php?c=${controller}&a=${action}`,
                 {

@@ -9,10 +9,11 @@ export default class Settings extends AbstractModel{
     }
 
     saveSubject(subject) {
-        console.log(allSubjects);
         subject.id = Fn.generateId(allSubjects);
-
-        console.log(subject);
+        
+        allSubjects.push(subject);
+        
+        this.makeAjaxQuery('settings', 'saveSubject', subject);
     }
 
     deleteSubject(id){
