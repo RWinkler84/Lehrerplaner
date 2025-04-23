@@ -64,6 +64,7 @@ async function startApp() {
 
     //handlers for settings
     document.querySelector('#createSubjectButton').addEventListener('click', SettingsView.saveSubject);
+    document.querySelector('#createNewTimetableButton').addEventListener('click', SettingsView.makeTimetableEditable);
 
 
     setDateForWeekdays();
@@ -76,6 +77,7 @@ async function startApp() {
 
     SettingsView.renderSelectableLessonColors();
     SettingsView.renderExistingSubjects();
+    SettingsView.renderLessons();
 
     // FIDDLING WITH DATE
 

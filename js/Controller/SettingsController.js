@@ -1,5 +1,6 @@
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
+import LessonController from "./LessonController.js";
 
 export default class SettingsController {
 
@@ -31,5 +32,9 @@ export default class SettingsController {
 
         View.renderExistingSubjects();
         View.renderSelectableLessonColors();
+    }
+
+    static getScheduledLessons(){
+        return LessonController.getScheduledLessons();
     }
 }

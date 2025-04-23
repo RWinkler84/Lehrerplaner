@@ -1,19 +1,14 @@
-- deleteSubject braucht serverseitige Logik
-- Subjects können noch gar nicht erzeugt werden
 - wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
-
 - eigene Validierungslogik bauen
 
 
 - unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement -> kein Showstopper
  
-
 - Einstellungsmenu: 
     - Stundenplan anlegen
-    - Fächer anlegen
-        - Farben für Fächer auswählen
 
 - perspektivisch: Arbeitszeitracker einbauen
+
 
 erledigt: 
 
@@ -82,3 +77,7 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - setDone
 
 - wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt
+
+- Einstellungsmenu: 
+    - Fächer anlegen
+        - Farben für Fächer auswählen

@@ -58,8 +58,13 @@ main {}
     top: 2rem;
     left: 2rem;
     right: 2rem;
-    bottom: 2rem;
+    /* bottom: 2rem; */
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+}
+
+#settingsTimetableContainer {
+    margin-bottom: 0;
+    scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
 }
 
 #timetableContainer {
@@ -78,7 +83,9 @@ main {}
 /* Time Table */
 
 #weekBackwardButton,
-#weekForwardButton {
+#weekForwardButton,
+#timetableBackwardButton,
+#timetableForwardButton {
     border: none;
     background-color: var(--contentContainerBackground);
 }
@@ -88,24 +95,30 @@ main {}
     color: var(--matteRed);
 }
 
-#weekOverviewContainer {
+#weekOverviewContainer,
+#settingsWeekOverviewContainer {
     position: relative;
     left: 0;
     transition: all 0.3s ease-out;
     cursor: default;
     overflow-x: scroll;
     overflow-y: hidden;
-
 }
 
-.weekOverview {
+.weekOverview,
+.settingsWeekOverview {
     width: 100%;
     display: grid;
     grid-template-columns: 0.3fr 1fr 1fr 1fr 1fr 1fr 0.6fr 0.6fr;
     min-width: 900px;
 }
 
-#timeslots {
+.settingsWeekOverview {
+    grid-template-columns: 0.3fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+#timeslots,
+#settingsTimeslots {
     display: grid;
     grid-template-rows: 3rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
@@ -116,6 +129,7 @@ main {}
 }
 
 .timeslot,
+.settingsTimeslot,
 .timeslotLabel {
     display: flex;
     border-top: solid 1px var(--lightgrey);
@@ -133,7 +147,8 @@ main {}
     color: var(--lightText);
 }
 
-.weekday {
+.weekday,
+.settingsWeekday {
     display: grid;
     border-left: solid 1px var(--lightgrey);
     grid-template-rows: 3rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -225,7 +240,8 @@ main {}
     color: #0F7173;
 }
 
-.weekOverview:hover .addLessonButtonWrapper {
+.weekOverview:hover .addLessonButtonWrapper,
+.settingsWeekOverview:hover .addLessonButtonWrapper {
     display: flex;
 }
 
@@ -336,6 +352,10 @@ tr[data-new]:has(td[data-taskDescription]) td {
     width: 150px;
 }
 
+#saveDiscardTimetableButtonWrapper {
+    display: none;
+}
+
 /* Buttons */
 .taskDone button,
 .discardNewLessonButton,
@@ -352,18 +372,30 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--matteGreen);
 }
 
-#createSubjectButton {
-    background-color: var(--matteGreen);
-    border: solid 2px var(--contentContainerBackground);
+#createSubjectButton,
+#createNewTimetableButton,
+#saveNewTimetableButton,
+#discardNewTimetableButton {
     padding: 0.25rem 1rem;
+    border: none;
     border-radius: 3px;
     background-color: var(--lightMatteGreen);
     font-size: 1rem;
     color: var(--lighterText);
 }
 
-#createSubjectButton:hover {
+#discardNewTimetableButton {
+    background-color: var(--lightMatteRed);
+}
+
+#createSubjectButton:hover,
+#createNewTimetableButton:hover,
+#saveNewTimetableButton:hover {
     background-color: var(--matteGreen);
+}
+
+#discardNewTimetableButton:hover {
+    background-color: var(--matteRed);
 }
 
 .lessonSelect {
@@ -484,6 +516,10 @@ h3 {
     gap: 2rem;
 }
 
+.marginBottom {
+    margin-bottom: 1rem;
+}
+
 .subjectColorOne {
     background-color: var(--matteGreen);
 }
@@ -553,9 +589,11 @@ h3 {
     0% {
         border-color: var(--matteRed);
     }
+
     50% {
         border-color: var(--matteRed);
     }
+
     100% {
         border-color: var(--contentContainerBackground);
     }

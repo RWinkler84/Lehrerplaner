@@ -17,13 +17,17 @@ export default class AbstractView {
 
     static showAddLessonButton(event) {
 
+        let weekdayElement = event.target.closest('.weekday')
+            ? event.target.closest('.weekday')
+            : event.target.closest('.settingsWeekday');
+
         let timeslot = event.target.dataset.timeslot;
         let date = event.target.parentElement.dataset.date;
 
         AbstractView.removeAddLessonButton();
 
         if (Fn.hasLesson(event.target)) return;
-        if (event.target.closest('.weekday').classList.contains('passed')) return;
+        if (weekdayElement.classList.contains('passed')) return;
 
         event.target.innerHTML = `<div class="addLessonButtonWrapper" data-timeslot="${timeslot}" data-date="${date}"><div class="addLessonButton">+</div></div>`;
 
@@ -32,6 +36,12 @@ export default class AbstractView {
     static removeAddLessonButton() {
 
         document.querySelectorAll('.timeslot').forEach((timeslot) => {
+            if (timeslot.querySelector('.addLessonButtonWrapper')) {
+                timeslot.querySelector('.addLessonButtonWrapper').remove();
+            }
+        });
+
+        document.querySelectorAll('.settingsTimeslot').forEach((timeslot) => {
             if (timeslot.querySelector('.addLessonButtonWrapper')) {
                 timeslot.querySelector('.addLessonButtonWrapper').remove();
             }
@@ -100,11 +110,11 @@ export default class AbstractView {
         document.querySelector('#isCurrentWeekDot').style.display = "none";
     }
 
-    static openSettings(){
+    static openSettings() {
 
     }
 
-    static closeSettings(){
-        
+    static closeSettings() {
+
     }
 }
