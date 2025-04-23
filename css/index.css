@@ -289,7 +289,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     border-top: solid 1px var(--contentContainerBackground);
 }
 
-/* Settingscontainer */
+/* Settings Container */
 #settingsContainer label {
     display: block;
     font-weight: bold;
@@ -315,10 +315,10 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .colorSelectionBox {
     box-sizing: content-box;
-    width: 3rem;
+    width: 1.5rem;
     height: 1.5rem;
     border: solid 2px var(--contentContainerBackground);
-    border-radius: 3px;
+    border-radius: 50%;
 }
 
 .colorSelectionBox:hover {

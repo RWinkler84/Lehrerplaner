@@ -1,5 +1,6 @@
 - deleteSubject braucht serverseitige Logik
 - Subjects können noch gar nicht erzeugt werden
+- wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
 
 - eigene Validierungslogik bauen
 

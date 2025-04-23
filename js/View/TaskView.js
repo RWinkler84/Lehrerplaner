@@ -1,6 +1,7 @@
 import AbstractView from './AbstractView.js';
 import Controller from '../Controller/TaskController.js';
 import Fn from '../inc/utils.js';
+import { allTasksArray } from '../index.js';
 
 export default class TaskView extends AbstractView {
 
@@ -135,7 +136,8 @@ export default class TaskView extends AbstractView {
     static createTaskForm(event) {
 
         let lessonElement = event.target.closest('.lesson');
-        let id = Fn.generateTaskId();
+        // let id = Fn.generateTaskId();
+        let id = Fn.generateId(allTasksArray);
         let className = lessonElement.dataset.class;
         let subject = lessonElement.dataset.subject;
         let date = lessonElement.closest('.weekday').dataset.date;

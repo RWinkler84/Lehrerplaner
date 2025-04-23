@@ -93,19 +93,6 @@ export default class Lesson extends AbstractModel {
         return lesson;
     }
 
-    static #generateLessonId() {
-
-        let lessonIds = [];
-
-        timetableChanges.forEach((entry) => {
-            lessonIds.push(entry.id);
-        })
-
-        if (lessonIds.length == 0) lessonIds = [0];
-
-        return Math.max(...lessonIds) + 1; //adds 1 to the highest existing lesson id
-    }
-
     //public class methods
     save() {
 
@@ -118,7 +105,8 @@ export default class Lesson extends AbstractModel {
             'initialStatus': this.initialStatus
         };
 
-        this.id = Lesson.#generateLessonId();
+        this.id = Fn.generateId(timetableChanges);
+
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
@@ -136,7 +124,8 @@ export default class Lesson extends AbstractModel {
             'initialStatus': this.initialStatus
         };
 
-        this.id = Lesson.#generateLessonId();
+        this.id = Fn.generateId(timetableChanges);
+
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
@@ -155,7 +144,8 @@ export default class Lesson extends AbstractModel {
         };
 
 
-        this.id = Lesson.#generateLessonId();
+        // this.id = Lesson.#generateLessonId();
+        this.id = Fn.generateId(timetableChanges);
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
