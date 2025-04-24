@@ -1,6 +1,7 @@
 import { allSubjects, standardTimetable } from "../index.js";
 import Controller from "../Controller/SettingsController.js";
 import AbstractView from "./AbstractView.js";
+import Fn from "../inc/utils.js";
 
 export default class SettingsView {
 
@@ -84,70 +85,59 @@ export default class SettingsView {
 
     }
 
+    static setDateOfTimetableToDisplay() {
+        let regularLessons = Controller.getScheduledLessons();
+        let validFromElement = document.querySelector('#validFrom');
+        let allValidDates = [];
+        let date;
+
+        regularLessons.forEach(lesson => {
+            if (!allValidDates.includes(new Date(lesson.validFrom).setHours(12, 0, 0, 0))) allValidDates.push(new Date(lesson.validFrom).setHours(12, 0, 0, 0));
+            lesson.validFrom = new Date(lesson.validFrom).setHours(12, 0, 0, 0);
+        })
+
+        date = new Date(allValidDates[allValidDates.length - 1]);
+
+        validFromElement.innerText = Fn.formatDateWithFullYear(date);
+        validFromElement.dataset.date = date;
+
+        //hide timetable changing buttons, if necessary
+        document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
+        if (allValidDates.length == 1) document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+    }
+
     static renderLessons() {
 
         let regularLessons = Controller.getScheduledLessons();
-
+        let validFromElement = document.querySelector('#validFrom');
         let timetableValidDates = [];
-        let dateOfTimetableCurrentlyDisplayed = document.querySelector('#validFrom').innerText;
-        let dateOfTimetableToDisplay;
+        let dateOfTimetableToDisplay = new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0);
 
         //get the all validity dates
         regularLessons.forEach(lesson => {
-            if (!timetableValidDates.includes(lesson.validFrom)) timetableValidDates.push(lesson.validFrom);
+            if (!timetableValidDates.includes(new Date(lesson.validFrom).setHours(12, 0, 0, 0))) timetableValidDates.push(new Date(lesson.validFrom).setHours(12, 0, 0, 0));
+            lesson.validFrom = new Date(lesson.validFrom).setHours(12, 0, 0, 0);
         })
 
-        console.log(standardTimetable);
-        console.log(timetableValidDates)
-        //get the validity date of the currently displayed timetable
-        if (dateOfTimetableCurrentlyDisplayed == 'aktueller Plan') {
-            dateOfTimetableToDisplay = timetableValidDates[timetableValidDates.length - 1];
-        } else {
-            dateOfTimetableToDisplay = timetableValidDates[timetableValidDates.length - 1];
-        }
+        //clean the timetable
+        document.querySelectorAll('.settingsTimeslot').forEach((element) => {
+            element.innerHTML = '';
+        });
 
-// aktuelle und vergangene Pläne sollen angezeigt werden können. Aktuell geht es darum, herauszufinden, welcher Plan aktuell angezeigt werden muss,
-// abhängig vom Gültigkeitsdatum
-// was fehlt ist unter anderem das Setzen des Datums im #validFrom-Feld in der View, der Abgleich, welche Stunden angezeigt werden müssen usw...
+        // now render the lessons with the correct validity date
+        regularLessons.forEach((lesson) => {
 
+            if (lesson.validFrom != dateOfTimetableToDisplay) return;
 
-        //now render the lessons with the correct validity date
-        // regularLessons.forEach((lesson) => {
+            let timeslot = SettingsView.#getTimeslotOfLesson(lesson);
 
-        //     if (lesson.validFrom != validDateOfTimetableDisplayed) return;
-
-        //     let timeslot = LessonView.#getTimeslotOfLesson(lesson);
-        //     let lessonDate = timeslot.closest('.weekday').dataset.date;
-        //     let lessonOptionsHTML = `
-        //                 <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
-        //                 <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
-        //                 <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
-        //     `;
-
-        //     if (timeslot.closest('.weekday').classList.contains('passed')) {
-        //         lessonOptionsHTML = `
-        //             <div class="lessonOption lessonPastMessage"><button>Stunde hat bereits stattgefunden.</button></div>
-        //             <div class="lessonOption lessonPastMessage responsive"><button>Stunde hat bereits statt-gefunden.</button></div>
-        //         `;
-        //     }
-
-        //     timeslot.innerHTML = `
-        //         <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
-        //              <div class="flex spaceBetween" style="width: 100%;">
-        //                 <div style="width: 1.5rem;" class="spacerBlock"></div>
-        //                 <div>${lesson.class} ${lesson.subject}</div>
-        //                 <div class="lessonMenuWrapper">
-        //                     <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
-        //                         <button class="lessonOptionsButton">&#x2630;</button>
-        //                     </div>
-        //                 </div>
-        //             </div>
-        //             <div style="display: none;" class="${lesson.cssColorClass} light lessonOptionsWrapper">
-        //                 ${lessonOptionsHTML}
-        //             </div>   
-        //         </div>`;
-
-        // })
+            timeslot.innerHTML = `
+                <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
+                     <div class="flex justifyCenter" style="width: 100%;">
+                        <div>${lesson.class} ${lesson.subject}</div>
+                    </div> 
+                </div>`;
+        })
     }
 
     static createLessonForm(event) {
@@ -180,7 +170,7 @@ export default class SettingsView {
 
         //form button event handlers
 
-        timeslotElement.querySelector('#lessonForm').addEventListener('submit', SettingsView.saveNewLesson);
+        timeslotElement.querySelector('#lessonForm').addEventListener('submit', SettingsView.createNewLesson);
 
         timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => SettingsView.removeLessonForm(event));
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
@@ -188,6 +178,44 @@ export default class SettingsView {
         //timeslot event handlers
         timeslotElement.removeEventListener('click', SettingsView.createLessonForm);
         timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
+    }
+
+    static changeDisplayedTimetable(event) {
+        let allScheduledLessons = Controller.getScheduledLessons();
+        let validFromElement = document.querySelector('#validFrom');
+        let allValidDates = [];
+        let currentlyDisplayedDate = new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0);
+        let i;
+
+        allScheduledLessons.forEach(lesson => {
+            if (!allValidDates.includes(new Date(lesson.validFrom).setHours(12, 0, 0, 0))) allValidDates.push(new Date(lesson.validFrom).setHours(12, 0, 0, 0));
+
+            lesson.validFrom = new Date(lesson.validFrom).setHours(12, 0, 0, 0);
+        })
+
+        i = allValidDates.indexOf(currentlyDisplayedDate);
+
+        if (event.target.getAttribute('id') == 'timetableBackwardButton') {
+            validFromElement.innerText = Fn.formatDateWithFullYear(allValidDates[i - 1]);
+            validFromElement.dataset.date = new Date(allValidDates[i - 1]);
+        } else {
+            validFromElement.innerText = Fn.formatDateWithFullYear(allValidDates[i + 1]);
+            validFromElement.dataset.date = new Date(allValidDates[i + 1]);
+        }
+
+        //hide the back and forward buttons, if the first or last timetable is displayed 
+        document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
+        document.querySelector('#timetableForwardButton').style.visibility = 'visible';
+
+        if (allValidDates.at(-1) == new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0)) {
+            document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
+        }
+
+        if (allValidDates.indexOf(new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0)) == 0) {
+            document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+        }
+
+        SettingsView.renderLessons();
     }
 
     static removeLessonForm(event) {
@@ -203,7 +231,7 @@ export default class SettingsView {
 
     }
 
-    static saveNewLesson(event) {
+    static createNewLesson(event) {
         event.preventDefault();
 
         let timeslotElement = event.target.closest('.settingsTimeslot');
@@ -215,7 +243,54 @@ export default class SettingsView {
             'subject': timeslotElement.querySelector('#subject').value,
         }
 
+        let lesson = Controller.getLessonObject(lessonData);
+
         SettingsView.removeLessonForm(event);
+
+        timeslotElement.innerHTML = `
+                <div class="settingsLesson ${lesson.cssColorClass}" data-cssColorClass="${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
+                     <div class="flex justifyCenter" style="width: 100%;">
+                        <div>${lesson.class} ${lesson.subject}</div>
+                    </div> 
+                </div>`;
+    }
+
+    static saveNewTimetable() {
+        let validFrom = document.querySelector('#validFromPicker').value;
+        let lessons = [];
+
+        document.querySelectorAll('.settingsTimeslot').forEach(timeslot => {
+            if (!Fn.hasLesson(timeslot)) return;
+
+            let lessonData = {
+                'validFrom': validFrom,
+                'class': timeslot.firstElementChild.dataset.class,
+                'subject': timeslot.firstElementChild.dataset.subject,
+                'weekdayNumber': timeslot.closest('.settingsWeekday').dataset.weekday_number,
+                'timeslot': timeslot.dataset.timeslot
+            }
+
+            lessons.push(lessonData);
+        });
+
+        Controller.saveNewTimetable(validFrom, lessons);
+    }
+
+    static discardNewTimetable() {
+        document.querySelectorAll('.settingsTimeslot').forEach((element) => {
+            element.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
+            element.removeEventListener('click', SettingsView.createLessonForm);
+        });
+
+        document.querySelector('#createTimetableButtonWrapper').style.display = 'flex';
+        document.querySelector('#saveDiscardTimetableButtonWrapper').style.display = 'none';
+
+        document.querySelector('#validFrom').style.display = 'inline';
+        document.querySelector('#validFromPicker').style.display = 'none';
+        document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
+        document.querySelector('#timetableForwardButton').style.visibility = 'visible';
+        SettingsView.setDateOfTimetableToDisplay();
+        SettingsView.renderLessons();
     }
 
     static makeTimetableEditable() {
@@ -225,10 +300,25 @@ export default class SettingsView {
             element.addEventListener('click', SettingsView.createLessonForm);
         });
 
+        document.querySelector('#validFromPicker').style.display = 'block';
+        document.querySelector('#validFrom').style.display = 'none';
+        document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+        document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
+
         document.querySelector('#createTimetableButtonWrapper').style.display = 'none';
         document.querySelector('#saveDiscardTimetableButtonWrapper').style.display = 'flex';
+    }
 
+    static #getTimeslotOfLesson(lesson) {
 
+        let allWeekdays = document.querySelectorAll('.settingsWeekday');
+        let weekday;
+        let timeslot;
+
+        allWeekdays.forEach((day) => { if (day.dataset.weekday_number == lesson.weekday) weekday = day });
+        weekday.querySelectorAll('.settingsTimeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot });
+
+        return timeslot;
     }
 
     //validation functions
@@ -250,4 +340,21 @@ export default class SettingsView {
         }, 300);
     }
 
+    static alertValidFromPicker() {
+        let validFromPicker = document.querySelector('#validFromPicker');
+
+        validFromPicker.parentElement.classList.add('validationError');
+        setTimeout(() => {
+            validFromPicker.parentElement.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertTimetable() {
+        let timetable = document.querySelector('.settingsWeekOverview.alertRing');
+
+        timetable.classList.add('validationError');
+        setTimeout(() => {
+            timetable.classList.remove('validationError');
+        }, 300);
+    }
 }

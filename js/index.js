@@ -64,7 +64,14 @@ async function startApp() {
 
     //handlers for settings
     document.querySelector('#createSubjectButton').addEventListener('click', SettingsView.saveSubject);
+    
+    document.querySelector('#timetableBackwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
+    document.querySelector('#timetableForwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
+    
     document.querySelector('#createNewTimetableButton').addEventListener('click', SettingsView.makeTimetableEditable);
+    document.querySelector('#saveNewTimetableButton').addEventListener('click', SettingsView.saveNewTimetable);
+    document.querySelector('#discardNewTimetableButton').addEventListener('click', SettingsView.discardNewTimetable);
+
 
 
     setDateForWeekdays();
@@ -77,6 +84,7 @@ async function startApp() {
 
     SettingsView.renderSelectableLessonColors();
     SettingsView.renderExistingSubjects();
+    SettingsView.setDateOfTimetableToDisplay();
     SettingsView.renderLessons();
 
     // FIDDLING WITH DATE

@@ -158,7 +158,8 @@ main {}
     background-color: var(--lightergrey);
 }
 
-.lesson {
+.lesson,
+.settingsLesson {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -352,6 +353,10 @@ tr[data-new]:has(td[data-taskDescription]) td {
     width: 150px;
 }
 
+#validFromPicker {
+    display: none;
+}
+
 #saveDiscardTimetableButtonWrapper {
     display: none;
 }
@@ -490,6 +495,10 @@ h3 {
 
 .spaceBetween {
     justify-content: space-between;
+}
+
+.justifyCenter {
+    justify-content: center;
 }
 
 .justifyEnd {

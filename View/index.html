@@ -248,16 +248,17 @@
             <div id="settingsTimetableContainer">
                 <!-- <label class="marginBottom">Stundenplan</label> -->
                 <div class="flex justifyEnd marginBottom">
-                    <div class="flex gap">
+                    <div class="flex gap alignEnd" style="height: 1.5rem;">
                         <label>gültig ab: </label>
                         <button id="timetableBackwardButton">&#9664</button>
                         <div id="dateSpan" class="flex alignEnd"><span
-                                id="validFrom">aktueller Plan</span></div>
+                                id="validFrom" data-date="">-</span></div>
+                        <div class="alertRing"><input type="date" name="validFromPicker" id="validFromPicker"></div>
                         <button id="timetableForwardButton">&#9654</button>
                     </div>
                 </div>
                 <div id="settingsWeekOverviewContainer">
-                    <div class="settingsWeekOverview">
+                    <div class="settingsWeekOverview alertRing">
                         <div id="settingsTimeslots">
                             <div></div>
                             <div class="timeslotLabel">1</div>

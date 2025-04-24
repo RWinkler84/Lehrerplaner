@@ -12,6 +12,10 @@ export default class LessonController {
         return Lesson.getTimetableChanges(mondayDate, sundayDate);
     }
 
+    static getLessonObject(lessonData) {
+        return this.#lessonDataToLessonObject(lessonData);
+    }
+
     static getLessonById(id){
         return Lesson.getLessonById(id);
     }

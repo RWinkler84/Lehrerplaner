@@ -6,12 +6,12 @@ export default class Utils {
     static hasLesson(element) {
         let bool = false;
 
-        if (element.classList.contains('lesson')) {
+        if (element.classList.contains('lesson') || element.classList.contains('settingsLesson')) {
             return true;
         }
 
         element.querySelectorAll('*').forEach(child => {
-            if (child.classList.contains('lesson')) {
+            if (child.classList.contains('lesson') || child.classList.contains('settingsLesson')) {
                 bool = true;
             }
         });
@@ -20,7 +20,7 @@ export default class Utils {
     }
 
     static isDateInWeek(date, mondayDate, sundayDate) {
-        let dateToTest = new Date(date).setHours(12,0,0,0);
+        let dateToTest = new Date(date).setHours(12, 0, 0, 0);
         let monday = new Date(mondayDate);
         let sunday = new Date(sundayDate);
 
@@ -33,6 +33,16 @@ export default class Utils {
         let formatter = new Intl.DateTimeFormat('de-DE', {
             month: '2-digit',
             day: '2-digit'
+        });
+
+        return formatter.format(date);
+    }
+
+    static formatDateWithFullYear(date) {
+        let formatter = new Intl.DateTimeFormat('de-DE', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
         });
 
         return formatter.format(date);
@@ -69,7 +79,7 @@ export default class Utils {
     }
 
     static getFirstAndLastDayOfWeek(date) {
-        let monday = new Date(date).setHours(12,0,0,0);
+        let monday = new Date(date).setHours(12, 0, 0, 0);
 
         while (new Date(monday).getDay() != 1) monday -= 86400000;
 
@@ -99,6 +109,6 @@ export default class Utils {
             b.date = b;
         }
 
-        return new Date(a.date).setHours(12,0,0,0) - new Date(b.date).setHours(12,0,0,0);
+        return new Date(a.date).setHours(12, 0, 0, 0) - new Date(b.date).setHours(12, 0, 0, 0);
     }
 }
