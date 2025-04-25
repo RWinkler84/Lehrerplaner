@@ -357,7 +357,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
     display: none;
 }
 
-#saveDiscardTimetableButtonWrapper {
+#saveDiscardTimetableButtonContainer,
+#saveDiscardTimetableChangesButtonContainer {
     display: none;
 }
 
@@ -380,7 +381,10 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #createSubjectButton,
 #createNewTimetableButton,
 #saveNewTimetableButton,
-#discardNewTimetableButton {
+#discardNewTimetableButton,
+#editTimetableButton,
+#saveTimetableChangesButton,
+#discardTimetableChangesButton {
     padding: 0.25rem 1rem;
     border: none;
     border-radius: 3px;
@@ -389,17 +393,21 @@ tr[data-new]:has(td[data-taskDescription]) td {
     color: var(--lighterText);
 }
 
-#discardNewTimetableButton {
+#discardNewTimetableButton,
+#discardTimetableChangesButton {
     background-color: var(--lightMatteRed);
 }
 
 #createSubjectButton:hover,
 #createNewTimetableButton:hover,
-#saveNewTimetableButton:hover {
+#saveNewTimetableButton:hover,
+#editTimetableButton:hover,
+#saveTimetableChangesButton:hover {
     background-color: var(--matteGreen);
 }
 
-#discardNewTimetableButton:hover {
+#discardNewTimetableButton:hover,
+#discardTimetableChangesButton:hover {
     background-color: var(--matteRed);
 }
 
@@ -416,7 +424,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 .lessonOptionsButton,
-.deleteSubjectButton {
+.deleteSubjectButton,
+.deleteLessonButton {
     color: var(--lightgrey);
     /* flex-grow: 1; */
     border: none;
@@ -426,7 +435,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 .lessonOptionsButton:hover,
-.deleteSubjectButton:hover {
+.deleteSubjectButton:hover,
+.deleteLessonButton:hover {
     background-color: rgba(256, 256, 256, 0.1);
 }
 

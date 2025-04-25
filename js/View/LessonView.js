@@ -230,8 +230,8 @@ export default class LessonView {
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
 
         //timeslot event handlers
-        timeslotElement.removeEventListener('click', LessonView.createLessonForm);
-        timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
+        // timeslotElement.removeEventListener('click', LessonView.createLessonForm);
+        // timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
 
     static saveNewLesson(event) {
@@ -353,10 +353,11 @@ export default class LessonView {
 
         if (discardedLesson) {
             LessonView.renderLesson();
-
-            timeslotElement.addEventListener('click', LessonView.createLessonForm);
-            timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
+            return;
         }
+        
+        timeslotElement.addEventListener('click', LessonView.createLessonForm);
+        timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
 
     static showLessonOptions(event) {

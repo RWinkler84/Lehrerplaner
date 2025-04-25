@@ -98,6 +98,7 @@ export default class SettingsView {
 
         date = new Date(allValidDates[allValidDates.length - 1]);
 
+
         validFromElement.innerText = Fn.formatDateWithFullYear(date);
         validFromElement.dataset.date = date;
 
@@ -133,11 +134,16 @@ export default class SettingsView {
 
             timeslot.innerHTML = `
                 <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
-                     <div class="flex justifyCenter" style="width: 100%;">
+                     <div class="flex spaceBetween" style="width: 100%;">
+                        <div style="width: 1.5rem;"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
+                        <button class="deleteLessonButton" style="width: 1.5rem; visibility: hidden;">&#215;</button>
                     </div> 
                 </div>`;
-        })
+
+        timeslot.querySelector('.deleteLessonButton').addEventListener('click', SettingsView.deleteLesson);
+        });
+
     }
 
     static createLessonForm(event) {
@@ -245,14 +251,28 @@ export default class SettingsView {
 
         let lesson = Controller.getLessonObject(lessonData);
 
-        SettingsView.removeLessonForm(event);
-
         timeslotElement.innerHTML = `
-                <div class="settingsLesson ${lesson.cssColorClass}" data-cssColorClass="${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
-                     <div class="flex justifyCenter" style="width: 100%;">
+                <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
+                     <div class="flex spaceBetween" style="width: 100%;">
+                        <div style="width: 1.5rem;"></div>
                         <div>${lesson.class} ${lesson.subject}</div>
+                        <button class="deleteLessonButton" style="width: 1.5rem;">&#215;</button>
                     </div> 
                 </div>`;
+                
+        timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
+        timeslotElement.querySelector('.deleteLessonButton').addEventListener('click', SettingsView.deleteLesson);
+    }
+
+    static deleteLesson(event) {
+        event.stopPropagation();
+
+        let timeslotElement = event.target.closest('.settingsTimeslot');
+
+        event.target.closest('.settingsLesson').remove();
+
+        timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
+        timeslotElement.addEventListener('click', SettingsView.createLessonForm);
     }
 
     static saveNewTimetable() {
@@ -282,15 +302,38 @@ export default class SettingsView {
             element.removeEventListener('click', SettingsView.createLessonForm);
         });
 
-        document.querySelector('#createTimetableButtonWrapper').style.display = 'flex';
-        document.querySelector('#saveDiscardTimetableButtonWrapper').style.display = 'none';
+        document.querySelector('#createChangeTimetableButtonContainer').style.display = 'flex';
+        document.querySelector('#saveDiscardTimetableButtonContainer').style.display = 'none';
+        document.querySelector('#saveDiscardTimetableChangesButtonContainer').style.display = 'none';
 
         document.querySelector('#validFrom').style.display = 'inline';
         document.querySelector('#validFromPicker').style.display = 'none';
+        document.querySelector('#validFromPicker').value = '';
         document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
         document.querySelector('#timetableForwardButton').style.visibility = 'visible';
         SettingsView.setDateOfTimetableToDisplay();
         SettingsView.renderLessons();
+    }
+
+    static saveTimetableChanges() {
+        let validFrom = Fn.formatDateSqlCompatible(document.querySelector('#validFrom').dataset.date);
+        let lessons = [];
+
+        document.querySelectorAll('.settingsTimeslot').forEach(timeslot => {
+            if (!Fn.hasLesson(timeslot)) return;
+
+            let lessonData = {
+                'validFrom': validFrom,
+                'class': timeslot.firstElementChild.dataset.class,
+                'subject': timeslot.firstElementChild.dataset.subject,
+                'weekdayNumber': timeslot.closest('.settingsWeekday').dataset.weekday_number,
+                'timeslot': timeslot.dataset.timeslot
+            }
+
+            lessons.push(lessonData);
+        });
+
+        Controller.saveTimetableChanges(validFrom, lessons);
     }
 
     static makeTimetableEditable() {
@@ -305,8 +348,28 @@ export default class SettingsView {
         document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
         document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
 
-        document.querySelector('#createTimetableButtonWrapper').style.display = 'none';
-        document.querySelector('#saveDiscardTimetableButtonWrapper').style.display = 'flex';
+        document.querySelector('#createChangeTimetableButtonContainer').style.display = 'none';
+        document.querySelector('#saveDiscardTimetableButtonContainer').style.display = 'flex';
+    }
+
+    static makeLessonsEditable() {
+        document.querySelectorAll('.settingsTimeslot').forEach((element) => {
+            if (Fn.hasLesson(element)) {
+                element.querySelector('.deleteLessonButton').style.visibility = 'visible';
+                element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
+
+                return;
+            }
+
+            document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+            document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
+
+            element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
+            element.addEventListener('click', SettingsView.createLessonForm);
+        });
+
+        document.querySelector('#createChangeTimetableButtonContainer').style.display = 'none';
+        document.querySelector('#saveDiscardTimetableChangesButtonContainer').style.display = 'flex';
     }
 
     static #getTimeslotOfLesson(lesson) {

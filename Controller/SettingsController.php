@@ -1,9 +1,11 @@
-<?php 
+<?php
 
 namespace Controller;
+
 use Model\Settings;
 
-class SettingsController extends AbstractController{
+class SettingsController extends AbstractController
+{
 
     private $model;
 
@@ -13,7 +15,8 @@ class SettingsController extends AbstractController{
         $this->model = new Settings;
     }
 
-    public function saveSubject(){
+    public function saveSubject()
+    {
         $subjectData = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->saveSubject($subjectData);
@@ -21,11 +24,28 @@ class SettingsController extends AbstractController{
         echo json_encode($result);
     }
 
-    public function deleteSubject(){
+    public function deleteSubject()
+    {
         $subjectId = json_decode(file_get_contents('php://input'), true);
 
-        error_log(print_r($subjectId, true));
         $this->model->deleteSubject($subjectId);
     }
 
+    public function saveTimetable()
+    {
+        $timetableData = json_decode(file_get_contents('php://input'), true);
+
+        $result = $this->model->saveTimetable($timetableData);
+
+        echo json_encode($result);
+    }
+
+    public function saveTimetableChanges()
+    {
+        $timetableData = json_decode(file_get_contents('php://input'), true);
+
+        $result = $this->model->saveTimetableChanges($timetableData);
+
+        echo json_encode($result);
+    }
 }

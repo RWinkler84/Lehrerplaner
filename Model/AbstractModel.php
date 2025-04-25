@@ -29,13 +29,14 @@ class AbstractModel
     protected function write($query, $params)
     {
         global $db;
+                error_log(print_r($params, true));
+
 
         try {
             $stmt = $db->prepare($query);
 
             foreach ($params as $key => $value) {
                 if ($key == 'date') {
-                    error_log($value);
                     $date = new DateTime($value);
                     $value = $date->format('Y-m-d');
                 }

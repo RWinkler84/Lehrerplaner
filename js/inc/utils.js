@@ -48,6 +48,14 @@ export default class Utils {
         return formatter.format(date);
     }
 
+    static formatDateSqlCompatible(date) {
+        let dateObject = new Date(date);
+
+        let timeString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2,'0') + '-' + dateObject.getDate().toString().padStart(2, '0');
+
+        return timeString;
+    }
+
     static getNumberOfWeeksPerYear(year) {
         let nextNewYear = new Date('1.1.' + (year + 1)).getTime();
         let firstThursday = Utils.getFirstThirsdayOfTheYear(year);

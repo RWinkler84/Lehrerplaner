@@ -33,15 +33,34 @@ export default class SettingsController {
     }
 
     static saveNewTimetable(validFrom, lessons) {
+        let model = new Settings;
+
         if (validFrom == '') {
             View.alertValidFromPicker();
             return;
         }
-        
+
         if (lessons.length == 0) {
             View.alertTimetable();
             return;
         }
+
+        model.saveNewTimetable(lessons);
+
+        View.discardNewTimetable();
+    }
+
+    static saveTimetableChanges(validFrom, lessons) {
+        let model = new Settings;
+
+        if (lessons.length == 0) {
+            View.alertTimetable();
+            return;
+        }
+
+        model.saveTimetableChanges(validFrom, lessons);
+
+        View.discardNewTimetable();
     }
 
     static getScheduledLessons() {

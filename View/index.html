@@ -251,8 +251,7 @@
                     <div class="flex gap alignEnd" style="height: 1.5rem;">
                         <label>gültig ab: </label>
                         <button id="timetableBackwardButton">&#9664</button>
-                        <div id="dateSpan" class="flex alignEnd"><span
-                                id="validFrom" data-date="">-</span></div>
+                        <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span></div>
                         <div class="alertRing"><input type="date" name="validFromPicker" id="validFromPicker"></div>
                         <button id="timetableForwardButton">&#9654</button>
                     </div>
@@ -338,16 +337,24 @@
                         </div>
                     </div>
                 </div>
-                <div id="createTimetableButtonWrapper" class="flex justifyEnd">
+                <div id="createChangeTimetableButtonContainer" class="flex justifyEnd halfGap">
+                    <div><button id="editTimetableButton">Bearbeiten</button></div>
                     <div><button id="createNewTimetableButton">Plan anlegen</button></div>
                 </div>
-                <div id="saveDiscardTimetableButtonWrapper" class="flex justifyEnd">
+                <div id="saveDiscardTimetableButtonContainer" class="flex justifyEnd">
                     <div class="flex halfGap">
                         <div><button id="saveNewTimetableButton">Speichern</button></div>
                         <div><button id="discardNewTimetableButton">Abbrechen</button></div>
                     </div>
                 </div>
+                <div id="saveDiscardTimetableChangesButtonContainer" class="flex justifyEnd">
+                    <div class="flex halfGap">
+                        <div><button id="saveTimetableChangesButton">Speichern</button></div>
+                        <div><button id="discardTimetableChangesButton">Abbrechen</button></div>
+                    </div>
+                </div>
             </div>
+        </div>
         </div>
 
     </main>

@@ -1,11 +1,15 @@
 - wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
 - eigene Validierungslogik bauen
+    - melden, wenn im validFrom-Picker ein Datum gewählt wird, für das es schon einen Stundenplan gibt und das Erstellen eines neuen verweigern
+- special Chars escaping
+- wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
 
 - unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement -> kein Showstopper
  
 - Einstellungsmenu: 
-    - Stundenplan anlegen
+    - Stundenplan bearbeiten
+    - Gültigkeitsdatums eines Stundenplans bearbeiten
 
 - perspektivisch: Arbeitszeitracker einbauen
 
@@ -81,3 +85,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - Einstellungsmenu: 
     - Fächer anlegen
         - Farben für Fächer auswählen
+    - Stundenpläne darstellen
+    - Stundenpläne durchklicken
+    - Stundenplan anlegen

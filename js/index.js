@@ -72,7 +72,9 @@ async function startApp() {
     document.querySelector('#saveNewTimetableButton').addEventListener('click', SettingsView.saveNewTimetable);
     document.querySelector('#discardNewTimetableButton').addEventListener('click', SettingsView.discardNewTimetable);
 
-
+    document.querySelector('#editTimetableButton').addEventListener('click', SettingsView.makeLessonsEditable);
+    document.querySelector('#saveTimetableChangesButton').addEventListener('click', SettingsView.saveTimetableChanges);
+    document.querySelector('#discardTimetableChangesButton').addEventListener('click', SettingsView.discardNewTimetable);
 
     setDateForWeekdays();
     setCalendarWeek();
@@ -258,41 +260,6 @@ async function startApp() {
             document.querySelector('.blankWeekTable').remove();
             document.querySelector('#weekOverviewContainer').style.left = 'auto';
         }
-    }
-
-
-    // HELPER FUNCTIONS
-
-
-    // filters an TaskArray by date, can return any task before and after a given date (including tasks on given date!)
-    // or returns all tasks between dates if startDate and endDate are specified
-    function filterTasksByDate(tasksArray, startDate, endDate = undefined, beforeStartDate = false) {
-
-        let filteredTasks = [];
-        let start = new Date(startDate);
-        let end = endDate ? new Date(endDate) : undefined;
-
-        if (startDate && endDate) {
-            tasksArray.forEach((task) => {
-                if (start <= new Date(task.date) && new Date(task.date) <= end) {
-                    filteredTasks.push(task);
-
-                    return filteredTasks;
-                }
-            });
-        }
-
-        if (startDate && beforeStartDate == true) {
-            tasksArray.forEach((task) => {
-                if (start >= new Date(task.date) && new Date(task.date) <= end) {
-                    filteredTasks.push(task);
-
-                    return filteredTasks;
-                }
-            });
-        }
-
-
     }
 }
 
