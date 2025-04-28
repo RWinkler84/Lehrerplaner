@@ -96,10 +96,10 @@ export default class SettingsView {
             lesson.validFrom = new Date(lesson.validFrom).setHours(12, 0, 0, 0);
         })
 
-        date = new Date(allValidDates[allValidDates.length - 1]);
+        date = allValidDates.length > 0 ? new Date(allValidDates[allValidDates.length - 1]) : undefined;
 
 
-        validFromElement.innerText = Fn.formatDateWithFullYear(date);
+        validFromElement.innerText = date != undefined ? Fn.formatDateWithFullYear(date) : 'keine Daten';
         validFromElement.dataset.date = date;
 
         //hide timetable changing buttons, if necessary

@@ -39,6 +39,7 @@ async function loadData() {
     tasks.forEach(entry => {
         allTasksArray.push(entry);
     })
+
 }
 
 async function startApp() {
@@ -77,6 +78,7 @@ async function startApp() {
     document.querySelector('#editTimetableButton').addEventListener('click', SettingsView.makeLessonsEditable);
     document.querySelector('#saveTimetableChangesButton').addEventListener('click', SettingsView.saveTimetableChanges);
     document.querySelector('#discardTimetableChangesButton').addEventListener('click', SettingsView.discardNewTimetable);
+
 
     setDateForWeekdays();
     setCalendarWeek();

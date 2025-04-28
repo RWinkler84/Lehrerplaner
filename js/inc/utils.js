@@ -57,7 +57,7 @@ export default class Utils {
     }
 
     static getNumberOfWeeksPerYear(year) {
-        let nextNewYear = new Date('1.1.' + (year + 1)).getTime();
+        let nextNewYear = new Date((year + 1) + '01-01').getTime();
         let firstThursday = Utils.getFirstThirsdayOfTheYear(year);
 
         let weeksPerYear = 0;
@@ -74,7 +74,7 @@ export default class Utils {
 
     //find the first thursday of the year, which marks the first calendar week
     static getFirstThirsdayOfTheYear(year) {
-        let firstDay = new Date('1.1.' + year);
+        let firstDay = new Date(year + '-01-01');
 
         if (firstDay.getDay() != 4) {
             while (firstDay.getDay() != 4) {
