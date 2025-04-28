@@ -9,19 +9,23 @@ export default class AbstractController {
         this.#db = new Model();
     }
 
-    async getSubjects(){
+    async getSubjectsFromDatabase(){
        return await this.#db.makeAjaxQuery('abstract','getSubjects');
     }
 
-    async getTimetable() {
+    async getTimetableFromDatabase() {
         return await this.#db.makeAjaxQuery('abstract', 'getTimetable');
     }
 
-    async getTimetableChanges() {
+    async getTimetableChangesFromDatabase() {
         return await this.#db.makeAjaxQuery('abstract', 'getTimetableChanges');
     }
 
-    async getAllTasks() {
+    async getAllTasksFromDatabase() {
         return await this.#db.makeAjaxQuery('abstract', 'getAllTasks');
+    }
+
+    static getAllSubjects(){
+        return Model.getAllSubjects();
     }
 }

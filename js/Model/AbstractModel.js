@@ -111,4 +111,7 @@ export default class AbstractModel {
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`; 
     }
 
+    static getAllSubjects(){
+        return allSubjects;
+    }
 }

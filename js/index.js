@@ -19,10 +19,10 @@ export let taskBackupArray = [];
 
 
 async function loadData() {
-    let subjects = await abstCtrl.getSubjects();
-    let timetable = await abstCtrl.getTimetable();
-    let changes = await abstCtrl.getTimetableChanges();
-    let tasks = await abstCtrl.getAllTasks();
+    let subjects = await abstCtrl.getSubjectsFromDatabase();
+    let timetable = await abstCtrl.getTimetableFromDatabase();
+    let changes = await abstCtrl.getTimetableChangesFromDatabase();
+    let tasks = await abstCtrl.getAllTasksFromDatabase();
 
     subjects.forEach(entry => {
         allSubjects.push(entry)

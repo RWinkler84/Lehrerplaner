@@ -1,4 +1,3 @@
-import { allSubjects, standardTimetable } from "../index.js";
 import Controller from "../Controller/SettingsController.js";
 import AbstractView from "./AbstractView.js";
 import Fn from "../inc/utils.js";
@@ -16,6 +15,7 @@ export default class SettingsView {
 
         let selectionContainer = document.querySelector('#colourSelection');
         let selectableColorsHTML = '';
+        let allSubjects = Controller.getAllSubjects();
 
         allSubjects.forEach(entry => {
             let i = allColorsArray.indexOf(entry.colorCssClass);
@@ -45,6 +45,7 @@ export default class SettingsView {
 
     static renderExistingSubjects() {
         let subjectsContainer = document.querySelector('#subjectsListContainer');
+        let allSubjects = Controller.getAllSubjects();
         let subjectsHTML = '';
 
         allSubjects.forEach(entry => {
@@ -55,6 +56,10 @@ export default class SettingsView {
                 </div>
             `;
         });
+
+        if (allSubjects.length == 0){
+            subjectsHTML = 'Keine Fächer gefunden.'
+        }
 
         subjectsContainer.innerHTML = subjectsHTML;
 
@@ -104,7 +109,10 @@ export default class SettingsView {
 
         //hide timetable changing buttons, if necessary
         document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
-        if (allValidDates.length == 1) document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+        if (allValidDates.length <= 1) document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+
+        //hide edit timetable button, if there is not yet a timetable
+        if (date == undefined) document.querySelector('#editTimetableButton').style.display = 'none';
     }
 
     static renderLessons() {

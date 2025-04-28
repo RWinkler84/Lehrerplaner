@@ -1,5 +1,6 @@
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
+import AbstractController from "./AbstractController.js";
 import LessonController from "./LessonController.js";
 
 export default class SettingsController {
@@ -69,5 +70,9 @@ export default class SettingsController {
 
     static getLessonObject(lessonData) {
         return LessonController.getLessonObject(lessonData);
+    }
+
+    static getAllSubjects(){
+        return AbstractController.getAllSubjects();
     }
 }
