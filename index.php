@@ -2,6 +2,8 @@
 
 require_once './core/loader.php';
 
+session_start();
+
 
 if (isset($_GET['c']) && isset($_GET['a'])) {
 
@@ -15,12 +17,15 @@ if (isset($_GET['c']) && isset($_GET['a'])) {
     $controllerName = '\Controller\\' . ucfirst($_GET['c']) .  'Controller';
     $action = $_GET['a'];
     $controller = new $controllerName;
-    
+
     $controller->$action();
     exit;
 }
 
-$html = file_get_contents('./View/index.html');
+if (isset($_SESSION['isLoggedIn']) && isset($_SESSION['userId'])) {
+    $html = file_get_contents('./View/index.html');
+} else {
+    $html = file_get_contents('./View/login.html');
+}
 
 echo $html;
-

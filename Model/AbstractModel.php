@@ -8,7 +8,6 @@ use DateTime;
 
 class AbstractModel
 {
-
     protected function read($query, $params)
     {
         global $db;
@@ -16,7 +15,9 @@ class AbstractModel
         $stmt = $db->prepare($query);
 
         if (count($params) > 0) {
-            $stmt->bindParam(...$params);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
         }
 
         $stmt->execute();
@@ -29,7 +30,7 @@ class AbstractModel
     protected function write($query, $params)
     {
         global $db;
-                error_log(print_r($params, true));
+        error_log(print_r($params, true));
 
 
         try {
@@ -74,7 +75,8 @@ class AbstractModel
 
     public function getSubjects()
     {
-        $query = 'SELECT * FROM subjects';
+        $tableName = TABLEPREFIX . 'subjects';
+        $query = "SELECT * FROM $tableName";
         $params = [];
 
         return $this->read($query, $params);
@@ -82,7 +84,8 @@ class AbstractModel
 
     public function getTimetable()
     {
-        $query = 'SELECT * FROM timetable';
+        $tableName = TABLEPREFIX . 'timetable';
+        $query = "SELECT * FROM $tableName";
         $params = [];
 
         return $this->read($query, $params);
@@ -90,7 +93,8 @@ class AbstractModel
 
     public function getTimetableChanges()
     {
-        $query = 'SELECT * FROM timetableChanges';
+        $tableName = TABLEPREFIX . 'timetableChanges';
+        $query = "SELECT * FROM $tableName";
         $params = [];
 
         return $this->read($query, $params);
@@ -98,7 +102,8 @@ class AbstractModel
 
     public function getAllTasks()
     {
-        $query = 'SELECT * FROM tasks';
+        $tableName = TABLEPREFIX . 'tasks';
+        $query = "SELECT * FROM $tableName";
         $params = [];
 
         return $this->read($query, $params);

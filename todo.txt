@@ -8,8 +8,8 @@
 - unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement -> kein Showstopper
  
 - Einstellungsmenu: 
-    - Stundenplan bearbeiten
     - Gültigkeitsdatums eines Stundenplans bearbeiten
+    - Button, um Menü zu schließen
 
 - perspektivisch: Arbeitszeitracker einbauen
 
@@ -88,3 +88,5 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - Stundenpläne darstellen
     - Stundenpläne durchklicken
     - Stundenplan anlegen
+    - Stundenplan bearbeiten
+

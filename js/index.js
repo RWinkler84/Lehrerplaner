@@ -1,9 +1,9 @@
 import AbstractView from './View/AbstractView.js';
+import AbstractController from './Controller/AbstractController.js';
 import TaskView from './View/TaskView.js';
 import LessonView from './View/LessonView.js';
 import SettingsView from './View/SettingsView.js';
 import Fn from './inc/utils.js';
-import AbstractController from './Controller/AbstractController.js';
 
 let abstCtrl = new AbstractController();
 
@@ -63,6 +63,8 @@ async function startApp() {
     })
 
     //handlers for settings
+    document.querySelector('#openSettingsButton').addEventListener('click', AbstractView.openSettings);
+    document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
     document.querySelector('#createSubjectButton').addEventListener('click', SettingsView.saveSubject);
     
     document.querySelector('#timetableBackwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);

@@ -7,17 +7,18 @@ use Model\AbstractModel;
 
 class Lesson extends AbstractModel
 {
+    private $tableName = TABLEPREFIX . 'timetableChanges';
 
     public function save($lessonData)
     {
-        $query = 'INSERT INTO timetableChanges (id, date, timeslot, class, subject, status, initialStatus) VALUES (:id, :date, :timeslot, :class, :subject, :status, :initialStatus)';
+        $query = "INSERT INTO $this->tableName (id, date, timeslot, class, subject, status, initialStatus) VALUES (:id, :date, :timeslot, :class, :subject, :status, :initialStatus)";
 
         return $this->write($query, $lessonData);
     }
 
     public function uncancel($lessonData) {
 
-        $query = 'DELETE FROM timetableChanges WHERE id=:id';
+        $query = "DELETE FROM $this->tableName WHERE id=:id";
 
         return $this->delete($query, $lessonData);
     }

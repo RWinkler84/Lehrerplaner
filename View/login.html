@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/login.css">
+</head>
+
+<body>
+    <dialog open>
+        <div id="headline">
+            <h3>Login</h3>
+        </div>
+        <form id="loginForm">
+            <div class="flex halfGap marginTop" id="formBody">
+                <div>
+                    <label for="username" style="display: block">Nutzer</label>
+                    <div class="alertRing"><input type="text" name="username" id="username"></div>
+                </div>
+                <div>
+                    <label for="userName" style="display: block">Passwort</label>
+                    <div class="alertRing"><input type="password" name="password" id="password"></div>
+                </div>
+            </div>
+                <div id="errorMessageDisplay"></div>
+            <div class="flex justifyEnd marginTop"><button type="submit "id="loginButton" style="margin-right: 3px">Login</button>
+            </div>
+        </form>
+    </dialog>
+    <script src="./js/login.js"></script>
+</body>
+
+</html>

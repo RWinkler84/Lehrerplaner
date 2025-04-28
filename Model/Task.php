@@ -6,7 +6,7 @@ use Model\AbstractModel;
 
 class Task extends AbstractModel
 {
-
+    private $tableName = TABLEPREFIX . 'users';
 
     public function save($taskData)
     {

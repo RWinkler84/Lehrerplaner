@@ -52,6 +52,7 @@ main {}
 }
 
 #settingsContainer {
+    display: none;
     position: absolute;
     background-color: var(--bodyBackground);
     padding: 0.5rem;
@@ -384,7 +385,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #discardNewTimetableButton,
 #editTimetableButton,
 #saveTimetableChangesButton,
-#discardTimetableChangesButton {
+#discardTimetableChangesButton,
+#loginButton {
     padding: 0.25rem 1rem;
     border: none;
     border-radius: 3px;
@@ -402,7 +404,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #createNewTimetableButton:hover,
 #saveNewTimetableButton:hover,
 #editTimetableButton:hover,
-#saveTimetableChangesButton:hover {
+#saveTimetableChangesButton:hover,
+#loginButton:hover {
     background-color: var(--matteGreen);
 }
 
@@ -425,7 +428,9 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .lessonOptionsButton,
 .deleteSubjectButton,
-.deleteLessonButton {
+.deleteLessonButton,
+#closeSettingsButton,
+#openSettingsButton {
     color: var(--lightgrey);
     /* flex-grow: 1; */
     border: none;
@@ -436,8 +441,17 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .lessonOptionsButton:hover,
 .deleteSubjectButton:hover,
-.deleteLessonButton:hover {
+.deleteLessonButton:hover,
+#closeSettingsButton:hover,
+#openSettingsButton:hover {
     background-color: rgba(256, 256, 256, 0.1);
+}
+
+#openSettingsButton,
+#closeSettingsButton {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.5rem;
 }
 
 .lessonOption.lessonPastMessage.responsive {
@@ -533,6 +547,10 @@ h3 {
 
 .doubleGap {
     gap: 2rem;
+}
+
+.marginTop {
+    margin-top: 1rem;
 }
 
 .marginBottom {
