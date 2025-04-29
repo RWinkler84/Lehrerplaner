@@ -46,6 +46,11 @@ export default class SettingsController {
             return;
         }
 
+        if (View.isDateTaken()){
+            View.alertValidFromPicker();
+            return;
+        }
+
         model.saveNewTimetable(lessons);
 
         View.discardNewTimetable();

@@ -1,6 +1,5 @@
 - wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
-- eigene Validierungslogik bauen
-    - melden, wenn im validFrom-Picker ein Datum gewählt wird, für das es schon einen Stundenplan gibt und das Erstellen eines neuen verweigern
+- 'Termin' als Standard im Subject-Select, auch ohne Klasse speicherbar und immer mit festem Termin
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
@@ -10,6 +9,7 @@
     - Gültigkeitsdatums eines Stundenplans bearbeiten
     - was passiert eigentlich, wenn sich der Stundenplan mitten in der Woche komplett ändert -> ein Teil alter, ein Teil neuer???
     - Stundenpläne nach Gültigkeitsdatum sortieren
+    - hover iOS fähig machen :-(
 
 - perspektivisch: Arbeitszeitracker einbauen
 
@@ -90,5 +90,9 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - Stundenplan anlegen
     - Stundenplan bearbeiten
     - Button, um Menü zu schließen
+    - Tooltipps zur Erklärung
+    - nölen, wenn versucht wird, einen Stundenplan anzulegen, obwohl keine Fächer angelegt sind
 
 
+- CSS: Textfarbe für mintfarbene Stunden angepasst, dunkleres Mint eingeführt
+- eigene Validierungslogik bauen

@@ -10,11 +10,16 @@
     --lighterText: #F3F5F7;
     --matteRed: #F05D5E;
     --matteGreen: #0F7173;
+    --mint: #C7F2A7;
+    --darkMint: #acef79;
     --lightMatteGreen: #17B2B5;
     --lightMatteRed: #F58F8F;
     --lightgrey: rgb(184, 184, 184);
     --lightergrey: rgb(227, 227, 227);
     --labelgrey: rgb(106, 106, 106);
+
+    --standardRadius: 5px;
+    --smallRadius: 3px;
 }
 
 html {
@@ -28,6 +33,18 @@ body {
 }
 
 main {}
+
+input,
+select {
+    font-size: 1rem;
+    height: 1.5rem;
+}
+
+/* input[type="date"] {
+    line-height: 1.5rem;
+    padding: 0px;
+    vertical-align: bottom;
+} */
 
 /* Top Menu */
 
@@ -46,6 +63,7 @@ main {}
 #settingsTimetableContainer,
 #timetableContainer,
 #taskContainer {
+    position: relative;
     background-color: var(--contentContainerBackground);
     padding: 2rem 2rem;
     margin-bottom: 1rem;
@@ -166,7 +184,7 @@ main {}
     flex-grow: 1;
     margin: 0.2rem;
     padding: 0.5rem 0.5rem;
-    border-radius: 5px;
+    border-radius: var(--standardRadius);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     color: var(--lighterText);
     text-align: center;
@@ -188,7 +206,7 @@ main {}
     flex-direction: column;
     background-color: var(--lightergrey);
     padding: 1rem 1.5rem;
-    border-radius: 5px;
+    border-radius: var(--standardRadius);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     /* transition: all 0.3s ease-out; */
 }
@@ -224,7 +242,7 @@ main {}
     flex-wrap: nowrap;
     gap: 0.5rem;
     background-color: var(--lightergrey);
-    border-radius: 5px;
+    border-radius: var(--standardRadius);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     padding: 0.5rem 0.5rem;
 }
@@ -349,13 +367,19 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .subjectListItem {
     padding: 0.5rem 0.5rem;
-    border-radius: 3px;
+    border-radius: var(--smallRadius);
     color: var(--lighterText);
     width: 150px;
 }
 
-#validFromPicker {
+#validFromPickerWrapper {
     display: none;
+}
+
+#validFromPickerAlertDisplay {
+    display: none;
+    color: var(--matteRed);
+    top: 3rem;
 }
 
 #saveDiscardTimetableButtonContainer,
@@ -369,7 +393,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 .saveNewLessonButton {
     border: none;
     padding: 0 1rem;
-    border-radius: 3px;
+    border-radius: var(--smallRadius);
     background-color: var(--lightMatteGreen);
     font-size: 1rem;
     color: var(--lighterText);
@@ -389,7 +413,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #loginButton {
     padding: 0.25rem 1rem;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--smallRadius);
     background-color: var(--lightMatteGreen);
     font-size: 1rem;
     color: var(--lighterText);
@@ -416,10 +440,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .lessonSelect {
     appearance: none;
-    /* border: none; */
-    /* background-color: transparent; */
-    height: 100%;
-    font-size: 1rem;
 }
 
 .lessonSelect option:first-child {
@@ -434,7 +454,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     color: var(--lightgrey);
     /* flex-grow: 1; */
     border: none;
-    border-radius: 3px;
+    border-radius: var(--smallRadius);
     padding: 0 0.2em;
     background-color: transparent;
 }
@@ -505,7 +525,96 @@ h3 {
     color: var(--matteRed);
 }
 
+/* tooltips */
 
+.tooltip {
+    position: relative;
+    margin-left: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1rem;
+    height: 1.5rem;
+    border-radius: var(--standardRadius);
+    background-color: var(--lightergrey);
+    text-align: center;
+}
+
+.tooltipTextLeft,
+.tooltipTextRight,
+.tooltipTextBottom {
+    visibility: hidden;
+    position: absolute;
+    right: calc(100% + 15px);
+    z-index: 4;
+    min-width: 250px;
+    padding: 1rem;
+    border-radius: var(--standardRadius);
+    background-color: var(--lightergrey);
+    color: black;
+    font-weight: normal;
+}
+
+.tooltipTextRight {
+    visibility: hidden;
+    position: absolute;
+    left: calc(100% + 15px);
+}
+
+.tooltip:hover {
+    background-color: var(--lightgrey);
+}
+
+.tooltip:hover .tooltipTextLeft,
+.tooltip:hover .tooltipTextRight,
+.tooltip:hover .tooltipTextBottom {
+    visibility: visible;
+}
+
+.tooltip .tooltipTextLeft::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--lightergrey);
+}
+
+.tooltip .tooltipTextRight::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent var(--lightergrey) transparent transparent;
+}
+
+.tooltip.error {
+    background-color: var(--lightMatteRed);
+    color: var(--lighterText);
+}
+
+.tooltip.error:hover {
+    background-color: var(--matteRed);
+}
+
+#subjectsInfoTooltip {
+    margin-right: 0.5rem;
+}
+
+#validFromPickerAlertTooltip {
+    position: absolute;
+    right: 100%;
+    display: none;
+}
+
+#noSubjectsAlertTooltip {
+    display: none;
+}
 
 /* generic classes */
 
@@ -574,7 +683,11 @@ h3 {
 }
 
 .subjectColorFive {
-    background-color: #C7F2A7;
+    background-color: var(--mint);
+    color: black;
+}
+
+.subjectColorFive.light.lessonOptionsWrapper .lessonOption button {
     color: black;
 }
 
@@ -594,6 +707,10 @@ h3 {
     background-color: var(--bodyBackground);
 }
 
+.subjectColorFive.light {
+    background-color: var(--darkMint);
+}
+
 .blankWeekTable {
     background-color: var(--contentContainerBackground);
     transition: all 0.3s ease-out;
@@ -610,16 +727,11 @@ h3 {
 }
 
 .validationError {
-    /* box-sizing: content-box; */
     border-style: solid;
     border-width: 3px;
-    border-radius: 3px;
+    border-radius: var(--smallRadius);
     animation-name: redFlash;
     animation-duration: 0.3s;
-}
-
-.alertRing {
-    border: solid 3px rgba(0, 0, 0, 0);
 }
 
 @keyframes redFlash {
@@ -637,7 +749,9 @@ h3 {
 
 }
 
-
+.alertRing {
+    border: solid 3px rgba(0, 0, 0, 0);
+}
 
 /* responsiveness */
 

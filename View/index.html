@@ -23,7 +23,7 @@
         <div id="timetableContainer">
             <div class="flex doubleGap spaceBetween" style="margin-bottom: 1rem;">
                 <div id="calendarWeek" class="flex alignCenter">
-                    <h2>KW <span id="calendarWeekCounter" data-split_first_week="false">-</span></h2>
+                    <h2>Wochenplan KW <span id="calendarWeekCounter" data-split_first_week="false">-</span></h2>
                     <div id="isCurrentWeekDot"></div>
                 </div>
                 <div class="flex gap">
@@ -213,151 +213,173 @@
     </main>
     <settings>
         <!-- Settings Menu -->
-            <div id="settingsContainer">
-                <div id="settingsTitleBar" class="flex spaceBetween alignCenter" style="height: 3rem;">
-                    <h3>Einstellungen</h3><button id="closeSettingsButton">&#215;</button>
-                </div>
+        <div id="settingsContainer">
+            <div id="settingsTitleBar" class="flex spaceBetween alignCenter" style="height: 3rem;">
+                <h3>Einstellungen</h3><button id="closeSettingsButton">&#215;</button>
+            </div>
 
-                <div id="settingsSubjectsContainer" class="flex doubleGap">
-                    <!-- create subjects and select their colors -->
-                    <div id="createSubjectContainer">
-                        <div class="flex gap">
-                            <div class="flex gap column">
-                                <div>
-                                    <label for="subjectName">Fach anlegen:</label>
-                                    <div class="alertRing"><input type="text" name="subjectName" id="subjectName"
-                                            style="width: 8rem; height: 1.5rem" placeholder="Fachkürzel"></div>
-                                </div>
-                                <div>
-                                    <label>Farbe wählen:</label>
-                                    <div id="colourSelection" class="flex halfGap"></div>
-                                </div>
+            <div id="settingsSubjectsContainer" class="flex doubleGap">
+                <!-- create subjects and select their colors -->
+                <div id="createSubjectContainer">
+                    <div class="flex gap">
+                        <div class="flex gap column">
+                            <div>
+                                <label for="subjectName">Fächer anlegen:</label>
+                                <div class="alertRing"><input type="text" name="subjectName" id="subjectName"
+                                        style="width: 8rem; height: 1.5rem" placeholder="Fachkürzel"></div>
                             </div>
-                            <div class="flex alignEnd">
-                                <div><button id="createSubjectButton">Anlegen</button></div>
+                            <div>
+                                <label>Farbe wählen:</label>
+                                <div id="colourSelection" class="flex halfGap"></div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- existing subjects list -->
-                    <div id="existingSubjectsContainer" class="flex gap column">
-                        <div><label>Fachübersicht:</label></div>
-                        <div id="subjectsListContainer" class="flex gap"></div>
+                        <div class="flex alignEnd">
+                            <div><button id="createSubjectButton">Anlegen</button></div>
+                        </div>
                     </div>
                 </div>
 
-                <div id="settingsTimetableContainer">
-                    <!-- <label class="marginBottom">Stundenplan</label> -->
-                    <div class="flex justifyEnd marginBottom">
-                        <div class="flex gap alignEnd" style="height: 1.5rem;">
-                            <label>gültig ab: </label>
-                            <button id="timetableBackwardButton">&#9664</button>
-                            <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span></div>
-                            <div class="alertRing">
-                            <div id="validFromPickerAlertDisplay">Datum bereits vergeben!</div>
-                            <input type="date" name="validFromPicker" id="validFromPicker"></div>
-                            <button id="timetableForwardButton">&#9654</button>
+                <!-- existing subjects list -->
+                <div id="existingSubjectsContainer" class="flex gap column">
+                    <div class="flex spaceBetween">
+                        <label>Fachübersicht:</label>
+                        <div id="subjectsInfoTooltip" class="tooltip">?
+                            <span class="tooltipTextLeft">Hier kannst du die von dir unterrichteten Fächer anlegen und ihnen
+                                eine Farbe zuweisen. Gib einfach ein Fachkürzel deiner Wahl ein und wähle eine Farbe
+                                aus.</span>
                         </div>
                     </div>
-                    <div id="settingsWeekOverviewContainer">
-                        <div class="settingsWeekOverview alertRing">
-                            <div id="settingsTimeslots">
-                                <div></div>
-                                <div class="timeslotLabel">1</div>
-                                <div class="timeslotLabel">2</div>
-                                <div class="timeslotLabel">3</div>
-                                <div class="timeslotLabel">4</div>
-                                <div class="timeslotLabel">5</div>
-                                <div class="timeslotLabel">6</div>
-                                <div class="timeslotLabel">7</div>
-                                <div class="timeslotLabel">8</div>
-                                <div class="timeslotLabel">9</div>
-                            </div>
+                    <div id="subjectsListContainer" class="flex gap"></div>
+                </div>
+            </div>
 
-                            <div class="settingsWeekday" data-weekday_number="1">
-                                <div class="weekdayLabel">Mo</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="2">
-                                <div class="weekdayLabel">Di</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="3">
-                                <div class="weekdayLabel">Mi</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="4" data-date="">
-                                <div class="weekdayLabel">Do</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="5">
-                                <div class="weekdayLabel">Fr</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
+            <div id="settingsTimetableContainer">
+                <div class="flex spaceBetween alignEnd marginBottom">
+                    <div class="flex alignEnd">
+                        <label>Stundenpläne anlegen:</label>
+                        <div id="noSubjectsAlertTooltip" class="tooltip error">!
+                            <span class="tooltipTextRight">Es wurden keine Fächer gefunden! Bevor du einen
+                                Stundenplan anlegen kannst, musst du oben deine Fächer eintragen.</span>
                         </div>
                     </div>
-                    <div id="createChangeTimetableButtonContainer" class="flex justifyEnd halfGap">
-                        <div><button id="editTimetableButton">Bearbeiten</button></div>
-                        <div><button id="createNewTimetableButton">Plan anlegen</button></div>
-                    </div>
-                    <div id="saveDiscardTimetableButtonContainer" class="flex justifyEnd">
-                        <div class="flex halfGap">
-                            <div><button id="saveNewTimetableButton">Speichern</button></div>
-                            <div><button id="discardNewTimetableButton">Abbrechen</button></div>
+                    <div class="flex gap alignEnd" style="height: 1.5rem;">
+                        <label>gültig ab: </label>
+                        <button id="timetableBackwardButton">&#9664</button>
+                        <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span></div>
+                        <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
+                            <div class="alertRing"><input type="date" name="validFromPicker" id="validFromPicker"></div>
+                            <div id="validFromPickerAlertTooltip" class="tooltip error">!
+                                <span class="tooltipTextLeft">Für dieses Datum existiert bereits ein Stundenplan. Um diesen
+                                    zu ändern, wähle ihn aus und bearbeite ihn direkt.</span>
+                            </div>
+                        </div>
+                        <button id="timetableForwardButton">&#9654</button>
+                        <div id="subjectsInfoTooltip" class="tooltip">?
+                            <span class="tooltipTextLeft">Hier kannst du deine festen Stundenpläne speichern und bearbeiten.
+                                Lege die Stunden im jeweilgen Zeitslot mit Klasse und Fach an. Wähle außerdem aus, ab
+                                wann der Plan gültig ist.</span>
                         </div>
                     </div>
-                    <div id="saveDiscardTimetableChangesButtonContainer" class="flex justifyEnd">
-                        <div class="flex halfGap">
-                            <div><button id="saveTimetableChangesButton">Speichern</button></div>
-                            <div><button id="discardTimetableChangesButton">Abbrechen</button></div>
+                </div>
+                <div id="settingsWeekOverviewContainer">
+                    <div class="settingsWeekOverview alertRing">
+                        <div id="settingsTimeslots">
+                            <div></div>
+                            <div class="timeslotLabel">1</div>
+                            <div class="timeslotLabel">2</div>
+                            <div class="timeslotLabel">3</div>
+                            <div class="timeslotLabel">4</div>
+                            <div class="timeslotLabel">5</div>
+                            <div class="timeslotLabel">6</div>
+                            <div class="timeslotLabel">7</div>
+                            <div class="timeslotLabel">8</div>
+                            <div class="timeslotLabel">9</div>
                         </div>
+
+                        <div class="settingsWeekday" data-weekday_number="1">
+                            <div class="weekdayLabel">Mo</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="2">
+                            <div class="weekdayLabel">Di</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="3">
+                            <div class="weekdayLabel">Mi</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="4" data-date="">
+                            <div class="weekdayLabel">Do</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="5">
+                            <div class="weekdayLabel">Fr</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="createChangeTimetableButtonContainer" class="flex justifyEnd halfGap">
+                    <div><button id="editTimetableButton">Bearbeiten</button></div>
+                    <div><button id="createNewTimetableButton">Plan anlegen</button></div>
+                </div>
+                <div id="saveDiscardTimetableButtonContainer" class="flex justifyEnd">
+                    <div class="flex halfGap">
+                        <div><button id="saveNewTimetableButton">Speichern</button></div>
+                        <div><button id="discardNewTimetableButton">Abbrechen</button></div>
+                    </div>
+                </div>
+                <div id="saveDiscardTimetableChangesButtonContainer" class="flex justifyEnd">
+                    <div class="flex halfGap">
+                        <div><button id="saveTimetableChangesButton">Speichern</button></div>
+                        <div><button id="discardTimetableChangesButton">Abbrechen</button></div>
                     </div>
                 </div>
             </div>
+        </div>
     </settings>
     <script src="./js/index.js" type="module"></script>
 </body>

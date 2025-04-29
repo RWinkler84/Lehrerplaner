@@ -57,7 +57,7 @@ export default class SettingsView {
             `;
         });
 
-        if (allSubjects.length == 0){
+        if (allSubjects.length == 0) {
             subjectsHTML = 'Keine Fächer gefunden.'
         }
 
@@ -149,7 +149,7 @@ export default class SettingsView {
                     </div> 
                 </div>`;
 
-        timeslot.querySelector('.deleteLessonButton').addEventListener('click', SettingsView.deleteLesson);
+            timeslot.querySelector('.deleteLessonButton').addEventListener('click', SettingsView.deleteLesson);
         });
 
     }
@@ -267,7 +267,7 @@ export default class SettingsView {
                         <button class="deleteLessonButton" style="width: 1.5rem;">&#215;</button>
                     </div> 
                 </div>`;
-                
+
         timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
         timeslotElement.querySelector('.deleteLessonButton').addEventListener('click', SettingsView.deleteLesson);
     }
@@ -315,8 +315,8 @@ export default class SettingsView {
         document.querySelector('#saveDiscardTimetableChangesButtonContainer').style.display = 'none';
 
         document.querySelector('#validFrom').style.display = 'inline';
-        document.querySelector('#validFromPicker').style.display = 'none';
-        document.querySelector('#validFromPicker').value = '';
+        document.querySelector('#validFromPickerWrapper').style.display = 'none';
+        document.querySelector('#validFromPickerWrapper').value = '';
         document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
         document.querySelector('#timetableForwardButton').style.visibility = 'visible';
         SettingsView.setDateOfTimetableToDisplay();
@@ -345,19 +345,31 @@ export default class SettingsView {
     }
 
     static makeTimetableEditable() {
+
         document.querySelectorAll('.settingsTimeslot').forEach((element) => {
             element.innerHTML = '';
             element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
             element.addEventListener('click', SettingsView.createLessonForm);
         });
 
-        document.querySelector('#validFromPicker').style.display = 'block';
+        document.querySelector('#validFromPickerWrapper').style.display = 'flex';
         document.querySelector('#validFrom').style.display = 'none';
         document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
         document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
 
         document.querySelector('#createChangeTimetableButtonContainer').style.display = 'none';
         document.querySelector('#saveDiscardTimetableButtonContainer').style.display = 'flex';
+
+        if (SettingsView.isAllSubjectsEmpty()) {
+            SettingsView.alertTimetable(true);
+
+            document.querySelectorAll('.settingsTimeslot').forEach((element) => {
+                element.innerHTML = '';
+                element.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
+                element.removeEventListener('click', SettingsView.createLessonForm);
+            });
+            return;
+        }
     }
 
     static makeLessonsEditable() {
@@ -380,17 +392,30 @@ export default class SettingsView {
         document.querySelector('#saveDiscardTimetableChangesButtonContainer').style.display = 'flex';
     }
 
-    static isDateTaken(){
+    static isDateTaken() {
         let pickedDate = document.querySelector('#validFromPicker').value;
         let timetables = Controller.getScheduledLessons();
 
-        for (let entry of timetables){
-            if (entry.validFrom == pickedDate){
+        document.querySelector('#validFromPickerAlertTooltip').style.display = 'none';
+
+        for (let entry of timetables) {
+            if (entry.validFrom == pickedDate) {
                 SettingsView.alertValidFromPicker(true)
                 return true;
             }
         }
-        
+
+        return false;
+    }
+
+    static isAllSubjectsEmpty() {
+        let allSubjects = Controller.getAllSubjects();
+
+        document.querySelector('#noSubjectsAlertTooltip').style.display = 'none';
+
+        if (allSubjects.length == 0) return true;
+
+        return false;
     }
 
     static #getTimeslotOfLesson(lesson) {
@@ -426,7 +451,9 @@ export default class SettingsView {
 
     static alertValidFromPicker(dateTaken = false) {
         let validFromPicker = document.querySelector('#validFromPicker');
-        let validFromPickerAlertDisplay = document.querySelector('#validFromPickerAlertDisplay');
+        let alertTooltip = document.querySelector('#validFromPickerAlertTooltip');
+
+        if (dateTaken) alertTooltip.style.display = 'flex';
 
         validFromPicker.parentElement.classList.add('validationError');
         setTimeout(() => {
@@ -434,8 +461,12 @@ export default class SettingsView {
         }, 300);
     }
 
-    static alertTimetable() {
+    static alertTimetable(noSubjectsFound = false) {
         let timetable = document.querySelector('.settingsWeekOverview.alertRing');
+
+        if (noSubjectsFound == true) {
+            document.querySelector('#noSubjectsAlertTooltip').style.display = 'flex';
+        }
 
         timetable.classList.add('validationError');
         setTimeout(() => {
