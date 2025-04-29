@@ -380,6 +380,19 @@ export default class SettingsView {
         document.querySelector('#saveDiscardTimetableChangesButtonContainer').style.display = 'flex';
     }
 
+    static isDateTaken(){
+        let pickedDate = document.querySelector('#validFromPicker').value;
+        let timetables = Controller.getScheduledLessons();
+
+        for (let entry of timetables){
+            if (entry.validFrom == pickedDate){
+                SettingsView.alertValidFromPicker(true)
+                return true;
+            }
+        }
+        
+    }
+
     static #getTimeslotOfLesson(lesson) {
 
         let allWeekdays = document.querySelectorAll('.settingsWeekday');
@@ -411,8 +424,9 @@ export default class SettingsView {
         }, 300);
     }
 
-    static alertValidFromPicker() {
+    static alertValidFromPicker(dateTaken = false) {
         let validFromPicker = document.querySelector('#validFromPicker');
+        let validFromPickerAlertDisplay = document.querySelector('#validFromPickerAlertDisplay');
 
         validFromPicker.parentElement.classList.add('validationError');
         setTimeout(() => {

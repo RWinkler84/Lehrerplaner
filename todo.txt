@@ -4,12 +4,12 @@
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
-
 - unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement -> kein Showstopper
  
 - Einstellungsmenu: 
     - Gültigkeitsdatums eines Stundenplans bearbeiten
-    - Button, um Menü zu schließen
+    - was passiert eigentlich, wenn sich der Stundenplan mitten in der Woche komplett ändert -> ein Teil alter, ein Teil neuer???
+    - Stundenpläne nach Gültigkeitsdatum sortieren
 
 - perspektivisch: Arbeitszeitracker einbauen
 
@@ -89,4 +89,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - Stundenpläne durchklicken
     - Stundenplan anlegen
     - Stundenplan bearbeiten
+    - Button, um Menü zu schließen
+
 

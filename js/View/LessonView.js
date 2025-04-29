@@ -165,8 +165,8 @@ export default class LessonView {
         let lessonFormHTML = `
             <form id="lessonForm">
                 <div class="lessonForm">
-                    <input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;" required>
-                    ${subjectSelectHTML}
+                    <div class="alertRing"><input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;"></div>
+                    <div class="alertRing">${subjectSelectHTML}</div>
                     <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
                     <button class="discardNewLessonButton">&#x2718;</button>
                 </div>
@@ -248,10 +248,13 @@ export default class LessonView {
             'initialStatus': 'sub'
         }
 
-        Controller.saveNewLesson(lessonData);
+        let valid = Controller.saveNewLesson(lessonData);
+
+        if (valid){
         Controller.reorderTasks(lessonData, false);
 
         LessonView.removeLessonForm(event);
+        }
     }
 
     /* The lesson update function doesn't really update the lesson, but stores a new on end sets the old one canceled.
@@ -355,7 +358,7 @@ export default class LessonView {
             LessonView.renderLesson();
             return;
         }
-        
+
         timeslotElement.addEventListener('click', LessonView.createLessonForm);
         timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
@@ -442,5 +445,25 @@ export default class LessonView {
             'timeslot': lessonElement.closest('.timeslot').dataset.timeslot,
             'status': isSubstitute
         }
+    }
+
+    // input validation
+
+    static alertSubjectSelect() {
+        let alertRing = document.querySelector('#subject').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertClassInput() {
+        let alertRing = document.querySelector('#class').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);a
     }
 }

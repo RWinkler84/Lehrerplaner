@@ -71,6 +71,7 @@ async function startApp() {
     document.querySelector('#timetableBackwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
     document.querySelector('#timetableForwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
     
+    document.querySelector('#validFromPicker').addEventListener('change', SettingsView.isDateTaken);
     document.querySelector('#createNewTimetableButton').addEventListener('click', SettingsView.makeTimetableEditable);
     document.querySelector('#saveNewTimetableButton').addEventListener('click', SettingsView.saveNewTimetable);
     document.querySelector('#discardNewTimetableButton').addEventListener('click', SettingsView.discardNewTimetable);

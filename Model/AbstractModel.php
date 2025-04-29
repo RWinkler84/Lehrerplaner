@@ -48,6 +48,7 @@ class AbstractModel
         } catch (Exception $e) {
             error_log('Fehler beim Speichern der Daten: ' . $e);
             http_response_code(500);
+            return ['message' => $e];
         }
 
         return ['message' => 'Data saved sucessfully'];

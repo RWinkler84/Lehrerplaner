@@ -16,19 +16,29 @@ export default class LessonController {
         return this.#lessonDataToLessonObject(lessonData);
     }
 
-    static getLessonById(id){
+    static getLessonById(id) {
         return Lesson.getLessonById(id);
     }
 
     static saveNewLesson(lessonData) {
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        
+
+        if (lessonData.class == '') {
+            View.alertClassInput();
+            return false;
+        }
+
+        if (lessonData.subject == '') {
+            View.alertSubjectSelect();
+            return false;
+        }
+
         lesson.save();
         View.renderNewLesson(lesson);
     }
 
-    static updateLesson(lessonData){
+    static updateLesson(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 
         lesson.update();
@@ -39,27 +49,27 @@ export default class LessonController {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 
         lesson.cancel();
-        
+
         return lesson.id;
     }
 
     static setLessonNotCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 
-        lesson.uncancel();       
+        lesson.uncancel();
     }
 
     static createNewTask(event) {
         TaskController.createNewTask(event);
     }
 
-    static reorderTasks(lessonData, lessonCanceled = false){
+    static reorderTasks(lessonData, lessonCanceled = false) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        
+
         TaskController.reorderTasks(lesson, lessonCanceled);
     }
 
-    static #lessonDataToLessonObject (lessonData) {
+    static #lessonDataToLessonObject(lessonData) {
         let lesson = new Lesson(lessonData.class, lessonData.subject);
         lesson.id = lessonData.id;
         lesson.weekday = lessonData.weekday;

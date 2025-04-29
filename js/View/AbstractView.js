@@ -12,7 +12,7 @@ export default class AbstractView {
             optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
         });
 
-        return `<select class="lessonSelect" id="subject" required>${optionsHTML}</select>`;
+        return `<select class="lessonSelect" id="subject">${optionsHTML}</select>`;
     }
 
     static showAddLessonButton(event) {
