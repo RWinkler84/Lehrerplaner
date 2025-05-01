@@ -34,8 +34,8 @@ export default class TaskView extends AbstractView {
             taskTrHTML += `
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
-                        <td data-subject="${task.subject}">
-                            <div>${task.subject}</div>
+                        <td class="taskSubjectContainer" data-subject="${task.subject}">
+                            <div class="taskSubject">${task.subject}</div>
                             <div class="smallDate">${subjectDate}</div>
                         </td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
@@ -102,7 +102,7 @@ export default class TaskView extends AbstractView {
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                         <td ${borderLeft} data-class="${task.class}">${task.class}</td>
                         <td data-subject="${task.subject}">
-                            <div>${task.subject}</div>
+                            <div class="taskSubject">${task.subject}</div>
                             <div class="smallDate">${subjectDate}</div>
                         </td>
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
@@ -147,7 +147,7 @@ export default class TaskView extends AbstractView {
         let trContent = `
             <tr data-taskid="${id}" data-date="${date}" data-timeslot="${timeslot}" data-new>
                 <td data-class="${className}">${className}</td>
-                <td data-subject="${subject}">${subject}</td>
+                <td data-subject="${subject}"><div  class="taskSubject">${subject}</div></td>
                 <td class="taskDescription" data-taskDescription contenteditable></td>
                 <td class="taskDone">
                     <button class="saveNewTaskButton">&#x2714;</button>

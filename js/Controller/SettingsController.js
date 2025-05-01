@@ -10,18 +10,20 @@ export default class SettingsController {
 
         if (subject.subject == '') {
             View.alertSubjectNameInput();
-            return;
+            return false;
         }
 
         if (subject.colorCssClass == undefined) {
             View.alertColorSelection();
-            return;
+            return false;
         }
 
         model.saveSubject(subject);
 
         View.renderExistingSubjects();
         View.renderSelectableLessonColors();
+
+        return true;
     }
 
     static deleteSubject(id) {

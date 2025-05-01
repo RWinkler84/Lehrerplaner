@@ -128,12 +128,12 @@ select {
 .settingsWeekOverview {
     width: 100%;
     display: grid;
-    grid-template-columns: 0.3fr 1fr 1fr 1fr 1fr 1fr 0.6fr 0.6fr;
+    grid-template-columns: 0.3fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 0.6fr 0.6fr;
     min-width: 900px;
 }
 
 .settingsWeekOverview {
-    grid-template-columns: 0.3fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 0.3fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
 }
 
 #timeslots,
@@ -150,9 +150,12 @@ select {
 .timeslot,
 .settingsTimeslot,
 .timeslotLabel {
+    min-width: 0;
     display: flex;
     border-top: solid 1px var(--lightgrey);
     height: 42px;
+    padding: 0.2rem;
+
 }
 
 .weekdayLabel {
@@ -170,7 +173,8 @@ select {
 .settingsWeekday {
     display: grid;
     border-left: solid 1px var(--lightgrey);
-    grid-template-rows: 3rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 3rem minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    min-width: 0;
 }
 
 .weekday.passed {
@@ -179,10 +183,10 @@ select {
 
 .lesson,
 .settingsLesson {
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    margin: 0.2rem;
     padding: 0.5rem 0.5rem;
     border-radius: var(--standardRadius);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
@@ -194,6 +198,12 @@ select {
 .lesson:hover {
     transform: translate(-1px, -1px);
 }
+
+.lessonClassSubjectField {
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
 
 .lessonOptionsWrapper {
     position: absolute;
@@ -299,6 +309,12 @@ select {
 #inProgressTasksTable .taskDescription {
     border-right: none;
     transition: all 0.3s ease-out;
+}
+
+.taskSubject {
+    max-width: 4rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .taskDescription {

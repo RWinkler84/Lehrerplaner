@@ -38,11 +38,21 @@ class LessonController extends AbstractController
         echo json_encode($result);
     }
 
-    public function cancel()
+//this function adds regular lessons to the timetablechanges, whilst subistute lessons that are canceled only get updated via cancel()
+    public function addcanceled()
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->save($lessonData);
+
+        echo json_encode($result);
+    }
+
+    public function cancel()
+    {
+        $lessonData = json_decode(file_get_contents('php://input'), true);
+
+        $result = $this->model->cancel($lessonData);
 
         echo json_encode($result);
     }

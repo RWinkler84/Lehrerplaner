@@ -14,9 +14,12 @@ export default class Lesson extends AbstractModel {
     #weekday = undefined;
     #date = undefined;
     #timeslot = undefined;
-    #status = 'normal'; //can also be canceled or sub for substitute lessons
-    #initialStatus = undefined;
+    // #status = 'normal'; //can also be canceled or sub for substitute lessons
+    // #initialStatus = undefined;
+    #type = undefined;
+    #canceled = false;
     #validFrom = undefined; //date a regular lesson was added to to the schuduled timetable
+    #validUntil = undefined;
 
     #controller = 'lesson';
 
@@ -48,7 +51,9 @@ export default class Lesson extends AbstractModel {
             lesson.weekday = entry.weekdayNumber;
             lesson.timeslot = entry.timeslot;
             lesson.validFrom = entry.validFrom;
-            lesson.initialStatus = 'normal'
+            lesson.type = 'normal';
+            lesson.validFrom = entry.validFrom;
+            lesson.validUntil = entry.validUntil;
 
             regularLessons.push(lesson);
         });
@@ -63,8 +68,8 @@ export default class Lesson extends AbstractModel {
             let lesson = new Lesson(entry.class, entry.subject);
             lesson.date = new Date(entry.date);
             lesson.id = entry.id;
-            lesson.status = entry.status;
-            lesson.initialStatus = entry.initialStatus;
+            lesson.canceled = entry.canceled;
+            lesson.type = entry.type;
             lesson.timeslot = entry.timeslot;
 
 
@@ -85,9 +90,8 @@ export default class Lesson extends AbstractModel {
             lesson.id = entry.id;
             lesson.date = entry.date;
             lesson.timeslot = entry.timeslot;
-            lesson.status = entry.status;
-            lesson.initialStatus = entry.initialStatus;
-
+            lesson.canceled = entry.canceled;
+            lesson.type = entry.type;
         })
 
         return lesson;
@@ -101,8 +105,8 @@ export default class Lesson extends AbstractModel {
             'timeslot': this.timeslot,
             'class': this.class,
             'subject': this.subject,
-            'status': this.status,
-            'initialStatus': this.initialStatus
+            'canceled': this.canceled,
+            'type': this.type
         };
 
         this.id = Fn.generateId(timetableChanges);
@@ -120,8 +124,8 @@ export default class Lesson extends AbstractModel {
             'timeslot': this.timeslot,
             'class': this.class,
             'subject': this.subject,
-            'status': this.status,
-            'initialStatus': this.initialStatus
+            'canceled': this.canceled,
+            'type': this.type
         };
 
         this.id = Fn.generateId(timetableChanges);
@@ -135,33 +139,42 @@ export default class Lesson extends AbstractModel {
     cancel() {
 
         let lessonData = {
+            'id': this.id,
             'date': this.formatDate(this.date),
             'timeslot': this.timeslot,
             'class': this.class,
             'subject': this.subject,
-            'status': this.status,
-            'initialStatus': this.initialStatus
+            'canceled': this.canceled,
+            'type': this.type
         };
 
+        if (this.id != undefined) { //lessons with an id are already on the timetablechanges table and must be updated
+
+            timetableChanges.forEach(entry => {
+                if (entry.id == this.id) entry.canceled = true;
+            })
+
+            this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
+
+            return;
+        }
 
         this.id = Fn.generateId(timetableChanges);
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
-        this.makeAjaxQuery('lesson', 'cancel', lessonData);
-
-        console.log(timetableChanges);
+        this.makeAjaxQuery('lesson', 'addCanceled', lessonData);
     }
 
     uncancel() {
 
-        for (let i = 0; i < timetableChanges.length; i++) {
-            if (timetableChanges[i].id == this.id) {
-                timetableChanges.splice(i, 1);
+        timetableChanges.forEach(entry => {
+            if (entry.id == this.id) {
+                entry.canceled = 'false';
             }
-        }
+        })
 
-        this.makeAjaxQuery('lesson', 'uncancel', {'id' : this.id})
+        this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
     }
 
 
@@ -190,12 +203,12 @@ export default class Lesson extends AbstractModel {
         return this.#timeslot;
     }
 
-    get status() {
-        return this.#status;
+    get canceled() {
+        return this.#canceled;
     }
 
-    get initialStatus() {
-        return this.#initialStatus;
+    get type() {
+        return this.#type;
     }
 
     get cssColorClass() {
@@ -204,6 +217,10 @@ export default class Lesson extends AbstractModel {
 
     get validFrom() {
         return this.#validFrom;
+    }
+
+    get validUntil() {
+        return this.#validUntil;
     }
 
     // generic setters
@@ -231,15 +248,19 @@ export default class Lesson extends AbstractModel {
         this.#timeslot = timeslot;
     }
 
-    set initialStatus(initialStatus) {
-        this.#initialStatus = initialStatus;
+    set type(type) {
+        this.#type = type;
     }
 
-    set status(status) {
-        this.#status = status;
+    set canceled(bool) {
+        this.#canceled = bool;
     }
 
-    set validFrom(added) {
-        this.#validFrom = added;
+    set validFrom(date) {
+        this.#validFrom = date;
+    }
+
+    set validUntil(date) {
+        this.#validUntil = date;
     }
 }

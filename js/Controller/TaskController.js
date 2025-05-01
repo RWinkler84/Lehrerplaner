@@ -70,8 +70,8 @@ export default class TaskController {
         View.renderInProgressTasks();
     }
 
-    static reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled) {
+    static reorderTasks(lesson, lessonCanceled) {
 
-        Task.reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled);
+        Task.reorderTasks(lesson, lessonCanceled);
     }
 }

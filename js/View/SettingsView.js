@@ -84,9 +84,9 @@ export default class SettingsView {
             'colorCssClass': colorCssClass
         };
 
-        Controller.saveSubject(subject);
-
-        document.querySelector('#subjectName').value = '';
+        if (Controller.saveSubject(subject)) {
+            document.querySelector('#subjectName').value = '';
+        }
 
     }
 
@@ -144,7 +144,7 @@ export default class SettingsView {
                 <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;"></div>
-                        <div>${lesson.class} ${lesson.subject}</div>
+                        <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <button class="deleteLessonButton" style="width: 1.5rem; visibility: hidden;">&#215;</button>
                     </div> 
                 </div>`;
@@ -263,7 +263,7 @@ export default class SettingsView {
                 <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;"></div>
-                        <div>${lesson.class} ${lesson.subject}</div>
+                        <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <button class="deleteLessonButton" style="width: 1.5rem;">&#215;</button>
                     </div> 
                 </div>`;

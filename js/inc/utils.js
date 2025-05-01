@@ -112,11 +112,15 @@ export default class Utils {
     }
 
     static sortByDate(a, b) {
+
+        let firstDate = a.date;
+        let secondDate = b.date;
         if (!a.date) {
-            a.date = a;
-            b.date = b;
+
+            firstDate = a;
+            secondDate = b;
         }
 
-        return new Date(a.date).setHours(12, 0, 0, 0) - new Date(b.date).setHours(12, 0, 0, 0);
+        return new Date(firstDate).setHours(12, 0, 0, 0) - new Date(secondDate).setHours(12, 0, 0, 0);
     }
 }

@@ -24,7 +24,7 @@ export default class LessonController {
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
 
-        if (lessonData.class == '') {
+        if (lessonData.class == '' && lessonData.subject != 'Termin') {
             View.alertClassInput();
             return false;
         }
@@ -75,8 +75,8 @@ export default class LessonController {
         lesson.weekday = lessonData.weekday;
         lesson.date = lessonData.date;
         lesson.timeslot = lessonData.timeslot;
-        lesson.status = lessonData.status = undefined ? 'normal' : lessonData.status;
-        lesson.initialStatus = lessonData.initialStatus = undefined ? 'normal' : lessonData.initialStatus;
+        lesson.canceled = lessonData.canceled = undefined ? 'false' : lessonData.canceled;
+        lesson.type = lessonData.type = undefined ? 'normal' : lessonData.type;
 
         return lesson;
     }

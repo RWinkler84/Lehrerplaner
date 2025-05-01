@@ -1,18 +1,25 @@
-- wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
+- Task-Sortierung ist kaputt:
+    -> an neue Datenstruktur anpassen
+    -> Kompatibilität zu mehreren gültigen und ungültigen Stundenplänen herstellen
+    -> mit jedem neu angelegten oder bearbeiteten Stundenplan müssen Tasks neu sortiert werden
+
 - 'Termin' als Standard im Subject-Select, auch ohne Klasse speicherbar und immer mit festem Termin
+    -> erledigt, braucht aber noch Styling
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
 - unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement -> kein Showstopper
+
+- Bug: wenn eine Lesson gecancelt und uncanceled wird, bleibt eine falsche Id zurück, die verhindert, dass die Lesson noch mal gecancelt werden kann
  
 - Einstellungsmenu: 
+    - wird einer neuer Stundenplan angelegt, muss beim vorhergehenden validUntil gesetzt werden
     - Gültigkeitsdatums eines Stundenplans bearbeiten
-    - was passiert eigentlich, wenn sich der Stundenplan mitten in der Woche komplett ändert -> ein Teil alter, ein Teil neuer???
     - Stundenpläne nach Gültigkeitsdatum sortieren
     - hover iOS fähig machen :-(
 
-- perspektivisch: Arbeitszeitracker einbauen
-
+- wenn ein neuer Stundenplan mitten in der Woche gültig wird, wird das aktuell beim Rendern nicht berücksichtigt
+    - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
 
 erledigt: 
 
@@ -96,3 +103,10 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 
 - CSS: Textfarbe für mintfarbene Stunden angepasst, dunkleres Mint eingeführt
 - eigene Validierungslogik bauen
+
+- wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
+    - im Timetable
+    - in den Tasks
+
+- lesson-Datenstruktur überarbeitet: statt status und initialStatus gibt es jetzt lesson.type und lesson.setLessonCanceled
+    -

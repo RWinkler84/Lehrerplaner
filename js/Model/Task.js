@@ -61,7 +61,7 @@ export default class Task extends AbstractModel {
             'fixedTime': this.fixedTime
         }
 
-        this.makeAjaxQuery('task', 'update', taskData);
+        // this.makeAjaxQuery('task', 'update', taskData);
     }
 
     save() {
@@ -182,8 +182,8 @@ export default class Task extends AbstractModel {
                     if (task.date.setHours(12, 0, 0, 0) == allLessonDates[i].date.setHours(12, 0, 0, 0)) {
 
                         let count = 1;
-
-                        while (allLessonDates[i - count].status == 'canceled') {
+                        
+                        while (allLessonDates[i - count].canceled == 'true') {
                             count++
                         }
 
@@ -205,7 +205,7 @@ export default class Task extends AbstractModel {
                     let taskCopy = new Task(task.id);
                     let count = 1;
 
-                    while (allLessonDates[i + count].status == 'canceled') {
+                    while (allLessonDates[i + count].canceled == 'true') {
                         count++
                     }
 

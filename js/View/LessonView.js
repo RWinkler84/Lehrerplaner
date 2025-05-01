@@ -52,7 +52,7 @@ export default class LessonView {
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
-                        <div>${lesson.class} ${lesson.subject}</div>
+                        <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
                                 <button class="lessonOptionsButton">&#x2630;</button>
@@ -80,7 +80,7 @@ export default class LessonView {
                     <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
             `;
 
-            if (lesson.status == 'canceled') {
+            if (lesson.canceled == 'true') {
                 canceled = 'canceled';
                 optionsColorClass = ''
                 lessonOptionsHTML = `
@@ -99,7 +99,7 @@ export default class LessonView {
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
-                        <div>${lesson.class} ${lesson.subject}</div>
+                        <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
                                 <button class="lessonOptionsButton">&#x2630;</button>
@@ -125,14 +125,13 @@ export default class LessonView {
     }
 
     static renderNewLesson(lesson) {
-        console.log(lesson);
         let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
         timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
-                        <div>${lesson.class} ${lesson.subject}</div>
+                        <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
                                 <button class="lessonOptionsButton">&#x2630;</button>
@@ -244,8 +243,8 @@ export default class LessonView {
             'timeslot': timeslotElement.dataset.timeslot,
             'class': timeslotElement.querySelector('#class').value.toLowerCase(),
             'subject': timeslotElement.querySelector('#subject').value,
-            'status': 'sub',
-            'initialStatus': 'sub'
+            'type': 'sub',
+            'canceled': 'false'
         }
 
         let valid = Controller.saveNewLesson(lessonData);
@@ -269,8 +268,8 @@ export default class LessonView {
             'timeslot': lessonElement.dataset.timeslot,
             'class': lessonElement.dataset.class,
             'subject': lessonElement.dataset.subject,
-            'status': 'canceled',
-            'initialStatus': 'normal'
+            'type': 'sub',
+            'canceled': 'false'
         }
 
         LessonView.createUpdateLessonForm(event, oldLessonData);
@@ -286,8 +285,8 @@ export default class LessonView {
             'timeslot': timeslotElement.dataset.timeslot,
             'class': timeslotElement.querySelector('#class').value.toLowerCase(),
             'subject': timeslotElement.querySelector('#subject').value,
-            'status': 'sub',
-            'initialStatus': 'sub'
+            'type': 'sub',
+            'canceled': 'false'
         }
 
         Controller.setLessonCanceled(oldLessonData);
@@ -303,11 +302,10 @@ export default class LessonView {
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
         let lessonData = lessonElement.dataset.id == undefined ? LessonView.#getLessonDataFromElement(event) : Controller.getLessonById(lessonElement.dataset.id);
-        console.log(lessonData);
-        lessonData.initialStatus = lessonData.status
-        lessonData.status = 'canceled';
+        lessonData.canceled = 'true';
 
         let lessonId = Controller.setLessonCanceled(lessonData);
+
         Controller.reorderTasks(lessonData, true);
 
         lessonElement.classList.add('canceled');
@@ -327,7 +325,9 @@ export default class LessonView {
         let lessonData = LessonView.#getLessonDataFromElement(event);
 
         Controller.setLessonNotCanceled(lessonData);
+        Controller.reorderTasks(lessonData, false);
 
+        lessonElement.dataset.id = lessonData.id;
         lessonElement.classList.remove('canceled');
         optionsWrapper.classList.remove('canceled');
         optionsWrapper.classList.add('light');
@@ -432,7 +432,7 @@ export default class LessonView {
 
         if (lessonElement.dataset.id) {
             let lessonData = Controller.getLessonById(lessonElement.dataset.id);
-            isSubstitute = lessonData.initialStatus;
+            isSubstitute = lessonData.type;
 
             return lessonData;
         }
@@ -443,7 +443,7 @@ export default class LessonView {
             'date': lessonElement.closest('.weekday').dataset.date,
             'weekday': lessonElement.closest('.weekday').dataset.weekday_number,
             'timeslot': lessonElement.closest('.timeslot').dataset.timeslot,
-            'status': isSubstitute
+            'type': isSubstitute
         }
     }
 
@@ -464,6 +464,6 @@ export default class LessonView {
         alertRing.classList.add('validationError');
         setTimeout(() => {
             alertRing.classList.remove('validationError');
-        }, 300);a
+        }, 300);
     }
 }
