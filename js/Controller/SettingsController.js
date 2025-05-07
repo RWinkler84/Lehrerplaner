@@ -2,6 +2,7 @@ import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import AbstractController from "./AbstractController.js";
 import LessonController from "./LessonController.js";
+import TaskController from "./TaskController.js";
 
 export default class SettingsController {
 
@@ -55,6 +56,9 @@ export default class SettingsController {
 
         model.saveNewTimetable(lessons);
 
+        //triggers reordering of tasks for each lesson
+        TaskController.reorderTasksAfterAddingTimetable(lessons);
+
         View.discardNewTimetable();
     }
 
@@ -82,4 +86,10 @@ export default class SettingsController {
     static getAllSubjects(){
         return AbstractController.getAllSubjects();
     }
+
+    // static getLessonsCountPerWeekPerSubjectAndClass(){
+    //     let model = new Settings;
+
+    //     return model.getLessonsCountPerWeekPerSubjectAndClass();
+    // }
 }

@@ -217,6 +217,32 @@ export default class Task extends AbstractModel {
 
         Controller.renderTaskChanges();
     }
+    
+    //adding a new timetable reorders tasks to their earliest possible lesson, while maintaining the number of lessons between them
+    static reorderTasksAfterAddingTimetable(lessons) {
+        let timetableValidDates = AbstractModel.getCurrentlyAndFutureValidTimetableDates();
+
+        console.log(timetableValidDates);
+
+        lessons.forEach(lesson => {
+            lesson.date = lesson.validFrom;
+            let allAffectedTasks = this.#getAllAffectedTasks(lesson);
+            
+            if (allAffectedTasks.length == 0) return;
+
+            let lastTaskDate = allAffectedTasks[allAffectedTasks.length - 1].date;
+            let oldTimetableDate = timetableValidDates[timetableValidDates.indexOf(lesson.validFrom) - 1];
+            let allNewDates = AbstractModel.calculateAllLessonDates(lastTaskDate, lesson.class, lesson.subject);
+            let allOldDates = AbstractModel.calculatePotentialLessonDates(oldTimetableDate, lastTaskDate, lesson.class, lesson.subject);
+
+            console.log(allNewDates);
+            console.log(allOldDates);
+            console.log(allAffectedTasks);
+            
+            
+            // allAffectedTasks filtern und nur die übrig lassen, die im Gültigkeitsbereich des neuen Stundenplans liegen
+        });
+    }
 
     static #getAllAffectedTasks(lesson) {
         let affectedTasks = [];

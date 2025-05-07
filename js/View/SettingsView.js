@@ -103,7 +103,6 @@ export default class SettingsView {
 
         date = allValidDates.length > 0 ? new Date(allValidDates[allValidDates.length - 1]) : undefined;
 
-
         validFromElement.innerText = date != undefined ? Fn.formatDateWithFullYear(date) : 'keine Daten';
         validFromElement.dataset.date = date;
 
@@ -302,6 +301,7 @@ export default class SettingsView {
         });
 
         Controller.saveNewTimetable(validFrom, lessons);
+        SettingsView.setDateOfTimetableToDisplay();
     }
 
     static discardNewTimetable() {
