@@ -51,7 +51,7 @@ export default class Utils {
     static formatDateSqlCompatible(date) {
         let dateObject = new Date(date);
 
-        let timeString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2,'0') + '-' + dateObject.getDate().toString().padStart(2, '0');
+        let timeString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
 
         return timeString;
     }
@@ -112,11 +112,37 @@ export default class Utils {
     }
 
     static sortByDate(a, b) {
+
+        let firstDate = a.date;
+        let secondDate = b.date;
         if (!a.date) {
-            a.date = a;
-            b.date = b;
+
+            firstDate = a;
+            secondDate = b;
         }
 
-        return new Date(a.date).setHours(12, 0, 0, 0) - new Date(b.date).setHours(12, 0, 0, 0);
+        return new Date(firstDate).setHours(12, 0, 0, 0) - new Date(secondDate).setHours(12, 0, 0, 0);
+    }
+
+    static sortByDateAndTimeslot(data) {
+        let grouped = {};
+        let groupedKeys;
+        let sorted = [];
+
+        data.forEach(entry => {
+            grouped[entry.date] ? grouped[entry.date].push(entry) : grouped[entry.date] = [entry];
+        });
+
+        groupedKeys = Object.keys(grouped);
+        groupedKeys.sort(this.sortByDate);
+        
+        groupedKeys.forEach(key => {
+            if (grouped[key].length > 1) grouped[key].sort((a, b) => {
+                return a.timeslot - b.timeslot;
+            });
+            grouped[key].forEach(entry => sorted.push(entry));
+        });
+
+        return sorted;
     }
 }

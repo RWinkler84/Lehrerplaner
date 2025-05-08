@@ -2,6 +2,7 @@ import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import AbstractController from "./AbstractController.js";
 import LessonController from "./LessonController.js";
+import TaskController from "./TaskController.js";
 
 export default class SettingsController {
 
@@ -10,18 +11,20 @@ export default class SettingsController {
 
         if (subject.subject == '') {
             View.alertSubjectNameInput();
-            return;
+            return false;
         }
 
         if (subject.colorCssClass == undefined) {
             View.alertColorSelection();
-            return;
+            return false;
         }
 
         model.saveSubject(subject);
 
         View.renderExistingSubjects();
         View.renderSelectableLessonColors();
+
+        return true;
     }
 
     static deleteSubject(id) {
@@ -46,12 +49,15 @@ export default class SettingsController {
             return;
         }
 
-        if (View.isDateTaken()){
+        if (View.isDateTaken()) {
             View.alertValidFromPicker();
             return;
         }
 
         model.saveNewTimetable(lessons);
+
+        //triggers reordering of tasks for each lesson
+        TaskController.reorderTasksAfterAddingTimetable(lessons);
 
         View.discardNewTimetable();
     }
@@ -65,6 +71,9 @@ export default class SettingsController {
         }
 
         model.saveTimetableChanges(validFrom, lessons);
+        
+        TaskController.reorderTasksAfterAddingTimetable(lessons);
+        // TaskController.reorderTasksAfterEditingTimetable(lessons);
 
         View.discardNewTimetable();
     }
@@ -77,7 +86,13 @@ export default class SettingsController {
         return LessonController.getLessonObject(lessonData);
     }
 
-    static getAllSubjects(){
+    static getAllSubjects() {
         return AbstractController.getAllSubjects();
     }
+
+    // static getLessonsCountPerWeekPerSubjectAndClass(){
+    //     let model = new Settings;
+
+    //     return model.getLessonsCountPerWeekPerSubjectAndClass();
+    // }
 }

@@ -17,7 +17,6 @@ export let timetableChanges = [];
 
 export let taskBackupArray = [];
 
-
 async function loadData() {
     let subjects = await abstCtrl.getSubjectsFromDatabase();
     let timetable = await abstCtrl.getTimetableFromDatabase();
@@ -39,6 +38,10 @@ async function loadData() {
     tasks.forEach(entry => {
         allTasksArray.push(entry);
     })
+
+    standardTimetable.sort((a, b) => {
+        return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
+    });
 
 }
 
@@ -67,10 +70,10 @@ async function startApp() {
     document.querySelector('#openSettingsButton').addEventListener('click', AbstractView.openSettings);
     document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
     document.querySelector('#createSubjectButton').addEventListener('click', SettingsView.saveSubject);
-    
+
     document.querySelector('#timetableBackwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
     document.querySelector('#timetableForwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
-    
+
     document.querySelector('#validFromPicker').addEventListener('change', SettingsView.isDateTaken);
     document.querySelector('#createNewTimetableButton').addEventListener('click', SettingsView.makeTimetableEditable);
     document.querySelector('#saveNewTimetableButton').addEventListener('click', SettingsView.saveNewTimetable);

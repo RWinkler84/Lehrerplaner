@@ -1,5 +1,6 @@
 import Task from '../Model/Task.js';
 import View from '../View/TaskView.js';
+import SettingsController from './SettingsController.js';
 
 export default class TaskController {
 
@@ -29,7 +30,7 @@ export default class TaskController {
 
     static saveNewTask(taskData) {
         let task = new Task();
-        
+
         task.id = taskData.id;
         task.class = taskData.class
         task.subject = taskData.subject
@@ -38,7 +39,7 @@ export default class TaskController {
         task.description = taskData.description
         task.status = 'open'
         task.fixedTime = taskData.fixedTime
-        
+
         task.save();
     }
 
@@ -63,15 +64,24 @@ export default class TaskController {
         let task = Task.getTaskById(id);
 
         task.setDone();
-    } 
+    }
 
-    static renderTaskChanges(){
+    static renderTaskChanges() {
         View.renderUpcomingTasks();
         View.renderInProgressTasks();
     }
 
-    static reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled) {
+    static reorderTasks(lesson, lessonCanceled) {
 
-        Task.reorderTasks(lesson, timetableChanges, scheduledLessons, lessonCanceled);
+        Task.reorderTasks(lesson, lessonCanceled);
     }
+
+    static reorderTasksAfterAddingTimetable(lessons) {
+
+        Task.reorderTasksAfterAddingTimetable(lessons);
+    }
+
+    // static reorderTasksAfterEditingTimetable(lessons) {
+    //     Task.reorderTasksAfterEditingTimetable(lessons);
+    // }
 }

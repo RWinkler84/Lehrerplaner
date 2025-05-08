@@ -66,6 +66,18 @@ class Settings extends AbstractModel
         }
     }
 
+    public function updateValidUntil($dates) {
+        $tableName = TABLEPREFIX . 'timetable';
+        $validUntilDate = $dates['validUntil'];
+        $validFromDate = $dates['dateOfAffectedLessons'];
+
+        $query = "UPDATE $tableName SET validUntil = '$validUntilDate' WHERE validFrom = '$validFromDate'";
+
+        error_log($query);
+
+        return $this->write($query, []);
+    }
+    
     private function executeQuery($query, $params)
     {
         return $this->delete($query, $params);

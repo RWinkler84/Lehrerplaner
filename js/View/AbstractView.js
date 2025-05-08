@@ -12,6 +12,8 @@ export default class AbstractView {
             optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
         });
 
+        optionsHTML += '<option value="Termin">Termin</option>';
+
         return `<select class="lessonSelect" id="subject">${optionsHTML}</select>`;
     }
 

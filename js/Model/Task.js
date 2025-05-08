@@ -39,12 +39,13 @@ export default class Task extends AbstractModel {
 
     //class methods
 
-        update() {
+    update() {
         allTasksArray.forEach(element => {
             if (element.id == this.id) {
                 element.date = this.date;
                 element.class = this.class;
                 element.subject = this.subject;
+                element.timeslot = this.timeslot;
                 element.description = this.description;
                 element.fixedTime = this.fixedTime;
             }
@@ -61,11 +62,10 @@ export default class Task extends AbstractModel {
             'fixedTime': this.fixedTime
         }
 
-        this.makeAjaxQuery('task', 'update', taskData);
+        // this.makeAjaxQuery('task', 'update', taskData);
     }
 
     save() {
-        console.log(this);
         let taskData = {
             'id': this.id,
             'class': this.class,
@@ -87,17 +87,17 @@ export default class Task extends AbstractModel {
             entry.status = 'inProgress';
         });
 
-        this.makeAjaxQuery('task', 'setInProgress', {'id' : this.id});
+        this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
     }
 
-    setDone(){
+    setDone() {
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
 
             entry.status = 'done';
         })
 
-        this.makeAjaxQuery('task', 'setDone', {'id': this.id});
+        this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
     }
 
     // Getter
@@ -183,11 +183,12 @@ export default class Task extends AbstractModel {
 
                         let count = 1;
 
-                        while (allLessonDates[i - count].status == 'canceled') {
+                        while (allLessonDates[i - count].canceled == 'true') {
                             count++
                         }
 
                         task.date = allLessonDates[i - count].date;
+                        task.timeslot = allLessonDates[i - count].timeslot;
                         task.update()
                     }
                 }
@@ -205,7 +206,7 @@ export default class Task extends AbstractModel {
                     let taskCopy = new Task(task.id);
                     let count = 1;
 
-                    while (allLessonDates[i + count].status == 'canceled') {
+                    while (allLessonDates[i + count].canceled == 'true') {
                         count++
                     }
 
@@ -216,6 +217,72 @@ export default class Task extends AbstractModel {
         })
 
         Controller.renderTaskChanges();
+    }
+
+    //adding a new timetable reorders tasks by changing their date while maintaining the number of lessons between them
+    static reorderTasksAfterAddingTimetable(lessons) {
+        let timetableValidDates = AbstractModel.getCurrentlyAndFutureValidTimetableDates();
+
+        lessons.forEach(lesson => {
+            lesson.date = lesson.validFrom;
+            let allAffectedTasks = this.#getAllAffectedTasks(lesson);
+
+            if (allAffectedTasks.length == 0) return;
+
+            let lastTaskDate = allAffectedTasks[allAffectedTasks.length - 1].date;
+            let oldTimetableDate = timetableValidDates[timetableValidDates.indexOf(lesson.validFrom) - 1];
+            let allNewDates = AbstractModel.calculateAllLessonDates(lastTaskDate, lesson.class, lesson.subject);
+            let allOldDates = AbstractModel.calculatePotentialLessonDates(oldTimetableDate, lastTaskDate, lesson.class, lesson.subject);
+
+            let lastUnaffectedTask;
+
+            allTasksArray.forEach(task => {
+                if (task.class != lesson.class) return;
+                if (task.subject != lesson.subject) return;
+                if (task.id >= allAffectedTasks[0].id) return;
+
+                lastUnaffectedTask = task;
+            })
+
+            //count the lesson between last unaffected task and the current task according to the old timetable
+            //and switch the task to its new date, preserving the number of lessons in between
+            allAffectedTasks.forEach(task => {
+                let indexOfUnaffectedTaskDateOldDates;
+                let indexOfUnaffectedTaskDateNewDates
+                let indexOfTaskDate;
+                let indexDifference;
+
+                allOldDates.forEach(entry => {
+                    if (new Date(entry.date).setHours(12, 0, 0, 0) == new Date(lastUnaffectedTask.date).setHours(12, 0, 0, 0)) {
+                        indexOfUnaffectedTaskDateOldDates = allOldDates.indexOf(entry);
+                    }
+                    if (new Date(entry.date).setHours(12, 0, 0, 0) == new Date(task.date).setHours(12, 0, 0, 0)) {
+                        indexOfTaskDate = allOldDates.indexOf(entry);
+                    }
+                });
+
+                indexDifference = indexOfTaskDate - indexOfUnaffectedTaskDateOldDates;
+
+                //now get the date with the exact same indexDifference on the new timetable and asign it as the new date to the task
+                allNewDates.forEach(entry => {
+                    if (new Date(entry.date).setHours(12, 0, 0, 0) == new Date(lastUnaffectedTask.date).setHours(12, 0, 0, 0)) {
+                        indexOfUnaffectedTaskDateNewDates = allNewDates.indexOf(entry);
+                    }
+                })
+
+                task.date = allNewDates[indexOfUnaffectedTaskDateNewDates + indexDifference].date;
+                task.timeslot = allNewDates[indexOfUnaffectedTaskDateNewDates + indexDifference].timeslot;
+                task.update();
+                console.log(allNewDates);
+                console.log(allTasksArray);
+            });
+        });
+
+        Controller.renderTaskChanges();
+    }
+
+    static reorderTasksAfterEditingTimetable(lessons) {
+        lessons.forEach()
     }
 
     static #getAllAffectedTasks(lesson) {

@@ -1,18 +1,28 @@
-- wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
+- Checkbox ist bei Sindy immer gecheckt -> Daten aus der Datenbank beim Rendern der Task checken
+
+- Task-Sortierung ist kaputt:
+    -> bei Stundenplan-Updates muss geprüft werden:
+        -> hat der Stundenplan eine veränderte Stundenzahl pro Fach?
+            ja -> intern als neuen Stundenplan handeln, gültig ab Erstellungstag, wenn es der aktuell Plan ist (Achtung validUntil muss gesetzt werden, falls es einen späteren Plan bereits gibt)
+                -> ist es ein zukünftiger Plan, wird der vorhergehende gelöscht und ersetzt 
+            nein -> alle Tasks in der jeweiligen Woche auf den equivalenten Termin setzen (das wird witzig...)
+
+    -> Tasks nach Datum und Timeslot sortieren
+
 - 'Termin' als Standard im Subject-Select, auch ohne Klasse speicherbar und immer mit festem Termin
+    -> erledigt, braucht aber noch Styling
+    -> braucht eigenen type-> normal, sub, appointment
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
-- unklarer Bug: Wenn ich eine Lesson cancele, wiederherstelle und dann ändere, verschwindet das timeslotElement -> kein Showstopper
  
 - Einstellungsmenu: 
+    - was passiert, wenn ein Stundenplan angelegt wird, dessen Gültigkeit vor bereits geplanten Vertretungen liegt?
     - Gültigkeitsdatums eines Stundenplans bearbeiten
-    - was passiert eigentlich, wenn sich der Stundenplan mitten in der Woche komplett ändert -> ein Teil alter, ein Teil neuer???
-    - Stundenpläne nach Gültigkeitsdatum sortieren
     - hover iOS fähig machen :-(
 
-- perspektivisch: Arbeitszeitracker einbauen
-
+- wenn ein neuer Stundenplan mitten in der Woche gültig wird, wird das aktuell beim Rendern nicht berücksichtigt
+    - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
 
 erledigt: 
 
@@ -92,7 +102,21 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - Button, um Menü zu schließen
     - Tooltipps zur Erklärung
     - nölen, wenn versucht wird, einen Stundenplan anzulegen, obwohl keine Fächer angelegt sind
+    - Stundenpläne nach Gültigkeitsdatum sortieren
+    - wird einer neuer Stundenplan angelegt, muss beim vorhergehenden validUntil gesetzt werden
 
 
 - CSS: Textfarbe für mintfarbene Stunden angepasst, dunkleres Mint eingeführt
 - eigene Validierungslogik bauen
+
+- wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
+    - im Timetable
+    - in den Tasks
+
+- lesson-Datenstruktur überarbeitet: statt status und initialStatus gibt es jetzt lesson.type und lesson.setLessonCanceled
+- Bug: wenn eine Lesson gecancelt und uncanceled wird, bleibt eine falsche Id zurück, die verhindert, dass die Lesson noch mal gecancelt werden kann
+
+- Task-Sortierung ist kaputt:
+    -> an neue Datenstruktur anpassen
+    -> Kompatibilität zu mehreren gültigen und ungültigen Stundenplänen herstellen
+    -> mit jedem neu angelegten Stundenplan müssen Tasks neu sortiert werden

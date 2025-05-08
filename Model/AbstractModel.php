@@ -30,8 +30,6 @@ class AbstractModel
     protected function write($query, $params)
     {
         global $db;
-        error_log(print_r($params, true));
-
 
         try {
             $stmt = $db->prepare($query);
