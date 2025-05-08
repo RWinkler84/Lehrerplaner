@@ -92,6 +92,8 @@ export default class AbstractModel {
 
         allLessonDates.sort(Fn.sortByDate);
 
+        console.log(allLessonDates);
+
         AbstractModel.#removeInvalidAndCanceledLessons(allLessonDates);
 
         return allLessonDates;

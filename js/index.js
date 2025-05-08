@@ -17,7 +17,6 @@ export let timetableChanges = [];
 
 export let taskBackupArray = [];
 
-
 async function loadData() {
     let subjects = await abstCtrl.getSubjectsFromDatabase();
     let timetable = await abstCtrl.getTimetableFromDatabase();
@@ -43,6 +42,8 @@ async function loadData() {
     standardTimetable.sort((a, b) => {
         return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
     });
+
+    console.log(allTasksArray);
 }
 
 async function startApp() {

@@ -39,7 +39,7 @@ export default class Task extends AbstractModel {
 
     //class methods
 
-        update() {
+    update() {
         allTasksArray.forEach(element => {
             if (element.id == this.id) {
                 element.date = this.date;
@@ -61,7 +61,7 @@ export default class Task extends AbstractModel {
             'fixedTime': this.fixedTime
         }
 
-        // this.makeAjaxQuery('task', 'update', taskData);
+        this.makeAjaxQuery('task', 'update', taskData);
     }
 
     save() {
@@ -87,17 +87,17 @@ export default class Task extends AbstractModel {
             entry.status = 'inProgress';
         });
 
-        this.makeAjaxQuery('task', 'setInProgress', {'id' : this.id});
+        this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
     }
 
-    setDone(){
+    setDone() {
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
 
             entry.status = 'done';
         })
 
-        this.makeAjaxQuery('task', 'setDone', {'id': this.id});
+        this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
     }
 
     // Getter
@@ -182,7 +182,7 @@ export default class Task extends AbstractModel {
                     if (task.date.setHours(12, 0, 0, 0) == allLessonDates[i].date.setHours(12, 0, 0, 0)) {
 
                         let count = 1;
-                        
+
                         while (allLessonDates[i - count].canceled == 'true') {
                             count++
                         }
@@ -217,7 +217,7 @@ export default class Task extends AbstractModel {
 
         Controller.renderTaskChanges();
     }
-    
+
     //adding a new timetable reorders tasks to their earliest possible lesson, while maintaining the number of lessons between them
     static reorderTasksAfterAddingTimetable(lessons) {
         let timetableValidDates = AbstractModel.getCurrentlyAndFutureValidTimetableDates();
@@ -227,7 +227,7 @@ export default class Task extends AbstractModel {
         lessons.forEach(lesson => {
             lesson.date = lesson.validFrom;
             let allAffectedTasks = this.#getAllAffectedTasks(lesson);
-            
+
             if (allAffectedTasks.length == 0) return;
 
             let lastTaskDate = allAffectedTasks[allAffectedTasks.length - 1].date;
@@ -238,9 +238,23 @@ export default class Task extends AbstractModel {
             console.log(allNewDates);
             console.log(allOldDates);
             console.log(allAffectedTasks);
-            
-            
-            // allAffectedTasks filtern und nur die übrig lassen, die im Gültigkeitsbereich des neuen Stundenplans liegen
+
+            let lastUnaffectedTask;
+
+            allTasksArray.forEach(task => {
+                if (task.class != lesson.class) return;
+                if (task.subject != lesson.subject) return;
+                if (task.id >= allAffectedTasks[0].id) return;
+
+                lastUnaffectedTask = task;
+            })
+
+            console.log(lastUnaffectedTask);
+            //count the lesson between last unaffected task and the current task accourding to the old timetable
+            //and switch the task to its new date, preserving the number of lessons in between
+            allAffectedTasks.forEach(task => {
+
+            })
         });
     }
 

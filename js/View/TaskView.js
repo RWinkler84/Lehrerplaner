@@ -24,7 +24,7 @@ export default class TaskView extends AbstractView {
 
         allUpcomingTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
-            let checked = task.fixedTime ? 'checked' : '';
+            let checked = task.fixedTime == '1' ? 'checked' : '';
             let subjectDate = Fn.formatDate(task.date);
 
             if (new Date(task.date) < new Date()) {

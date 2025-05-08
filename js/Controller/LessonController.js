@@ -36,6 +36,8 @@ export default class LessonController {
 
         lesson.save();
         View.renderNewLesson(lesson);
+        
+        return true;
     }
 
     static updateLesson(lessonData) {

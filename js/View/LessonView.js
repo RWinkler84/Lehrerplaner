@@ -251,8 +251,6 @@ export default class LessonView {
 
         if (valid){
         Controller.reorderTasks(lessonData, false);
-
-        LessonView.removeLessonForm(event);
         }
     }
 
@@ -269,7 +267,7 @@ export default class LessonView {
             'class': lessonElement.dataset.class,
             'subject': lessonElement.dataset.subject,
             'type': 'sub',
-            'canceled': 'false'
+            'canceled': 'true'
         }
 
         LessonView.createUpdateLessonForm(event, oldLessonData);

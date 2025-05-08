@@ -1,3 +1,5 @@
+- Checkbox ist bei Sindy immer gecheckt -> Daten aus der Datenbank beim Rendern der Task checken
+
 - Task-Sortierung ist kaputt:
     -> an neue Datenstruktur anpassen
     -> Kompatibilität zu mehreren gültigen und ungültigen Stundenplänen herstellen
