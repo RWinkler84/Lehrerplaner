@@ -45,6 +45,7 @@ export default class Task extends AbstractModel {
                 element.date = this.date;
                 element.class = this.class;
                 element.subject = this.subject;
+                element.timeslot = this.timeslot;
                 element.description = this.description;
                 element.fixedTime = this.fixedTime;
             }
@@ -61,11 +62,10 @@ export default class Task extends AbstractModel {
             'fixedTime': this.fixedTime
         }
 
-        this.makeAjaxQuery('task', 'update', taskData);
+        // this.makeAjaxQuery('task', 'update', taskData);
     }
 
     save() {
-        console.log(this);
         let taskData = {
             'id': this.id,
             'class': this.class,
@@ -188,6 +188,7 @@ export default class Task extends AbstractModel {
                         }
 
                         task.date = allLessonDates[i - count].date;
+                        task.timeslot = allLessonDates[i - count].timeslot;
                         task.update()
                     }
                 }
@@ -218,11 +219,9 @@ export default class Task extends AbstractModel {
         Controller.renderTaskChanges();
     }
 
-    //adding a new timetable reorders tasks to their earliest possible lesson, while maintaining the number of lessons between them
+    //adding a new timetable reorders tasks by changing their date while maintaining the number of lessons between them
     static reorderTasksAfterAddingTimetable(lessons) {
         let timetableValidDates = AbstractModel.getCurrentlyAndFutureValidTimetableDates();
-
-        console.log(timetableValidDates);
 
         lessons.forEach(lesson => {
             lesson.date = lesson.validFrom;
@@ -235,10 +234,6 @@ export default class Task extends AbstractModel {
             let allNewDates = AbstractModel.calculateAllLessonDates(lastTaskDate, lesson.class, lesson.subject);
             let allOldDates = AbstractModel.calculatePotentialLessonDates(oldTimetableDate, lastTaskDate, lesson.class, lesson.subject);
 
-            console.log(allNewDates);
-            console.log(allOldDates);
-            console.log(allAffectedTasks);
-
             let lastUnaffectedTask;
 
             allTasksArray.forEach(task => {
@@ -249,13 +244,45 @@ export default class Task extends AbstractModel {
                 lastUnaffectedTask = task;
             })
 
-            console.log(lastUnaffectedTask);
-            //count the lesson between last unaffected task and the current task accourding to the old timetable
+            //count the lesson between last unaffected task and the current task according to the old timetable
             //and switch the task to its new date, preserving the number of lessons in between
             allAffectedTasks.forEach(task => {
+                let indexOfUnaffectedTaskDateOldDates;
+                let indexOfUnaffectedTaskDateNewDates
+                let indexOfTaskDate;
+                let indexDifference;
 
-            })
+                allOldDates.forEach(entry => {
+                    if (new Date(entry.date).setHours(12, 0, 0, 0) == new Date(lastUnaffectedTask.date).setHours(12, 0, 0, 0)) {
+                        indexOfUnaffectedTaskDateOldDates = allOldDates.indexOf(entry);
+                    }
+                    if (new Date(entry.date).setHours(12, 0, 0, 0) == new Date(task.date).setHours(12, 0, 0, 0)) {
+                        indexOfTaskDate = allOldDates.indexOf(entry);
+                    }
+                });
+
+                indexDifference = indexOfTaskDate - indexOfUnaffectedTaskDateOldDates;
+
+                //now get the date with the exact same indexDifference on the new timetable and asign it as the new date to the task
+                allNewDates.forEach(entry => {
+                    if (new Date(entry.date).setHours(12, 0, 0, 0) == new Date(lastUnaffectedTask.date).setHours(12, 0, 0, 0)) {
+                        indexOfUnaffectedTaskDateNewDates = allNewDates.indexOf(entry);
+                    }
+                })
+
+                task.date = allNewDates[indexOfUnaffectedTaskDateNewDates + indexDifference].date;
+                task.timeslot = allNewDates[indexOfUnaffectedTaskDateNewDates + indexDifference].timeslot;
+                task.update();
+                console.log(allNewDates);
+                console.log(allTasksArray);
+            });
         });
+
+        Controller.renderTaskChanges();
+    }
+
+    static reorderTasksAfterEditingTimetable(lessons) {
+        lessons.forEach()
     }
 
     static #getAllAffectedTasks(lesson) {

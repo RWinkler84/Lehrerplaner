@@ -22,6 +22,8 @@ export default class TaskView extends AbstractView {
             return;
         }
 
+        allUpcomingTasks = Fn.sortByDateAndTimeslot(allUpcomingTasks);
+
         allUpcomingTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
             let checked = task.fixedTime == '1' ? 'checked' : '';
@@ -41,7 +43,7 @@ export default class TaskView extends AbstractView {
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
                         <td class="taskDone">
                             <button class="setTaskDoneButton">&#x2714;</button>
-                            <button class="setTaskInProgressButton">&#x2692;</button>                        
+                            <button class="setTaskInProgressButton">&#x279C;</button>                        
                         </td>
                     </tr>
                     <tr data-checkboxTr style="display: none;">
@@ -53,7 +55,7 @@ export default class TaskView extends AbstractView {
                     <tr>
                         <td class="taskDone responsive" colspan="3">
                             <button class="setTaskDoneButton">&#x2714;</button>
-                            <button class="setTaskInProgressButton">&#x2692;</button>                        
+                            <button class="setTaskInProgressButton">&#x279C;</button>                        
                         </td>
                     </tr>
                 `;
@@ -88,6 +90,8 @@ export default class TaskView extends AbstractView {
             document.querySelector('#inProgressTasksTable thead').style.display = 'table-row-group  ';
             document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'none';
         }
+
+        allInProgressTasks = Fn.sortByDateAndTimeslot(allInProgressTasks);
 
         allInProgressTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
@@ -317,9 +321,10 @@ export default class TaskView extends AbstractView {
 
         let taskId = taskTr.dataset.taskid;
         let task = Controller.getTaskBackupData(taskId);
+        let taskDate = Fn.formatDate(task.date)
 
         taskTr.querySelector('td[data-class]').innerText = task.class;
-        taskTr.querySelector('td[data-subject]').innerText = task.subject;
+        taskTr.querySelector('td[data-subject]').innerHTML = `<div class="taskSubject">${task.subject}</div><div class="smallDate">${taskDate}</div>`;
         taskTr.querySelector('td[data-taskDescription]').innerText = task.description;
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);
@@ -390,7 +395,7 @@ export default class TaskView extends AbstractView {
 
         let buttonHTML = `
             <button class="setTaskDoneButton">&#x2714;</button>
-            <button class="setTaskInProgressButton">&#x2692;</button>
+            <button class="setTaskInProgressButton">&#x279C;</button>
         `;
 
         if (event.target.closest('table').getAttribute('id') == 'inProgressTasksTable') {

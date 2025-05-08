@@ -81,7 +81,7 @@ export default class TaskController {
         Task.reorderTasksAfterAddingTimetable(lessons);
     }
 
-    // static getLessonsCountPerWeekPerSubjectAndClass() {
-    //     return SettingsController.getLessonsCountPerWeekPerSubjectAndClass();
+    // static reorderTasksAfterEditingTimetable(lessons) {
+    //     Task.reorderTasksAfterEditingTimetable(lessons);
     // }
 }

@@ -49,7 +49,7 @@ export default class SettingsController {
             return;
         }
 
-        if (View.isDateTaken()){
+        if (View.isDateTaken()) {
             View.alertValidFromPicker();
             return;
         }
@@ -71,6 +71,9 @@ export default class SettingsController {
         }
 
         model.saveTimetableChanges(validFrom, lessons);
+        
+        TaskController.reorderTasksAfterAddingTimetable(lessons);
+        // TaskController.reorderTasksAfterEditingTimetable(lessons);
 
         View.discardNewTimetable();
     }
@@ -83,7 +86,7 @@ export default class SettingsController {
         return LessonController.getLessonObject(lessonData);
     }
 
-    static getAllSubjects(){
+    static getAllSubjects() {
         return AbstractController.getAllSubjects();
     }
 

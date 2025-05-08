@@ -43,7 +43,6 @@ async function loadData() {
         return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
     });
 
-    console.log(allTasksArray);
 }
 
 async function startApp() {
