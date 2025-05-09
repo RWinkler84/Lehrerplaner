@@ -53,7 +53,7 @@ export default class Settings extends AbstractModel {
 
         lessons.forEach(entry => standardTimetable.push(entry));
 
-        this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
+        // this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
     }
 
     // sets the valid until date on the old timetable and checks, if the new one is an
@@ -96,20 +96,4 @@ export default class Settings extends AbstractModel {
 
         return lessons;
     }
-
-    // getLessonsCountPerWeekPerSubjectAndClass() {
-    //     let filtered = [];
-
-    //     standardTimetable.forEach(lesson => {
-    //         if (!filtered[lesson.validFrom]) filtered[lesson.validFrom] = {};
-    //         if (!filtered[lesson.validFrom][lesson.class]) filtered[lesson.validFrom][lesson.class] = {};
-    //         if (!filtered[lesson.validFrom][lesson.class][lesson.subject]) {
-    //             filtered[lesson.validFrom][lesson.class][lesson.subject] = 1;
-    //             } else {
-    //             filtered[lesson.validFrom][lesson.class][lesson.subject]++;
-    //             }       
-    //     });
-
-    //     return filtered;
-    // }
 }

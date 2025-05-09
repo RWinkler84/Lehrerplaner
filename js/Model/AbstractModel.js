@@ -1,6 +1,5 @@
-import { allSubjects } from "../index.js";
+import { allSubjects, timetableChanges } from "../index.js";
 import { standardTimetable } from "../index.js";
-import { timetableChanges } from "../index.js";
 import Fn from '../inc/utils.js';
 
 export default class AbstractModel {
@@ -23,20 +22,15 @@ export default class AbstractModel {
         return response.json();
     }
 
-    static calculateAllLessonDates(lastTaskDate, className, subject) {
+    static calculateAllLessonDates(className, subject, endDate, timetable = standardTimetable, lessonChanges = timetableChanges) {
 
         let dateIterator = new Date().setHours(12, 0, 0, 0);
-        let lastDate = Fn.getFirstAndLastDayOfWeek(lastTaskDate);
         let validTimetableDates = AbstractModel.getCurrentlyAndFutureValidTimetableDates();
         let teachingWeekdays = [];
         let allLessonDates = [];
 
-        //last calculated date should at least be a month after the last task date, so that tasks can be pushed back enough, 
-        //if a lesson is canceled or the timetable and lessons per subject count changes        
-        lastDate = lastDate.sunday.setHours(12, 0, 0, 0) + 86400000 * 30;
-
         //check on which weekdays a lesson is held
-        standardTimetable.forEach(entry => {
+        timetable.forEach(entry => {
             if (entry.class != className) return;
             if (entry.subject != subject) return;
             if (!validTimetableDates.includes(entry.validFrom)) return;
@@ -50,7 +44,7 @@ export default class AbstractModel {
         })
 
         //get all regular lesson dates till last date
-        while (new Date(dateIterator).setHours(12, 0, 0, 0) <= lastDate) {
+        while (new Date(dateIterator).setHours(12, 0, 0, 0) <= endDate) {
 
             let weekday = new Date(dateIterator).getDay();
 
@@ -74,7 +68,7 @@ export default class AbstractModel {
         //merging with the timetable changes
         let today = new Date().setHours(12, 0, 0, 0);
 
-        timetableChanges.forEach(entry => {
+        lessonChanges.forEach(entry => {
             if (entry.class != className) return;
             if (entry.subject != subject) return;
             if (new Date(entry.date).setHours(12, 0, 0, 0) < today) return;
@@ -95,6 +89,7 @@ export default class AbstractModel {
         AbstractModel.#removeInvalidAndCanceledLessons(allLessonDates);
 
         return allLessonDates;
+
     }
 
     static calculatePotentialLessonDates(timetableValidDate, lastTaskDate, className, subject) {
@@ -190,23 +185,24 @@ export default class AbstractModel {
     }
 
     static #removeInvalidAndCanceledLessons(allLessonDates) {
+        let entriesToFilterOut = [];
 
         //filters out regular lesson dates, that have been marked as canceled
         allLessonDates.forEach(lessonDate => {
 
-            if (lessonDate.canceled == true) {
-                for (let i = 0; i < allLessonDates.length; i++) {
+            if (lessonDate.canceled == 'true') entriesToFilterOut.push(lessonDate);
+        });
 
-                    if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) == new Date(lessonDate.date).setHours(12, 0, 0, 0)
-                        && allLessonDates[i].timeslot == lessonDate.timeslot
-                        && allLessonDates[i].canceled == 'false'
-                    ) {
+        entriesToFilterOut.forEach(lessonToRemove => {
+            for (let i = allLessonDates.length - 1; i >= 0; i--) {
 
-                        allLessonDates.splice(i, 1);
-                    }
+                if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) == new Date(lessonToRemove.date).setHours(12, 0, 0, 0)
+                    && allLessonDates[i].timeslot == lessonToRemove.timeslot
+                ) {
+                    allLessonDates.splice(i, 1);
                 }
             }
-        })
+        });
 
         //filters out lessons belonging to timetables that are not yet valid or not valid anymore
 
@@ -253,6 +249,22 @@ export default class AbstractModel {
         })
 
         return allValidDates;
+    }
+
+    static getLessonsCountPerWeekPerSubjectAndClass(timetable) {
+        let filtered = [];
+
+        timetable.forEach(lesson => {
+            if (!filtered[lesson.validFrom]) filtered[lesson.validFrom] = {};
+            if (!filtered[lesson.validFrom][lesson.class]) filtered[lesson.validFrom][lesson.class] = {};
+            if (!filtered[lesson.validFrom][lesson.class][lesson.subject]) {
+                filtered[lesson.validFrom][lesson.class][lesson.subject] = 1;
+            } else {
+                filtered[lesson.validFrom][lesson.class][lesson.subject]++;
+            }
+        });
+
+        return filtered;
     }
 
     // this function returns only valid timetable dates that are valid right now or will be

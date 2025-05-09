@@ -97,6 +97,15 @@ export default class Lesson extends AbstractModel {
         return lesson;
     }
 
+    static getOldTimetableCopy() {
+        return JSON.parse(JSON.stringify(standardTimetable));
+    };
+
+    static getOldTimetableChanges() {
+        return JSON.parse(JSON.stringify(timetableChanges));
+
+    };
+
     //public class methods
     save() {
         
@@ -153,7 +162,7 @@ export default class Lesson extends AbstractModel {
         if (this.id != undefined) { //lessons with an id are already on the timetablechanges table and must be updated
 
             timetableChanges.forEach(entry => {
-                if (entry.id == this.id) entry.canceled = true;
+                if (entry.id == this.id) entry.canceled = 'true';
             })
 
             this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });

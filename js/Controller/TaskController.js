@@ -1,6 +1,6 @@
 import Task from '../Model/Task.js';
 import View from '../View/TaskView.js';
-import SettingsController from './SettingsController.js';
+import LessonController from './LessonController.js';
 
 export default class TaskController {
 
@@ -71,17 +71,9 @@ export default class TaskController {
         View.renderInProgressTasks();
     }
 
-    static reorderTasks(lesson, lessonCanceled) {
+    static reorderTasks(oldTimetable, oldTimetableChanges) {
 
-        Task.reorderTasks(lesson, lessonCanceled);
+        Task.reorderTasks(oldTimetable, oldTimetableChanges);
     }
 
-    static reorderTasksAfterAddingTimetable(lessons) {
-
-        Task.reorderTasksAfterAddingTimetable(lessons);
-    }
-
-    static reorderTasksAfterEditingTimetable(lessons) {
-        Task.reorderTasksAfterEditingTimetable(lessons);
-    }
 }

@@ -1,3 +1,5 @@
+Stunden könnne ohne SUbject gespeichert werden bei Updates???
+
 - Task-Sortierung ist kaputt:
     -> bei Stundenplan-Updates muss geprüft werden:
         -> hat der Stundenplan eine veränderte Stundenzahl pro Fach?
@@ -5,9 +7,7 @@
                 -> ist es ein zukünftiger Plan, wird der vorhergehende gelöscht und ersetzt 
             nein -> alle Tasks in der jeweiligen Woche auf den equivalenten Termin setzen (das wird witzig...)
 
-- 'Termin' als Standard im Subject-Select, auch ohne Klasse speicherbar und immer mit festem Termin
-    -> erledigt, braucht aber noch Styling
-    -> braucht eigenen type-> normal, sub, appointment
+
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
@@ -112,9 +112,13 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - lesson-Datenstruktur überarbeitet: statt status und initialStatus gibt es jetzt lesson.type und lesson.setLessonCanceled
 - Checkbox ist bei Sindy immer gecheckt -> Daten aus der Datenbank beim Rendern der Task checken
 - Bug: wenn eine Lesson gecancelt und uncanceled wird, bleibt eine falsche Id zurück, die verhindert, dass die Lesson noch mal gecancelt werden kann
+- wird das CheckboxTR einer bearbeitbaren Task gehovert, wird nun auch das dazugehörige TR mit den Taskinformationen gehighlightet- 'Termin' als Standard im Subject-Select, auch ohne Klasse speicherbar und immer mit festem Termin
+    -> erledigt, braucht aber noch Styling
+    -> braucht eigenen type-> normal, sub, appointment
 
 - Task-Sortierung ist kaputt:
     -> an neue Datenstruktur anpassen
     -> Kompatibilität zu mehreren gültigen und ungültigen Stundenplänen herstellen
     -> mit jedem neu angelegten Stundenplan müssen Tasks neu sortiert werden
     -> Tasks nach Datum und Timeslot sortieren
+

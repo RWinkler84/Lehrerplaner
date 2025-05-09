@@ -72,7 +72,6 @@ export default class LessonView {
 
         //reflect timetable changes
         lessonChanges.forEach((lesson) => {
-            console.log(lesson);
 
             let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
@@ -211,8 +210,8 @@ export default class LessonView {
         let lessonFormHTML = `
             <form id="lessonForm">
                 <div class="lessonForm">
-                    <input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;" value="${oldLessonData.class}" required>
-                    ${subjectSelectHTML}
+                    <div class="alertRing"><input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;" value="${oldLessonData.class}"></div>
+                    <div class="alertRing">${subjectSelectHTML}</div>
                     <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
                     <button class="discardNewLessonButton">&#x2718;</button>
                 </div>
@@ -255,11 +254,7 @@ export default class LessonView {
             'canceled': 'false'
         }
 
-        let valid = Controller.saveNewLesson(lessonData);
-
-        if (valid) {
-            Controller.reorderTasks(lessonData, false);
-        }
+        Controller.saveNewLesson(lessonData);
     }
 
     /* The lesson update function doesn't really update the lesson, but stores a new on end sets the old one canceled.
@@ -295,12 +290,9 @@ export default class LessonView {
             'canceled': 'false'
         }
 
-        Controller.setLessonCanceled(oldLessonData);
-        Controller.reorderTasks(oldLessonData, true);
-        Controller.updateLesson(newLessonData);
-        Controller.reorderTasks(newLessonData, false);
+        Controller.updateLesson(newLessonData, oldLessonData);
 
-        LessonView.removeLessonForm(event);
+        // LessonView.removeLessonForm(event);
     }
 
     static setLessonCanceled(event) {
@@ -311,8 +303,6 @@ export default class LessonView {
         lessonData.canceled = 'true';
 
         let lessonId = Controller.setLessonCanceled(lessonData);
-
-        Controller.reorderTasks(lessonData, true);
 
         lessonElement.classList.add('canceled');
         lessonElement.dataset.id = lessonId;
@@ -331,7 +321,6 @@ export default class LessonView {
         let lessonData = LessonView.#getLessonDataFromElement(event);
 
         Controller.setLessonNotCanceled(lessonData);
-        Controller.reorderTasks(lessonData, false);
 
         lessonElement.dataset.id = lessonData.id;
         lessonElement.classList.remove('canceled');

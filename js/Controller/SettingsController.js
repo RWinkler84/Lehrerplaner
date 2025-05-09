@@ -38,6 +38,8 @@ export default class SettingsController {
 
     static saveNewTimetable(validFrom, lessons) {
         let model = new Settings;
+        let oldTimetable = LessonController.getOldTimetableCopy();
+        let oldTimetableChanges = LessonController.getOldTimetableChanges();
 
         if (validFrom == '') {
             View.alertValidFromPicker();
@@ -57,23 +59,27 @@ export default class SettingsController {
         model.saveNewTimetable(lessons);
 
         //triggers reordering of tasks for each lesson
-        TaskController.reorderTasksAfterAddingTimetable(lessons);
+        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
 
         View.discardNewTimetable();
     }
 
     static saveTimetableChanges(validFrom, lessons) {
         let model = new Settings;
+        let oldTimetable = LessonController.getOldTimetableCopy();
+        let oldTimetableChanges = LessonController.getOldTimetableChanges();
 
         if (lessons.length == 0) {
             View.alertTimetable();
             return;
         }
 
-        TaskController.reorderTasksAfterEditingTimetable(lessons);
-        
+        if (model.isNewTimetable) this.saveNewTimetable(validFrom, lessons);
+
+
         model.saveTimetableChanges(validFrom, lessons);
-        
+
+        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
 
         View.discardNewTimetable();
     }
@@ -89,10 +95,4 @@ export default class SettingsController {
     static getAllSubjects() {
         return AbstractController.getAllSubjects();
     }
-
-    // static getLessonsCountPerWeekPerSubjectAndClass(){
-    //     let model = new Settings;
-
-    //     return model.getLessonsCountPerWeekPerSubjectAndClass();
-    // }
 }

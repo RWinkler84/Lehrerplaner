@@ -285,7 +285,6 @@ export default class TaskView extends AbstractView {
     }
 
     static removeHighlightCheckboxTrPreviousSibling(event) {
-        console.log('fire');
         event.target.closest('tr').previousElementSibling.removeAttribute('style');
     }
 

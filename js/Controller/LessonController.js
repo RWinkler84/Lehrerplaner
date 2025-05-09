@@ -23,6 +23,8 @@ export default class LessonController {
     static saveNewLesson(lessonData) {
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+        let oldTimetable = Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = Lesson.getOldTimetableChanges();
 
         if (lessonData.class == '' && lessonData.subject != 'Termin') {
             View.alertClassInput();
@@ -36,40 +38,69 @@ export default class LessonController {
 
         lesson.save();
         View.renderNewLesson(lesson);
-        
-        return true;
+
+        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+
     }
 
-    static updateLesson(lessonData) {
-        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+    static updateLesson(lessonData, oldLessonData) {
 
+        if (lessonData.class == '' && lessonData.subject != 'Termin') {
+            View.alertClassInput();
+            return false;
+        }
+
+        if (lessonData.subject == '') {
+            View.alertSubjectSelect();
+            return false;
+        }
+
+        this.setLessonCanceled(oldLessonData);
+
+        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+        let oldTimetable = Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = Lesson.getOldTimetableChanges();
         lesson.update();
+
+        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         View.renderNewLesson(lesson);
     }
 
     static setLessonCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+        let oldTimetable = Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = Lesson.getOldTimetableChanges();
 
         lesson.cancel();
+
+        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+
 
         return lesson.id;
     }
 
     static setLessonNotCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+        let oldTimetable = Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = Lesson.getOldTimetableChanges();
 
         lesson.uncancel();
+
+        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+
     }
 
     static createNewTask(event) {
         TaskController.createNewTask(event);
     }
 
-    static reorderTasks(lessonData, lessonCanceled = false) {
-        let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+    static getOldTimetableCopy() {
+        return Lesson.getOldTimetableCopy();
+    };
 
-        TaskController.reorderTasks(lesson, lessonCanceled);
-    }
+    static getOldTimetableChanges() {
+        return Lesson.getOldTimetableChanges();
+    };
 
     static #lessonDataToLessonObject(lessonData) {
         let lesson = new Lesson(lessonData.class, lessonData.subject);
