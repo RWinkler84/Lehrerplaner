@@ -71,6 +71,12 @@ export default class TaskView extends AbstractView {
         upcomingTasksTableBody.querySelectorAll('#taskContainer td').forEach((td) => {
             td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
         });
+
+        //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
+        document.querySelectorAll('tr[data-checkboxtr]').forEach(tr => {
+            tr.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
+            tr.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
+        });
     }
 
     static renderInProgressTasks() {
@@ -134,6 +140,12 @@ export default class TaskView extends AbstractView {
         //make editable
         document.querySelectorAll('#taskContainer td').forEach((td) => {
             td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        });
+
+        //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
+        document.querySelectorAll('tr[data-checkboxtr]').forEach(tr => {
+            tr.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
+            tr.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
         });
     }
 
@@ -266,6 +278,15 @@ export default class TaskView extends AbstractView {
 
         window.getSelection().removeAllRanges();
         TaskView.#createSaveOrDiscardChangesButtons(event);
+    }
+
+    static highlightCheckboxTrPreviousSibling(event) {
+        event.target.closest('tr').previousElementSibling.style.backgroundColor = 'var(--lightergrey)';
+    }
+
+    static removeHighlightCheckboxTrPreviousSibling(event) {
+        console.log('fire');
+        event.target.closest('tr').previousElementSibling.removeAttribute('style');
     }
 
     static #removeEditability(event) {
