@@ -41,12 +41,16 @@ export default class LessonView {
                         <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
             `;
 
+            //deactive the lesson options, when the weekday it is rendered on already passed
             if (timeslot.closest('.weekday').classList.contains('passed')) {
                 lessonOptionsHTML = `
                     <div class="lessonOption lessonPastMessage"><button>Stunde hat bereits stattgefunden.</button></div>
                     <div class="lessonOption lessonPastMessage responsive"><button>Stunde hat bereits statt-gefunden.</button></div>
                 `;
             }
+
+            //is the lesson a appointement, use change the undefined cssColorClass to appointement
+            if (lesson.subject == 'Termin') lesson.cssColorClass = 'appointement';
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
@@ -68,6 +72,7 @@ export default class LessonView {
 
         //reflect timetable changes
         lessonChanges.forEach((lesson) => {
+            console.log(lesson);
 
             let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
@@ -87,13 +92,16 @@ export default class LessonView {
                     <div class="lessonOption"><button data-lesson_uncanceled>findet statt</button></div>
                 `;
             }
-
+            //deactive the lesson options, when the weekday it is rendered on already passed
             if (timeslot.closest('.weekday').classList.contains('passed')) {
                 lessonOptionsHTML = `
                         <div class="lessonOption lessonPastMessage"><button>Stunde hat bereits stattgefunden.</button></div>
                         <div class="lessonOption lessonPastMessage responsive"><button>Stunde hat bereits statt-gefunden.</button></div>
                 `;
             }
+
+            //is the lesson a appointement, use change the undefined cssColorClass to appointement
+            if (lesson.subject == 'Termin') lesson.cssColorClass = 'appointement';
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
@@ -249,8 +257,8 @@ export default class LessonView {
 
         let valid = Controller.saveNewLesson(lessonData);
 
-        if (valid){
-        Controller.reorderTasks(lessonData, false);
+        if (valid) {
+            Controller.reorderTasks(lessonData, false);
         }
     }
 

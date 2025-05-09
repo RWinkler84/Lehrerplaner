@@ -293,6 +293,11 @@ select {
     background-color: var(--lightergrey);
 }
 
+#upcomingTasksTable tbody tr:hover + tr ,
+#inProgressTasksTable tbody tr:hover + tr {
+    background-color: var(--lightergrey);
+}
+
 #upcomingTasksTable td,
 #inProgressTasksTable td,
 #upcomingTasksTable th,
@@ -732,8 +737,13 @@ h3 {
     transition: all 0.3s ease-out;
 }
 
-.undefined {
+.undefined,
+.appointement {
     border: solid 1px var(--bodyBackground);
+    color: var(--bodyBackground);
+}
+
+.appointement.light.lessonOptionsWrapper .lessonOption button {
     color: var(--bodyBackground);
 }
 

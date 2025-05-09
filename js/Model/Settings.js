@@ -51,8 +51,6 @@ export default class Settings extends AbstractModel {
             }
         })
 
-        console.log(standardTimetable);
-
         lessons.forEach(entry => standardTimetable.push(entry));
 
         this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);

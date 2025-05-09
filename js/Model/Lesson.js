@@ -99,6 +99,8 @@ export default class Lesson extends AbstractModel {
 
     //public class methods
     save() {
+        
+        if (this.subject == 'Termin') this.type = 'appointement';
 
         let lessonData = {
             'date': this.formatDate(this.date),
@@ -262,5 +264,9 @@ export default class Lesson extends AbstractModel {
 
     set validUntil(date) {
         this.#validUntil = date;
+    }
+
+    set cssColorClass(colorClass) {
+        this.#cssColorClass =  colorClass;
     }
 }

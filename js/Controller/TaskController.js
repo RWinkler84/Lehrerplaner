@@ -81,7 +81,7 @@ export default class TaskController {
         Task.reorderTasksAfterAddingTimetable(lessons);
     }
 
-    // static reorderTasksAfterEditingTimetable(lessons) {
-    //     Task.reorderTasksAfterEditingTimetable(lessons);
-    // }
+    static reorderTasksAfterEditingTimetable(lessons) {
+        Task.reorderTasksAfterEditingTimetable(lessons);
+    }
 }

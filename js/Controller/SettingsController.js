@@ -70,10 +70,10 @@ export default class SettingsController {
             return;
         }
 
+        TaskController.reorderTasksAfterEditingTimetable(lessons);
+        
         model.saveTimetableChanges(validFrom, lessons);
         
-        TaskController.reorderTasksAfterAddingTimetable(lessons);
-        // TaskController.reorderTasksAfterEditingTimetable(lessons);
 
         View.discardNewTimetable();
     }
