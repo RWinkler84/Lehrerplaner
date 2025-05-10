@@ -40,7 +40,7 @@ export default class Settings extends AbstractModel {
             return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
         });
 
-        // this.makeAjaxQuery('settings', 'saveTimetable', lessons);
+        this.makeAjaxQuery('settings', 'saveTimetable', lessons);
     }
 
     saveTimetableChanges(validFrom, lessons) {
@@ -53,7 +53,7 @@ export default class Settings extends AbstractModel {
 
         lessons.forEach(entry => standardTimetable.push(entry));
 
-        // this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
+        this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
     }
 
     // sets the valid until date on the old timetable and checks, if the new one is an

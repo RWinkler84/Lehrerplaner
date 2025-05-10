@@ -62,7 +62,7 @@ export default class Task extends AbstractModel {
             'fixedTime': this.fixedTime
         }
 
-        // this.makeAjaxQuery('task', 'update', taskData);
+        this.makeAjaxQuery('task', 'update', taskData);
     }
 
     save() {
