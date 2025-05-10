@@ -74,6 +74,7 @@ export default class TaskController {
     static reorderTasks(oldTimetable, oldTimetableChanges) {
 
         Task.reorderTasks(oldTimetable, oldTimetableChanges);
+        this.renderTaskChanges();
     }
 
 }

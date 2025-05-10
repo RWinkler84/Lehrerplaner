@@ -159,7 +159,10 @@ export default class Task extends AbstractModel {
 
         return allTasks;
     }
-
+ 
+    //adding a new timetable reorders tasks by changing their date while maintaining the number of lessons between them.
+    //It takes all old lesson dates and new dates, finds the index of the task.date and sets the date as the new task.date
+    //that has the same index on allNewDates
     static reorderTasks(oldTimetable, oldTimetableChanges) {
 
         let allAffectedTasks = this.#getAllAffectedTasks()
@@ -167,13 +170,13 @@ export default class Task extends AbstractModel {
 
         let subjectsByClass = {};
 
-        console.log(allAffectedTasks);
+        //get class names and their subjects for which there are tasks in the allAffacted Tasks
         allAffectedTasks.forEach(task => {
             subjectsByClass[task.class] ? '' : subjectsByClass[task.class] = [];
             if (!subjectsByClass[task.class].includes(task.subject)) subjectsByClass[task.class].push(task.subject);
         });
 
-        console.log(subjectsByClass);
+        //calculate all lesson dates before and after the change for each class/subject combination
         Object.keys(subjectsByClass).forEach(key => {
             let className = key;
             let subjectsArray = subjectsByClass[key];
@@ -182,58 +185,30 @@ export default class Task extends AbstractModel {
                 let allOldLessonDates = this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
                 let allNewLessonDates = this.calculateAllLessonDates(className, subject, endDate);
 
-                console.log(className + ' ' + subject);
+                //in the unlikely case, a tasks exists without a corresponding lesson, jump to the next subject
+                if (allOldLessonDates.length == 0) return;
+                if (allNewLessonDates.length == 0) return;
 
-                console.log('allOldLessonDates');
-                console.log(allOldLessonDates);
-                console.log('allNewLessonDates');
-                console.log(allNewLessonDates);
+                //find the index of the task.date for this class/subject combination on the old dates and then pick the
+                //date with the corresponding index on the new dates and asign it as the new task.date
+                allAffectedTasks.forEach(task => {
+                    if (task.class != className) return;
+                    if (task.subject != subject) return;
 
+                    let taskDate = new Date(task.date).setHours(12, 0, 0, 0)
+                    let indexInOldDates = 0;
 
+                    //search for the task.date and get its index
+                    while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
+                        indexInOldDates++
+                        if (indexInOldDates > 1000) break;
+                    }
+                    task.date = allNewLessonDates[indexInOldDates].date;
+                    task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
+                    task.update();
+                })
             })
         });
-
-    }
-
-    //adding a new timetable reorders tasks by changing their date while maintaining the number of lessons between them.
-    //It takes all old lesson dates and new dates, finds the index of the task.date and sets the date as the new task.date
-    //that has the same index on allNewDates
-    static reorderTasksAfterTimetableChanges(lessons) {
-
-        let timetableValidDates = AbstractModel.getCurrentlyAndFutureValidTimetableDates();
-
-        lessons.forEach(lesson => {
-            lesson.date = lesson.validFrom;
-            let allAffectedTasks = this.#getAllAffectedTasks(lesson);
-
-            if (allAffectedTasks.length == 0) return;
-
-            let lastTaskDate = allAffectedTasks[allAffectedTasks.length - 1].date;
-            let oldTimetableDate = timetableValidDates[timetableValidDates.indexOf(lesson.validFrom) - 1];
-            let allNewDates = AbstractModel.calculateAllLessonDates(lastTaskDate, lesson.class, lesson.subject, lessons);
-            let allOldDates = AbstractModel.calculatePotentialLessonDates(oldTimetableDate, lastTaskDate, lesson.class, lesson.subject);
-
-            console.log(allNewDates);
-
-            //count the lesson between the reference date and the current task according to the old timetable
-            //and switch the task to its new date, preserving the number of lessons in between
-            allAffectedTasks.forEach(task => {
-                let indexOfTaskDate;
-
-                allOldDates.forEach(entry => {
-                    if (new Date(entry.date).setHours(12, 0, 0, 0) == new Date(task.date).setHours(12, 0, 0, 0)) {
-                        indexOfTaskDate = allOldDates.indexOf(entry);
-                    }
-                });
-
-                //now get the date with the exact same indexDifference on the new timetable and asign it as the new date to the task
-                task.date = allNewDates[indexOfTaskDate].date;
-                task.timeslot = allNewDates[indexOfTaskDate].timeslot;
-                task.update();
-            });
-        });
-
-        Controller.renderTaskChanges();
     }
 
     static #getAllAffectedTasks() {

@@ -1,12 +1,9 @@
-Stunden könnne ohne SUbject gespeichert werden bei Updates???
 
 - Task-Sortierung ist kaputt:
-    -> bei Stundenplan-Updates muss geprüft werden:
-        -> hat der Stundenplan eine veränderte Stundenzahl pro Fach?
-            ja -> intern als neuen Stundenplan handeln, gültig ab Erstellungstag, wenn es der aktuell Plan ist (Achtung validUntil muss gesetzt werden, falls es einen späteren Plan bereits gibt)
-                -> ist es ein zukünftiger Plan, wird der vorhergehende gelöscht und ersetzt 
-            nein -> alle Tasks in der jeweiligen Woche auf den equivalenten Termin setzen (das wird witzig...)
-
+    - gleiche Indizis von alten und neuen Terminen ab
+- nach Stundenplan-Neuerstellung: 
+    - sicherstellen, dass Pläne korrekt gerendert werden, wenn sie mitten in der Woche beginnen
+    - mit dem Speichern eines Plans die Lessons neu rendern
 
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
