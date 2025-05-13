@@ -185,7 +185,6 @@ select {
 .settingsLesson {
     max-width: 100%;
     display: flex;
-    flex-direction: column;
     flex-grow: 1;
     padding: 0.5rem 0.5rem;
     border-radius: var(--standardRadius);
@@ -199,12 +198,22 @@ select {
     transform: translate(-1px, -1px);
 }
 
+.lessonContentContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
 .lessonHasTaskIndicator{
-    display: none;
     width: 0.3rem;
     height: 0.3rem;
     border-radius: 50%;
-    background-color: var(--contentContainerBackground);
+    background-color: transparent;
+    margin-right: -0.3rem;
+}
+
+.spacerBlock {
+    width: 0.3rem;
+    margin-right: 0.3rem;
 }
 
 .lessonClassSubjectField {
@@ -808,6 +817,11 @@ h3 {
 }
 
 @media screen and (max-width: 1100px) {
+
+    .lessonHasTaskIndicator {
+        margin-right: 0.25rem;
+    }
+
     .spacerBlock {
         display: none;
     }
@@ -815,8 +829,6 @@ h3 {
     .lessonOptionsWrapper {
         padding: 1rem 0.5rem;
     }
-
-
 }
 
 @media screen and (max-width: 900px) {

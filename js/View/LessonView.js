@@ -56,9 +56,9 @@ export default class LessonView {
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
-                     <div class="flex spaceBetween" style="width: 100%;">
-                        <div class="lessonHasTaskIndicator"></div>
-                        <div style="width: 1.5rem;" class="spacerBlock"></div>
+                    <div class="lessonHasTaskIndicator"></div>
+                    <div class="lessonContentContainer" style="width: 100%;">
+                        <div class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
@@ -106,9 +106,9 @@ export default class LessonView {
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
-                     <div class="flex spaceBetween" style="width: 100%;">
-                        <div class="lessonHasTaskIndicator"></div>
-                        <div style="width: 1.5rem;" class="spacerBlock"></div>
+                    <div class="lessonHasTaskIndicator"></div>
+                    <div class="lessonContentContainer" style="width: 100%;">
+                        <div class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
@@ -144,9 +144,9 @@ export default class LessonView {
 
         timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
-                     <div class="flex spaceBetween" style="width: 100%;">
-                        <div class="lessonHasTaskIndicator"></div>
-                        <div style="width: 1.5rem;" class="spacerBlock"></div>
+                    <div class="lessonHasTaskIndicator"></div>
+                    <div class="lessonContentContainer" style="width: 100%;">
+                        <div class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
@@ -181,8 +181,7 @@ export default class LessonView {
                 if (taskRow.querySelector('td[data-subject').dataset.subject != lesson.dataset.subject) return;
                 if (taskRow.dataset.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
 
-                lesson.querySelector('.lessonHasTaskIndicator').style.display = 'block';
-                lesson.querySelector('.lessonHasTaskIndicator').nextElementSibling.style.display = 'none';
+                lesson.querySelector('.lessonHasTaskIndicator').style.backgroundColor = 'var(--contentContainerBackground)';
             });
         });
     }

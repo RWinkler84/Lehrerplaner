@@ -1,16 +1,12 @@
-- visuellen Indikator, das eine Stunde eine Task hat einbauen
- 
 - Einstellungsmenu: 
     - hover iOS fähig machen :-(
     - nach Stundenplan-Neuerstellung: 
         - sicherstellen, dass Pläne korrekt gerendert werden, wenn sie mitten in der Woche beginnen
-        - mit dem Speichern eines Plans die Lessons neu rendern
     - wenn ein neuer Stundenplan mitten in der Woche gültig wird, wird das aktuell beim Rendern nicht berücksichtigt
         - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
 
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
-
 
 
 
@@ -42,7 +38,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - focus bei mehreren ungespeicherten Task Forms korrigieren
 - task-Formular muss Möglichkeit bieten, sie als fest terminiert auszuweisen
 - abgleich zwischen angezeigten lessons und tasks
-
 - logik für das zeitliche verschieben von Tasks, wenn Stunden dazukommen oder wegfallen
     -> erledigt: sammle die betroffenen Tasks, die wandern dürfen, in einem Array
     -> noch offen: task das gleichen Termins rutschen auf den nächstmöglichen Termin, egal ob Vertretungs- oder reguläre Stunden...
@@ -56,9 +51,7 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - Tasks werden nach dem Erstellen einer neuen Aufgabe neu sortiert
 - Datumsanzeige bei Tasks einbauen
 - Stunden sollen auch bearbeitet werden können
-
 - Funktionen für Lessons deaktivieren, die in der Vergangenheit liegen
-
 - persistente Datenschicht aufbauen:
    - Ajax-query-funktion
     - php-MVC zur Durchleitung der Daten
@@ -67,7 +60,6 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - PHP-Datenbank-Connector per PDO
 - Bugfix: Task-Id wird infinity, wenn vorher keine Task angelegt ist
 - sollten mehrere Stundenpläne in der Datenbank sein, können diese entsprechend ihres Gültigkeitsdatums dargestellt werden
-
 - geschossene Bugs...
     - gecancelte Lessons bekommen keine Id im Frontend
     - bei Lesson Update kommen gecancelte und geänderte Lessons in der falschen Reihenfolge an (Logik angepasst, Frontend legt Id und damit die Reihenfolge in
@@ -79,9 +71,7 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - Tasks lassen sich updaten
     - task in Progress setzen
     - setDone
-
 - wird eine Stunde unabsichtlich bearbeitet, darf sie nicht aus dem Timetable verschwunden sein, wenn man das Formular schließt
-
 - Einstellungsmenu: 
     - Fächer anlegen
         - Farben für Fächer auswählen
@@ -94,22 +84,18 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - nölen, wenn versucht wird, einen Stundenplan anzulegen, obwohl keine Fächer angelegt sind
     - Stundenpläne nach Gültigkeitsdatum sortieren
     - wird einer neuer Stundenplan angelegt, muss beim vorhergehenden validUntil gesetzt werden
-
-
+    - mit dem Speichern eines Plans die Lessons neu rendern
 - CSS: Textfarbe für mintfarbene Stunden angepasst, dunkleres Mint eingeführt
 - eigene Validierungslogik bauen
-
 - wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte
     - im Timetable
     - in den Tasks
-
 - lesson-Datenstruktur überarbeitet: statt status und initialStatus gibt es jetzt lesson.type und lesson.setLessonCanceled
 - Checkbox ist bei Sindy immer gecheckt -> Daten aus der Datenbank beim Rendern der Task checken
 - Bug: wenn eine Lesson gecancelt und uncanceled wird, bleibt eine falsche Id zurück, die verhindert, dass die Lesson noch mal gecancelt werden kann
 - wird das CheckboxTR einer bearbeitbaren Task gehovert, wird nun auch das dazugehörige TR mit den Taskinformationen gehighlightet- 'Termin' als Standard im Subject-Select, auch ohne Klasse speicherbar und immer mit festem Termin
     -> erledigt, braucht aber noch Styling
     -> braucht eigenen type-> normal, sub, appointment
-
 - Task-Sortierung ist kaputt:
     -> an neue Datenstruktur anpassen
     -> Kompatibilität zu mehreren gültigen und ungültigen Stundenplänen herstellen
@@ -117,4 +103,5 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     -> Tasks nach Datum und Timeslot sortieren
     -> gleiche Indizis von alten und neuen Terminen ab
 
+- visuellen Indikator, das eine Stunde eine Task hat einbauen
 
