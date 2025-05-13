@@ -8,6 +8,10 @@ export default class LessonController {
         return Lesson.getScheduledLessons();
     }
 
+    static getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday){
+        return Lesson.getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday);
+    }
+
     static getTimetableChanges(mondayDate, sundayDate) {
         return Lesson.getTimetableChanges(mondayDate, sundayDate);
     }

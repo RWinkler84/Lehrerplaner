@@ -1,12 +1,11 @@
 - Einstellungsmenu: 
     - hover iOS fähig machen :-(
-    - nach Stundenplan-Neuerstellung: 
-        - sicherstellen, dass Pläne korrekt gerendert werden, wenn sie mitten in der Woche beginnen
-    - wenn ein neuer Stundenplan mitten in der Woche gültig wird, wird das aktuell beim Rendern nicht berücksichtigt
-        - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
+    - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
 
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
+
+- Multi-User-Support
 
 
 
@@ -85,6 +84,8 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     - Stundenpläne nach Gültigkeitsdatum sortieren
     - wird einer neuer Stundenplan angelegt, muss beim vorhergehenden validUntil gesetzt werden
     - mit dem Speichern eines Plans die Lessons neu rendern
+    - nach Stundenplan-Neuerstellung: 
+    - sicherstellen, dass Pläne korrekt gerendert werden, wenn sie mitten in der Woche beginnen
 - CSS: Textfarbe für mintfarbene Stunden angepasst, dunkleres Mint eingeführt
 - eigene Validierungslogik bauen
 - wenn Fachname zu lang, overflow und Abkürzung durch drei Punkte

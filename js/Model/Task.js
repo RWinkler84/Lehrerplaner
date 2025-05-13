@@ -2,6 +2,7 @@ import Fn from '../inc/utils.js';
 import Controller from '../Controller/TaskController.js';
 import { standardTimetable, taskBackupArray, timetableChanges } from '../index.js';
 import { allTasksArray } from '../index.js';
+import { ONEDAY } from '../index.js';
 import AbstractModel from './AbstractModel.js';
 
 export default class Task extends AbstractModel {
@@ -159,14 +160,14 @@ export default class Task extends AbstractModel {
 
         return allTasks;
     }
- 
+
     //adding a new timetable reorders tasks by changing their date while maintaining the number of lessons between them.
     //It takes all old lesson dates and new dates, finds the index of the task.date and sets the date as the new task.date
     //that has the same index on allNewDates
     static reorderTasks(oldTimetable, oldTimetableChanges) {
 
         let allAffectedTasks = this.#getAllAffectedTasks()
-        let endDate = new Date(allAffectedTasks[allAffectedTasks.length - 1].date).setHours(12, 0, 0, 0) + 86400000 * 30;
+        let endDate = new Date(allAffectedTasks[allAffectedTasks.length - 1].date).setHours(12, 0, 0, 0) + ONEDAY * 30;
 
         let subjectsByClass = {};
 
@@ -201,11 +202,16 @@ export default class Task extends AbstractModel {
                     //search for the task.date and get its index
                     while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
                         indexInOldDates++
+
+                        if (!allOldLessonDates[indexInOldDates]) break;
                         if (indexInOldDates > 1000) break;
                     }
-                    task.date = allNewLessonDates[indexInOldDates].date;
-                    task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                    task.update();
+
+                    if (allNewLessonDates[indexInOldDates]) {
+                        task.date = allNewLessonDates[indexInOldDates].date;
+                        task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
+                        task.update();
+                    }
                 })
             })
         });

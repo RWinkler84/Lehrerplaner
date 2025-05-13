@@ -1,4 +1,4 @@
-import { allSubjects, timetableChanges } from "../index.js";
+import { allSubjects, timetableChanges, ONEDAY } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
 
@@ -62,7 +62,7 @@ export default class AbstractModel {
                 }
             })
 
-            dateIterator += 86400000;
+            dateIterator += ONEDAY;
         }
 
         //merging with the timetable changes

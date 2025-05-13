@@ -5,6 +5,9 @@ import LessonView from './View/LessonView.js';
 import SettingsView from './View/SettingsView.js';
 import Fn from './inc/utils.js';
 
+//config
+export const ONEDAY = 86400000;
+
 let abstCtrl = new AbstractController();
 
 export let allSubjects = [];
@@ -107,13 +110,13 @@ async function startApp() {
         let currentYear = new Date().getFullYear();
         let referenceDate = new Date().setHours(12, 0, 0, 0);
         let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
-        let monday = firstThursday - 86400000 * 3
-        let sunday = firstThursday + 86400000 * 3;
+        let monday = firstThursday - ONEDAY * 3
+        let sunday = firstThursday + ONEDAY * 3;
 
         //checks, if the reference date lies in the current week. if not, tests against the next week
         while (monday < referenceDate && sunday < referenceDate) {
-            monday += 86400000 * 7; // + 7 days
-            sunday += 86400000 * 7; // + 7 days
+            monday += ONEDAY * 7; // + 7 days
+            sunday += ONEDAY * 7; // + 7 days
             weekCounter++;
         }
 
@@ -125,13 +128,13 @@ async function startApp() {
         let todayUnix = new Date().setHours(12, 0, 0, 0);
 
         //go back to monday of given week
-        while (new Date(todayUnix).getDay() != 1) todayUnix -= 86400000;
+        while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;
 
         document.querySelectorAll('.weekday').forEach((weekday) => {
 
             weekday.dataset.date = new Date(todayUnix).toString();
 
-            todayUnix += 86400000;    // 86400000 = ms/day
+            todayUnix += ONEDAY;    // ONEDAY = ms/day
         })
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
@@ -159,7 +162,7 @@ async function startApp() {
         // iterates over all weekday columns and adjusts date of weekdays
         document.querySelectorAll('.weekday').forEach((weekday) => {
             let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
-            let newDate = currentDate - 86400000 * 7; // -7 days
+            let newDate = currentDate - ONEDAY * 7; // -7 days
 
             weekday.dataset.date = new Date(newDate).toString();
         });
@@ -179,7 +182,7 @@ async function startApp() {
         // iterates over all weekday columns and adjusts date of weekdays
         document.querySelectorAll('.weekday').forEach((weekday) => {
             let currentDate = new Date(weekday.dataset.date).getTime();
-            let newDate = currentDate + 86400000 * 7; // +7 days
+            let newDate = currentDate + ONEDAY * 7; // +7 days
 
             weekday.dataset.date = new Date(newDate).toString();
         });

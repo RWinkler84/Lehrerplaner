@@ -1,4 +1,4 @@
-import { allSubjects } from "../index.js";
+import { allSubjects, ONEDAY } from "../index.js";
 import { timetableChanges } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
@@ -14,11 +14,9 @@ export default class Lesson extends AbstractModel {
     #weekday = undefined;
     #date = undefined;
     #timeslot = undefined;
-    // #status = 'normal'; //can also be canceled or sub for substitute lessons
-    // #initialStatus = undefined;
     #type = undefined;
     #canceled = false;
-    #validFrom = undefined; //date a regular lesson was added to to the schuduled timetable
+    #validFrom = undefined; //date a regular lesson was added to to the scheduled timetable
     #validUntil = undefined;
 
     #controller = 'lesson';
@@ -59,6 +57,42 @@ export default class Lesson extends AbstractModel {
         });
 
         return regularLessons;
+    }
+
+    static getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday) {
+        let scheduledLessons = this.getScheduledLessons()
+        let mondayDate = new Date(monday).setHours(12, 0, 0, 0);
+        let sundayDate = new Date(sunday).setHours(12, 0, 0, 0);
+        let validLessons = [];
+
+        scheduledLessons.forEach(lesson => {
+            let lessonValidFrom = new Date(lesson.validFrom).setHours(12, 0, 0, 0)
+            let lessonValidUntil = new Date(lesson.validUntil).setHours(12, 0, 0, 0);
+
+            //to check whether a lesson is valid for the current week it needs a validUntil date even it has none yet
+            //which is the standard for the latest timetable in the database
+            if (!lesson.validUntil) lessonValidUntil = new Date().setHours(12, 0, 0, 0) + ONEDAY * 365
+
+            //to make sure weeks with two valid timetables are displayed correctly, every day of the week has to be checked individually
+            let currentDayDate = mondayDate;
+
+            while (currentDayDate < sundayDate) {
+                //only check against the day, if it's the day the lesson is scheduled for or all lessons will be pushed
+                //that would be valid on monday
+                if (new Date(currentDayDate).getDay() != lesson.weekday) {
+                    currentDayDate += ONEDAY;
+                    continue;
+                }
+
+                if (lessonValidFrom <= currentDayDate && currentDayDate <= lessonValidUntil) {
+                    if (!validLessons.includes(lesson)) validLessons.push(lesson);
+                }
+
+                currentDayDate += ONEDAY;
+            }
+        });
+
+        return validLessons;
     }
 
     static getTimetableChanges(mondayDate, sundayDate) {
@@ -108,7 +142,7 @@ export default class Lesson extends AbstractModel {
 
     //public class methods
     save() {
-        
+
         if (this.subject == 'Termin') this.type = 'appointement';
 
         let lessonData = {
@@ -276,6 +310,6 @@ export default class Lesson extends AbstractModel {
     }
 
     set cssColorClass(colorClass) {
-        this.#cssColorClass =  colorClass;
+        this.#cssColorClass = colorClass;
     }
 }

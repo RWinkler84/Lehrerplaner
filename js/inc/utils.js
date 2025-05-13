@@ -1,4 +1,4 @@
-import { allTasksArray, timetableChanges } from "../index.js";
+import { allTasksArray, timetableChanges, ONEDAY } from "../index.js";
 
 export default class Utils {
 
@@ -64,7 +64,7 @@ export default class Utils {
 
         //count up until it is the next year starting with 0 because the first 
         while (firstThursday < nextNewYear) {
-            firstThursday = firstThursday + 86400000 * 7;
+            firstThursday = firstThursday + ONEDAY * 7;
 
             weeksPerYear++;
         }
@@ -78,7 +78,7 @@ export default class Utils {
 
         if (firstDay.getDay() != 4) {
             while (firstDay.getDay() != 4) {
-                firstDay = firstDay.getTime() + 86400000;
+                firstDay = firstDay.getTime() + ONEDAY;
                 firstDay = new Date(firstDay);
             }
         }
@@ -89,9 +89,9 @@ export default class Utils {
     static getFirstAndLastDayOfWeek(date) {
         let monday = new Date(date).setHours(12, 0, 0, 0);
 
-        while (new Date(monday).getDay() != 1) monday -= 86400000;
+        while (new Date(monday).getDay() != 1) monday -= ONEDAY;
 
-        let sunday = monday + 86400000 * 6;
+        let sunday = monday + ONEDAY * 6;
 
         return {
             'monday': new Date(monday),

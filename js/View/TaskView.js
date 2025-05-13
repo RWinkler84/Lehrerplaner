@@ -361,15 +361,6 @@ export default class TaskView extends AbstractView {
         Controller.setTaskInProgress(taskId);
         TaskView.renderUpcomingTasks();
         TaskView.renderInProgressTasks();
-
-        // //removes no Entries message from inProgress table, if it was empty
-        // if (inProgressTasksTable.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
-        //     inProgressTasksTable.querySelector('thead').removeAttribute('style');
-        //     inProgressTasksTable.querySelector('td[data-noentriesfound]').style.display = 'none';
-        // }
-
-        // //shows no Entries message on openTasks table, if it is empty now
-
     }
 
     static setTaskDone(event) {

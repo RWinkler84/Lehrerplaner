@@ -1,5 +1,6 @@
 import { allSubjects } from "../index.js";
 import { standardTimetable } from "../index.js";
+import { ONEDAY } from "../index.js";
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js"
 import AbstractController from "../Controller/AbstractController.js";
@@ -62,7 +63,7 @@ export default class Settings extends AbstractModel {
 
         let previousTimetableValidFromDate;
         let allValidDates = AbstractModel.getAllValidDates();
-        let prevTimetableValidUntil = new Date(lessons[0].validFrom).setHours(12, 0, 0, 0) - 86400000;
+        let prevTimetableValidUntil = new Date(lessons[0].validFrom).setHours(12, 0, 0, 0) - ONEDAY;
         prevTimetableValidUntil = this.formatDate(prevTimetableValidUntil);
 
         //intermediate timetable
@@ -70,7 +71,7 @@ export default class Settings extends AbstractModel {
             let date = new Date(entry).setHours(12, 0, 0, 0);
 
             if (date > new Date(lessons[0].validFrom).setHours(12, 0, 0, 0)) {
-                let validUntilDate = date - 86400000;
+                let validUntilDate = date - ONEDAY;
                 validUntilDate = this.formatDate(validUntilDate);
 
                 lessons.forEach(lesson => lesson.validUntil = validUntilDate);
