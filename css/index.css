@@ -153,7 +153,7 @@ select {
     min-width: 0;
     display: flex;
     border-top: solid 1px var(--lightgrey);
-    height: 42px;
+    height: 2.6rem;
     padding: 0.2rem;
 
 }
@@ -203,7 +203,7 @@ select {
     justify-content: space-between;
 }
 
-.lessonHasTaskIndicator{
+.lessonHasTaskIndicator {
     width: 0.3rem;
     height: 0.3rem;
     border-radius: 50%;
@@ -220,7 +220,7 @@ select {
     text-wrap: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    }
+}
 
 .lessonOptionsWrapper {
     position: absolute;
@@ -310,8 +310,8 @@ select {
     background-color: var(--lightergrey);
 }
 
-#upcomingTasksTable tbody tr:hover + tr ,
-#inProgressTasksTable tbody tr:hover + tr {
+#upcomingTasksTable tbody tr:hover+tr,
+#inProgressTasksTable tbody tr:hover+tr {
     background-color: var(--lightergrey);
 }
 
@@ -836,6 +836,12 @@ h3 {
     #taskContainer {
         flex-direction: column;
     }
+
+    #upcomingTasksContainer,
+    #inProgressTasksContainer {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -848,6 +854,21 @@ h3 {
     #taskContainer {
         padding: 1rem 0.5rem;
 
+    }
+
+    .timeslot,
+    .settingsTimeslot,
+    .timeslotLabel {
+        min-width: 0;
+        display: flex;
+        border-top: solid 1px var(--lightgrey);
+        height: 2.4rem;
+        padding: 0.2rem;
+
+    }
+
+    .lessonContentContainer {
+        height: 1rem;
     }
 
     .taskDone {
