@@ -134,6 +134,9 @@ export default class LessonView {
     static renderNewLesson(lesson) {
         let timeslot = LessonView.#getTimeslotOfLesson(lesson);
 
+        //is the lesson a appointement, use change the undefined cssColorClass to appointement
+        if (lesson.subject == 'Termin') lesson.cssColorClass = 'appointement';
+
         timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">

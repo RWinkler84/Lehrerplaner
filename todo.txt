@@ -1,21 +1,18 @@
-
-- Task-Sortierung ist kaputt:
-    - gleiche Indizis von alten und neuen Terminen ab
-- nach Stundenplan-Neuerstellung: 
-    - sicherstellen, dass Pläne korrekt gerendert werden, wenn sie mitten in der Woche beginnen
-    - mit dem Speichern eines Plans die Lessons neu rendern
+- visuellen Indikator, das eine Stunde eine Task hat einbauen
+ 
+- Einstellungsmenu: 
+    - hover iOS fähig machen :-(
+    - nach Stundenplan-Neuerstellung: 
+        - sicherstellen, dass Pläne korrekt gerendert werden, wenn sie mitten in der Woche beginnen
+        - mit dem Speichern eines Plans die Lessons neu rendern
+    - wenn ein neuer Stundenplan mitten in der Woche gültig wird, wird das aktuell beim Rendern nicht berücksichtigt
+        - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
 
 - special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
- 
-- Einstellungsmenu: 
-    - was passiert, wenn ein Stundenplan angelegt wird, dessen Gültigkeit vor bereits geplanten Vertretungen liegt?
-    - Gültigkeitsdatums eines Stundenplans bearbeiten
-    - hover iOS fähig machen :-(
 
-- wenn ein neuer Stundenplan mitten in der Woche gültig wird, wird das aktuell beim Rendern nicht berücksichtigt
-    - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
+
 
 erledigt: 
 
@@ -116,6 +113,8 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - Task-Sortierung ist kaputt:
     -> an neue Datenstruktur anpassen
     -> Kompatibilität zu mehreren gültigen und ungültigen Stundenplänen herstellen
-    -> mit jedem neu angelegten Stundenplan müssen Tasks neu sortiert werden
+    -> mit jeder Stundenplanänderung müssen Tasks neu sortiert werden
     -> Tasks nach Datum und Timeslot sortieren
+    -> gleiche Indizis von alten und neuen Terminen ab
+
 

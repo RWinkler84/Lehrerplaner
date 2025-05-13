@@ -747,6 +747,10 @@ h3 {
     color: var(--bodyBackground);
 }
 
+.appointement.canceled {
+    border-color: var(--lightgrey)
+}
+
 .canceled {
     background-color: var(--lightergrey);
     color: var(--lightgrey);
