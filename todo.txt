@@ -6,6 +6,8 @@
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
 
 - Multi-User-Support
+    - Datensätze mit User-Id verbinden
+    - E-Mail-Service für E-Mail-Bestätigung und Passwort-Wiederherstellung
 
 
 

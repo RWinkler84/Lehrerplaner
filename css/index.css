@@ -204,10 +204,10 @@ select {
 }
 
 .lessonHasTaskIndicator {
+    visibility: hidden;
     width: 0.3rem;
     height: 0.3rem;
     border-radius: 50%;
-    background-color: transparent;
     margin-right: -0.3rem;
 }
 
@@ -727,6 +727,17 @@ h3 {
 
 .subjectColorFive.light.lessonOptionsWrapper .lessonOption button {
     color: black;
+}
+
+.subjectColorOne .lessonHasTaskIndicator,
+.subjectColorTwo .lessonHasTaskIndicator,
+.subjectColorThree .lessonHasTaskIndicator,
+.subjectColorFour .lessonHasTaskIndicator {
+    background-color: var(--lightergrey);
+}
+
+.subjectColorFive .lessonHasTaskIndicator {
+    background-color: var(--labelgrey);
 }
 
 .subjectColorOne.light {

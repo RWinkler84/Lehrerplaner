@@ -164,7 +164,7 @@ export default class LessonView {
                 if (taskRow.querySelector('td[data-subject').dataset.subject != lesson.dataset.subject) return;
                 if (taskRow.dataset.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
 
-                lesson.querySelector('.lessonHasTaskIndicator').style.backgroundColor = 'var(--contentContainerBackground)';
+                lesson.querySelector('.lessonHasTaskIndicator').style.visibility = 'visible';
             });
         });
     }
