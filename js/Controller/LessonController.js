@@ -20,6 +20,10 @@ export default class LessonController {
         return Lesson.getLessonById(id);
     }
 
+    static renderLesson(){
+        View.renderLesson();
+    }
+
     static saveNewLesson(lessonData) {
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);

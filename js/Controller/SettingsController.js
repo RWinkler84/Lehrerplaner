@@ -59,6 +59,7 @@ export default class SettingsController {
         model.saveNewTimetable(lessons);
 
         //triggers reordering of tasks for each lesson
+        LessonController.renderLesson();
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
 
         View.discardNewTimetable();
@@ -79,6 +80,7 @@ export default class SettingsController {
 
         model.saveTimetableChanges(validFrom, lessons);
 
+        LessonController.renderLesson();
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
 
         View.discardNewTimetable();

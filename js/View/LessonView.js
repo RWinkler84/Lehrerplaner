@@ -5,6 +5,8 @@ import Fn from '../inc/utils.js'
 export default class LessonView {
 
     static renderLesson() {
+        console.log('hier');
+        this.removeAllLessons()
         let monday = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         let sunday = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
@@ -55,6 +57,7 @@ export default class LessonView {
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
                      <div class="flex spaceBetween" style="width: 100%;">
+                        <div class="lessonHasTaskIndicator"></div>
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
@@ -67,7 +70,6 @@ export default class LessonView {
                         ${lessonOptionsHTML}
                     </div>   
                 </div>`;
-
         })
 
         //reflect timetable changes
@@ -105,6 +107,7 @@ export default class LessonView {
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
+                        <div class="lessonHasTaskIndicator"></div>
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
@@ -118,6 +121,8 @@ export default class LessonView {
                     </div>    
                 </div>`;
         })
+
+        this.showLessonHasTaskIndicator();
 
         document.querySelectorAll('.lesson').forEach((lesson) => {
             lesson.addEventListener('mouseenter', AbstractView.highlightTask);
@@ -140,6 +145,7 @@ export default class LessonView {
         timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                      <div class="flex spaceBetween" style="width: 100%;">
+                        <div class="lessonHasTaskIndicator"></div>
                         <div style="width: 1.5rem;" class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
@@ -155,10 +161,30 @@ export default class LessonView {
                     </div>    
                 </div>`;
 
+        this.showLessonHasTaskIndicator();
+
         timeslot.querySelector('.lessonOptionsButton').addEventListener('click', LessonView.showLessonOptions);
         timeslot.querySelector('.lesson').addEventListener('mouseleave', LessonView.hideLessonsOptions);
         timeslot.querySelector('.lesson').addEventListener('mouseenter', AbstractView.highlightTask);
         timeslot.querySelector('.lesson').addEventListener('mouseleave', AbstractView.removeTaskHighlight);
+    }
+
+    static showLessonHasTaskIndicator() {
+        let taskContainer = document.querySelector('#taskContainer')
+        let allLessons = document.querySelectorAll('.lesson');
+
+        allLessons.forEach(lesson => {
+            taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
+
+                if (new Date(taskRow.dataset.date).setHours(12, 0, 0, 0) != new Date(lesson.dataset.date).setHours(12, 0, 0, 0)) return;
+                if (taskRow.querySelector('td[data-class]').dataset.class != lesson.dataset.class) return;
+                if (taskRow.querySelector('td[data-subject').dataset.subject != lesson.dataset.subject) return;
+                if (taskRow.dataset.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
+
+                lesson.querySelector('.lessonHasTaskIndicator').style.display = 'block';
+                lesson.querySelector('.lessonHasTaskIndicator').nextElementSibling.style.display = 'none';
+            });
+        });
     }
 
     static createLessonForm(event, oldLessonData = undefined) {
@@ -389,7 +415,10 @@ export default class LessonView {
         event.target.closest('.lesson').querySelector('.lessonOptionsWrapper').style.display = 'none';
     }
 
-    static removeAllLessons(weekTable) {
+    static removeAllLessons(weekTable = undefined) {
+        if (!weekTable) weekTable = document.querySelector('#weekOverviewContainer');
+
+
         weekTable.querySelectorAll('.lesson').forEach((lesson) => {
 
             lesson.closest('.timeslot').addEventListener('mouseenter', AbstractView.showAddLessonButton);

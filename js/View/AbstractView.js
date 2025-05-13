@@ -59,6 +59,8 @@ export default class AbstractView {
             if (new Date(taskRow.dataset.date).setHours(12, 0, 0, 0) != new Date(event.target.dataset.date).setHours(12, 0, 0, 0)) return;
             if (taskRow.querySelector('td[data-class]').dataset.class != event.target.dataset.class) return;
             if (taskRow.querySelector('td[data-subject').dataset.subject != event.target.dataset.subject) return;
+            if (taskRow.dataset.timeslot != event.target.closest('.timeslot').dataset.timeslot) return;
+
 
             taskRow.style.backgroundColor = 'var(--lightergrey)';
             taskRow.nextElementSibling.style.backgroundColor = 'var(--lightergrey)';

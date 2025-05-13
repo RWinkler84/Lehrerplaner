@@ -92,6 +92,8 @@ async function startApp() {
     TaskView.renderUpcomingTasks();
     TaskView.renderInProgressTasks();
 
+    LessonView.showLessonHasTaskIndicator() // <- this has to run, after Tasks are rendered to work
+
     SettingsView.renderSelectableLessonColors();
     SettingsView.renderExistingSubjects();
     SettingsView.setDateOfTimetableToDisplay();
