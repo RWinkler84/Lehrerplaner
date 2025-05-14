@@ -73,8 +73,6 @@ class Settings extends AbstractModel
 
         $query = "UPDATE $tableName SET validUntil = '$validUntilDate' WHERE validFrom = '$validFromDate'";
 
-        error_log($query);
-
         return $this->write($query, []);
     }
     

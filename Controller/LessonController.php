@@ -20,8 +20,6 @@ class LessonController extends AbstractController
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
 
-        error_log('speichere: ' . print_r($lessonData, true));
-
         $result = $this->model->save($lessonData);
 
         echo json_encode($result);
@@ -30,8 +28,6 @@ class LessonController extends AbstractController
     public function update()
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
-
-        error_log('update: ' . print_r($lessonData, true));
 
         $result = $this->model->save($lessonData);
 

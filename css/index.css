@@ -736,7 +736,8 @@ h3 {
     background-color: var(--lightergrey);
 }
 
-.subjectColorFive .lessonHasTaskIndicator {
+.subjectColorFive .lessonHasTaskIndicator,
+.appointement .lessonHasTaskIndicator {
     background-color: var(--labelgrey);
 }
 

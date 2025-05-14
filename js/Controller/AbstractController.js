@@ -28,4 +28,8 @@ export default class AbstractController {
     static getAllSubjects(){
         return Model.getAllSubjects();
     }
+
+    checkDataState(){
+        this.#db.checkDataState();
+    }
 }

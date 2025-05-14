@@ -43,8 +43,6 @@ class SettingsController extends AbstractController
     public function updateValidUntil(){
         $dates = json_decode(file_get_contents('php://input'), true);
 
-        error_log(print_r($dates, true));
-
         $result = $this->model->updateValidUntil($dates);
 
         echo json_encode($result);

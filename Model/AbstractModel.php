@@ -78,7 +78,9 @@ class AbstractModel
         $query = "SELECT * FROM $tableName";
         $params = [];
 
-        return $this->read($query, $params);
+        $dataFromDb = $this->read($query, $params);
+
+        return $this->escapeDbData($dataFromDb);
     }
 
     public function getTimetable()
@@ -87,7 +89,9 @@ class AbstractModel
         $query = "SELECT * FROM $tableName";
         $params = [];
 
-        return $this->read($query, $params);
+        $dataFromDb = $this->read($query, $params);
+
+        return $this->escapeDbData($dataFromDb);
     }
 
     public function getTimetableChanges()
@@ -96,7 +100,9 @@ class AbstractModel
         $query = "SELECT * FROM $tableName";
         $params = [];
 
-        return $this->read($query, $params);
+        $dataFromDb = $this->read($query, $params);
+
+        return $this->escapeDbData($dataFromDb);
     }
 
     public function getAllTasks()
@@ -105,6 +111,20 @@ class AbstractModel
         $query = "SELECT * FROM $tableName";
         $params = [];
 
-        return $this->read($query, $params);
+        $dataFromDb = $this->read($query, $params);
+        
+        return $this->escapeDbData($dataFromDb);
+    }
+
+    //escape
+    private function escapeDbData($data)
+    {
+        foreach ($data as $k => $dataset) {
+            foreach ($dataset as $key => $value) {
+                $data[$k][$key] = htmlspecialchars($value);
+            }
+        }
+
+        return $data;
     }
 }

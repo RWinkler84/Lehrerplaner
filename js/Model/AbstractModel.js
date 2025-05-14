@@ -193,4 +193,102 @@ export default class AbstractModel {
 
         return validDates;
     }
+
+    async checkDataState() {
+        console.log('checking Data');
+
+        let allSubjectsRemote = await this.makeAjaxQuery('abstract', 'getSubjects');
+        let standardTimetableRemote = await this.makeAjaxQuery('abstract', 'getTimetable');
+        let timetableChangesRemote = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
+        let allTasksRemote = await this.makeAjaxQuery('abstract', 'getAllTasks');
+
+        //subjects
+        let subjectsToSave = [];
+        let subjectsToDelete = [];
+        let subjectsToUpdate = [];
+
+        if (allSubjectsRemote.length < allSubjects.length) {
+            subjectsToSave = this.#findDataToSave(allSubjects, allSubjectsRemote);
+        } else if (allSubjectsRemote.length > allSubjects.length) {
+            subjectsToDelete = this.#findDataToDelete(allSubjectsRemote, allSubjects);
+        } else {
+            subjectsToUpdate = this.#findDataToUpdate(allSubjects, allSubjectsRemote);
+        }
+
+        console.log('subjectsToSave');
+        console.log(subjectsToSave);
+        console.log('subjectsToUpdate');
+        console.log(subjectsToUpdate);
+        console.log('subjectsToDelete');
+        console.log(subjectsToDelete);
+
+
+        /*
+        check by id
+            -> if id exists, check if the content is equal
+                -> if not, push the date to an update array
+            -> if doesn't exist, push the date to an create array
+        send the create and update array to the backend, if they are not empty
+
+        do for every dataset
+        */
+
+    }
+
+    #findDataToSave(biggerDataset, smallerDataset) {
+        let dataToSave = [];
+
+        biggerDataset.forEach(datasetA => {
+            let match = false;
+
+            smallerDataset.every(datasetB => {
+                if (datasetA.id == datasetB.id) {
+                    match = true;
+                    return false;
+                }
+                return true;
+            });
+
+            if (!match) dataToSave.push(datasetA);
+        });
+
+        return dataToSave;
+    }
+
+    #findDataToDelete(biggerDataset, smallerDataset) {
+        let dataToDelete = [];
+
+        biggerDataset.forEach(datasetA => {
+            let match = false;
+
+            smallerDataset.every(datasetB => {
+                if (datasetA.id == datasetB.id) {
+                    match = true;
+                    return false;
+                }
+                return true;
+            });
+
+            if (!match) dataToDelete.push(datasetA);
+        });
+
+        return dataToDelete;
+    }
+
+    #findDataToUpdate(localDataset, remoteDataset) {
+        let dataToUpdate = [];
+
+        for (let i = 0; i < localDataset.length; i++) {
+            let needsUpdate = false;
+
+            for (let key in localDataset[i]) {
+                localDataset[i][key] != remoteDataset[i][key] ? needsUpdate = true : '';
+            }
+
+            if (needsUpdate) dataToUpdate.push(localDataset);
+        }
+
+        return dataToUpdate;
+    }
+
 }

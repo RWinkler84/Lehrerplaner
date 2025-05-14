@@ -2,8 +2,9 @@
     - hover iOS fähig machen :-(
     - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
 
-- special Chars escaping
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
+    -> funktioniert nur per Abgleich über Id -> damit Ids aller Einträge konsistent sind, müssen Ids im Frontend erzeugt werden
+        -> subjects und timetable arbeiten noch mit Autoincrement -> ändern, damit Update-Funktion sauber laufen kann
 
 - Multi-User-Support
     - Datensätze mit User-Id verbinden
@@ -107,4 +108,5 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
     -> gleiche Indizis von alten und neuen Terminen ab
 
 - visuellen Indikator, das eine Stunde eine Task hat einbauen
+- special Chars escaping
 

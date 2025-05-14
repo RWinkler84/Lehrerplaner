@@ -7,6 +7,7 @@ import Fn from './inc/utils.js';
 
 //config
 export const ONEDAY = 86400000;
+export const ONEMIN = 60000;
 
 let abstCtrl = new AbstractController();
 
@@ -50,6 +51,9 @@ async function loadData() {
 
 async function startApp() {
     await loadData();
+
+    // setInterval(abstCtrl.checkDataState, ONEMIN * 5);
+    document.querySelector('#checkData').addEventListener('click', abstCtrl.checkDataState.bind(abstCtrl));
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
