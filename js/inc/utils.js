@@ -29,6 +29,21 @@ export default class Utils {
         return false;
     }
 
+    static formatSubjectName(name) {
+        let reformated = []
+
+        for (let i = 0; i < name.length; i++) {
+            if (i == 0) {
+                reformated[i] = name[i].toUpperCase()
+            } else {
+                reformated[i] = name[i].toLowerCase();
+            }
+        }
+
+        return reformated.join('');
+
+    }
+
     static formatDate(date) {
         let formatter = new Intl.DateTimeFormat('de-DE', {
             month: '2-digit',
@@ -102,12 +117,13 @@ export default class Utils {
     static generateId(baseArray) {
         let allIds = [];
 
+console.log(baseArray);
         baseArray.forEach((entry) => {
+            if (entry.id == undefined) return;
             allIds.push(Number(entry.id));
         })
 
         if (allIds.length == 0) allIds = [0];
-
         return Math.max(...allIds) + 1; //adds 1 to the highest existing lesson id
     }
 
@@ -135,7 +151,7 @@ export default class Utils {
 
         groupedKeys = Object.keys(grouped);
         groupedKeys.sort(this.sortByDate);
-        
+
         groupedKeys.forEach(key => {
             if (grouped[key].length > 1) grouped[key].sort((a, b) => {
                 return a.timeslot - b.timeslot;

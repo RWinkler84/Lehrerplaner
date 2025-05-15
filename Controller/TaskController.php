@@ -31,6 +31,14 @@ class TaskController extends AbstractController {
         echo json_encode($result);
     }
 
+    public function updateDate(){
+        $taskData = json_decode(file_get_contents('php://input'), true);
+
+        $result = $this->model->updateDate($taskData);
+
+        echo json_encode($result);
+    }
+
     public function setInProgress() {
         $taskId = json_decode(file_get_contents('php://input'), true);
 

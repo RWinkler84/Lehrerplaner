@@ -29,6 +29,13 @@ class Task extends AbstractModel
         return $this->write($query, $taskData);
     }
 
+    public function updateDate($taskData)
+    {   
+        $query = "UPDATE $this->tableName SET id=:id, date=:date WHERE id=:id";
+
+        return $this->write($query, $taskData);
+    }
+
     public function setInProgress($taskId) {
         $query = "UPDATE $this->tableName SET status='inProgress' WHERE id=:id";
 

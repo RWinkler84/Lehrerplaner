@@ -66,6 +66,21 @@ export default class Task extends AbstractModel {
         this.makeAjaxQuery('task', 'update', taskData);
     }
 
+    updateDate() {
+        allTasksArray.forEach(element => {
+            if (element.id == this.id) {
+                element.date = this.date;
+            }
+        });
+
+        let taskData = {
+            'id': this.id,
+            'date': this.formatDate(this.date),
+        }
+
+        this.makeAjaxQuery('task', 'updateDate', taskData);
+    }
+
     save() {
         let taskData = {
             'id': this.id,
@@ -210,7 +225,7 @@ export default class Task extends AbstractModel {
                     if (allNewLessonDates[indexInOldDates]) {
                         task.date = allNewLessonDates[indexInOldDates].date;
                         task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                        task.update();
+                        task.updateDate();
                     }
                 })
             })

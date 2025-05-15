@@ -80,7 +80,7 @@ export default class SettingsView {
             : undefined;
 
         let subject = {
-            'subject': document.querySelector('#subjectName').value,
+            'subject': Fn.formatSubjectName(document.querySelector('#subjectName').value),
             'colorCssClass': colorCssClass
         };
 
@@ -134,13 +134,13 @@ export default class SettingsView {
 
         // now render the lessons with the correct validity date
         regularLessons.forEach((lesson) => {
-
+            console.log(lesson)
             if (lesson.validFrom != dateOfTimetableToDisplay) return;
 
             let timeslot = SettingsView.#getTimeslotOfLesson(lesson);
 
             timeslot.innerHTML = `
-                <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
+                <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-id="${lesson.id}" data-validuntil="${lesson.validUntil}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
@@ -331,7 +331,9 @@ export default class SettingsView {
             if (!Fn.hasLesson(timeslot)) return;
 
             let lessonData = {
+                'id': timeslot.firstElementChild.dataset.id,
                 'validFrom': validFrom,
+                'validUntil': timeslot.firstElementChild.dataset.validuntil,
                 'class': timeslot.firstElementChild.dataset.class,
                 'subject': timeslot.firstElementChild.dataset.subject,
                 'weekdayNumber': timeslot.closest('.settingsWeekday').dataset.weekday_number,

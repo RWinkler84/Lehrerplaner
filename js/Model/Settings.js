@@ -35,7 +35,12 @@ export default class Settings extends AbstractModel {
     saveNewTimetable(lessons) {
         lessons = this.setValidUntilDates(lessons);
 
-        lessons.forEach(entry => standardTimetable.push(entry));
+        lessons.forEach(entry => {
+            entry.id = Fn.generateId(standardTimetable);
+            standardTimetable.push(entry);
+        });
+
+        console.log(lessons);
 
         standardTimetable.sort((a, b) => {
             return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
@@ -45,12 +50,29 @@ export default class Settings extends AbstractModel {
     }
 
     saveTimetableChanges(validFrom, lessons) {
+        let timetableHasValidUntil = false;
+        let validUntilDate;
 
+        lessons.forEach(lesson => {
+            if (lesson.validUntil != undefined) {
+                timetableHasValidUntil = true;
+                validUntilDate = lesson.validUntil;
+            }
+            if (!lesson.id) lesson.id = Fn.generateId(standardTimetable);
+        })
+
+        // if a lesson is added to a timetable with a validUntil date, this date is missing on the new lesson and needs to be added
+        if (timetableHasValidUntil){
+            lessons.forEach(lesson => lesson.validUntil = validUntilDate);
+        }
+        
         standardTimetable.forEach(entry => {
             if (entry.validFrom == validFrom) {
                 standardTimetable.splice(standardTimetable.indexOf(entry));
             }
         })
+
+        console.log(lessons);
 
         lessons.forEach(entry => standardTimetable.push(entry));
 
@@ -65,6 +87,8 @@ export default class Settings extends AbstractModel {
         let allValidDates = AbstractModel.getAllValidDates();
         let prevTimetableValidUntil = new Date(lessons[0].validFrom).setHours(12, 0, 0, 0) - ONEDAY;
         prevTimetableValidUntil = this.formatDate(prevTimetableValidUntil);
+        
+        if (allValidDates.length == 0) return lessons;
 
         //intermediate timetable
         allValidDates.forEach(entry => {
@@ -78,7 +102,7 @@ export default class Settings extends AbstractModel {
             }
         });
 
-        //give the validUntil date to all lessons on in the allLessons array that have the latest validFrom date
+        //give the validUntil date to all lessons of the timetable that where valid right before the new timetable 
         let i = allValidDates.length;
 
         do {

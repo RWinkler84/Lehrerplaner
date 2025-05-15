@@ -46,6 +46,7 @@ export default class Lesson extends AbstractModel {
 
         standardTimetable.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
+            lesson.id = entry.id;
             lesson.weekday = entry.weekdayNumber;
             lesson.timeslot = entry.timeslot;
             lesson.validFrom = entry.validFrom;

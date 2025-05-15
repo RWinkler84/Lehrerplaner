@@ -75,9 +75,6 @@ export default class SettingsController {
             return;
         }
 
-        if (model.isNewTimetable) this.saveNewTimetable(validFrom, lessons);
-
-
         model.saveTimetableChanges(validFrom, lessons);
 
         LessonController.renderLesson();

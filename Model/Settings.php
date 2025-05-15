@@ -29,9 +29,15 @@ class Settings extends AbstractModel
     {
         $tableName = TABLEPREFIX . 'timetable';
         $allResults = [];
-        $query = "INSERT INTO $tableName (validFrom, class, subject, weekdayNumber, timeslot) VALUES (:validFrom, :class, :subject, :weekdayNumber, :timeslot)";
+        $query = "INSERT INTO $tableName (id, validFrom, validUntil, class, subject, weekdayNumber, timeslot) VALUES (:id, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot)";
 
         foreach ($timetableData as $k => $values) {
+            if (!isset($values['validUntil'])) {
+                $values['validUntil'] = null;
+            }
+
+            error_log(print_r($values, true));
+
             $result = $this->write($query, $values);
             array_push($allResults, $result);
         }

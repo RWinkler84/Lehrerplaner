@@ -1,3 +1,9 @@
+- lessons im Settings-Timetable brauchen jetzt auch eine Id, um Update beim Bearbeiten des Timetables zu fixen
+    -> erstellt wird sie im settings-Model
+    -> gerendert werden muss sie in der SettingsView.renderLesson() -> dort muss sie zum Template hinzugefügt werden
+
+- taskDescription scrollbar machen, wenn ein Wort die Layoutbreite sprengt
+
 - Einstellungsmenu: 
     - hover iOS fähig machen :-(
     - beim Erstellen des Stundenplans gecancelte Lessons aus der LessonChanges löschen, falls diese im Gültigkeitsbereich des neuen Plans liegen
@@ -5,6 +11,7 @@
 - wenn fehler bei der datenbankverbindung auftreten, soll der state später gespeichert werden...
     -> funktioniert nur per Abgleich über Id -> damit Ids aller Einträge konsistent sind, müssen Ids im Frontend erzeugt werden
         -> subjects und timetable arbeiten noch mit Autoincrement -> ändern, damit Update-Funktion sauber laufen kann
+
 
 - Multi-User-Support
     - Datensätze mit User-Id verbinden
