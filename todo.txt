@@ -1,11 +1,6 @@
-- baue eine Funktion, die die Daten aus und für die Datenbank vorbereitet
-    - lesen: itemId wird id, userId aus den Daten gelöscht
-    - schreiben: id wird itemID, userId aus dem User-Model geholt
-
-
-- lessons im Settings-Timetable brauchen jetzt auch eine Id, um Update beim Bearbeiten des Timetables zu fixen
-    -> erstellt wird sie im settings-Model
-    -> gerendert werden muss sie in der SettingsView.renderLesson() -> dort muss sie zum Template hinzugefügt werden
+- Multi-User-Support
+    - Datensätze mit User-Id verbinden
+    - E-Mail-Service für E-Mail-Bestätigung und Passwort-Wiederherstellung
 
 - taskDescription scrollbar machen, wenn ein Wort die Layoutbreite sprengt
 
@@ -18,9 +13,7 @@
         -> subjects und timetable arbeiten noch mit Autoincrement -> ändern, damit Update-Funktion sauber laufen kann
 
 
-- Multi-User-Support
-    - Datensätze mit User-Id verbinden
-    - E-Mail-Service für E-Mail-Bestätigung und Passwort-Wiederherstellung
+
 
 
 
@@ -122,3 +115,10 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - visuellen Indikator, das eine Stunde eine Task hat einbauen
 - special Chars escaping
 
+
+- lessons im Settings-Timetable brauchen jetzt auch eine Id, um Update beim Bearbeiten des Timetables zu fixen
+    -> erstellt wird sie im settings-Model
+    -> gerendert werden muss sie in der SettingsView.renderLesson() -> dort muss sie zum Template hinzugefügt werden
+- baue eine Funktion, die die Daten aus und für die Datenbank vorbereitet
+    - lesen: itemId wird id, userId aus den Daten gelöscht
+    - schreiben: id wird itemID, userId aus dem User-Model geholt

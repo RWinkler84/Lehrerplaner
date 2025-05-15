@@ -10,26 +10,72 @@
 </head>
 
 <body>
-    <dialog open>
-        <div id="headline">
-            <h3>Login</h3>
-        </div>
-        <form id="loginForm" method="post">
-            <div class="flex halfGap marginTop" id="formBody">
-                <div>
-                    <label for="username" style="display: block">Nutzer</label>
-                    <div class="alertRing"><input type="text" name="username" id="username"></div>
-                </div>
-                <div>
-                    <label for="userName" style="display: block">Passwort</label>
-                    <div class="alertRing"><input type="password" name="password" id="password"></div>
-                </div>
+    <div id="dialogContainer">
+        <dialog id="loginDialog" open>
+            <div id="headline">
+                <h3>Login</h3>
             </div>
+            <form id="loginForm" method="post">
+                <div class="flex halfGap marginTop" id="formBody">
+                    <div>
+                        <label for="username" style="display: block">Nutzer</label>
+                        <div class="alertRing"><input type="text" name="username" id="username"></div>
+                    </div>
+                    <div>
+                        <label for="userName" style="display: block">Passwort</label>
+                        <div class="alertRing"><input type="password" name="password" id="password"></div>
+                    </div>
+                </div>
                 <div id="errorMessageDisplay"></div>
-            <div class="flex justifyEnd marginTop"><button type="submit "id="loginButton" style="margin-right: 3px">Login</button>
+                <div class="flex spaceBetween alignEnd marginTop"><a href="" id="createAccount"
+                        style="margin-left: 3px; text-decoration: none;">Kein Konto?</a><button type="submit"
+                        id="loginButton" style="margin-right: 3px">Login</button>
+                </div>
+            </form>
+        </dialog>
+
+        <dialog id="usernameDialog">
+            <div id="headline">
+                <h3>Nutzernamen wählen</h3>
             </div>
-        </form>
-    </dialog>
+            <form id="usernameForm" method="post">
+                <div class="flex halfGap marginTop" id="formBody">
+                    <div>
+                        <label for="newUsername" style="display: block">Nutzer</label>
+                        <div class="alertRing"><input type="text" name="newUsername" id="newUsername"></div>
+                    </div>
+                </div>
+                <div id="errorMessageDisplayUserNameDialog"></div>
+                <div class="flex justifyEnd alignEnd marginTop"><button type="submit" id="submitNewUsernameButton"
+                        style="margin-right: 3px">Verfügbar?</button>
+                </div>
+            </form>
+        </dialog>
+
+        <dialog id="passwordDialog">
+            <div id="headline">
+                <h3>Passwort anlegen</h3>
+            </div>
+            <form id="passwordForm" method="post">
+                <div class="flex halfGap marginTop" id="formBody">
+                    <div>
+                        <label for="newPassword" style="display: block">Passwort wählen</label>
+                        <div class="alertRing"><input type="password" name="newPassword" id="newPassword"></div>
+                    </div>
+                    <div>
+                        <label for="newPasswordRepeat" style="display: block">Passwort wiederholen</label>
+                        <div class="alertRing"><input type="password" name="newPasswordRepeat" id="newPasswordRepeat">
+                        </div>
+                    </div>
+                </div>
+                <div id="errorMessageDisplayPasswordDialog"></div>
+                <div class="flex justifyEnd alignEnd marginTop">
+                    <button type="submit" id="submitNewPasswordButton" style="margin-right: 3px">Anlegen</button>
+                </div>
+            </form>
+        </dialog>
+    </div>
+
     <script src="./js/login.js"></script>
 </body>
 

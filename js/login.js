@@ -1,4 +1,9 @@
 document.querySelector('#loginForm').addEventListener('submit', attemptLogin);
+document.querySelector('#createAccount').addEventListener('click', beginAccountCreation);
+
+const loginDialog = document.querySelector('#loginDialog');
+const usernameDialog = document.querySelector('#usernameDialog');
+const passwordDialog = document.querySelector('#passwordDialog');
 
 async function attemptLogin(event) {
 
@@ -51,6 +56,13 @@ function getLoginDataFromForm() {
         'username': username,
         'password': password
     };
+}
+
+function beginAccountCreation(event) {
+    event.preventDefault();
+
+    loginDialog.removeAttribute('open');
+    usernameDialog.setAttribute('open', '');
 }
 
 function alertUsername() {

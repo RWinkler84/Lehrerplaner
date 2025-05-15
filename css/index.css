@@ -447,8 +447,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #discardNewTimetableButton,
 #editTimetableButton,
 #saveTimetableChangesButton,
-#discardTimetableChangesButton,
-#loginButton {
+#discardTimetableChangesButton {
     padding: 0.25rem 1rem;
     border: none;
     border-radius: var(--smallRadius);
@@ -466,8 +465,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #createNewTimetableButton:hover,
 #saveNewTimetableButton:hover,
 #editTimetableButton:hover,
-#saveTimetableChangesButton:hover,
-#loginButton:hover {
+#saveTimetableChangesButton:hover {
     background-color: var(--matteGreen);
 }
 

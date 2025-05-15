@@ -2,9 +2,13 @@
     box-sizing: border-box;
 }
 
+#dialogContainer {
+    max-width: 460px;
+}
+
 dialog {
     background-color: var(--contentContainerBackground);
-
+    min-width: 460px;
 }
 
 #headline {
@@ -31,4 +35,18 @@ label {
 #errorMessageDisplay {
     color: var(--matteRed);
     text-align: center;
+}
+
+
+dialog button {
+    padding: 0.25rem 1rem;
+    border: none;
+    border-radius: var(--smallRadius);
+    background-color: var(--lightMatteGreen);
+    font-size: 1rem;
+    color: var(--lighterText);
+}
+
+dialog button:hover {
+    background-color: var(--matteGreen);
 }
