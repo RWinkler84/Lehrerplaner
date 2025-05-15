@@ -39,8 +39,27 @@ class User extends AbstractModel
         }
     }
 
+    public function createUser($newUserData){
+        $allUsers = $this->getAllUsers();
+
+        error_log(print_r($allUsers, true));
+
+        foreach ($allUsers as $existingUser) {
+            if ($existingUser['username'] == $newUserData['username']){
+                echo 'Username already in use.';
+            }
+        }
+    }
+
     public function getId()
     {
         return $this->userId;
+    }
+
+    private function getAllUsers(){
+        $params = [];
+        $query = "SELECT * FROM $this->tableName";
+
+        return $this->read($query, $params);
     }
 }

@@ -2,9 +2,15 @@
 
 require_once './core/loader.php';
 
+use Model\User;
+
 ini_set('session.gc_maxlifetime', 86400000);
 session_set_cookie_params(86400000);
 session_start();
+
+if (isset($_SESSION['userId'])) {
+    $user = new User($_SESSION['userId']);
+}
 
 
 if (isset($_GET['c']) && isset($_GET['a'])) {

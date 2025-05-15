@@ -10,15 +10,20 @@ class Settings extends AbstractModel
     public function saveSubject($subject)
     {
         $tableName = TABLEPREFIX . 'subjects';
-        $query = "INSERT INTO $tableName (id, subject, colorCssClass) VALUES (:id, :subject, :colorCssClass)";
+        $subject = $this->preprocessDataToWrite($subject);
+
+        $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass) VALUES (:userId, :itemId, :subject, :colorCssClass)";
 
         return $this->write($query, $subject);
     }
 
     public function deleteSubject($id)
     {
+        global $user;
+
+        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'subjects';
-        $query = "DELETE FROM $tableName WHERE id=:id";
+        $query = "DELETE FROM $tableName WHERE userId = $userId AND itemId=:id";
 
         $result = $this->delete($query, $id);
 
@@ -28,15 +33,15 @@ class Settings extends AbstractModel
     public function saveTimetable($timetableData)
     {
         $tableName = TABLEPREFIX . 'timetable';
+        $timetableData = $this->preprocessDataToWrite($timetableData);
         $allResults = [];
-        $query = "INSERT INTO $tableName (id, validFrom, validUntil, class, subject, weekdayNumber, timeslot) VALUES (:id, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot)";
+
+        $query = "INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekdayNumber, timeslot) VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot)";
 
         foreach ($timetableData as $k => $values) {
             if (!isset($values['validUntil'])) {
                 $values['validUntil'] = null;
             }
-
-            error_log(print_r($values, true));
 
             $result = $this->write($query, $values);
             array_push($allResults, $result);
@@ -49,12 +54,15 @@ class Settings extends AbstractModel
     // only if this order is maintained, it is garantued that the timetable will be displayed correctly later
     public function saveTimetableChanges($timetableData)
     {
+        global $user;
+
+        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'timetable';
 
         $tries = 0;
         $validFromDate['validFrom'] = $timetableData[0]['validFrom'];
 
-        $query = "DELETE FROM $tableName WHERE validFrom = :validFrom";
+        $query = "DELETE FROM $tableName WHERE userId = $userId AND validFrom = :validFrom";
 
         try {
             $deleted = $this->executeQuery($query, $validFromDate);
@@ -72,16 +80,21 @@ class Settings extends AbstractModel
         }
     }
 
-    public function updateValidUntil($dates) {
+    public function updateValidUntil($dates)
+    {
+        global $user;
+
+        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'timetable';
         $validUntilDate = $dates['validUntil'];
         $validFromDate = $dates['dateOfAffectedLessons'];
 
-        $query = "UPDATE $tableName SET validUntil = '$validUntilDate' WHERE validFrom = '$validFromDate'";
+        $query = "UPDATE $tableName SET validUntil = '$validUntilDate' WHERE userId = $userId AND validFrom = '$validFromDate'";
 
         return $this->write($query, []);
     }
-    
+
+    //query function necessary for the saveTimetableChanges function
     private function executeQuery($query, $params)
     {
         return $this->delete($query, $params);

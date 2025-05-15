@@ -74,45 +74,61 @@ class AbstractModel
 
     public function getSubjects()
     {
+        global $user;
+        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'subjects';
-        $query = "SELECT * FROM $tableName";
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
         $params = [];
 
         $dataFromDb = $this->read($query, $params);
+        $dataFromDb = $this->preprocessReadData($dataFromDb);
 
         return $this->escapeDbData($dataFromDb);
     }
 
     public function getTimetable()
     {
+        global $user;
+        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'timetable';
-        $query = "SELECT * FROM $tableName";
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
         $params = [];
 
         $dataFromDb = $this->read($query, $params);
+        $dataFromDb = $this->preprocessReadData($dataFromDb);
 
         return $this->escapeDbData($dataFromDb);
     }
 
     public function getTimetableChanges()
     {
+        global $user;
+        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'timetableChanges';
-        $query = "SELECT * FROM $tableName";
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
         $params = [];
 
         $dataFromDb = $this->read($query, $params);
+        $dataFromDb = $this->preprocessReadData($dataFromDb);
 
         return $this->escapeDbData($dataFromDb);
     }
 
     public function getAllTasks()
     {
+        global $user;
+        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'tasks';
-        $query = "SELECT * FROM $tableName";
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
         $params = [];
 
         $dataFromDb = $this->read($query, $params);
-        
+        $dataFromDb = $this->preprocessReadData($dataFromDb);
+
         return $this->escapeDbData($dataFromDb);
     }
 
@@ -126,5 +142,45 @@ class AbstractModel
         }
 
         return $data;
+    }
+
+    protected function preprocessReadData($dataArray)
+    {
+        $dataArray = array_map(function ($data) {
+            $data['id'] = $data['itemId'];
+            unset($data['userId']);
+            unset($data['itemId']);
+
+            return $data;
+        }, $dataArray);
+
+        return $dataArray;
+    }
+
+    protected function preprocessDataToWrite($dataArray)
+    {
+        global $user;
+
+        //sometimes dataArray will be a set of associative arrays, sometimes it will just be a single associative array
+        if (isset($dataArray[0])) {
+
+            $dataArray = array_map(function ($data) {
+                global $user;
+
+                $data['userId'] = $user->getId();
+                $data['itemId'] = $data['id'];
+                unset($data['id']);
+
+                return $data;
+            }, $dataArray);
+
+        } else {
+            $dataArray['userId'] = $user->getId();
+            $dataArray['itemId'] = $dataArray['id'];
+            unset($dataArray['id']);
+        }
+
+        return $dataArray;
+
     }
 }

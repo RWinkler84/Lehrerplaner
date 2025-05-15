@@ -14,7 +14,9 @@ class Task extends AbstractModel
             $taskData['fixedTime'] = 0;
         }
 
-        $query = "INSERT INTO $this->tableName (id, date, timeslot, class, subject, description, status, fixedTime) VALUES (:id, :date, :timeslot, :class, :subject, :description, :status, :fixedTime)";
+        $taskData = $this->preprocessDataToWrite($taskData);
+
+        $query = "INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime) VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime)";
         return $this->write($query, $taskData);
     }
 
@@ -24,26 +26,36 @@ class Task extends AbstractModel
             $taskData['fixedTime'] = 0;
         }
 
-        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime WHERE id=:id";
+        $taskData = $this->preprocessDataToWrite($taskData);
+
+        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime WHERE userId = :userId AND itemId=:itemId";
 
         return $this->write($query, $taskData);
     }
 
     public function updateDate($taskData)
-    {   
-        $query = "UPDATE $this->tableName SET id=:id, date=:date WHERE id=:id";
+    {
+        $taskData = $this->preprocessDataToWrite($taskData);
+
+        $query = "UPDATE $this->tableName SET id=:id, date=:date WHERE userId=:userId AND itemId = :itemId";
 
         return $this->write($query, $taskData);
     }
 
-    public function setInProgress($taskId) {
-        $query = "UPDATE $this->tableName SET status='inProgress' WHERE id=:id";
+    public function setInProgress($taskId)
+    {
+        $taskId = $this->preprocessDataToWrite($taskId);
+
+        $query = "UPDATE $this->tableName SET status='inProgress' WHERE userId=:userId AND itemId = :itemId";
 
         return $this->write($query, $taskId);
     }
 
-    public function setDone($taskId) {
-        $query = "UPDATE $this->tableName SET status='done' WHERE id=:id";
+    public function setDone($taskId)
+    {
+        $taskId = $this->preprocessDataToWrite($taskId);
+
+        $query = "UPDATE $this->tableName SET status='done' WHERE userId=:userId AND itemId = :itemId";
 
         return $this->write($query, $taskId);
     }
