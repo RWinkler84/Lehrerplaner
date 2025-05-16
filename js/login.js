@@ -1,9 +1,11 @@
+document.querySelector('#createAccount').addEventListener('click', openAccountCreationForm);
 document.querySelector('#loginForm').addEventListener('submit', attemptLogin);
-document.querySelector('#createAccount').addEventListener('click', beginAccountCreation);
+document.querySelector('#createForm').addEventListener('submit', attemptAccountCreation);
 
 const loginDialog = document.querySelector('#loginDialog');
-const usernameDialog = document.querySelector('#usernameDialog');
-const passwordDialog = document.querySelector('#passwordDialog');
+const createAccountDialog = document.querySelector('#createAccountDialog');
+const loginErrorMessageDisplay = document.querySelector('#loginErrorMessageDisplay');
+const accountCreationErrorMessageDisplay = document.querySelector('#accountCreationErrorMessageDisplay');
 
 async function attemptLogin(event) {
 
@@ -32,7 +34,7 @@ async function attemptLogin(event) {
         if (result.message === 'Successfully logged in') {
             window.location = 'index.php';
         } else {
-            document.querySelector('#errorMessageDisplay').innerText = result.message;
+            loginErrorMessageDisplay.innerText = result.message;
             alertLogin();
         }
     }
@@ -58,13 +60,72 @@ function getLoginDataFromForm() {
     };
 }
 
-function beginAccountCreation(event) {
+function openAccountCreationForm(event) {
     event.preventDefault();
 
     loginDialog.removeAttribute('open');
-    usernameDialog.setAttribute('open', '');
+    createAccountDialog.setAttribute('open', '');
 }
 
+async function attemptAccountCreation(event) {
+    event.preventDefault()
+    let accountData = getAccountDataFromForm();
+
+    console.log(accountData);
+}
+
+function getAccountDataFromForm() {
+    let email = createAccountDialog.querySelector('#newUserEmail').value;
+    let password = createAccountDialog.querySelector('#newPassword').value;
+    let passwordRepeat = createAccountDialog.querySelector('#newPasswordRepeat').value;
+
+    const mailRegEx = /^[^@]+@[^@]+\.[^@]+$/;
+    const passwordRegEx = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+    //empty
+    if (email == '') {
+        alertAccountCreationEmail();
+        return false;
+    }
+
+    if (password == '') {
+        alertAccountCreationNewPassword();
+        return false;
+    }
+
+    if (passwordRepeat == '') {
+        alertAccountCreationNewPasswordRepeat();
+        return false;
+    }
+
+    //different passwords
+    if (password != passwordRepeat) {
+        alertAccountCreationNewPassword('Die Passwörter müssen identisch sein.');
+        alertAccountCreationNewPasswordRepeat();
+        return false;
+    }
+
+    //regex
+    if (!mailRegEx.test(email)) {
+        alertAccountCreationEmail('Ungültige E-Mail-Adresse');
+        return false;
+    }
+
+    if (!passwordRegEx.test(password)) {
+        let message = 'Das Passwort muss mindestens 8 Zeichen lang sein, Großbuchstaben, mindestens eine Zahl und ein Sonderzeichen enthalten.'
+        alertAccountCreationNewPassword(message);
+        return false;
+    }
+
+    return {
+        'email': email,
+        'password': password,
+        'passwordRepeat': passwordRepeat 
+    }
+}
+
+//Validation
+//Login
 function alertUsername() {
     let alertRing = document.querySelector('#username').parentElement;
 
@@ -85,6 +146,46 @@ function alertPassword() {
 
 function alertLogin() {
     let alertRing = document.querySelector('dialog');
+
+    alertRing.classList.add('validationError');
+    setTimeout(() => {
+        alertRing.classList.remove('validationError');
+    }, 300);
+}
+
+// Account Creation
+function alertAccountCreationEmail(message = false) {
+    let alertRing = createAccountDialog.querySelector('#newUserEmail').parentElement;
+
+    if (message) {
+        accountCreationErrorMessageDisplay.innerText = message;
+    }
+
+    alertRing.classList.add('validationError');
+    setTimeout(() => {
+        alertRing.classList.remove('validationError');
+    }, 300);
+}
+
+function alertAccountCreationNewPassword(message = false) {
+    let alertRing = createAccountDialog.querySelector('#newPassword').parentElement;
+
+    if (message) {
+        accountCreationErrorMessageDisplay.innerText = message;
+    }
+
+    alertRing.classList.add('validationError');
+    setTimeout(() => {
+        alertRing.classList.remove('validationError');
+    }, 300);
+}
+
+function alertAccountCreationNewPasswordRepeat(message = false) {
+    let alertRing = createAccountDialog.querySelector('#newPasswordRepeat').parentElement;
+
+    if (message) {
+        accountCreationErrorMessageDisplay.innerText = message;
+    }
 
     alertRing.classList.add('validationError');
     setTimeout(() => {

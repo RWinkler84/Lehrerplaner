@@ -9,6 +9,7 @@
 dialog {
     background-color: var(--contentContainerBackground);
     min-width: 460px;
+    max-width: 460px;
 }
 
 #headline {
@@ -17,7 +18,7 @@ dialog {
     padding: 0.5rem 1rem ;
 }
 
-#formBody {
+.formBody {
     background-color: var(--contentContainerBackground);
 }
 
@@ -32,9 +33,12 @@ label {
     margin-left: 3px;
 }
 
-#errorMessageDisplay {
+.errorMessageDisplay {
+    max-width: 90%;
+    margin-top: 0.5rem;
     color: var(--matteRed);
     text-align: center;
+    text-wrap: wrap;
 }
 
 

@@ -1,5 +1,7 @@
 - Multi-User-Support
-    - Datensätze mit User-Id verbinden
+    - Account creation
+        - checken, ob Nutzername frei ist
+        - checken, ob PW sicher ist
     - E-Mail-Service für E-Mail-Bestätigung und Passwort-Wiederherstellung
 
 - taskDescription scrollbar machen, wenn ein Wort die Layoutbreite sprengt
@@ -14,6 +16,8 @@
 
 
 
+
+- Mittel gegen Brute Force suchen
 
 
 
@@ -122,3 +126,7 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 - baue eine Funktion, die die Daten aus und für die Datenbank vorbereitet
     - lesen: itemId wird id, userId aus den Daten gelöscht
     - schreiben: id wird itemID, userId aus dem User-Model geholt
+
+- Multi-User-Support
+    - Datensätze mit User-Id verbinden
+    

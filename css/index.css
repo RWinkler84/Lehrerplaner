@@ -807,6 +807,7 @@ h3 {
 }
 
 .alertRing {
+    width: fit-content;
     border: solid 3px rgba(0, 0, 0, 0);
 }
 
