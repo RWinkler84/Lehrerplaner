@@ -1,10 +1,12 @@
-<?php 
+<?php
 
 namespace Controller;
+
 use Model\User;
 
-class UserController extends AbstractController {
-    
+class UserController extends AbstractController
+{
+
     private $model;
 
     function __construct()
@@ -13,11 +15,12 @@ class UserController extends AbstractController {
         $this->model = new User;
     }
 
-    public function login() {
+    public function login()
+    {
 
-        $loginData = json_decode(file_get_contents('php://input'),true);
+        $loginData = json_decode(file_get_contents('php://input'), true);
 
-        if (isset($loginData['username']) && isset($loginData['password'])){
+        if (isset($loginData['username']) && isset($loginData['password'])) {
             $response = $this->model->login($loginData);
 
             http_response_code(200);
@@ -27,6 +30,35 @@ class UserController extends AbstractController {
 
         http_response_code(400);
         echo json_encode(['message' => 'Wrong username or password']);
+    }
 
+    public function createAccount(){
+        $accountData = json_decode(file_get_contents('php://input'), true);
+
+        if (
+            $this->validateEmail($accountData['email']) &&
+            $this->validatePassword($accountData['password']) &&
+            $this->validatePassword($accountData['passwordRepeat']) &&
+            $accountData['password'] == $accountData['passwordRepeat']
+        ) {
+        $result = $this->model->createAccount($accountData);
+        
+        http_response_code(200);
+        echo json_encode($result);
+        exit();
+        }
+
+        http_response_code(400);
+        echo json_encode(['message' => 'Da ist etwas schief gelaufen.']);
+    }
+
+    private function validatePassword($password){
+        $regEx = '/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/';
+        return preg_match($regEx, $password);
+    }
+
+    private function validateEmail($email){
+        $regEx = '/^[^@]+@[^@]+\.[^@]+$/';
+        return preg_match($regEx, $email);
     }
 }

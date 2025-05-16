@@ -69,9 +69,33 @@ function openAccountCreationForm(event) {
 
 async function attemptAccountCreation(event) {
     event.preventDefault()
+    let response;
+    let result;
     let accountData = getAccountDataFromForm();
 
-    console.log(accountData);
+    if (accountData) {
+        try {
+            response = await fetch('index.php?c=user&a=createAccount', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(accountData)
+            });
+
+            if (!response.ok) throw new Error(`Response status: ${response.status}`)
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+
+        result = await response.json();
+
+        if (result.message == 'Confirmation email send'){
+            accountCreationErrorMessageDisplay.innerText = 'Erfolg! Eine Bestätigungsmail wurde an die angegebene Adresse gesendet. Bitte klicke den darin enthaltenen Link, damit du loslegen kannst.'
+        } else {
+            accountCreationErrorMessageDisplay.innerText = result.message;
+        }
+        console.log(result);
+    }
 }
 
 function getAccountDataFromForm() {
@@ -120,11 +144,11 @@ function getAccountDataFromForm() {
     return {
         'email': email,
         'password': password,
-        'passwordRepeat': passwordRepeat 
+        'passwordRepeat': passwordRepeat
     }
 }
 
-//Validation
+//Validation alerts
 //Login
 function alertUsername() {
     let alertRing = document.querySelector('#username').parentElement;

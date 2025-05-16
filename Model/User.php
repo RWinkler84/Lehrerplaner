@@ -39,7 +39,14 @@ class User extends AbstractModel
         }
     }
 
-    public function createUser($newUserData){
+    public function createAccount($accountData){
+        //is username in use?
+
+        //wenns geklappt hat
+        return ['message' => 'Confirmation email send'];
+    }
+
+    private function userExists($newUserData){
         $allUsers = $this->getAllUsers();
 
         error_log(print_r($allUsers, true));
