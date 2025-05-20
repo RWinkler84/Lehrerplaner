@@ -9,11 +9,11 @@ const createAccountDialog = document.querySelector('#createAccountDialog');
 const loginErrorMessageDisplay = document.querySelector('#loginErrorMessageDisplay');
 const accountCreationErrorMessageDisplay = document.querySelector('#accountCreationErrorMessageDisplay');
 
-function isAuth(){
+function isAuth() {
     let params = new URLSearchParams(window.location.search);
     let status = params.get('auth');
 
-    if (status == 'success'){
+    if (status == 'success') {
         loginErrorMessageDisplay.style.color = 'var(--matteGreen)';
         loginErrorMessageDisplay.innerText = 'Du hast deine Mail-Adresse erfolgreich authentifiziert. Du kannst dich jetzt anmelden.';
     } else if (status == 'failed') {
@@ -25,25 +25,11 @@ async function attemptLogin(event) {
 
     event.preventDefault();
 
-    let response;
     let result;
     let loginData = getLoginDataFromForm();
 
     if (loginData) {
-        try {
-            response = await fetch('index.php?c=user&a=login', {
-                method: 'post',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(loginData)
-            });
-
-            if (!response.ok) throw new Error(`Response status: ${response.status}`)
-        }
-        catch (error) {
-            console.log(error.message);
-        }
-
-        result = await response.json();
+        result = await makeAjaxQuery('index.php?c=user&a=login', loginData);
 
         if (result.message === 'Successfully logged in') {
             window.location = 'index.php';
@@ -55,32 +41,18 @@ async function attemptLogin(event) {
                 loginErrorMessageDisplay.innerHTML += '<p><a href="" id="resendAuthMail" style="text-decoration: none;">Bestätigungsmail erneut senden?</a></p>';
                 loginErrorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
             }
-            alertLoginErrorMessageDisplay();            
+            alertLoginErrorMessageDisplay();
         }
     }
 }
 
-async function resendAuthMail(event){
+async function resendAuthMail(event) {
     event.preventDefault();
 
     let userEmail = loginDialog.querySelector('#userEmail').value;
-    let response;
     let result;
 
-    try {
-    response = await fetch('index.php?c=user&a=resendAuthMail', {
-        method: 'post',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({'userEmail': userEmail})
-    });
-
-    if (!response.ok) throw new Error(`Response status: ${response.status}`)
-    }
-    catch (error) {
-        console.log(error.message);
-    }
-
-    result = await response.json();
+    result = await makeAjaxQuery('index.php?c=user&a=resendAuthMail', {'userEmail': userEmail});
 
     loginErrorMessageDisplay.innerText = result.message;
     if (result.status == 'success') loginErrorMessageDisplay.style.color = 'var(--matteGreen';
@@ -116,25 +88,11 @@ function openAccountCreationForm(event) {
 
 async function attemptAccountCreation(event) {
     event.preventDefault()
-    let response;
     let result;
     let accountData = getAccountDataFromForm();
 
     if (accountData) {
-        try {
-            response = await fetch('index.php?c=user&a=createAccount', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(accountData)
-            });
-
-            if (!response.ok) throw new Error(`Response status: ${response.status}`)
-        }
-        catch (error) {
-            console.log(error.message);
-        }
-
-        result = await response.json();
+        result = await makeAjaxQuery('index.php?c=user&a=createAccount', accountData);
 
         if (result.message == 'Confirmation email send') {
             accountCreationErrorMessageDisplay.style.color = 'var(--matteGreen)';
@@ -194,6 +152,27 @@ function getAccountDataFromForm() {
         'password': password,
         'passwordRepeat': passwordRepeat
     }
+}
+
+async function makeAjaxQuery(url, dataToSend) {
+    try {
+        response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSend)
+        });
+
+        if (!response.ok) throw new Error(`Response status: ${response.status}`)
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+
+    result = await response.json();
+
+    console.log(result);
+
+    return result;
 }
 
 //Validation alerts
