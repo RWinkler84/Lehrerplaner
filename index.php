@@ -1,6 +1,7 @@
 <?php
 
 require_once './core/loader.php';
+require_once './vendor/autoload.php';
 
 use Model\User;
 

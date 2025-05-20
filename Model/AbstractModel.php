@@ -5,6 +5,7 @@ namespace Model;
 use Exception;
 use PDO;
 use DateTime;
+use PHPMailer\PHPMailer
 
 class AbstractModel
 {
@@ -183,4 +184,8 @@ class AbstractModel
         return $dataArray;
 
     }
+
+    protected function sendMail($address, $){
+
+    } 
 }

@@ -41,11 +41,11 @@ async function attemptLogin(event) {
 }
 
 function getLoginDataFromForm() {
-    let username = document.querySelector('#username').value;
+    let userEmail = document.querySelector('#userEmail').value;
     let password = document.querySelector('#password').value;
 
-    if (username == '') {
-        alertUsername();
+    if (userEmail == '') {
+        alertUserEmail();
         return false;
     }
 
@@ -55,7 +55,7 @@ function getLoginDataFromForm() {
     }
 
     return {
-        'username': username,
+        'userEmail': userEmail,
         'password': password
     };
 }
@@ -142,7 +142,7 @@ function getAccountDataFromForm() {
     }
 
     return {
-        'email': email,
+        'userEmail': email,
         'password': password,
         'passwordRepeat': passwordRepeat
     }
@@ -150,8 +150,8 @@ function getAccountDataFromForm() {
 
 //Validation alerts
 //Login
-function alertUsername() {
-    let alertRing = document.querySelector('#username').parentElement;
+function alertUserEmail() {
+    let alertRing = document.querySelector('#userEmail').parentElement;
 
     alertRing.classList.add('validationError');
     setTimeout(() => {

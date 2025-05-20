@@ -20,7 +20,7 @@ class UserController extends AbstractController
 
         $loginData = json_decode(file_get_contents('php://input'), true);
 
-        if (isset($loginData['username']) && isset($loginData['password'])) {
+        if (isset($loginData['userEmail']) && isset($loginData['password'])) {
             $response = $this->model->login($loginData);
 
             http_response_code(200);
@@ -36,7 +36,7 @@ class UserController extends AbstractController
         $accountData = json_decode(file_get_contents('php://input'), true);
 
         if (
-            $this->validateEmail($accountData['email']) &&
+            $this->validateEmail($accountData['userEmail']) &&
             $this->validatePassword($accountData['password']) &&
             $this->validatePassword($accountData['passwordRepeat']) &&
             $accountData['password'] == $accountData['passwordRepeat']
