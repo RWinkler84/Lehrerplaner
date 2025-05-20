@@ -26,8 +26,15 @@ class User extends AbstractModel
         $result = $this->read($query, ['userEmail' => $loginData['userEmail']]);
 
         if (empty($result)) {
-            return ['message' => 'Wrong username or password!'];
+            return ['message' => 'Falsche E-Mail oder falsches Passwort.'];
             exit();
+        }
+
+        if ($result[0]['emailConfirmed'] == 0) {
+            return [
+                'message' => 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte öffne den Link in der Mail, die du nach der Anmeldung erhalten hast.',
+                'status' => 'mail auth missing'
+            ];
         }
 
         if (password_verify($loginData['password'], $result[0]['password'])) {
@@ -42,7 +49,7 @@ class User extends AbstractModel
 
     public function createAccount($accountData)
     {
-        $mailsend = false;
+        $mailSend = false;
 
         if ($this->userExists($accountData)) {
             return ['message' => 'Die angegebene E-Mail-Adresse wird bereits verwendet.'];
@@ -56,26 +63,13 @@ class User extends AbstractModel
 
         $result = $this->write($query, $accountData);
 
-        // $result['message'] = 'Data saved sucessfully';
-
         if ($result['message'] == 'Data saved sucessfully') {
             $user = $this->getUserByEmail($accountData['userEmail']);
 
-            $mailConfirmationLink = $this->getMailConfirmationLink($user);
-            $mailSubject = 'Dein Account beim Lehrerplaner wartet auf Aktivierung';
-            $mailMessage = <<<MAIL
-                <b>Fast geschafft!</b><br>
-                <br>
-                Du hast erfolgreich einen Account bei Lehrerplaner angelegt. Um ihn nutzen zu können, musst du deine E-Mail-Adresse bestätigen.
-                Klicke dazu nachfolgenden Link: <br>
-                <br>
-                $mailConfirmationLink
-            MAIL;
-
-            $mailsend = $this->sendMail($accountData['userEmail'], $mailSubject, $mailMessage);
+            $mailSend = $user->sendEmailAuthenticationMail();
         }
 
-        if ($mailsend) {
+        if ($mailSend) {
             return ['message' => 'Confirmation email send'];
         }
 
@@ -88,15 +82,39 @@ class User extends AbstractModel
 
         if (password_verify($user->email, $emailHash)) {
             $query = "UPDATE $this->tableName SET emailConfirmed = 1 WHERE userEmail = :userEmail";
-            
-            $this->write($query, ['userEmail' => $user->getEmail()]);
 
-            header('Location:' . ROOTURL);
-        } else {
-            error_log('UserId ' . $user->getId() . ': Authentifizierung der E-Mail ging daneben.');
+            $result = $this->write($query, ['userEmail' => $user->getEmail()]);
+
+            if ($result['message'] == 'Data saved sucessfully') {
+                return true;
+            }
         }
+
+        return false;
     }
 
+    private function sendEmailAuthenticationMail(): bool
+    {
+        $mailConfirmationLink = $this->getMailConfirmationLink();
+        $mailSubject = 'Dein Account beim Lehrerplaner wartet auf Aktivierung';
+        $mailMessage = <<<MAIL
+                <b>Fast geschafft!</b><br>
+                <br>
+                Du hast erfolgreich einen Account bei Lehrerplaner angelegt. Um ihn nutzen zu können, musst du deine E-Mail-Adresse bestätigen.
+                Klicke dazu nachfolgenden Link: <br>
+                <br>
+                $mailConfirmationLink
+            MAIL;
+        
+        return $this->sendMail($this->getEmail(), $mailSubject, $mailMessage);
+    }
+
+    public function resendAuthMail($data): bool
+    {
+        $user = $this->getUserByEmail($data['userEmail']);
+
+        return $user->sendEmailAuthenticationMail();
+    }
 
     public function getId()
     {
@@ -151,10 +169,10 @@ class User extends AbstractModel
         return false;
     }
 
-    private function getMailConfirmationLink($user)
+    private function getMailConfirmationLink()
     {
-        $emailHash = password_hash($user->getEmail(), PASSWORD_DEFAULT);
+        $emailHash = password_hash($this->getEmail(), PASSWORD_DEFAULT);
 
-        return ROOTURL . '?c=user&a=authenticateMail&i=' . $user->getId() . '&t=' . $emailHash;
+        return ROOTURL . '?c=user&a=authenticateMail&i=' . $this->getId() . '&t=' . $emailHash;
     }
 }

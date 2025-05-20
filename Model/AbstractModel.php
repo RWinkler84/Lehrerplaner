@@ -185,7 +185,7 @@ class AbstractModel
         return $dataArray;
     }
 
-    protected function sendMail($recipient, $subject, $message)
+    protected function sendMail($recipient, $subject, $message): bool
     {
         $mail = new PHPMailer(true);
 

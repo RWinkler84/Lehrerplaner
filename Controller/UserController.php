@@ -32,7 +32,8 @@ class UserController extends AbstractController
         echo json_encode(['message' => 'Wrong username or password']);
     }
 
-    public function createAccount(){
+    public function createAccount()
+    {
         $accountData = json_decode(file_get_contents('php://input'), true);
 
         if (
@@ -41,27 +42,55 @@ class UserController extends AbstractController
             $this->validatePassword($accountData['passwordRepeat']) &&
             $accountData['password'] == $accountData['passwordRepeat']
         ) {
-        $result = $this->model->createAccount($accountData);
-        
-        http_response_code(200);
-        echo json_encode($result);
-        exit();
+            $result = $this->model->createAccount($accountData);
+
+            http_response_code(200);
+            echo json_encode($result);
+            exit();
         }
 
         http_response_code(400);
         echo json_encode(['message' => 'Da ist etwas schief gelaufen.']);
     }
 
-    public function authenticateMail(){
-        $this->model->authenticateMail($_GET['i'], $_GET['t']);
+    public function authenticateMail()
+    {
+        $updated = $this->model->authenticateMail($_GET['i'], $_GET['t']);
+
+        if ($updated) {
+            header('Location:' . ROOTURL . '?auth=success');
+            exit();
+        }
+
+        header('Location:' . ROOTURL. '?auth=failed');
     }
 
-    private function validatePassword($password){
+    public function resendAuthMail(){
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $mailSend = $this->model->resendAuthMail($data);
+
+        if ($mailSend){
+            echo json_encode([
+                'message' => 'Die Mail wurde erneut geschickt. Sollte sie sich nicht im Posteingang befinden, kontrolliere bitte deinen Spam-Ordner.',
+                'status' => 'success'
+            ]);
+            exit();
+        }
+            echo json_encode([
+                'message' => 'Beim Mail-Versand ist etwas schief gelaufen. Bitte versuche es später noch einmal.',
+                'status' => 'failed'
+            ]);
+    }
+
+    private function validatePassword($password)
+    {
         $regEx = '/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/';
         return preg_match($regEx, $password);
     }
 
-    private function validateEmail($email){
+    private function validateEmail($email)
+    {
         $regEx = '/^[^@]+@[^@]+\.[^@]+$/';
         return preg_match($regEx, $email);
     }

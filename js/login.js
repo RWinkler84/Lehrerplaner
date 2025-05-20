@@ -2,10 +2,24 @@ document.querySelector('#createAccount').addEventListener('click', openAccountCr
 document.querySelector('#loginForm').addEventListener('submit', attemptLogin);
 document.querySelector('#createForm').addEventListener('submit', attemptAccountCreation);
 
+window.addEventListener('DOMContentLoaded', isAuth);
+
 const loginDialog = document.querySelector('#loginDialog');
 const createAccountDialog = document.querySelector('#createAccountDialog');
 const loginErrorMessageDisplay = document.querySelector('#loginErrorMessageDisplay');
 const accountCreationErrorMessageDisplay = document.querySelector('#accountCreationErrorMessageDisplay');
+
+function isAuth(){
+    let params = new URLSearchParams(window.location.search);
+    let status = params.get('auth');
+
+    if (status == 'success'){
+        loginErrorMessageDisplay.style.color = 'var(--matteGreen)';
+        loginErrorMessageDisplay.innerText = 'Du hast deine Mail-Adresse erfolgreich authentifiziert. Du kannst dich jetzt anmelden.';
+    } else if (status == 'failed') {
+        loginErrorMessageDisplay.innerText = 'Die Authentifizierung ist fehlgeschlagen. Versuche es bitte später erneut.';
+    }
+}
 
 async function attemptLogin(event) {
 
@@ -21,7 +35,7 @@ async function attemptLogin(event) {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(loginData)
-            })
+            });
 
             if (!response.ok) throw new Error(`Response status: ${response.status}`)
         }
@@ -34,10 +48,43 @@ async function attemptLogin(event) {
         if (result.message === 'Successfully logged in') {
             window.location = 'index.php';
         } else {
+            loginErrorMessageDisplay.style.color = 'var(--matteRed)';
             loginErrorMessageDisplay.innerText = result.message;
-            alertLogin();
+
+            if (result.status == 'mail auth missing') {
+                loginErrorMessageDisplay.innerHTML += '<p><a href="" id="resendAuthMail" style="text-decoration: none;">Bestätigungsmail erneut senden?</a></p>';
+                loginErrorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
+            }
+            alertLoginErrorMessageDisplay();            
         }
     }
+}
+
+async function resendAuthMail(event){
+    event.preventDefault();
+
+    let userEmail = loginDialog.querySelector('#userEmail').value;
+    let response;
+    let result;
+
+    try {
+    response = await fetch('index.php?c=user&a=resendAuthMail', {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({'userEmail': userEmail})
+    });
+
+    if (!response.ok) throw new Error(`Response status: ${response.status}`)
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+
+    result = await response.json();
+
+    loginErrorMessageDisplay.innerText = result.message;
+    if (result.status == 'success') loginErrorMessageDisplay.style.color = 'var(--matteGreen';
+
 }
 
 function getLoginDataFromForm() {
@@ -96,7 +143,6 @@ async function attemptAccountCreation(event) {
             accountCreationErrorMessageDisplay.innerText = result.message;
             alertAccountCreationErrorMessageDisplay();
         }
-        console.log(result);
     }
 }
 
@@ -170,12 +216,12 @@ function alertPassword() {
     }, 300);
 }
 
-function alertLogin() {
+function alertLoginErrorMessageDisplay() {
     let alertRing = document.querySelector('dialog');
 
-    alertRing.classList.add('validationError');
+    loginErrorMessageDisplay.classList.add('validationError');
     setTimeout(() => {
-        alertRing.classList.remove('validationError');
+        loginErrorMessageDisplay.classList.remove('validationError');
     }, 300);
 }
 
