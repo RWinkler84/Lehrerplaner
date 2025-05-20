@@ -2,6 +2,7 @@
 
 require_once 'db.php';
 require_once 'config.php';
+require_once 'mailconfig.php';
 
 //Controller
 require_once './Controller/AbstractController.php';

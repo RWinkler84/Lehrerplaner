@@ -89,10 +89,12 @@ async function attemptAccountCreation(event) {
 
         result = await response.json();
 
-        if (result.message == 'Confirmation email send'){
+        if (result.message == 'Confirmation email send') {
+            accountCreationErrorMessageDisplay.style.color = 'var(--matteGreen)';
             accountCreationErrorMessageDisplay.innerText = 'Erfolg! Eine Bestätigungsmail wurde an die angegebene Adresse gesendet. Bitte klicke den darin enthaltenen Link, damit du loslegen kannst.'
         } else {
             accountCreationErrorMessageDisplay.innerText = result.message;
+            alertAccountCreationErrorMessageDisplay();
         }
         console.log(result);
     }
@@ -214,5 +216,13 @@ function alertAccountCreationNewPasswordRepeat(message = false) {
     alertRing.classList.add('validationError');
     setTimeout(() => {
         alertRing.classList.remove('validationError');
+    }, 300);
+}
+
+function alertAccountCreationErrorMessageDisplay() {
+
+    accountCreationErrorMessageDisplay.classList.add('validationError');
+    setTimeout(() => {
+        accountCreationErrorMessageDisplay.classList.remove('validationError');
     }, 300);
 }

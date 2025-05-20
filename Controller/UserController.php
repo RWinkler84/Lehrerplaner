@@ -52,6 +52,10 @@ class UserController extends AbstractController
         echo json_encode(['message' => 'Da ist etwas schief gelaufen.']);
     }
 
+    public function authenticateMail(){
+        $this->model->authenticateMail($_GET['i'], $_GET['t']);
+    }
+
     private function validatePassword($password){
         $regEx = '/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/';
         return preg_match($regEx, $password);

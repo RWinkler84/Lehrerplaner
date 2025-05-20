@@ -9,7 +9,8 @@ class User extends AbstractModel
 {
 
     private $userId;
-    private $username;
+    private $email;
+
     private $tableName = TABLEPREFIX . 'users';
 
 
@@ -17,7 +18,6 @@ class User extends AbstractModel
     {
         $this->userId = $id;
     }
-
 
     public function login($loginData)
     {
@@ -42,26 +42,100 @@ class User extends AbstractModel
 
     public function createAccount($accountData)
     {
+        $mailsend = false;
+
         if ($this->userExists($accountData)) {
             return ['message' => 'Die angegebene E-Mail-Adresse wird bereits verwendet.'];
         }
 
         $query = "INSERT INTO $this->tableName (userEmail, emailConfirmed, password) VALUES (:userEmail, :emailConfirmed, :password)";
+
         $accountData['password'] = password_hash($accountData['password'], PASSWORD_DEFAULT);
-        unset($accountData['passwordRepeat']);
         $accountData['emailConfirmed'] = 0;
-        
-        // $result = $this->write($query, $accountData);
-        $result['message'] = 'Data saved sucessfully';
+        unset($accountData['passwordRepeat']);
+
+        $result = $this->write($query, $accountData);
+
+        // $result['message'] = 'Data saved sucessfully';
 
         if ($result['message'] == 'Data saved sucessfully') {
-            $mailsend = mail($accountData['userEmail'], 'Dein Account beim Lehrerplaner wartet auf Aktivierung', 'Du hast einen Account bei Lehrerplaner angelegt. Um ihn nutzen zu können, musst du deine E-Mail-Adresse bestätigen.');
-            if ($mailsend) {error_log('geschickt? ' . $mailsend);} else {error_log('ging nicht raus');}
-            
+            $user = $this->getUserByEmail($accountData['userEmail']);
+
+            $mailConfirmationLink = $this->getMailConfirmationLink($user);
+            $mailSubject = 'Dein Account beim Lehrerplaner wartet auf Aktivierung';
+            $mailMessage = <<<MAIL
+                <b>Fast geschafft!</b><br>
+                <br>
+                Du hast erfolgreich einen Account bei Lehrerplaner angelegt. Um ihn nutzen zu können, musst du deine E-Mail-Adresse bestätigen.
+                Klicke dazu nachfolgenden Link: <br>
+                <br>
+                $mailConfirmationLink
+            MAIL;
+
+            $mailsend = $this->sendMail($accountData['userEmail'], $mailSubject, $mailMessage);
+        }
+
+        if ($mailsend) {
             return ['message' => 'Confirmation email send'];
         }
 
         return ['message' => 'Etwas ist schief gelaufen...'];
+    }
+
+    public function authenticateMail($userId, $emailHash)
+    {
+        $user = $this->getUserById($userId);
+
+        if (password_verify($user->email, $emailHash)) {
+            $query = "UPDATE $this->tableName SET emailConfirmed = 1 WHERE userEmail = :userEmail";
+            
+            $this->write($query, ['userEmail' => $user->getEmail()]);
+
+            header('Location:' . ROOTURL);
+        } else {
+            error_log('UserId ' . $user->getId() . ': Authentifizierung der E-Mail ging daneben.');
+        }
+    }
+
+
+    public function getId()
+    {
+        return $this->userId;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function getAllUsers()
+    {
+        $params = [];
+        $query = "SELECT * FROM $this->tableName";
+
+        return $this->read($query, $params);
+    }
+
+    public function getUserById($id)
+    {
+        $query = "SELECT * FROM $this->tableName WHERE id = :id";
+        $result = $this->read($query, ['id' => $id]);
+
+        $user = new User($id);
+        $user->email = $result[0]['userEmail'];
+
+        return $user;
+    }
+
+    public function getUserByEmail($email)
+    {
+        $query = "SELECT * FROM $this->tableName WHERE userEmail = :email";
+        $result = $this->read($query, ['email' => $email]);
+
+        $user = new User($result[0]['id']);
+        $user->email = $result[0]['userEmail'];
+
+        return $user;
     }
 
     private function userExists($newUserData)
@@ -77,16 +151,10 @@ class User extends AbstractModel
         return false;
     }
 
-    public function getId()
+    private function getMailConfirmationLink($user)
     {
-        return $this->userId;
-    }
+        $emailHash = password_hash($user->getEmail(), PASSWORD_DEFAULT);
 
-    private function getAllUsers()
-    {
-        $params = [];
-        $query = "SELECT * FROM $this->tableName";
-
-        return $this->read($query, $params);
+        return ROOTURL . '?c=user&a=authenticateMail&i=' . $user->getId() . '&t=' . $emailHash;
     }
 }

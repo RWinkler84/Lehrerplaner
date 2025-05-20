@@ -23,7 +23,6 @@ dialog {
 }
 
 input {
-    /* background-color: var(--lightergrey); */
     border: solid 1px var(--lightgrey);
     border-radius: 3px;
     height: 1.5rem;
@@ -38,7 +37,7 @@ label {
 }
 
 .errorMessageDisplay {
-    max-width: 90%;
+    width: 100% !important;
     margin-top: 0.5rem;
     color: var(--matteRed);
     text-align: center;
