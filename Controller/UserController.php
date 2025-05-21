@@ -62,25 +62,45 @@ class UserController extends AbstractController
             exit();
         }
 
-        header('Location:' . ROOTURL. '?auth=failed');
+        header('Location:' . ROOTURL . '?auth=failed');
     }
 
-    public function resendAuthMail(){
+    public function resendAuthMail()
+    {
         $data = json_decode(file_get_contents('php://input'), true);
 
         $mailSend = $this->model->resendAuthMail($data);
 
-        if ($mailSend){
+        if ($mailSend) {
             echo json_encode([
                 'message' => 'Die Mail wurde erneut geschickt. Sollte sie sich nicht im Posteingang befinden, kontrolliere bitte deinen Spam-Ordner.',
                 'status' => 'success'
             ]);
             exit();
         }
+        echo json_encode([
+            'message' => 'Beim Mail-Versand ist etwas schief gelaufen. Bitte versuche es später noch einmal.',
+            'status' => 'failed'
+        ]);
+    }
+
+    public function sendPasswortResetMail()
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $mailSend = $this->model->sendPasswortResetMail($data);
+
+        if ($mailSend) {
             echo json_encode([
-                'message' => 'Beim Mail-Versand ist etwas schief gelaufen. Bitte versuche es später noch einmal.',
-                'status' => 'failed'
+                'message' => 'Die Reset-Mail wurde geschickt. Sollte sie sich nicht im Posteingang befinden, kontrolliere bitte deinen Spam-Ordner.',
+                'status' => 'success'
             ]);
+            exit();
+        }
+        echo json_encode([
+            'message' => 'Beim Mail-Versand ist etwas schief gelaufen. Bitte versuche es später noch einmal.',
+            'status' => 'failed'
+        ]);
     }
 
     private function validatePassword($password)

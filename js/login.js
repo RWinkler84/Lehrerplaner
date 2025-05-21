@@ -1,13 +1,22 @@
+// import { ONEMIN } from "./index.js";
+
 document.querySelector('#createAccount').addEventListener('click', openAccountCreationForm);
 document.querySelector('#loginForm').addEventListener('submit', attemptLogin);
 document.querySelector('#createForm').addEventListener('submit', attemptAccountCreation);
 
 window.addEventListener('DOMContentLoaded', isAuth);
+window.addEventListener('DOMContentLoaded', isReset);
+
+const ONEMIN = 60000;
 
 const loginDialog = document.querySelector('#loginDialog');
 const createAccountDialog = document.querySelector('#createAccountDialog');
+const resetPasswordDialog = document.querySelector('#resetPasswordDialog');
 const loginErrorMessageDisplay = document.querySelector('#loginErrorMessageDisplay');
 const accountCreationErrorMessageDisplay = document.querySelector('#accountCreationErrorMessageDisplay');
+
+let authMailAlreadySend = false;
+let resetMailAlreadySend = false;
 
 function isAuth() {
     let params = new URLSearchParams(window.location.search);
@@ -18,6 +27,15 @@ function isAuth() {
         loginErrorMessageDisplay.innerText = 'Du hast deine Mail-Adresse erfolgreich authentifiziert. Du kannst dich jetzt anmelden.';
     } else if (status == 'failed') {
         loginErrorMessageDisplay.innerText = 'Die Authentifizierung ist fehlgeschlagen. Versuche es bitte später erneut.';
+    }
+}
+
+function isReset() {
+    let params = new URLSearchParams(window.location.search);
+    let token = params.get('reset');
+
+    if (token) {
+
     }
 }
 
@@ -42,9 +60,10 @@ async function attemptLogin(event) {
                 loginErrorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
             }
 
+            console.log(result.status)
             if (result.status == 'wrong login data') {
                 loginErrorMessageDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
-                loginErrorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', resendAuthMail);
+                loginErrorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', sendResetPasswordMail);
             }
             alertLoginErrorMessageDisplay();
         }
@@ -57,11 +76,44 @@ async function resendAuthMail(event) {
     let userEmail = loginDialog.querySelector('#userEmail').value;
     let result;
 
-    result = await makeAjaxQuery('index.php?c=user&a=resendAuthMail', {'userEmail': userEmail});
+    if (!authMailAlreadySend) {
+        authMailAlreadySend = true;
+        
+        result = await makeAjaxQuery('index.php?c=user&a=resendAuthMail', { 'userEmail': userEmail });
+        loginErrorMessageDisplay.innerText = result.message;
 
-    loginErrorMessageDisplay.innerText = result.message;
-    if (result.status == 'success') loginErrorMessageDisplay.style.color = 'var(--matteGreen';
+        if (result.status == 'success') {
+            loginErrorMessageDisplay.style.color = 'var(--matteGreen';
+        }
 
+        setTimeout(() => {authMailAlreadySend = false;}, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
+        return;
+    }
+
+    loginErrorMessageDisplay.innerText = 'Es wurde bereits eine Authentifierungsmail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
+}
+
+async function sendResetPasswordMail(event){
+    event.preventDefault();
+
+    let userEmail = loginDialog.querySelector('#userEmail').value;
+    let result;
+
+    if (!resetMailAlreadySend) {
+        resetMailAlreadySend = true;
+        
+        result = await makeAjaxQuery('index.php?c=user&a=sendPasswortResetMail', { 'userEmail': userEmail });
+        loginErrorMessageDisplay.innerText = result.message;
+
+        if (result.status == 'success') {
+            loginErrorMessageDisplay.style.color = 'var(--matteGreen';
+        }
+
+        setTimeout(() => {resetMailAlreadySend = false;}, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
+        return;
+    }
+
+    loginErrorMessageDisplay.innerText = 'Es wurde bereits eine Reset-Mail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
 }
 
 function getLoginDataFromForm() {

@@ -29,9 +29,9 @@ class User extends AbstractModel
 
         if (empty($result)) {
             return [
-                'message' => 'Falsche E-Mail oder falsches Passwort.',
+                'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
                 'status' => 'wrong login data'
-                ];
+            ];
             exit();
         }
 
@@ -42,7 +42,7 @@ class User extends AbstractModel
             ];
         }
 
-        if ((new DateTime())->getTimestamp() > (new DateTime($result[0]['activeUntil']))->getTimestamp()){
+        if ((new DateTime())->getTimestamp() > (new DateTime($result[0]['activeUntil']))->getTimestamp()) {
             return ['message' => 'Dein Abonnement ist abgelaufen. Bitte verlängere es, um den Lehrerplaner weiter nutzen zu können.'];
         }
 
@@ -52,7 +52,10 @@ class User extends AbstractModel
 
             return ['message' => 'Successfully logged in'];
         } else {
-            return ['message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.'];
+            return [
+                'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
+                'status' => 'wrong login data'
+            ];
         }
     }
 
@@ -70,8 +73,6 @@ class User extends AbstractModel
         $accountData['emailConfirmed'] = 0;
         $accountData['activeUntil'] = (new DateTime())->modify('+ 30 days')->format('Y-m-d');
         unset($accountData['passwordRepeat']);
-
-        error_log($accountData['activeUntil']);
 
         $result = $this->write($query, $accountData);
 
@@ -107,7 +108,7 @@ class User extends AbstractModel
 
     private function sendEmailAuthenticationMail(): bool
     {
-        $mailConfirmationLink = $this->getMailConfirmationLink();
+        $mailConfirmationLink = $this->generateMailConfirmationLink();
         $mailSubject = 'Dein Account beim Lehrerplaner wartet auf Aktivierung';
         $mailMessage = <<<MAIL
                 <b>Fast geschafft!</b><br>
@@ -117,8 +118,25 @@ class User extends AbstractModel
                 <br>
                 $mailConfirmationLink
             MAIL;
-        
+
         return $this->sendMail($this->getEmail(), $mailSubject, $mailMessage);
+    }
+
+    public function sendPasswortResetMail($data): bool
+    {
+        $user = $this->getUserByEmail($data['userEmail']);
+
+        $passwordResetLink = $user->generatePasswordResetLink();
+        $mailSubject = 'Passwort zurücksetzen';
+        $mailMessage = <<<MAIL
+                <b>Du hast dein Passwort vergessen und kommst nicht mehr in deinen Account? Keine Panik!</b><br>
+                <br>
+                Um ein neues Passwort anzulegen, klicke folgenden Link. Der Link ist eine Stunde gültig.<br>
+                <br>
+                $passwordResetLink
+            MAIL;
+
+        return $this->sendMail($user->getEmail(), $mailSubject, $mailMessage);
     }
 
     public function resendAuthMail($data): bool
@@ -181,10 +199,27 @@ class User extends AbstractModel
         return false;
     }
 
-    private function getMailConfirmationLink()
+    private function generateMailConfirmationLink()
     {
         $emailHash = password_hash($this->getEmail(), PASSWORD_DEFAULT);
 
         return ROOTURL . '?c=user&a=authenticateMail&i=' . $this->getId() . '&t=' . $emailHash;
+    }
+
+    private function generatePasswordResetLink()
+    {
+        $resetToken = bin2hex(random_bytes(20));
+        $timestamp = (new DateTime())->modify('+ 1 hour')->format('Y-m-d H:i:s');
+
+        $query = "UPDATE $this->tableName SET resetToken = :resetToken, resetTokenValidUntil = :resetTokenValidUntil WHERE id = :id";
+        $params = [
+            'id' => $this->getId(),
+            'resetToken' => $resetToken,
+            'resetTokenValidUntil' => $timestamp
+        ];
+
+        $this->write($query, $params);
+
+        return ROOTURL . '?reset=' . $resetToken;
     }
 }
