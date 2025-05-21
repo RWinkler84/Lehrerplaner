@@ -345,10 +345,6 @@ export default class LessonView {
             <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
             <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
         `;
-
-        optionsWrapper.querySelector('button[data-update_lesson]').addEventListener('click', LessonView.createLessonForm);
-        optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', Controller.createNewTask);
-        optionsWrapper.querySelector('button[data-lesson_canceled]').addEventListener('click', LessonView.setLessonCanceled);
     }
 
     static removeLessonForm(event, discardedLesson = false) {

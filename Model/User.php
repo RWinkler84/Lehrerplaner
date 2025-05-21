@@ -2,6 +2,8 @@
 
 namespace Model;
 
+use DateInterval;
+use DateTime;
 use Error;
 use Model\AbstractModel;
 
@@ -26,7 +28,10 @@ class User extends AbstractModel
         $result = $this->read($query, ['userEmail' => $loginData['userEmail']]);
 
         if (empty($result)) {
-            return ['message' => 'Falsche E-Mail oder falsches Passwort.'];
+            return [
+                'message' => 'Falsche E-Mail oder falsches Passwort.',
+                'status' => 'wrong login data'
+                ];
             exit();
         }
 
@@ -35,6 +40,10 @@ class User extends AbstractModel
                 'message' => 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte öffne den Link in der Mail, die du nach der Anmeldung erhalten hast.',
                 'status' => 'mail auth missing'
             ];
+        }
+
+        if ((new DateTime())->getTimestamp() > (new DateTime($result[0]['activeUntil']))->getTimestamp()){
+            return ['message' => 'Dein Abonnement ist abgelaufen. Bitte verlängere es, um den Lehrerplaner weiter nutzen zu können.'];
         }
 
         if (password_verify($loginData['password'], $result[0]['password'])) {
@@ -55,11 +64,14 @@ class User extends AbstractModel
             return ['message' => 'Die angegebene E-Mail-Adresse wird bereits verwendet.'];
         }
 
-        $query = "INSERT INTO $this->tableName (userEmail, emailConfirmed, password) VALUES (:userEmail, :emailConfirmed, :password)";
+        $query = "INSERT INTO $this->tableName (userEmail, emailConfirmed, password, activeUntil) VALUES (:userEmail, :emailConfirmed, :password, :activeUntil)";
 
         $accountData['password'] = password_hash($accountData['password'], PASSWORD_DEFAULT);
         $accountData['emailConfirmed'] = 0;
+        $accountData['activeUntil'] = (new DateTime())->modify('+ 30 days')->format('Y-m-d');
         unset($accountData['passwordRepeat']);
+
+        error_log($accountData['activeUntil']);
 
         $result = $this->write($query, $accountData);
 

@@ -36,8 +36,9 @@ class Task extends AbstractModel
     public function updateDate($taskData)
     {
         $taskData = $this->preprocessDataToWrite($taskData);
+        error_log(print_r($taskData, true));
 
-        $query = "UPDATE $this->tableName SET id=:id, date=:date WHERE userId=:userId AND itemId = :itemId";
+        $query = "UPDATE $this->tableName SET date=:date WHERE userId=:userId AND itemId = :itemId";
 
         return $this->write($query, $taskData);
     }

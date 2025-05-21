@@ -1,8 +1,7 @@
 - Multi-User-Support
-    - Account creation
-        - checken, ob Nutzername frei ist
-        - checken, ob PW sicher ist
-    - E-Mail-Service für E-Mail-Bestätigung und Passwort-Wiederherstellung
+    - E-Mail-Service für Passwort-Wiederherstellung
+    - bei Anmeldung Aktivitätszeitraum setzen
+        - beim Login checken, ob der Account aktiv ist
 
 - taskDescription scrollbar machen, wenn ein Wort die Layoutbreite sprengt
 
@@ -129,4 +128,8 @@ bin einen Umweg über CSS gegangen. der addtaskButtonWrapper wird nur angezeigt,
 
 - Multi-User-Support
     - Datensätze mit User-Id verbinden
-    
+        - Account creation
+            - checken, ob Nutzername frei ist
+            - checken, ob PW sicher ist
+            - bei Anmeldung Aktivitätszeitraum setzen
+    - E-Mail-Service für E-Mail-Bestätigung 

@@ -41,6 +41,11 @@ async function attemptLogin(event) {
                 loginErrorMessageDisplay.innerHTML += '<p><a href="" id="resendAuthMail" style="text-decoration: none;">Bestätigungsmail erneut senden?</a></p>';
                 loginErrorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
             }
+
+            if (result.status == 'wrong login data') {
+                loginErrorMessageDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
+                loginErrorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', resendAuthMail);
+            }
             alertLoginErrorMessageDisplay();
         }
     }
@@ -169,8 +174,6 @@ async function makeAjaxQuery(url, dataToSend) {
     }
 
     result = await response.json();
-
-    console.log(result);
 
     return result;
 }
