@@ -276,6 +276,7 @@ export default class LessonView {
         let oldLessonData;
 
         oldLessonData = {
+            'id': lessonElement.dataset.id,
             'date': lessonElement.dataset.date,
             'timeslot': lessonElement.dataset.timeslot,
             'class': lessonElement.dataset.class,
