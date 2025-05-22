@@ -40,7 +40,7 @@ class UserController extends AbstractController
             $this->validateEmail($accountData['userEmail']) &&
             $this->validatePassword($accountData['password']) &&
             $this->validatePassword($accountData['passwordRepeat']) &&
-            $accountData['password'] == $accountData['passwordRepeat']
+            $accountData['password'] === $accountData['passwordRepeat']
         ) {
             $result = $this->model->createAccount($accountData);
 
@@ -52,6 +52,30 @@ class UserController extends AbstractController
         http_response_code(400);
         echo json_encode(['message' => 'Da ist etwas schief gelaufen.']);
     }
+
+    public function resetPassword()
+    {
+        $passwordData = json_decode(file_get_contents('php://input'), true);
+
+        if (
+            $this->validatePassword($passwordData['newPassword']) &&
+            $this->validatePassword($passwordData['newPasswordRepeat']) &&
+            $passwordData['newPassword'] === $passwordData['newPasswordRepeat']
+        ) {
+            $result = $this->model->resetPassword($passwordData);
+
+            http_response_code(200);
+            echo json_encode($result);
+            exit();
+        }
+
+        http_response_code(400);
+        echo json_encode([
+            'message' => 'Da ist etwas schief gelaufen.',
+            'status' => 'failed'
+            ]);
+    }
+
 
     public function authenticateMail()
     {

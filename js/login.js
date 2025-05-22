@@ -1,8 +1,9 @@
-// import { ONEMIN } from "./index.js";
-
 document.querySelector('#createAccount').addEventListener('click', openAccountCreationForm);
 document.querySelector('#loginForm').addEventListener('submit', attemptLogin);
-document.querySelector('#createForm').addEventListener('submit', attemptAccountCreation);
+document.querySelector('#createAccountForm').addEventListener('submit', attemptAccountCreation);
+document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', sendResetPasswordMail);
+document.querySelector('#resetPasswordForm').addEventListener('submit', attemptPasswordReset);
+document.querySelectorAll('.backToLoginLink').forEach(link => {link.addEventListener('click', openLoginForm);});
 
 window.addEventListener('DOMContentLoaded', isAuth);
 window.addEventListener('DOMContentLoaded', isReset);
@@ -11,9 +12,13 @@ const ONEMIN = 60000;
 
 const loginDialog = document.querySelector('#loginDialog');
 const createAccountDialog = document.querySelector('#createAccountDialog');
+const sendResetPasswordMailDialog = document.querySelector('#sendResetPasswordMailDialog');
 const resetPasswordDialog = document.querySelector('#resetPasswordDialog');
-const loginErrorMessageDisplay = document.querySelector('#loginErrorMessageDisplay');
-const accountCreationErrorMessageDisplay = document.querySelector('#accountCreationErrorMessageDisplay');
+
+const loginErrorMessageDisplay = loginDialog.querySelector('#loginErrorMessageDisplay');
+const accountCreationErrorMessageDisplay = createAccountDialog.querySelector('#accountCreationErrorMessageDisplay');
+const sendResetPasswordMailErrorMessageDisplay = resetPasswordDialog.querySelector('#sendResetPasswordErrorMessageDisplay')
+const resetPasswordErrorMessageDisplay = resetPasswordDialog.querySelector('#resetPasswordErrorMessageDisplay')
 
 let authMailAlreadySend = false;
 let resetMailAlreadySend = false;
@@ -35,7 +40,8 @@ function isReset() {
     let token = params.get('reset');
 
     if (token) {
-
+        resetPasswordDialog.setAttribute('open', '');
+        loginDialog.removeAttribute('open');
     }
 }
 
@@ -63,10 +69,38 @@ async function attemptLogin(event) {
             console.log(result.status)
             if (result.status == 'wrong login data') {
                 loginErrorMessageDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
-                loginErrorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', sendResetPasswordMail);
+                loginErrorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', openSendResetPasswordMailDialog);
             }
             alertLoginErrorMessageDisplay();
         }
+    }
+}
+
+async function attemptPasswordReset(event) {
+    event.preventDefault();
+
+    let params = new URLSearchParams(window.location.search);
+    let token = params.get('reset');
+    let formData = getPasswordResetDataFromForm();
+
+    if (formData) {
+        formData['token'] = token;
+
+        let result = await makeAjaxQuery('index.php?c=user&a=resetPassword', formData);
+
+        console.log(result);
+
+        if (result.status == 'success') {
+            resetPasswordErrorMessageDisplay.style.color = 'var(--matteGreen)';
+            resetPasswordErrorMessageDisplay.innerText = result.message;
+            resetPasswordErrorMessageDisplay.innerHTML += '<p><a href="" id="backToLogin" style="text-decoration: none">Zurück zum Login</a></p>';
+
+            resetPasswordErrorMessageDisplay.querySelector('#backToLogin').addEventListener('click', openLoginForm);
+
+            return;
+        }
+
+        resetPasswordErrorMessageDisplay.innerText = result.message;
     }
 }
 
@@ -78,7 +112,7 @@ async function resendAuthMail(event) {
 
     if (!authMailAlreadySend) {
         authMailAlreadySend = true;
-        
+
         result = await makeAjaxQuery('index.php?c=user&a=resendAuthMail', { 'userEmail': userEmail });
         loginErrorMessageDisplay.innerText = result.message;
 
@@ -86,22 +120,22 @@ async function resendAuthMail(event) {
             loginErrorMessageDisplay.style.color = 'var(--matteGreen';
         }
 
-        setTimeout(() => {authMailAlreadySend = false;}, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
+        setTimeout(() => { authMailAlreadySend = false; }, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
         return;
     }
 
     loginErrorMessageDisplay.innerText = 'Es wurde bereits eine Authentifierungsmail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
 }
 
-async function sendResetPasswordMail(event){
+async function sendResetPasswordMail(event) {
     event.preventDefault();
 
-    let userEmail = loginDialog.querySelector('#userEmail').value;
+    let userEmail = sendResetPasswordMailDialog.querySelector('#resetPasswordMail').value; //das auslesen in Funktion auslagern und validieren
     let result;
 
     if (!resetMailAlreadySend) {
         resetMailAlreadySend = true;
-        
+
         result = await makeAjaxQuery('index.php?c=user&a=sendPasswortResetMail', { 'userEmail': userEmail });
         loginErrorMessageDisplay.innerText = result.message;
 
@@ -109,7 +143,7 @@ async function sendResetPasswordMail(event){
             loginErrorMessageDisplay.style.color = 'var(--matteGreen';
         }
 
-        setTimeout(() => {resetMailAlreadySend = false;}, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
+        setTimeout(() => { resetMailAlreadySend = false; }, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
         return;
     }
 
@@ -134,31 +168,6 @@ function getLoginDataFromForm() {
         'userEmail': userEmail,
         'password': password
     };
-}
-
-function openAccountCreationForm(event) {
-    event.preventDefault();
-
-    loginDialog.removeAttribute('open');
-    createAccountDialog.setAttribute('open', '');
-}
-
-async function attemptAccountCreation(event) {
-    event.preventDefault()
-    let result;
-    let accountData = getAccountDataFromForm();
-
-    if (accountData) {
-        result = await makeAjaxQuery('index.php?c=user&a=createAccount', accountData);
-
-        if (result.message == 'Confirmation email send') {
-            accountCreationErrorMessageDisplay.style.color = 'var(--matteGreen)';
-            accountCreationErrorMessageDisplay.innerText = 'Erfolg! Eine Bestätigungsmail wurde an die angegebene Adresse gesendet. Bitte klicke den darin enthaltenen Link, damit du loslegen kannst.'
-        } else {
-            accountCreationErrorMessageDisplay.innerText = result.message;
-            alertAccountCreationErrorMessageDisplay();
-        }
-    }
 }
 
 function getAccountDataFromForm() {
@@ -208,6 +217,83 @@ function getAccountDataFromForm() {
         'userEmail': email,
         'password': password,
         'passwordRepeat': passwordRepeat
+    }
+}
+
+function getPasswordResetDataFromForm() {
+    const passwordRegEx = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+    let newPassword = resetPasswordDialog.querySelector('#resetPassword').value;
+    let newPasswordRepeat = resetPasswordDialog.querySelector('#resetPasswordRepeat').value;
+
+    //empty
+    if (newPassword == '') {
+        alertResetPassword();
+        return false;
+    }
+
+    if (newPasswordRepeat == '') {
+        alertResetPasswordRepeat();
+        return false;
+    }
+
+    //different passwords
+    if (newPassword != newPasswordRepeat) {
+        alertResetPassword('Die Passwörter müssen identisch sein.');
+        alertResetPasswordRepeat();
+        return false;
+    }
+
+    //regex
+    if (!passwordRegEx.test(newPassword)) {
+        let message = 'Das Passwort muss mindestens 8 Zeichen lang sein, Großbuchstaben, mindestens eine Zahl und ein Sonderzeichen enthalten.'
+        alertResetPassword(message);
+        return false;
+    }
+
+    return {
+        'newPassword': newPassword,
+        'newPasswordRepeat': newPasswordRepeat
+    }
+}
+
+function openLoginForm(event) {
+    event.preventDefault();
+
+    loginDialog.setAttribute('open', '');
+    createAccountDialog.removeAttribute('open');
+    resetPasswordDialog.removeAttribute('open');
+    sendResetPasswordMailDialog.removeAttribute('open');
+}
+
+function openAccountCreationForm(event) {
+    event.preventDefault();
+
+    loginDialog.removeAttribute('open');
+    createAccountDialog.setAttribute('open', '');
+}
+
+function openSendResetPasswordMailDialog(event) {
+    event.preventDefault();
+    loginDialog.removeAttribute('open');
+    sendResetPasswordMailDialog.setAttribute('open', '');
+}
+
+async function attemptAccountCreation(event) {
+    event.preventDefault()
+    let result;
+    let accountData = getAccountDataFromForm();
+
+    if (accountData) {
+        result = await makeAjaxQuery('index.php?c=user&a=createAccount', accountData);
+
+        if (result.message == 'Confirmation email send') {
+            accountCreationErrorMessageDisplay.style.color = 'var(--matteGreen)';
+            accountCreationErrorMessageDisplay.innerText = 'Erfolg! Eine Bestätigungsmail wurde an die angegebene Adresse gesendet. Bitte klicke den darin enthaltenen Link, damit du loslegen kannst.'
+        } else {
+            accountCreationErrorMessageDisplay.innerText = result.message;
+            alertAccountCreationErrorMessageDisplay();
+        }
     }
 }
 
@@ -304,5 +390,28 @@ function alertAccountCreationErrorMessageDisplay() {
     accountCreationErrorMessageDisplay.classList.add('validationError');
     setTimeout(() => {
         accountCreationErrorMessageDisplay.classList.remove('validationError');
+    }, 300);
+}
+
+// password reset
+function alertResetPassword(message) {
+    let alertRing = resetPasswordDialog.querySelector('#resetPassword').parentElement;
+
+    if (message) {
+        resetPasswordErrorMessageDisplay.innerText = message;
+    }
+
+    alertRing.classList.add('validationError');
+    setTimeout(() => {
+        alertRing.classList.remove('validationError');
+    }, 300);
+}
+
+function alertResetPasswordRepeat() {
+    let alertRing = resetPasswordDialog.querySelector('#resetPasswordRepeat').parentElement;
+
+    alertRing.classList.add('validationError');
+    setTimeout(() => {
+        alertRing.classList.remove('validationError');
     }, 300);
 }

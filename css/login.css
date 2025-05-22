@@ -28,7 +28,8 @@ input {
     height: 1.5rem;
 }
 
-#newUserEmail {
+#newUserEmail,
+#resetPasswordMail {
     width: 419px;
 }
 

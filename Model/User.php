@@ -126,9 +126,10 @@ class User extends AbstractModel
     {
         $user = $this->getUserByEmail($data['userEmail']);
 
-        $passwordResetLink = $user->generatePasswordResetLink();
-        $mailSubject = 'Passwort zurücksetzen';
-        $mailMessage = <<<MAIL
+        if (!is_null($user)) {
+            $passwordResetLink = $user->generatePasswordResetLink();
+            $mailSubject = 'Passwort zurücksetzen';
+            $mailMessage = <<<MAIL
                 <b>Du hast dein Passwort vergessen und kommst nicht mehr in deinen Account? Keine Panik!</b><br>
                 <br>
                 Um ein neues Passwort anzulegen, klicke folgenden Link. Der Link ist eine Stunde gültig.<br>
@@ -136,7 +137,10 @@ class User extends AbstractModel
                 $passwordResetLink
             MAIL;
 
-        return $this->sendMail($user->getEmail(), $mailSubject, $mailMessage);
+            return $this->sendMail($user->getEmail(), $mailSubject, $mailMessage);
+        }
+        
+        return false;
     }
 
     public function resendAuthMail($data): bool
@@ -144,6 +148,29 @@ class User extends AbstractModel
         $user = $this->getUserByEmail($data['userEmail']);
 
         return $user->sendEmailAuthenticationMail();
+    }
+
+    public function resetPassword($passwordData)
+    {
+        $now = (new DateTime())->getTimestamp();
+        $userData = $this->getUserDataByPasswordResetToken($passwordData['token']);
+
+        if (!empty($userData)) {
+            $tokenValidUntil = (new DateTime($userData[0]['resetTokenValidUntil']))->getTimestamp();
+
+            if (
+                $userData[0]['resetToken'] == $passwordData['token'] &&
+                $tokenValidUntil >= $now
+            ) {
+
+                return [
+                    'message' => 'Dein Passwort wurde erfolgreich zurückgesetzt',
+                    'status' => 'success'
+                ];
+            }
+        }
+
+        return ['message' => 'Der von dir verwendete Link scheint abgelaufen zu sein. Fordere einen neuen an.'];
     }
 
     public function getId()
@@ -184,6 +211,15 @@ class User extends AbstractModel
         $user->email = $result[0]['userEmail'];
 
         return $user;
+    }
+
+    private function getUserDataByPasswordResetToken($token): array
+    {
+        $query = "SELECT * FROM $this->tableName WHERE resetToken = :token";
+
+        $result = $this->read($query, ['token' => $token]);
+
+        return $result;
     }
 
     private function userExists($newUserData)

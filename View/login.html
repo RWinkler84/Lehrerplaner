@@ -23,7 +23,7 @@
                         <div class="alertRing"><input type="text" name="userEmail" id="userEmail"></div>
                     </div>
                     <div>
-                        <label for="userEmail" style="display: block">Passwort</label>
+                        <label for="password" style="display: block">Passwort</label>
                         <div class="alertRing"><input type="password" name="password" id="password"></div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
             <div id="headline">
                 <h3>Konto anlegen</h3>
             </div>
-            <form id="createForm" method="post">
+            <form id="createAccountForm" method="post">
                 <div class="flex column halfGap marginTop" class="formBody">
                     <div>
                         <label for="newUserEmail" style="display: block">E-Mail</label>
@@ -59,8 +59,52 @@
                     </div>
                 </div>
                 <div id="accountCreationErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
-                <div class="flex justifyEnd alignEnd marginTop">
+                <div class="flex spaceBetween alignEnd marginTop">
+                    <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
                     <button type="submit" id="submitNewAccountDataButton" style="margin-right: 3px">Anlegen</button>
+                </div>
+            </form>
+        </dialog>
+
+        <dialog id="sendResetPasswordMailDialog" open>
+            <div id="headline">
+                <h3>Passwort-Reset-Mail anfordern</h3>
+            </div>
+            <form id="sendResetPasswordMailForm" method="post">
+                <div class="flex halfGap marginTop" class="formBody">
+                    <div>
+                        <label for="resetPasswordMail" style="display: block">E-Mail-Adresse</label>
+                        <div class="alertRing"><input type="mail" name="resetPasswordMail" id="resetPasswordMail"></div>
+                    </div>
+                </div>
+                <div id="sendResetPasswordMailErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
+                <div class="flex spaceBetween alignEnd marginTop">
+                    <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
+                    <button type="submit" id="sendResetPasswordMailButton" style="margin-right: 3px">Anfordern</button>
+                </div>
+            </form>
+        </dialog>
+
+        <dialog id="resetPasswordDialog">
+            <div id="headline">
+                <h3>Passwort zurücksetzen</h3>
+            </div>
+            <form id="resetPasswordForm" method="post">
+                <div class="flex halfGap marginTop" class="formBody">
+                    <div>
+                        <label for="resetPassword" style="display: block">Neues Passwort</label>
+                        <div class="alertRing"><input type="password" name="resetPassword" id="resetPassword"></div>
+                    </div>
+                    <div>
+                        <label for="resetPasswordRepeat" style="display: block">Passwort wiederholen</label>
+                        <div class="alertRing"><input type="password" name="resetPasswordRepeat"
+                                id="resetPasswordRepeat"></div>
+                    </div>
+                </div>
+                <div id="resetPasswordErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
+                <div class="flex spaceBetween alignEnd marginTop">
+                    <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
+                    <button type="submit" id="resetPasswordButton" style="margin-right: 3px">Speichern</button>
                 </div>
             </form>
         </dialog>
