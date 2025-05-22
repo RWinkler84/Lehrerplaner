@@ -139,7 +139,7 @@ class User extends AbstractModel
 
             return $this->sendMail($user->getEmail(), $mailSubject, $mailMessage);
         }
-        
+
         return false;
     }
 
@@ -147,7 +147,11 @@ class User extends AbstractModel
     {
         $user = $this->getUserByEmail($data['userEmail']);
 
-        return $user->sendEmailAuthenticationMail();
+        if (!is_null($user)) {
+            return $user->sendEmailAuthenticationMail();
+        }
+
+        return false;
     }
 
     public function resetPassword($passwordData)
@@ -162,11 +166,24 @@ class User extends AbstractModel
                 $userData[0]['resetToken'] == $passwordData['token'] &&
                 $tokenValidUntil >= $now
             ) {
+                $query = "UPDATE $this->tableName SET password = :newPassword, resetToken = NULL, resetTokenValidUntil = NULL WHERE id = :id";
+                
+                $params['id'] = $userData[0]['id'];
+                $params['newPassword'] = password_hash($passwordData['newPassword'], PASSWORD_DEFAULT);
 
-                return [
-                    'message' => 'Dein Passwort wurde erfolgreich zurückgesetzt',
-                    'status' => 'success'
-                ];
+                $result = $this->write($query, $params);
+
+                if ($result['message']  == 'Data saved sucessfully') {
+                    return [
+                        'message' => 'Dein Passwort wurde erfolgreich zurückgesetzt',
+                        'status' => 'success'
+                    ];
+                } else {
+                    return [
+                        'message' => 'Da ist etwas schief gelaufen. Bitte versuche es später noch einmal.',
+                        'status' => 'failed'
+                    ];
+                }
             }
         }
 
@@ -207,10 +224,13 @@ class User extends AbstractModel
         $query = "SELECT * FROM $this->tableName WHERE userEmail = :email";
         $result = $this->read($query, ['email' => $email]);
 
-        $user = new User($result[0]['id']);
-        $user->email = $result[0]['userEmail'];
 
-        return $user;
+        if (!empty($result)) {
+            $user = new User($result[0]['id']);
+            $user->email = $result[0]['userEmail'];
+
+            return $user;
+        }
     }
 
     private function getUserDataByPasswordResetToken($token): array

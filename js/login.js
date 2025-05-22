@@ -3,7 +3,7 @@ document.querySelector('#loginForm').addEventListener('submit', attemptLogin);
 document.querySelector('#createAccountForm').addEventListener('submit', attemptAccountCreation);
 document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', sendResetPasswordMail);
 document.querySelector('#resetPasswordForm').addEventListener('submit', attemptPasswordReset);
-document.querySelectorAll('.backToLoginLink').forEach(link => {link.addEventListener('click', openLoginForm);});
+document.querySelectorAll('.backToLoginLink').forEach(link => { link.addEventListener('click', openLoginForm); });
 
 window.addEventListener('DOMContentLoaded', isAuth);
 window.addEventListener('DOMContentLoaded', isReset);
@@ -17,7 +17,7 @@ const resetPasswordDialog = document.querySelector('#resetPasswordDialog');
 
 const loginErrorMessageDisplay = loginDialog.querySelector('#loginErrorMessageDisplay');
 const accountCreationErrorMessageDisplay = createAccountDialog.querySelector('#accountCreationErrorMessageDisplay');
-const sendResetPasswordMailErrorMessageDisplay = resetPasswordDialog.querySelector('#sendResetPasswordErrorMessageDisplay')
+const sendResetPasswordMailErrorMessageDisplay = sendResetPasswordMailDialog.querySelector('#sendResetPasswordMailErrorMessageDisplay')
 const resetPasswordErrorMessageDisplay = resetPasswordDialog.querySelector('#resetPasswordErrorMessageDisplay')
 
 let authMailAlreadySend = false;
@@ -118,6 +118,8 @@ async function resendAuthMail(event) {
 
         if (result.status == 'success') {
             loginErrorMessageDisplay.style.color = 'var(--matteGreen';
+        } else {
+            authMailAlreadySend = false;
         }
 
         setTimeout(() => { authMailAlreadySend = false; }, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
@@ -130,24 +132,32 @@ async function resendAuthMail(event) {
 async function sendResetPasswordMail(event) {
     event.preventDefault();
 
-    let userEmail = sendResetPasswordMailDialog.querySelector('#resetPasswordMail').value; //das auslesen in Funktion auslagern und validieren
+    let userEmail = sendResetPasswordMailDialog.querySelector('#resetPasswordMail').value;
     let result;
+
+    if (userEmail == '') {
+        alertSendAccountResetMailInput();
+        return;
+    }
 
     if (!resetMailAlreadySend) {
         resetMailAlreadySend = true;
 
         result = await makeAjaxQuery('index.php?c=user&a=sendPasswortResetMail', { 'userEmail': userEmail });
-        loginErrorMessageDisplay.innerText = result.message;
 
         if (result.status == 'success') {
-            loginErrorMessageDisplay.style.color = 'var(--matteGreen';
+            sendResetPasswordMailErrorMessageDisplay.style.color = 'var(--matteGreen';
+            sendResetPasswordMailErrorMessageDisplay.innerText = result.message;
+        } else {
+            resetMailAlreadySend = false;
         }
 
         setTimeout(() => { resetMailAlreadySend = false; }, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
         return;
     }
 
-    loginErrorMessageDisplay.innerText = 'Es wurde bereits eine Reset-Mail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
+    sendResetPasswordMailErrorMessageDisplay.innerText = 'Es wurde bereits eine Reset-Mail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
+
 }
 
 function getLoginDataFromForm() {
@@ -393,7 +403,18 @@ function alertAccountCreationErrorMessageDisplay() {
     }, 300);
 }
 
-// password reset
+// send password reset mail form
+
+function alertSendAccountResetMailInput() {
+    let alertRing = sendResetPasswordMailDialog.querySelector('#resetPasswordMail').parentElement;
+
+    alertRing.classList.add('validationError');
+    setTimeout(() => {
+        alertRing.classList.remove('validationError');
+    }, 300);
+}
+
+// password reset form
 function alertResetPassword(message) {
     let alertRing = resetPasswordDialog.querySelector('#resetPassword').parentElement;
 

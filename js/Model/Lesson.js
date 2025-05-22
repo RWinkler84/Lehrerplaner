@@ -164,7 +164,6 @@ export default class Lesson extends AbstractModel {
     }
 
     update() {
-        console.log(this);
         let lessonData = {
             'date': this.formatDate(this.date),
             'timeslot': this.timeslot,
@@ -183,7 +182,6 @@ export default class Lesson extends AbstractModel {
     }
 
     cancel() {
-        console.log(this);
         let lessonData = {
             'id': this.id,
             'date': this.formatDate(this.date),
