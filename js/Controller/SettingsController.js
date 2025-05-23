@@ -83,6 +83,11 @@ export default class SettingsController {
         View.discardNewTimetable();
     }
 
+    static logout(){
+        let model = new Settings;
+        model.logout();
+    }
+
     static getScheduledLessons() {
         return LessonController.getScheduledLessons();
     }

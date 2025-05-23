@@ -1,5 +1,6 @@
 import AbstractView from './View/AbstractView.js';
 import AbstractController from './Controller/AbstractController.js';
+import SettingsController from './Controller/SettingsController.js';
 import TaskView from './View/TaskView.js';
 import LessonView from './View/LessonView.js';
 import SettingsView from './View/SettingsView.js';
@@ -89,6 +90,9 @@ async function startApp() {
     document.querySelector('#editTimetableButton').addEventListener('click', SettingsView.makeLessonsEditable);
     document.querySelector('#saveTimetableChangesButton').addEventListener('click', SettingsView.saveTimetableChanges);
     document.querySelector('#discardTimetableChangesButton').addEventListener('click', SettingsView.discardNewTimetable);
+
+    //logout
+    document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);
 
 
     setDateForWeekdays();

@@ -121,4 +121,12 @@ export default class Settings extends AbstractModel {
 
         return lessons;
     }
+
+    async logout(){
+        let result = await this.makeAjaxQuery('user', 'logout');
+        
+        if (result.status == 'success') {
+            location.reload();
+        }
+    }
 }

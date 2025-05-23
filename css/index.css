@@ -482,7 +482,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 .deleteSubjectButton,
 .deleteLessonButton,
 #closeSettingsButton,
-#openSettingsButton {
+#openSettingsButton,
+#logoutButton {
     color: var(--lightgrey);
     /* flex-grow: 1; */
     border: none;
@@ -499,8 +500,13 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: rgba(256, 256, 256, 0.1);
 }
 
+#logoutButton:hover {
+    background-color: var(--matteRed);
+}
+
 #openSettingsButton,
-#closeSettingsButton {
+#closeSettingsButton,
+#logoutButton {
     width: 2rem;
     height: 2rem;
     font-size: 1.5rem;

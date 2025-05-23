@@ -32,6 +32,12 @@ class UserController extends AbstractController
         echo json_encode(['message' => 'Wrong username or password']);
     }
 
+    public function logout() {
+        session_destroy();
+        echo json_encode(['status' => 'success']);
+
+    }
+
     public function createAccount()
     {
         $accountData = json_decode(file_get_contents('php://input'), true);
