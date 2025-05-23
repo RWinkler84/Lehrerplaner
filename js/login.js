@@ -49,6 +49,7 @@ async function attemptLogin(event) {
 
     event.preventDefault();
 
+    const errorMessageDisplay = loginDialog.querySelector('.errorMessageDisplay');
     let result;
     let loginData = getLoginDataFromForm();
 
@@ -58,18 +59,18 @@ async function attemptLogin(event) {
         if (result.message === 'Successfully logged in') {
             window.location = 'index.php';
         } else {
-            loginErrorMessageDisplay.style.color = 'var(--matteRed)';
-            loginErrorMessageDisplay.innerText = result.message;
+            errorMessageDisplay.style.color = 'var(--matteRed)';
+            errorMessageDisplay.innerText = result.message;
 
             if (result.status == 'mail auth missing') {
-                loginErrorMessageDisplay.innerHTML += '<p><a href="" id="resendAuthMail" style="text-decoration: none;">Bestätigungsmail erneut senden?</a></p>';
-                loginErrorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
+                errorMessageDisplay.innerHTML += '<p><a href="" id="resendAuthMail" style="text-decoration: none;">Bestätigungsmail erneut senden?</a></p>';
+                errorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
             }
 
             console.log(result.status)
             if (result.status == 'wrong login data') {
-                loginErrorMessageDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
-                loginErrorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', openSendResetPasswordMailDialog);
+                errorMessageDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
+                errorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', openSendResetPasswordMailDialog);
             }
             alertLoginErrorMessageDisplay();
         }
@@ -79,6 +80,7 @@ async function attemptLogin(event) {
 async function attemptPasswordReset(event) {
     event.preventDefault();
 
+    const errorMessageDisplay = resetPasswordDialog.querySelector('.errorMessageDisplay');
     let params = new URLSearchParams(window.location.search);
     let token = params.get('reset');
     let formData = getPasswordResetDataFromForm();
@@ -91,22 +93,23 @@ async function attemptPasswordReset(event) {
         console.log(result);
 
         if (result.status == 'success') {
-            resetPasswordErrorMessageDisplay.style.color = 'var(--matteGreen)';
-            resetPasswordErrorMessageDisplay.innerText = result.message;
-            resetPasswordErrorMessageDisplay.innerHTML += '<p><a href="" id="backToLogin" style="text-decoration: none">Zurück zum Login</a></p>';
+            errorMessageDisplay.style.color = 'var(--matteGreen)';
+            errorMessageDisplay.innerText = result.message;
+            errorMessageDisplay.innerHTML += '<p><a href="" id="backToLogin" style="text-decoration: none">Zurück zum Login</a></p>';
 
-            resetPasswordErrorMessageDisplay.querySelector('#backToLogin').addEventListener('click', openLoginForm);
+            errorMessageDisplay.querySelector('#backToLogin').addEventListener('click', openLoginForm);
 
             return;
         }
 
-        resetPasswordErrorMessageDisplay.innerText = result.message;
+        errorMessageDisplay.innerText = result.message;
     }
 }
 
 async function resendAuthMail(event) {
     event.preventDefault();
 
+    const errorMessageDisplay = loginDialog.querySelector('.errorMessageDisplay');
     let userEmail = loginDialog.querySelector('#userEmail').value;
     let result;
 
@@ -114,10 +117,10 @@ async function resendAuthMail(event) {
         authMailAlreadySend = true;
 
         result = await makeAjaxQuery('index.php?c=user&a=resendAuthMail', { 'userEmail': userEmail });
-        loginErrorMessageDisplay.innerText = result.message;
+        errorMessageDisplay.innerText = result.message;
 
         if (result.status == 'success') {
-            loginErrorMessageDisplay.style.color = 'var(--matteGreen';
+            errorMessageDisplay.style.color = 'var(--matteGreen';
         } else {
             authMailAlreadySend = false;
         }
@@ -126,12 +129,13 @@ async function resendAuthMail(event) {
         return;
     }
 
-    loginErrorMessageDisplay.innerText = 'Es wurde bereits eine Authentifierungsmail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
+    errorMessageDisplay.innerText = 'Es wurde bereits eine Authentifierungsmail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
 }
 
 async function sendResetPasswordMail(event) {
     event.preventDefault();
 
+    const errorMessageDisplay = sendResetPasswordMailDialog.querySelector('.errorMessageDisplay');
     let userEmail = sendResetPasswordMailDialog.querySelector('#resetPasswordMail').value;
     let result;
 
@@ -146,8 +150,8 @@ async function sendResetPasswordMail(event) {
         result = await makeAjaxQuery('index.php?c=user&a=sendPasswortResetMail', { 'userEmail': userEmail });
 
         if (result.status == 'success') {
-            sendResetPasswordMailErrorMessageDisplay.style.color = 'var(--matteGreen';
-            sendResetPasswordMailErrorMessageDisplay.innerText = result.message;
+            errorMessageDisplay.style.color = 'var(--matteGreen';
+            errorMessageDisplay.innerText = result.message;
         } else {
             resetMailAlreadySend = false;
         }
@@ -156,7 +160,7 @@ async function sendResetPasswordMail(event) {
         return;
     }
 
-    sendResetPasswordMailErrorMessageDisplay.innerText = 'Es wurde bereits eine Reset-Mail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
+    errorMessageDisplay.innerText = 'Es wurde bereits eine Reset-Mail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
 
 }
 
@@ -270,23 +274,33 @@ function getPasswordResetDataFromForm() {
 function openLoginForm(event) {
     event.preventDefault();
 
-    loginDialog.setAttribute('open', '');
     createAccountDialog.removeAttribute('open');
     resetPasswordDialog.removeAttribute('open');
     sendResetPasswordMailDialog.removeAttribute('open');
+
+    loginDialog.setAttribute('open', '');
+    loginErrorMessageDisplay.style.color = 'var(--matteRed)';
+    loginErrorMessageDisplay.innerText = '';
 }
 
 function openAccountCreationForm(event) {
     event.preventDefault();
 
     loginDialog.removeAttribute('open');
+
     createAccountDialog.setAttribute('open', '');
+    accountCreationErrorMessageDisplay.style.color = 'var(--matteRed)';
+    accountCreationErrorMessageDisplay.innerText = '';
 }
 
 function openSendResetPasswordMailDialog(event) {
     event.preventDefault();
+
     loginDialog.removeAttribute('open');
+
     sendResetPasswordMailDialog.setAttribute('open', '');
+    sendResetPasswordMailErrorMessageDisplay.style.color = 'var(--matteRed)';
+    sendResetPasswordMailErrorMessageDisplay.innerText = '';
 }
 
 async function attemptAccountCreation(event) {
@@ -347,8 +361,6 @@ function alertPassword() {
 }
 
 function alertLoginErrorMessageDisplay() {
-    let alertRing = document.querySelector('dialog');
-
     loginErrorMessageDisplay.classList.add('validationError');
     setTimeout(() => {
         loginErrorMessageDisplay.classList.remove('validationError');

@@ -12,6 +12,9 @@ class User extends AbstractModel
 
     private $userId;
     private $email;
+    private $password;
+    private $emailConfirmed;
+    private $activeUntil;
 
     private $tableName = TABLEPREFIX . 'users';
 
@@ -23,11 +26,9 @@ class User extends AbstractModel
 
     public function login($loginData)
     {
-        $query = "SELECT * FROM $this->tableName WHERE userEmail=:userEmail";
+        $user = $this->getUserByEmail($loginData['userEmail']);
 
-        $result = $this->read($query, ['userEmail' => $loginData['userEmail']]);
-
-        if (empty($result)) {
+        if (empty($user)) {
             return [
                 'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
                 'status' => 'wrong login data'
@@ -35,20 +36,24 @@ class User extends AbstractModel
             exit();
         }
 
-        if ($result[0]['emailConfirmed'] == 0) {
+        if ($user->emailConfirmed == 0) {
             return [
                 'message' => 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte öffne den Link in der Mail, die du nach der Anmeldung erhalten hast.',
                 'status' => 'mail auth missing'
             ];
         }
 
-        if ((new DateTime())->getTimestamp() > (new DateTime($result[0]['activeUntil']))->getTimestamp()) {
+        if ((new DateTime())->getTimestamp() > (new DateTime($user->getActiveUntil()))->getTimestamp()) {
             return ['message' => 'Dein Abonnement ist abgelaufen. Bitte verlängere es, um den Lehrerplaner weiter nutzen zu können.'];
         }
 
-        if (password_verify($loginData['password'], $result[0]['password'])) {
+        if (password_verify($loginData['password'], $user->getPassword())) {
             $_SESSION['isLoggedIn'] = true;
-            $_SESSION['userId'] = $result[0]['id'];
+            $_SESSION['userId'] = $user->getId();
+
+            //if the user has requested a password reset, but still logs in with the old data the token needs to be wiped
+            $query = "UPDATE $this->tableName SET resetToken = NULL, resetTokenValidUntil = NULL WHERE id = :userId";
+            $this->write($query, ['userId' => $user->getId()]);
 
             return ['message' => 'Successfully logged in'];
         } else {
@@ -167,7 +172,7 @@ class User extends AbstractModel
                 $tokenValidUntil >= $now
             ) {
                 $query = "UPDATE $this->tableName SET password = :newPassword, resetToken = NULL, resetTokenValidUntil = NULL WHERE id = :id";
-                
+
                 $params['id'] = $userData[0]['id'];
                 $params['newPassword'] = password_hash($passwordData['newPassword'], PASSWORD_DEFAULT);
 
@@ -200,6 +205,14 @@ class User extends AbstractModel
         return $this->email;
     }
 
+    private function getPassword(){
+        return $this->password;
+    }
+
+    public function getActiveUntil() {
+        return $this->activeUntil;
+    }
+
     public function getAllUsers()
     {
         $params = [];
@@ -213,10 +226,15 @@ class User extends AbstractModel
         $query = "SELECT * FROM $this->tableName WHERE id = :id";
         $result = $this->read($query, ['id' => $id]);
 
-        $user = new User($id);
-        $user->email = $result[0]['userEmail'];
+        if (!empty($result)) {
+            $user = new User($id);
+            $user->email = $result[0]['userEmail'];
+            $user->password = $result[0]['password'];
+            $user->emailConfirmed = $result[0]['emailConfirmed'];
+            $user->activeUntil = $result[0]['activeUntil'];
 
-        return $user;
+            return $user;
+        }
     }
 
     public function getUserByEmail($email)
@@ -228,7 +246,9 @@ class User extends AbstractModel
         if (!empty($result)) {
             $user = new User($result[0]['id']);
             $user->email = $result[0]['userEmail'];
-
+            $user->password = $result[0]['password'];
+            $user->emailConfirmed = $result[0]['emailConfirmed'];
+            $user->activeUntil = $result[0]['activeUntil'];
             return $user;
         }
     }
