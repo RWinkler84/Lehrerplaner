@@ -40,12 +40,6 @@ select {
     height: 1.5rem;
 }
 
-/* input[type="date"] {
-    line-height: 1.5rem;
-    padding: 0px;
-    vertical-align: bottom;
-} */
-
 /* Top Menu */
 
 #topMenuContainer,
@@ -77,7 +71,6 @@ select {
     top: 2rem;
     left: 2rem;
     right: 2rem;
-    /* bottom: 2rem; */
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
 }
 
@@ -341,6 +334,9 @@ select {
 
 .taskDescription {
     width: 100%;
+    max-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .taskDone {
@@ -842,7 +838,7 @@ h3 {
     }
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1000px) {
 
     #taskContainer {
         flex-direction: column;

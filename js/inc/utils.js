@@ -41,7 +41,14 @@ export default class Utils {
         }
 
         return reformated.join('');
+    }
 
+    static formatClassName(name) {
+        //if the first character is a number, it is most likely a class name and should be reformated to lowercase
+        //otherwise just return the unchanged string
+        if (isNaN(Number(name[0]))) return name;
+
+        return name.toLowerCase();
     }
 
     static formatDate(date) {
@@ -117,7 +124,6 @@ export default class Utils {
     static generateId(baseArray) {
         let allIds = [];
 
-console.log(baseArray);
         baseArray.forEach((entry) => {
             if (entry.id == undefined) return;
             allIds.push(Number(entry.id));

@@ -81,6 +81,8 @@ async function attemptPasswordReset(event) {
     event.preventDefault();
 
     const errorMessageDisplay = resetPasswordDialog.querySelector('.errorMessageDisplay');
+    const navigation = resetPasswordDialog.querySelector('.navigation');
+
     let params = new URLSearchParams(window.location.search);
     let token = params.get('reset');
     let formData = getPasswordResetDataFromForm();
@@ -99,10 +101,30 @@ async function attemptPasswordReset(event) {
 
             errorMessageDisplay.querySelector('#backToLogin').addEventListener('click', openLoginForm);
 
+            navigation.style.display = 'none';
+
             return;
         }
 
         errorMessageDisplay.innerText = result.message;
+    }
+}
+
+async function attemptAccountCreation(event) {
+    event.preventDefault()
+    let result;
+    let accountData = getAccountDataFromForm();
+
+    if (accountData) {
+        result = await makeAjaxQuery('index.php?c=user&a=createAccount', accountData);
+
+        if (result.message == 'Confirmation email send') {
+            accountCreationErrorMessageDisplay.style.color = 'var(--matteGreen)';
+            accountCreationErrorMessageDisplay.innerText = 'Erfolg! Eine Bestätigungsmail wurde an die angegebene Adresse gesendet. Bitte klicke den darin enthaltenen Link, damit du loslegen kannst.'
+        } else {
+            accountCreationErrorMessageDisplay.innerText = result.message;
+            alertAccountCreationErrorMessageDisplay();
+        }
     }
 }
 
@@ -303,23 +325,6 @@ function openSendResetPasswordMailDialog(event) {
     sendResetPasswordMailErrorMessageDisplay.innerText = '';
 }
 
-async function attemptAccountCreation(event) {
-    event.preventDefault()
-    let result;
-    let accountData = getAccountDataFromForm();
-
-    if (accountData) {
-        result = await makeAjaxQuery('index.php?c=user&a=createAccount', accountData);
-
-        if (result.message == 'Confirmation email send') {
-            accountCreationErrorMessageDisplay.style.color = 'var(--matteGreen)';
-            accountCreationErrorMessageDisplay.innerText = 'Erfolg! Eine Bestätigungsmail wurde an die angegebene Adresse gesendet. Bitte klicke den darin enthaltenen Link, damit du loslegen kannst.'
-        } else {
-            accountCreationErrorMessageDisplay.innerText = result.message;
-            alertAccountCreationErrorMessageDisplay();
-        }
-    }
-}
 
 async function makeAjaxQuery(url, dataToSend) {
     try {

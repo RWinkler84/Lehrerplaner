@@ -259,7 +259,7 @@ export default class LessonView {
         let lessonData = {
             'date': timeslotElement.closest('.weekday').dataset.date,
             'timeslot': timeslotElement.dataset.timeslot,
-            'class': timeslotElement.querySelector('#class').value.toLowerCase(),
+            'class': Fn.formatClassName(timeslotElement.querySelector('#class').value),
             'subject': timeslotElement.querySelector('#subject').value,
             'type': 'sub',
             'canceled': 'false'
@@ -296,7 +296,7 @@ export default class LessonView {
         let newLessonData = {
             'date': timeslotElement.closest('.weekday').dataset.date,
             'timeslot': timeslotElement.dataset.timeslot,
-            'class': timeslotElement.querySelector('#class').value.toLowerCase(),
+            'class': Fn.formatClassName(timeslotElement.querySelector('#class').value),
             'subject': timeslotElement.querySelector('#subject').value,
             'type': 'sub',
             'canceled': 'false'
