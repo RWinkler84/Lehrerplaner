@@ -285,6 +285,8 @@ export default class LessonView {
             'canceled': 'true'
         }
 
+        if (oldLessonData.subject == 'Termin') oldLessonData.type = 'appointement';
+
         LessonView.createUpdateLessonForm(event, oldLessonData);
     }
 
@@ -301,6 +303,8 @@ export default class LessonView {
             'type': 'sub',
             'canceled': 'false'
         }
+
+        if (newLessonData.subject == 'Termin') newLessonData.type = 'appointement';
 
         Controller.updateLesson(newLessonData, oldLessonData);
 
