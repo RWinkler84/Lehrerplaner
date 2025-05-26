@@ -134,7 +134,6 @@ export default class SettingsView {
 
         // now render the lessons with the correct validity date
         regularLessons.forEach((lesson) => {
-            console.log(lesson)
             if (lesson.validFrom != dateOfTimetableToDisplay) return;
 
             let timeslot = SettingsView.#getTimeslotOfLesson(lesson);

@@ -40,7 +40,7 @@ export default class Task extends AbstractModel {
 
     //class methods
 
-    update() {
+    async update() {
         allTasksArray.forEach(element => {
             if (element.id == this.id) {
                 element.date = this.date;
@@ -63,10 +63,11 @@ export default class Task extends AbstractModel {
             'fixedTime': this.fixedTime
         }
 
-        this.makeAjaxQuery('task', 'update', taskData);
+        let result = await this.makeAjaxQuery('task', 'update', taskData);
+        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
-    updateDate() {
+    async updateDate() {
         allTasksArray.forEach(element => {
             if (element.id == this.id) {
                 element.date = this.date;
@@ -78,10 +79,11 @@ export default class Task extends AbstractModel {
             'date': this.formatDate(this.date),
         }
 
-        this.makeAjaxQuery('task', 'updateDate', taskData);
+        let result = await this.makeAjaxQuery('task', 'updateDate', taskData);
+        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
-    save() {
+    async save() {
         let taskData = {
             'id': this.id,
             'class': this.class,
@@ -94,26 +96,31 @@ export default class Task extends AbstractModel {
         }
 
         allTasksArray.push(this);
-        this.makeAjaxQuery('task', 'save', taskData);
+        
+        let result = await this.makeAjaxQuery('task', 'save', taskData);
+        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
-    setInProgress() {
+    async setInProgress() {
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
             entry.status = 'inProgress';
         });
 
-        this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
+        let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
+        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
+
     }
 
-    setDone() {
+    async setDone() {
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
 
             entry.status = 'done';
         })
 
-        this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
+        let result = await this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
+        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
     // Getter
@@ -182,54 +189,57 @@ export default class Task extends AbstractModel {
     static reorderTasks(oldTimetable, oldTimetableChanges) {
 
         let allAffectedTasks = this.#getAllAffectedTasks()
-        let endDate = new Date(allAffectedTasks[allAffectedTasks.length - 1].date).setHours(12, 0, 0, 0) + ONEDAY * 30;
 
-        let subjectsByClass = {};
+        if (allAffectedTasks.length > 0) {
+            let endDate = new Date(allAffectedTasks[allAffectedTasks.length - 1].date).setHours(12, 0, 0, 0) + ONEDAY * 30;
 
-        //get class names and their subjects for which there are tasks in the allAffacted Tasks
-        allAffectedTasks.forEach(task => {
-            subjectsByClass[task.class] ? '' : subjectsByClass[task.class] = [];
-            if (!subjectsByClass[task.class].includes(task.subject)) subjectsByClass[task.class].push(task.subject);
-        });
+            let subjectsByClass = {};
 
-        //calculate all lesson dates before and after the change for each class/subject combination
-        Object.keys(subjectsByClass).forEach(key => {
-            let className = key;
-            let subjectsArray = subjectsByClass[key];
+            //get class names and their subjects for which there are tasks in the allAffacted Tasks
+            allAffectedTasks.forEach(task => {
+                subjectsByClass[task.class] ? '' : subjectsByClass[task.class] = [];
+                if (!subjectsByClass[task.class].includes(task.subject)) subjectsByClass[task.class].push(task.subject);
+            });
 
-            subjectsArray.forEach(subject => {
-                let allOldLessonDates = this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
-                let allNewLessonDates = this.calculateAllLessonDates(className, subject, endDate);
+            //calculate all lesson dates before and after the change for each class/subject combination
+            Object.keys(subjectsByClass).forEach(key => {
+                let className = key;
+                let subjectsArray = subjectsByClass[key];
 
-                //in the unlikely case, a tasks exists without a corresponding lesson, jump to the next subject
-                if (allOldLessonDates.length == 0) return;
-                if (allNewLessonDates.length == 0) return;
+                subjectsArray.forEach(subject => {
+                    let allOldLessonDates = this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
+                    let allNewLessonDates = this.calculateAllLessonDates(className, subject, endDate);
 
-                //find the index of the task.date for this class/subject combination on the old dates and then pick the
-                //date with the corresponding index on the new dates and asign it as the new task.date
-                allAffectedTasks.forEach(task => {
-                    if (task.class != className) return;
-                    if (task.subject != subject) return;
+                    //in the unlikely case, a tasks exists without a corresponding lesson, jump to the next subject
+                    if (allOldLessonDates.length == 0) return;
+                    if (allNewLessonDates.length == 0) return;
 
-                    let taskDate = new Date(task.date).setHours(12, 0, 0, 0)
-                    let indexInOldDates = 0;
+                    //find the index of the task.date for this class/subject combination on the old dates and then pick the
+                    //date with the corresponding index on the new dates and asign it as the new task.date
+                    allAffectedTasks.forEach(task => {
+                        if (task.class != className) return;
+                        if (task.subject != subject) return;
 
-                    //search for the task.date and get its index
-                    while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
-                        indexInOldDates++
+                        let taskDate = new Date(task.date).setHours(12, 0, 0, 0)
+                        let indexInOldDates = 0;
 
-                        if (!allOldLessonDates[indexInOldDates]) break;
-                        if (indexInOldDates > 1000) break;
-                    }
+                        //search for the task.date and get its index
+                        while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
+                            indexInOldDates++
 
-                    if (allNewLessonDates[indexInOldDates]) {
-                        task.date = allNewLessonDates[indexInOldDates].date;
-                        task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                        task.updateDate();
-                    }
+                            if (!allOldLessonDates[indexInOldDates]) break;
+                            if (indexInOldDates > 1000) break;
+                        }
+
+                        if (allNewLessonDates[indexInOldDates]) {
+                            task.date = allNewLessonDates[indexInOldDates].date;
+                            task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
+                            task.updateDate();
+                        }
+                    })
                 })
-            })
-        });
+            });
+        }
     }
 
     static #getAllAffectedTasks() {

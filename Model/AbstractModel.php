@@ -15,64 +15,96 @@ class AbstractModel
     {
         global $db;
 
-        $stmt = $db->prepare($query);
+        if (!is_null($db)) {
 
-        if (count($params) > 0) {
-            foreach ($params as $key => $value) {
-                $stmt->bindValue($key, $value);
+            $stmt = $db->prepare($query);
+
+            if (count($params) > 0) {
+                foreach ($params as $key => $value) {
+                    $stmt->bindValue($key, $value);
+                }
             }
+
+            $stmt->execute();
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $result;
         }
 
-        $stmt->execute();
-
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $result;
+        return [
+            'status' => 'failed'
+        ];
     }
 
     protected function write($query, $params)
     {
         global $db;
 
-        try {
-            $stmt = $db->prepare($query);
+        if (!is_null($db)) {
+            try {
+                $stmt = $db->prepare($query);
 
-            foreach ($params as $key => $value) {
-                if ($key == 'date') {
-                    $date = new DateTime($value);
-                    $value = $date->format('Y-m-d');
+                foreach ($params as $key => $value) {
+                    if ($key == 'date') {
+                        $date = new DateTime($value);
+                        $value = $date->format('Y-m-d');
+                    }
+                    $stmt->bindValue($key, $value);
                 }
-                $stmt->bindValue($key, $value);
+
+                $stmt->execute();
+            } catch (Exception $e) {
+                error_log('Fehler beim Speichern der Daten: ' . $e);
+                http_response_code(500);
+                return [
+                    'message' => $e,
+                    'status' => 'failed'
+                ];
             }
 
-            $stmt->execute();
-        } catch (Exception $e) {
-            error_log('Fehler beim Speichern der Daten: ' . $e);
-            http_response_code(500);
-            return ['message' => $e];
+            return [
+                'message' => 'Data saved sucessfully',
+                'status' => 'success'
+            ];
         }
 
-        return ['message' => 'Data saved sucessfully'];
+        return [
+            'status' => 'failed'
+        ];
     }
 
     protected function delete($query, $params)
     {
         global $db;
 
-        try {
-            $stmt = $db->prepare($query);
+        if (!is_null($db)) {
+            try {
+                $stmt = $db->prepare($query);
 
-            foreach ($params as $key => $value) {
-                $stmt->bindValue($key, $value);
+                foreach ($params as $key => $value) {
+                    $stmt->bindValue($key, $value);
+                }
+
+                $stmt->execute();
+            } catch (Exception $e) {
+                error_log('Fehler beim Löschen der Daten: ' . $e);
+                http_response_code(500);
+                return [
+                    'message' => $e,
+                    'status' => 'failed'
+                ];
             }
 
-            $stmt->execute();
-        } catch (Exception $e) {
-            error_log('Fehler beim Löschen der Daten: ' . $e);
-            http_response_code(500);
+            return [
+                'message' => 'Data saved sucessfully',
+                'status' => 'success'
+            ];
         }
 
-        return ['message' => 'Lesson deleted sucessfully'];
+        return [
+            'status' => 'failed'
+        ];
     }
 
     public function getSubjects()
@@ -212,11 +244,11 @@ class AbstractModel
             // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
             $mail->send();
-            
+
             return true;
         } catch (Exception $e) {
             error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
-            
+
             return false;
         }
     }

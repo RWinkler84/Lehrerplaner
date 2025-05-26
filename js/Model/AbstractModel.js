@@ -1,4 +1,4 @@
-import { allSubjects, timetableChanges, ONEDAY } from "../index.js";
+import { allSubjects, timetableChanges, ONEDAY, allTasksArray } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
 
@@ -16,7 +16,7 @@ export default class AbstractModel {
                 })
         }
         catch (error) {
-            console.log('Uppsi...' + error);
+            return {'status': 'failed'};
         }
 
         return response.json();
@@ -194,33 +194,41 @@ export default class AbstractModel {
         return validDates;
     }
 
+    markUnsynced(id, hostDataset){
+        hostDataset.forEach(entry => {
+            if (entry.id != id) return;
+            entry.synced = false;
+            entry.lastEdited = new Date();
+        })
+    }
+
     async checkDataState() {
         console.log('checking Data');
 
-        let allSubjectsRemote = await this.makeAjaxQuery('abstract', 'getSubjects');
-        let standardTimetableRemote = await this.makeAjaxQuery('abstract', 'getTimetable');
-        let timetableChangesRemote = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
-        let allTasksRemote = await this.makeAjaxQuery('abstract', 'getAllTasks');
+        // let allSubjectsRemote = await this.makeAjaxQuery('abstract', 'getSubjects');
+        // let standardTimetableRemote = await this.makeAjaxQuery('abstract', 'getTimetable');
+        // let timetableChangesRemote = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
+        // let allTasksRemote = await this.makeAjaxQuery('abstract', 'getAllTasks');
 
-        //subjects
-        let subjectsToSave = [];
-        let subjectsToDelete = [];
-        let subjectsToUpdate = [];
+        // //subjects
+        // let subjectsToSave = [];
+        // let subjectsToDelete = [];
+        // let subjectsToUpdate = [];
 
-        if (allSubjectsRemote.length < allSubjects.length) {
-            subjectsToSave = this.#findDataToSave(allSubjects, allSubjectsRemote);
-        } else if (allSubjectsRemote.length > allSubjects.length) {
-            subjectsToDelete = this.#findDataToDelete(allSubjectsRemote, allSubjects);
-        } else {
-            subjectsToUpdate = this.#findDataToUpdate(allSubjects, allSubjectsRemote);
-        }
+        // if (allSubjectsRemote.length < allSubjects.length) {
+        //     subjectsToSave = this.#findDataToSave(allSubjects, allSubjectsRemote);
+        // } else if (allSubjectsRemote.length > allSubjects.length) {
+        //     subjectsToDelete = this.#findDataToDelete(allSubjectsRemote, allSubjects);
+        // } else {
+        //     subjectsToUpdate = this.#findDataToUpdate(allSubjects, allSubjectsRemote);
+        // }
 
-        console.log('subjectsToSave');
-        console.log(subjectsToSave);
-        console.log('subjectsToUpdate');
-        console.log(subjectsToUpdate);
-        console.log('subjectsToDelete');
-        console.log(subjectsToDelete);
+        // console.log('subjectsToSave');
+        // console.log(subjectsToSave);
+        // console.log('subjectsToUpdate');
+        // console.log(subjectsToUpdate);
+        // console.log('subjectsToDelete');
+        // console.log(subjectsToDelete);
 
 
         /*
@@ -232,6 +240,15 @@ export default class AbstractModel {
 
         do for every dataset
         */
+
+        console.log('timetable:');
+        console.log(standardTimetable);
+        console.log('timetablechanges:');
+        console.log(timetableChanges);
+        console.log('subjects:');
+        console.log(allSubjects);
+        console.log('tasks:');
+        console.log(allTasksArray);
 
     }
 

@@ -142,8 +142,28 @@ export default class Lesson extends AbstractModel {
     };
 
     //public class methods
-    save() {
+    async save() {
+        if (this.subject == 'Termin') this.type = 'appointement';
 
+        let lessonData = {
+            'date': this.formatDate(this.date),
+            'timeslot': this.timeslot,
+            'class': this.class,
+            'subject': this.subject,
+            'canceled': this.canceled,
+            'type': this.type
+        };
+
+        this.id = Fn.generateId(timetableChanges);
+        lessonData.id = this.id;
+
+        timetableChanges.push(lessonData);
+        let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
+
+        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+    }
+
+    async update() {
         if (this.subject == 'Termin') this.type = 'appointement';
 
         let lessonData = {
@@ -160,28 +180,13 @@ export default class Lesson extends AbstractModel {
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
-        this.makeAjaxQuery('lesson', 'save', lessonData);
+        let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
+
+        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        console.log(timetableChanges);
     }
 
-    update() {
-        let lessonData = {
-            'date': this.formatDate(this.date),
-            'timeslot': this.timeslot,
-            'class': this.class,
-            'subject': this.subject,
-            'canceled': this.canceled,
-            'type': this.type
-        };
-
-        this.id = Fn.generateId(timetableChanges);
-
-        lessonData.id = this.id;
-
-        timetableChanges.push(lessonData);
-        this.makeAjaxQuery('lesson', 'save', lessonData);
-    }
-
-    cancel() {
+    async cancel() {
         let lessonData = {
             'id': this.id,
             'date': this.formatDate(this.date),
@@ -198,7 +203,9 @@ export default class Lesson extends AbstractModel {
                 if (entry.id == this.id) entry.canceled = 'true';
             })
 
-            this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
+            let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
+            if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+            console.log(timetableChanges);
 
             return;
         }
@@ -207,10 +214,13 @@ export default class Lesson extends AbstractModel {
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
-        this.makeAjaxQuery('lesson', 'addCanceled', lessonData);
+        let result = await this.makeAjaxQuery('lesson', 'addCanceled', lessonData);
+
+        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        console.log(timetableChanges);
     }
 
-    uncancel() {
+    async uncancel() {
 
         timetableChanges.forEach(entry => {
             if (entry.id == this.id) {
@@ -218,7 +228,10 @@ export default class Lesson extends AbstractModel {
             }
         })
 
-        this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
+        let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
+
+        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        console.log(timetableChanges);
     }
 
 

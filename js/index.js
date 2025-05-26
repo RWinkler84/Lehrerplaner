@@ -10,6 +10,8 @@ import Fn from './inc/utils.js';
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 
+export let unsyncedDeletedSubjects = [];
+
 let abstCtrl = new AbstractController();
 
 export let allSubjects = [];

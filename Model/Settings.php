@@ -71,7 +71,8 @@ class Settings extends AbstractModel
             $tries++;
 
             if ($tries == 5) {
-                die('Löschen der alten Daten fehlgeschlagen!');
+                return ['status' => 'failed']; 
+                exit();
             }
         }
 

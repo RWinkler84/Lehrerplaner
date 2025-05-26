@@ -304,11 +304,7 @@ export default class LessonView {
             'canceled': 'false'
         }
 
-        if (newLessonData.subject == 'Termin') newLessonData.type = 'appointement';
-
         Controller.updateLesson(newLessonData, oldLessonData);
-
-        // LessonView.removeLessonForm(event);
     }
 
     static setLessonCanceled(event) {
