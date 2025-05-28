@@ -3,6 +3,9 @@
 namespace Controller;
 
 use Model\AbstractModel;
+use Controller\LessonController;
+use Controller\SettingsController;
+use Controller\TaskController;
 
 class AbstractController {
 
@@ -33,6 +36,16 @@ class AbstractController {
     public function getAllTasks() {
         $result = $this->db->getAllTasks();
 
+        echo json_encode($result);
+    }
+
+    public function syncDatabase(){
+        $dataToSync = json_decode(file_get_contents('php://input'), true);
+
+        error_log(print_r($dataToSync, true));
+        SettingsController::syncSettingsData($dataToSync['subjects'], $dataToSync['timetable']);
+
+        $result = ['message' => 'function in arbeit'];
         echo json_encode($result);
     }
 }

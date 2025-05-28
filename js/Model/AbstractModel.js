@@ -1,4 +1,4 @@
-import { allSubjects, timetableChanges, ONEDAY, allTasksArray } from "../index.js";
+import { allSubjects, timetableChanges, ONEDAY, allTasksArray, unsyncedDeletedSubjects } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
 
@@ -16,7 +16,7 @@ export default class AbstractModel {
                 })
         }
         catch (error) {
-            return {'status': 'failed'};
+            return { 'status': 'failed' };
         }
 
         return response.json();
@@ -194,7 +194,7 @@ export default class AbstractModel {
         return validDates;
     }
 
-    markUnsynced(id, hostDataset){
+    markUnsynced(id, hostDataset) {
         hostDataset.forEach(entry => {
             if (entry.id != id) return;
             entry.synced = false;
@@ -204,43 +204,6 @@ export default class AbstractModel {
 
     async checkDataState() {
         console.log('checking Data');
-
-        // let allSubjectsRemote = await this.makeAjaxQuery('abstract', 'getSubjects');
-        // let standardTimetableRemote = await this.makeAjaxQuery('abstract', 'getTimetable');
-        // let timetableChangesRemote = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
-        // let allTasksRemote = await this.makeAjaxQuery('abstract', 'getAllTasks');
-
-        // //subjects
-        // let subjectsToSave = [];
-        // let subjectsToDelete = [];
-        // let subjectsToUpdate = [];
-
-        // if (allSubjectsRemote.length < allSubjects.length) {
-        //     subjectsToSave = this.#findDataToSave(allSubjects, allSubjectsRemote);
-        // } else if (allSubjectsRemote.length > allSubjects.length) {
-        //     subjectsToDelete = this.#findDataToDelete(allSubjectsRemote, allSubjects);
-        // } else {
-        //     subjectsToUpdate = this.#findDataToUpdate(allSubjects, allSubjectsRemote);
-        // }
-
-        // console.log('subjectsToSave');
-        // console.log(subjectsToSave);
-        // console.log('subjectsToUpdate');
-        // console.log(subjectsToUpdate);
-        // console.log('subjectsToDelete');
-        // console.log(subjectsToDelete);
-
-
-        /*
-        check by id
-            -> if id exists, check if the content is equal
-                -> if not, push the date to an update array
-            -> if doesn't exist, push the date to an create array
-        send the create and update array to the backend, if they are not empty
-
-        do for every dataset
-        */
-
         console.log('timetable:');
         console.log(standardTimetable);
         console.log('timetablechanges:');
@@ -249,63 +212,58 @@ export default class AbstractModel {
         console.log(allSubjects);
         console.log('tasks:');
         console.log(allTasksArray);
+        console.log('to delete')
+        console.log(unsyncedDeletedSubjects);
 
-    }
+        let dataToSync = {
+            'subjects': [],
+            'timetable': [],
+            'timetableChanges': [],
+            'tasks': []
+        };
+        let result;
 
-    #findDataToSave(biggerDataset, smallerDataset) {
-        let dataToSave = [];
-
-        biggerDataset.forEach(datasetA => {
-            let match = false;
-
-            smallerDataset.every(datasetB => {
-                if (datasetA.id == datasetB.id) {
-                    match = true;
-                    return false;
-                }
-                return true;
-            });
-
-            if (!match) dataToSave.push(datasetA);
+        allSubjects.forEach(entry => {
+            if (entry.synced == false) dataToSync['subjects'].push(entry);
         });
 
-        return dataToSave;
-    }
-
-    #findDataToDelete(biggerDataset, smallerDataset) {
-        let dataToDelete = [];
-
-        biggerDataset.forEach(datasetA => {
-            let match = false;
-
-            smallerDataset.every(datasetB => {
-                if (datasetA.id == datasetB.id) {
-                    match = true;
-                    return false;
-                }
-                return true;
-            });
-
-            if (!match) dataToDelete.push(datasetA);
+        standardTimetable.forEach(entry => {
+            if (entry.synced == false) dataToSync['timetable'].push(entry);
         });
 
-        return dataToDelete;
-    }
+        timetableChanges.forEach(entry => {
+            if (entry.synced == false) dataToSync['timetableChanges'].push(entry);
+        });
 
-    #findDataToUpdate(localDataset, remoteDataset) {
-        let dataToUpdate = [];
+        allTasksArray.forEach(entry => {
+            if (entry.synced == false) dataToSync['tasks'].push(entry);
+        });
 
-        for (let i = 0; i < localDataset.length; i++) {
-            let needsUpdate = false;
 
-            for (let key in localDataset[i]) {
-                localDataset[i][key] != remoteDataset[i][key] ? needsUpdate = true : '';
-            }
+        // first delete, what needs to be deleted 
+        if (unsyncedDeletedSubjects.length > 0) {
+            result = await this.makeAjaxQuery('settings', 'deleteSubject', unsyncedDeletedSubjects);
 
-            if (needsUpdate) dataToUpdate.push(localDataset);
+            result.forEach(entry => {
+                if (entry.status == 'success') {
+                    unsyncedDeletedSubjects.forEach(subject => {
+                        if (subject.id == entry.id) unsyncedDeletedSubjects.splice(unsyncedDeletedSubjects.indexOf(subject), 1);
+                    });
+                }
+            });
         }
 
-        return dataToUpdate;
-    }
+        //if the deletion worked, go on to sync the rest
+        if (unsyncedDeletedSubjects.length == 0) {
+            result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
+
+        }
+
+
+        console.log('dataToSync');
+        console.log(dataToSync);
+
+        // then send the rest, that needs to be saved or updated
+    }
 }

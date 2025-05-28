@@ -56,7 +56,6 @@ export default class TaskController {
 
     static setTaskInProgress(taskId) {
         let task = Task.getTaskById(taskId);
-        console.log(task);
         task.setInProgress();
     }
 

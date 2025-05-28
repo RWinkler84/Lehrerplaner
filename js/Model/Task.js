@@ -1,13 +1,11 @@
 import Fn from '../inc/utils.js';
 import Controller from '../Controller/TaskController.js';
-import { standardTimetable, taskBackupArray, timetableChanges } from '../index.js';
+import { taskBackupArray } from '../index.js';
 import { allTasksArray } from '../index.js';
 import { ONEDAY } from '../index.js';
 import AbstractModel from './AbstractModel.js';
 
 export default class Task extends AbstractModel {
-
-    // now static, should later be filled from DB
 
     #id;
     #class;
@@ -188,7 +186,7 @@ export default class Task extends AbstractModel {
     //that has the same index on allNewDates
     static reorderTasks(oldTimetable, oldTimetableChanges) {
 
-        let allAffectedTasks = this.#getAllAffectedTasks()
+        let allAffectedTasks = this.#getAllAffectedTasks() //all tasks after the date of the timetable change
 
         if (allAffectedTasks.length > 0) {
             let endDate = new Date(allAffectedTasks[allAffectedTasks.length - 1].date).setHours(12, 0, 0, 0) + ONEDAY * 30;

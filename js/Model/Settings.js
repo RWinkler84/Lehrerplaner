@@ -28,13 +28,12 @@ export default class Settings extends AbstractModel {
         for (let i = 0; i < allSubjects.length; i++) {
             if (allSubjects[i].id == id) {
                 let deletedSubject = allSubjects.splice(i, 1);
-                console.log(deletedSubject);
 
-                let result = await this.makeAjaxQuery('settings', 'deleteSubject', { 'id': id });
+                let result = await this.makeAjaxQuery('settings', 'deleteSubject', [{ 'id': id }]);
 
-                if (result.status == 'failed') {
-                    deletedSubject.lastEdited = new Date();
-                    unsyncedDeletedSubjects.push(deletedSubject);
+                if (result[0].status == 'failed') {
+                    deletedSubject[0].lastEdited = new Date();
+                    unsyncedDeletedSubjects.push(deletedSubject[0]);
                 }
 
                 return;
@@ -69,29 +68,33 @@ export default class Settings extends AbstractModel {
         let timetableHasValidUntil = false;
         let validUntilDate;
 
+        for (let i = standardTimetable.length - 1; i > 0; i--){
+            if (standardTimetable[i].validFrom == validFrom) {
+                standardTimetable.splice(i,1);
+            }
+        }
+
+        console.log(standardTimetable);
+
         lessons.forEach(lesson => {
             if (lesson.validUntil != undefined) {
                 timetableHasValidUntil = true;
                 validUntilDate = lesson.validUntil;
             }
             if (!lesson.id) lesson.id = Fn.generateId(standardTimetable);
+
+            // if a lesson is added to a timetable with a validUntil date, this date is missing on the new lesson and needs to be added
+            if (timetableHasValidUntil) lesson.validUntil = validUntilDate;
+            lesson.lastEdited = new Date();
+
+            standardTimetable.push(lesson);
         })
 
-        // if a lesson is added to a timetable with a validUntil date, this date is missing on the new lesson and needs to be added
-        if (timetableHasValidUntil) {
-            lessons.forEach(lesson => lesson.validUntil = validUntilDate);
-        }
 
-        standardTimetable.forEach(entry => {
-            if (entry.validFrom == validFrom) {
-                standardTimetable.splice(standardTimetable.indexOf(entry));
-            }
-        })
-
-        lessons.forEach(entry => standardTimetable.push(entry));
+        console.log(lessons);
 
         let results = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
-        
+
         results.forEach(result => {
             if (result.status == 'failed') {
                 lessons.forEach(entry => {
@@ -111,18 +114,6 @@ export default class Settings extends AbstractModel {
         prevTimetableValidUntil = this.formatDate(prevTimetableValidUntil);
 
         if (allValidDates.length == 0) return lessons;
-
-        //intermediate timetable
-        allValidDates.forEach(entry => {
-            let date = new Date(entry).setHours(12, 0, 0, 0);
-
-            if (date > new Date(lessons[0].validFrom).setHours(12, 0, 0, 0)) {
-                let validUntilDate = date - ONEDAY;
-                validUntilDate = this.formatDate(validUntilDate);
-
-                lessons.forEach(lesson => lesson.validUntil = validUntilDate);
-            }
-        });
 
         //give the validUntil date to all lessons of the timetable that where valid right before the new timetable 
         let i = allValidDates.length;
@@ -147,6 +138,20 @@ export default class Settings extends AbstractModel {
                 this.markUnsynced(entry.id, standardTimetable);
             })
         }
+
+        //intermediate timetable
+        allValidDates.forEach(entry => {
+            let date = new Date(entry).setHours(12, 0, 0, 0);
+
+            if (date > new Date(lessons[0].validFrom).setHours(12, 0, 0, 0)) {
+                let validUntilDate = date - ONEDAY;
+                validUntilDate = this.formatDate(validUntilDate);
+
+                lessons.forEach(lesson => lesson.validUntil = validUntilDate);
+            } else {
+                lessons.forEach(lesson => lesson.validUntil = null);
+            }
+        });
 
         return lessons;
     }

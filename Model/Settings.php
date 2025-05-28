@@ -17,17 +17,26 @@ class Settings extends AbstractModel
         return $this->write($query, $subject);
     }
 
-    public function deleteSubject($id)
+    public function deleteSubject($ids)
     {
         global $user;
 
         $userId = $user->getId();
         $tableName = TABLEPREFIX . 'subjects';
+        $results = [];
+
+
         $query = "DELETE FROM $tableName WHERE userId = $userId AND itemId=:id";
 
-        $result = $this->delete($query, $id);
+        foreach ($ids as $entry) {
+            $item['id'] = $entry['id'];
 
-        echo json_encode($result);
+            $result = $this->delete($query, $item);
+            $result['id'] = $entry['id'];
+            array_push($results, $result);
+        };
+
+        return $results;
     }
 
     public function saveTimetable($timetableData)
@@ -50,35 +59,31 @@ class Settings extends AbstractModel
         return $allResults;
     }
 
-    // saving timetable changes is devided in two parts: deleting the old timetable and saving the new one afterwards
-    // only if this order is maintained, it is garantued that the timetable will be displayed correctly later
     public function saveTimetableChanges($timetableData)
     {
-        global $user;
-
-        $userId = $user->getId();
+        $timetableData = $this->preprocessDataToWrite($timetableData);
         $tableName = TABLEPREFIX . 'timetable';
+        $results = [];
 
-        $tries = 0;
-        $validFromDate['validFrom'] = $timetableData[0]['validFrom'];
+        $query = "
+            INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekdayNumber, timeslot, lastEdited)
+            VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot, :lastEdited)
+            ON DUPLICATE KEY UPDATE
+                validFrom = IF (VALUES(lastEdited) > lastEdited, VALUES(validFrom), validFrom),
+                validUntil = IF (VALUES(lastEdited) > lastEdited, VALUES(validUntil), validUntil),
+                class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
+                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
+                weekdayNumber = IF (VALUES(lastEdited) > lastEdited, VALUES(weekdayNumber), weekdayNumber),
+                timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
+                lastEdited =  IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
+        ";
 
-        $query = "DELETE FROM $tableName WHERE userId = $userId AND validFrom = :validFrom";
-
-        try {
-            $deleted = $this->executeQuery($query, $validFromDate);
-        } catch (Exception $e) {
-            $this->executeQuery($query, $validFromDate);
-            $tries++;
-
-            if ($tries == 5) {
-                return ['status' => 'failed']; 
-                exit();
-            }
+        foreach ($timetableData as $lesson) {
+            $result = $this->write($query, $lesson);
+            array_push($results, $result);
         }
 
-        if ($deleted['message'] == 'Lesson deleted sucessfully') {
-            $this->saveTimetable($timetableData);
-        }
+        return $results;
     }
 
     public function updateValidUntil($dates)
@@ -95,9 +100,54 @@ class Settings extends AbstractModel
         return $this->write($query, []);
     }
 
-    //query function necessary for the saveTimetableChanges function
-    private function executeQuery($query, $params)
+    public function syncSubjects($subjectsData)
     {
-        return $this->delete($query, $params);
+        error_log('print_r($subjectsData)');
+        $tableName = TABLEPREFIX . 'subjects';
+        $subjectsData = $this->preprocessDataToWrite($subjectsData);
+        $results = [];
+
+        foreach ($subjectsData as $subject) {
+            $query = "
+                INSERT INTO $tableName (userId, itemId, subject, colorCssClass, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :lastEdited)
+                ON DUPLICATE KEY UPDATE
+                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
+                colorCssClass = IF (VALUES(lastEdited) > lastEdited, VALUES(colorCssClass), colorCssClass),
+                lastEdited =  IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
+            ";
+
+            $result = $this->write($query, $subject);
+            array_push($results, $result);
+        }
+
+        return $results;
+    }
+
+    public function syncTimetable($timetableData)
+    {
+        $timetableData = $this->preprocessDataToWrite($timetableData);
+        $results = [];
+        $tableName = TABLEPREFIX . 'timetable';
+
+        $query = "
+            INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekdayNumber, timeslot, lastEdited)
+            VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot, :lastEdited)
+            ON DUPLICATE KEY UPDATE
+                validFrom = IF (VALUES(lastEdited) > lastEdited, VALUES(validFrom), validFrom),
+                validUntil = IF (VALUES(lastEdited) > lastEdited, VALUES(validUntil), validUntil),
+                class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
+                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
+                weekdayNumber = IF (VALUES(lastEdited) > lastEdited, VALUES(weekdayNumber), weekdayNumber),
+                timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
+                lastEdited =  IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
+            ";
+
+        foreach ($timetableData as $timetable) {
+
+            $result = $this->write($query, $timetable);
+            array_push($results, $result);
+        }
+        // error_log(print_r($results, true));
+        return $results;
     }
 }

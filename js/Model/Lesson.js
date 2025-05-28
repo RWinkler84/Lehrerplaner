@@ -183,7 +183,6 @@ export default class Lesson extends AbstractModel {
         let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
 
         if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
-        console.log(timetableChanges);
     }
 
     async cancel() {
@@ -205,7 +204,6 @@ export default class Lesson extends AbstractModel {
 
             let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
             if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
-            console.log(timetableChanges);
 
             return;
         }
@@ -217,7 +215,6 @@ export default class Lesson extends AbstractModel {
         let result = await this.makeAjaxQuery('lesson', 'addCanceled', lessonData);
 
         if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
-        console.log(timetableChanges);
     }
 
     async uncancel() {
@@ -231,7 +228,6 @@ export default class Lesson extends AbstractModel {
         let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
 
         if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
-        console.log(timetableChanges);
     }
 
 

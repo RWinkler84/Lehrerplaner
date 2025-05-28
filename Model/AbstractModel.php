@@ -97,14 +97,12 @@ class AbstractModel
             }
 
             return [
-                'message' => 'Data saved sucessfully',
+                'message' => 'Data deleted sucessfully',
                 'status' => 'success'
             ];
         }
 
-        return [
-            'status' => 'failed'
-        ];
+        return ['status' => 'failed'];
     }
 
     public function getSubjects()
@@ -203,15 +201,21 @@ class AbstractModel
                 global $user;
 
                 $data['userId'] = $user->getId();
-                $data['itemId'] = $data['id'];
+
+                if (isset($data['id'])) $data['itemId'] = $data['id'];
+                if (isset($data['lastEdited'])) $data['lastEdited'] = (new DateTime($data['lastEdited']))->modify('+2 hours')->format('Y-m-d H:i:s');
+
                 unset($data['id']);
+                if (isset($data['synced'])) unset($data['synced']);
 
                 return $data;
             }, $dataArray);
         } else {
             $dataArray['userId'] = $user->getId();
-            $dataArray['itemId'] = $dataArray['id'];
+            if (isset($dataArray['id'])) $dataArray['itemId'] = $dataArray['id'];
+            
             unset($dataArray['id']);
+            if (isset($dataArray['synced'])) unset($dataArray['synced']);
         }
 
         return $dataArray;

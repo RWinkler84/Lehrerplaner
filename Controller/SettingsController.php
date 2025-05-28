@@ -26,9 +26,11 @@ class SettingsController extends AbstractController
 
     public function deleteSubject()
     {
-        $subjectId = json_decode(file_get_contents('php://input'), true);
+        $subjectIds = json_decode(file_get_contents('php://input'), true);
 
-        $this->model->deleteSubject($subjectId);
+        $result = $this->model->deleteSubject($subjectIds);
+
+        echo json_encode($result);
     }
 
     public function saveTimetable()
@@ -52,8 +54,17 @@ class SettingsController extends AbstractController
     {
         $timetableData = json_decode(file_get_contents('php://input'), true);
 
+        error_log(print_r($timetableData,true));
+
         $result = $this->model->saveTimetableChanges($timetableData);
 
         echo json_encode($result);
+    }
+
+    public static function syncSettingsData($subjectsData, $timetableData) {
+        $model = new Settings;
+        
+        if (!empty($subjectsData)) $model->syncSubjects($subjectsData);
+        if (!empty($timetableData)) $model->syncTimetable($timetableData);
     }
 }
