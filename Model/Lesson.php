@@ -32,4 +32,31 @@ class Lesson extends AbstractModel
 
         return $this->write($query, $lessonData);
     }
+
+    public function syncTimetableChanges($timetableChanges) {
+        $timetableChanges = $this->preprocessDataToWrite($timetableChanges);
+        $results = [];
+
+        $query = "
+            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, type, canceled, lastEdited)
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :type, :canceled, :lastEdited)
+            ON DUPLICATE KEY UPDATE
+                date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
+                timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
+                class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
+                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
+                type = IF (VALUES(lastEdited) > lastEdited, VALUES(type), type),
+                canceled = IF (VALUES(lastEdited) > lastEdited, VALUES(canceled), canceled),
+                lastEdited = IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
+            ";
+        
+        foreach ($timetableChanges as $lesson) {
+            error_log(print_r($lesson, true));
+            $result = $this->write($query, $lesson);
+            array_push($results, $result);
+        }
+            error_log(print_r($results, true));
+
+        return $results;
+    }
 }

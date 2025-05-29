@@ -43,7 +43,10 @@ class AbstractController {
         $dataToSync = json_decode(file_get_contents('php://input'), true);
 
         error_log(print_r($dataToSync, true));
-        SettingsController::syncSettingsData($dataToSync['subjects'], $dataToSync['timetable']);
+
+        SettingsController::syncSettings($dataToSync['subjects'], $dataToSync['timetable']);
+        LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
+        TaskController::syncTasks($dataToSync['tasks']);
 
         $result = ['message' => 'function in arbeit'];
         echo json_encode($result);

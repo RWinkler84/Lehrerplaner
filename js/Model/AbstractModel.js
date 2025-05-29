@@ -255,6 +255,7 @@ export default class AbstractModel {
 
         //if the deletion worked, go on to sync the rest
         if (unsyncedDeletedSubjects.length == 0) {
+            console.log(JSON.stringify(dataToSync));
             result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
 

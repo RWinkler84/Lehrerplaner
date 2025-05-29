@@ -93,7 +93,7 @@ export default class Task extends AbstractModel {
             'fixedTime': this.fixedTime
         }
 
-        allTasksArray.push(this);
+        allTasksArray.push(taskData);
         
         let result = await this.makeAjaxQuery('task', 'save', taskData);
         if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);

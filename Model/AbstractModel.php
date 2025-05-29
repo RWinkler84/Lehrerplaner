@@ -41,8 +41,6 @@ class AbstractModel
     {
         global $db;
 
-        error_log(print_r($params, true));
-
         if (!is_null($db)) {
             try {
                 $stmt = $db->prepare($query);

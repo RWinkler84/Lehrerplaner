@@ -150,7 +150,6 @@ class Settings extends AbstractModel
             $result = $this->write($query, $lesson);
             array_push($results, $result);
         }
-        // error_log(print_r($results, true));
         return $results;
     }
 }

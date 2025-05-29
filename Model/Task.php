@@ -59,4 +59,36 @@ class Task extends AbstractModel
 
         return $this->write($query, $taskId);
     }
+
+    public function syncTasks($tasks)
+    {
+        $results = [];
+        $tasks = $this->preprocessDataToWrite($tasks);
+
+        $query = "
+            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, lastEdited) 
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :lastEdited)
+            ON DUPLICATE KEY UPDATE
+                date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
+                timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
+                class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
+                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
+                description = IF (VALUES(lastEdited) > lastEdited, VALUES(description), description),
+                status = IF (VALUES(lastEdited) > lastEdited, VALUES(status), status),
+                fixedTime = IF (VALUES(lastEdited) > lastEdited, VALUES(fixedTime), fixedTime),
+                lastEdited = IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
+        ";
+
+        foreach ($tasks as $task) {
+
+            if ($task['fixedTime'] == '') {
+                $task['fixedTime'] = 0;
+            }
+
+            $result = $this->write($query, $task);
+            array_push($results, $result);
+        }
+
+        return $results;
+    }
 }
