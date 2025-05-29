@@ -80,7 +80,7 @@ export default class SettingsView {
             : undefined;
 
         let subject = {
-            'subject': Fn.formatSubjectName(document.querySelector('#subjectName').value),
+            'subject': document.querySelector('#subjectName').value,
             'colorCssClass': colorCssClass
         };
 

@@ -54,8 +54,6 @@ class SettingsController extends AbstractController
     {
         $timetableData = json_decode(file_get_contents('php://input'), true);
 
-        error_log(print_r($timetableData,true));
-
         $result = $this->model->saveTimetableChanges($timetableData);
 
         echo json_encode($result);

@@ -79,6 +79,9 @@ class Settings extends AbstractModel
         ";
 
         foreach ($timetableData as $lesson) {
+
+            if (empty($lesson['validUntil'])) $lesson['validUntil'] = null;
+
             $result = $this->write($query, $lesson);
             array_push($results, $result);
         }
@@ -102,7 +105,6 @@ class Settings extends AbstractModel
 
     public function syncSubjects($subjectsData)
     {
-        error_log('print_r($subjectsData)');
         $tableName = TABLEPREFIX . 'subjects';
         $subjectsData = $this->preprocessDataToWrite($subjectsData);
         $results = [];
@@ -142,9 +144,10 @@ class Settings extends AbstractModel
                 lastEdited =  IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
             ";
 
-        foreach ($timetableData as $timetable) {
-
-            $result = $this->write($query, $timetable);
+        foreach ($timetableData as $lesson) {
+            if (!isset($lesson['validUntil']) || empty($lesson['validUntil'])) $lesson['validUntil'] = null;
+            
+            $result = $this->write($query, $lesson);
             array_push($results, $result);
         }
         // error_log(print_r($results, true));

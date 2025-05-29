@@ -74,13 +74,12 @@ export default class Settings extends AbstractModel {
             }
         }
 
-        console.log(standardTimetable);
-
         lessons.forEach(lesson => {
             if (lesson.validUntil != undefined) {
                 timetableHasValidUntil = true;
                 validUntilDate = lesson.validUntil;
             }
+
             if (!lesson.id) lesson.id = Fn.generateId(standardTimetable);
 
             // if a lesson is added to a timetable with a validUntil date, this date is missing on the new lesson and needs to be added
@@ -89,9 +88,6 @@ export default class Settings extends AbstractModel {
 
             standardTimetable.push(lesson);
         })
-
-
-        console.log(lessons);
 
         let results = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
 
@@ -148,8 +144,6 @@ export default class Settings extends AbstractModel {
                 validUntilDate = this.formatDate(validUntilDate);
 
                 lessons.forEach(lesson => lesson.validUntil = validUntilDate);
-            } else {
-                lessons.forEach(lesson => lesson.validUntil = null);
             }
         });
 
