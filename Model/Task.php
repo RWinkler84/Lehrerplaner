@@ -86,6 +86,7 @@ class Task extends AbstractModel
             }
 
             $result = $this->write($query, $task);
+            $result['id'] = $task['itemId'];
             array_push($results, $result);
         }
 

@@ -42,7 +42,8 @@ class SettingsController extends AbstractController
         echo json_encode($result);
     }
 
-    public function updateValidUntil(){
+    public function updateValidUntil()
+    {
         $dates = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->updateValidUntil($dates);
@@ -59,18 +60,25 @@ class SettingsController extends AbstractController
         echo json_encode($result);
     }
 
-    public static function syncSettings($subjectsData, $timetableData) {
+    public static function syncSubjects($subjectsData)
+    {
         $subjectsResult = [];
-        $timetableResult = [];
-        
-        $model = new Settings;
-        
-        if (!empty($subjectsData)) $subjectsResult = $model->syncSubjects($subjectsData);
-        if (!empty($timetableData)) $timetableResult = $model->syncTimetable($timetableData);
 
-        return [
-            'subjects' => $subjectsResult,
-            'timetable' => $timetableResult            
-        ];
+        $model = new Settings;
+
+        if (!empty($subjectsData)) $subjectsResult = $model->syncSubjects($subjectsData);
+
+        return $subjectsResult;
+    }
+
+    public static function syncTimetable($timetableData)
+    {
+        $timetableResult = [];
+
+        $model = new Settings;
+
+        if (!empty($timetableData)) $timetableResult = $model->saveTimetableChanges($timetableData);
+
+        return $timetableResult;
     }
 }

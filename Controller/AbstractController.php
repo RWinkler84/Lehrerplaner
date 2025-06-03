@@ -44,11 +44,21 @@ class AbstractController {
 
         error_log(print_r($dataToSync, true));
 
-        SettingsController::syncSettings($dataToSync['subjects'], $dataToSync['timetable']);
-        LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
-        TaskController::syncTasks($dataToSync['tasks']);
+        $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects']);
+        $timetableResults = SettingsController::syncTimetable($dataToSync['timetable']);
+        $lessonResults = LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
+        $taskResults = TaskController::syncTasks($dataToSync['tasks']);
 
-        $result = ['message' => 'function in arbeit'];
+        $result = [
+            'subjects' => $subjectsResults,
+            'timetable' => $timetableResults,
+            'lessons' => $lessonResults,
+            'tasks' => $taskResults,
+            ];
+
+        error_log(print_r($result, true));
+
+        
         echo json_encode($result);
     }
 }

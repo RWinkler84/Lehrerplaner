@@ -51,11 +51,10 @@ class Lesson extends AbstractModel
             ";
         
         foreach ($timetableChanges as $lesson) {
-            error_log(print_r($lesson, true));
             $result = $this->write($query, $lesson);
+            $result['id'] = $lesson['itemId'];
             array_push($results, $result);
         }
-            error_log(print_r($results, true));
 
         return $results;
     }
