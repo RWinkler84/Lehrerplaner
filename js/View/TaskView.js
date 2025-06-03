@@ -101,7 +101,7 @@ export default class TaskView extends AbstractView {
 
         allInProgressTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
-            let checked = task.fixedTime ? 'checked' : '';
+            let checked = task.fixedTime == '1' ? 'checked' : '';
             let subjectDate = Fn.formatDate(task.date);
 
             if (new Date(task.date) < new Date()) {
@@ -337,7 +337,7 @@ export default class TaskView extends AbstractView {
 
         taskTr.querySelector('td[data-class]').innerText = task.class;
         taskTr.querySelector('td[data-subject]').innerHTML = `<div class="taskSubject">${task.subject}</div><div class="smallDate">${taskDate}</div>`;
-        taskTr.querySelector('td[data-taskDescription]').innerText = task.description;
+        taskTr.querySelector('td[data-taskDescription]').innerHTML = task.description;
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);
     }
