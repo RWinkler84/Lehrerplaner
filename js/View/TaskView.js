@@ -249,14 +249,6 @@ export default class TaskView extends AbstractView {
             'fixedTime': taskTr.nextElementSibling.querySelector('input[type="checkbox"]').checked
         }
 
-        //apply changes to datasets
-        classTd.dataset.class = classTd.innerText;
-        if (subjectTd.querySelector('td[data-subject] select')) {
-            subjectTd.dataset.subject = subjectTd.querySelector('select').value;
-        } else {
-            subjectTd.dataset.subject = subjectTd.innerText;
-        }
-
         Controller.updateTask(taskData);
         TaskView.#removeEditability(event);
         TaskView.#createSetDoneOrInProgressButtons(event);

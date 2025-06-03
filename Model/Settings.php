@@ -43,7 +43,7 @@ class Settings extends AbstractModel
     {
         $tableName = TABLEPREFIX . 'timetable';
         $timetableData = $this->preprocessDataToWrite($timetableData);
-        $allResults = [];
+        $finalResult['status'] = 'success';
 
         //edited timetables will have a lastEdited field, new timetables won't
         $query = "
@@ -58,17 +58,19 @@ class Settings extends AbstractModel
             ";
         }
 
+        error_log(print_r($timetableData, true));
+
         foreach ($timetableData as $lesson) {
             if (!isset($lesson['validUntil'])) {
                 $lesson['validUntil'] = null;
             }
 
             $result = $this->write($query, $lesson);
-            $result['id'] = $lesson['itemId'];
-            array_push($allResults, $result);
+
+            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         }
 
-        return $allResults;
+        return $finalResult;
     }
 
     // saving timetable changes is devided in two parts: deleting the old timetable and saving the new one afterwards
@@ -96,7 +98,7 @@ class Settings extends AbstractModel
             return $results;
         }
 
-        return $result[0]['status'] = 'failed'; 
+        return ['status' => 'failed']; 
     }
 
     //query function necessary for the saveTimetableChanges function

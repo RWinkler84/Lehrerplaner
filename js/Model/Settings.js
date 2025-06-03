@@ -68,9 +68,9 @@ export default class Settings extends AbstractModel {
         let timetableHasValidUntil = false;
         let validUntilDate;
 
-        for (let i = standardTimetable.length - 1; i > 0; i--){
+        for (let i = standardTimetable.length - 1; i > 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {
-                standardTimetable.splice(i,1);
+                standardTimetable.splice(i, 1);
             }
         }
 
@@ -89,15 +89,13 @@ export default class Settings extends AbstractModel {
             standardTimetable.push(lesson);
         })
 
-        let results = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
+        let result = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
 
-        results.forEach(result => {
-            if (result.status == 'failed') {
-                lessons.forEach(entry => {
-                    this.markUnsynced(entry.id, standardTimetable);
-                });
-            }
-        })
+        if (result.status == 'failed') {
+            lessons.forEach(entry => {
+                this.markUnsynced(entry.id, standardTimetable);
+            });
+        }
     }
 
     // sets the valid until date on the old timetable and checks, if the new one is an
