@@ -344,11 +344,7 @@ export default class TaskView extends AbstractView {
 
     static setTaskInProgress(event) {
 
-        let upcomingTasksTable = document.querySelector('#upcomingTasksTable');
-        let inProgressTasksTable = document.querySelector('inProgressTasksTable');
-
         let taskId = event.target.closest('tr').dataset.taskid;
-        console.log('bald in Progress')
 
         Controller.setTaskInProgress(taskId);
         TaskView.renderUpcomingTasks();

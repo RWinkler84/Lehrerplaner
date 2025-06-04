@@ -203,17 +203,6 @@ export default class AbstractModel {
     }
 
     async checkDataState() {
-        console.log('checking Data');
-        console.log('timetable:');
-        console.log(standardTimetable);
-        console.log('timetablechanges:');
-        console.log(timetableChanges);
-        console.log('subjects:');
-        console.log(allSubjects);
-        console.log('tasks:');
-        console.log(allTasksArray);
-        console.log('to delete')
-        console.log(unsyncedDeletedSubjects);
 
         let dataToSync = {
             'subjects': [],
@@ -221,6 +210,7 @@ export default class AbstractModel {
             'timetableChanges': [],
             'tasks': []
         };
+        
         let result;
 
         allSubjects.forEach(entry => {
@@ -244,26 +234,54 @@ export default class AbstractModel {
         if (unsyncedDeletedSubjects.length > 0) {
             result = await this.makeAjaxQuery('settings', 'deleteSubject', unsyncedDeletedSubjects);
 
-            result.forEach(entry => {
-                if (entry.status == 'success') {
-                    unsyncedDeletedSubjects.forEach(subject => {
-                        if (subject.id == entry.id) unsyncedDeletedSubjects.splice(unsyncedDeletedSubjects.indexOf(subject), 1);
-                    });
-                }
-            });
+            // if the server can not be contacted, the result will just be an object, else it will be an array of objects
+            if (result.status !== 'failed') {
+                result.forEach(entry => {
+                    if (entry.status == 'success') {
+                        for (let i = unsyncedDeletedSubjects.length - 1; i >= 0; i--) {
+                            if (entry.id == unsyncedDeletedSubjects[i].id) unsyncedDeletedSubjects.splice(unsyncedDeletedSubjects[i], 1);
+                        }
+                    }
+                });
+            }
         }
 
         //if the deletion worked, go on to sync the rest
         if (unsyncedDeletedSubjects.length == 0) {
             result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
-            console.log(result);
+            // then set previously unsynced items to synced on the global data
+            //subjects
+            if (result.subjects.status == 'success') {
+                allSubjects.forEach(entry => {
+                    if (!entry.synced) entry.synced = true;
+                })
+            }
+
+            //timetable
+            if (result.timetable.status == 'success') {
+                standardTimetable.forEach(entry => {
+                    if (!entry.synced) entry.synced = true;
+                })
+            }
+
+            //lessonChanges
+            result.timetableChanges.forEach(entry => {
+                if (entry.status == 'success') {
+                    timetableChanges.forEach(lesson => {
+                        if (lesson.id == entry.id) lesson.synced = true;
+                    });
+                }
+            });
+
+            //tasks
+            result.tasks.forEach(entry => {
+                if (entry.status == 'success') {
+                    allTasksArray.forEach(task => {
+                        if (task.id == entry.id) task.synced = true;
+                    });
+                }
+            });
         }
-
-
-        console.log('dataToSync');
-        console.log(dataToSync);
-
-        // then send the rest, that needs to be saved or updated
     }
 }

@@ -61,7 +61,7 @@ class Settings extends AbstractModel
         error_log(print_r($timetableData, true));
 
         foreach ($timetableData as $lesson) {
-            if (!isset($lesson['validUntil'])) {
+            if (empty($lesson['validUntil'])) {
                 $lesson['validUntil'] = null;
             }
 
@@ -83,22 +83,31 @@ class Settings extends AbstractModel
         $tableName = TABLEPREFIX . 'timetable';
 
         $tries = 0;
-        $deleted['status'] = 'failed';
-        $validFromDate['validFrom'] = $timetableData[0]['validFrom'];
+        $finalResult['status'] = 'success';
+        $validFromDates = [];
+
+        foreach ($timetableData as $lesson) {
+            if (!in_array($lesson['validFrom'], $validFromDates)) array_push($validFromDates, $lesson['validFrom']);
+        }
 
         $query = "DELETE FROM $tableName WHERE userId = $userId AND validFrom = :validFrom";
 
-        while ($tries < 5 && $deleted['status'] == 'failed') {
-            $deleted = $this->executeQuery($query, $validFromDate);
-            $tries++;
+        foreach ($validFromDates as $validFromDate) {
+            $deleted['status'] = 'failed';
+
+            while ($tries < 5 && $deleted['status'] == 'failed') {
+                $deleted = $this->executeQuery($query, ['validFrom' => $validFromDate]);
+                $tries++;
+            }
         }
 
         if ($deleted['status'] == 'success') {
-            $results = $this->saveTimetable($timetableData);
-            return $results;
+            $result = $this->saveTimetable($timetableData);
+
+            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         }
 
-        return ['status' => 'failed']; 
+        return $finalResult;
     }
 
     //query function necessary for the saveTimetableChanges function
@@ -131,7 +140,7 @@ class Settings extends AbstractModel
     {
         $tableName = TABLEPREFIX . 'subjects';
         $subjectsData = $this->preprocessDataToWrite($subjectsData);
-        $results = [];
+        $finalResult['status'] = 'success';
 
         foreach ($subjectsData as $subject) {
             $query = "
@@ -143,11 +152,11 @@ class Settings extends AbstractModel
             ";
 
             $result = $this->write($query, $subject);
-            $result['id'] = $subject['itemId'];
-            array_push($results, $result);
+
+            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         }
 
-        return $results;
+        return $finalResult;
     }
 
     // public function syncTimetable($timetableData)

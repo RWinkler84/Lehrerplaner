@@ -46,13 +46,13 @@ class AbstractController {
 
         $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects']);
         $timetableResults = SettingsController::syncTimetable($dataToSync['timetable']);
-        $lessonResults = LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
+        $timetableChangesResults = LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
         $taskResults = TaskController::syncTasks($dataToSync['tasks']);
 
         $result = [
             'subjects' => $subjectsResults,
             'timetable' => $timetableResults,
-            'lessons' => $lessonResults,
+            'timetableChanges' => $timetableChangesResults,
             'tasks' => $taskResults,
             ];
 

@@ -50,7 +50,12 @@ class AbstractModel
                         $date = new DateTime($value);
                         $value = $date->format('Y-m-d');
                     }
-                    $stmt->bindValue($key, $value);
+
+                    if (isset($key['validUntil']) && $key['validUntil'] === null) {
+                        $stmt->bindValue($key, $value, PDO::PARAM_NULL);
+                    } else {
+                        $stmt->bindValue($key, $value);
+                    }
                 }
 
                 $stmt->execute();
@@ -213,7 +218,7 @@ class AbstractModel
         } else {
             $dataArray['userId'] = $user->getId();
             if (isset($dataArray['id'])) $dataArray['itemId'] = $dataArray['id'];
-            
+
             unset($dataArray['id']);
             if (isset($dataArray['synced'])) unset($dataArray['synced']);
         }

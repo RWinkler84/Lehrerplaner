@@ -31,7 +31,7 @@ export default class Settings extends AbstractModel {
 
                 let result = await this.makeAjaxQuery('settings', 'deleteSubject', [{ 'id': id }]);
 
-                if (result[0].status == 'failed') {
+                if (result.status == 'failed') {
                     deletedSubject[0].lastEdited = new Date();
                     unsyncedDeletedSubjects.push(deletedSubject[0]);
                 }
