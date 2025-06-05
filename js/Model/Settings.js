@@ -53,15 +53,13 @@ export default class Settings extends AbstractModel {
             return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
         });
 
-        let results = await this.makeAjaxQuery('settings', 'saveTimetable', lessons);
-
-        results.forEach(result => {
+        let result = await this.makeAjaxQuery('settings', 'saveTimetable', lessons);
+            console.log(result);
             if (result.status == 'failed') {
                 lessons.forEach(entry => {
                     this.markUnsynced(entry.id, standardTimetable);
                 });
             }
-        })
     }
 
     async saveTimetableChanges(validFrom, lessons) {

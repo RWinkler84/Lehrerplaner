@@ -55,8 +55,8 @@ async function loadData() {
 async function startApp() {
     await loadData();
 
-    // setInterval(abstCtrl.checkDataState, ONEMIN * 5);
-    document.querySelector('#checkData').addEventListener('click', abstCtrl.checkDataState.bind(abstCtrl));
+    //checking for unsynced changes
+    setInterval(abstCtrl.checkDataState.bind(abstCtrl), ONEMIN);
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {

@@ -204,31 +204,48 @@ export default class AbstractModel {
 
     async checkDataState() {
 
+        let isUnsyncedData = false;
+
         let dataToSync = {
             'subjects': [],
             'timetable': [],
             'timetableChanges': [],
             'tasks': []
         };
-        
+
         let result;
 
         allSubjects.forEach(entry => {
-            if (entry.synced == false) dataToSync['subjects'].push(entry);
+            if (entry.synced == false) {
+                dataToSync['subjects'].push(entry);
+                isUnsyncedData = true;
+            }
         });
 
         standardTimetable.forEach(entry => {
-            if (entry.synced == false) dataToSync['timetable'].push(entry);
+            if (entry.synced == false) {
+                dataToSync['timetable'].push(entry);
+                isUnsyncedData = true;
+            }
         });
 
         timetableChanges.forEach(entry => {
-            if (entry.synced == false) dataToSync['timetableChanges'].push(entry);
+            if (entry.synced == false) {
+                dataToSync['timetableChanges'].push(entry);
+                isUnsyncedData = true;
+            }
         });
 
         allTasksArray.forEach(entry => {
-            if (entry.synced == false) dataToSync['tasks'].push(entry);
+            if (entry.synced == false) {
+                dataToSync['tasks'].push(entry);
+                isUnsyncedData = true;
+            }
         });
 
+        console.log('data to sync', dataToSync);
+
+        if (!isUnsyncedData && unsyncedDeletedSubjects.length == 0) return;
 
         // first delete, what needs to be deleted 
         if (unsyncedDeletedSubjects.length > 0) {
@@ -249,6 +266,15 @@ export default class AbstractModel {
         //if the deletion worked, go on to sync the rest
         if (unsyncedDeletedSubjects.length == 0) {
             result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
+
+            if (result.status && result.status == 'failed'){
+                result = {
+                    'subjects': {'status': 'failed'},
+                    'timetable': {'status': 'failed'},
+                    'timetableChanges': [{'status': 'failed'}],
+                    'tasks': [{'status': 'failed'}],
+                }
+            }
 
             // then set previously unsynced items to synced on the global data
             //subjects

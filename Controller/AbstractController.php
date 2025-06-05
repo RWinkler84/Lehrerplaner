@@ -42,7 +42,6 @@ class AbstractController {
     public function syncDatabase(){
         $dataToSync = json_decode(file_get_contents('php://input'), true);
 
-        error_log(print_r($dataToSync, true));
 
         $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects']);
         $timetableResults = SettingsController::syncTimetable($dataToSync['timetable']);
@@ -56,9 +55,6 @@ class AbstractController {
             'tasks' => $taskResults,
             ];
 
-        error_log(print_r($result, true));
-
-        
         echo json_encode($result);
     }
 }

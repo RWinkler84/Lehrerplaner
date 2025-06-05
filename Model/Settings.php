@@ -58,8 +58,6 @@ class Settings extends AbstractModel
             ";
         }
 
-        error_log(print_r($timetableData, true));
-
         foreach ($timetableData as $lesson) {
             if (empty($lesson['validUntil'])) {
                 $lesson['validUntil'] = null;
