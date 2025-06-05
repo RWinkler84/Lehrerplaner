@@ -27,10 +27,11 @@ input {
     border-radius: 3px;
     height: 1.5rem;
 }
-
+#userEmail,
+#password,
 #newUserEmail,
 #resetPasswordMail {
-    width: 419px;
+    width: 100%;
 }
 
 label {
@@ -57,4 +58,8 @@ dialog button {
 
 dialog button:hover {
     background-color: var(--matteGreen);
+}
+
+.alertRing {
+    width: 100%;
 }

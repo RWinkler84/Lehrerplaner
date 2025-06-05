@@ -292,6 +292,7 @@ export default class SettingsView {
     }
 
     static saveNewTimetable() {
+        let editTimetableButton = document.querySelector('#editTimetableButton');
         let validFrom = document.querySelector('#validFromPicker').value;
         let lessons = [];
 
@@ -310,6 +311,9 @@ export default class SettingsView {
         });
 
         Controller.saveNewTimetable(validFrom, lessons);
+
+
+        if (editTimetableButton.hasAttribute('style')) editTimetableButton.removeAttribute('style'); 
     }
 
     static discardNewTimetable() {

@@ -17,7 +17,7 @@
                 <h3>Login</h3>
             </div>
             <form id="loginForm" method="post">
-                <div class="flex halfGap marginTop" class="formBody">
+                <div class="flex column halfGap marginTop" class="formBody">
                     <div>
                         <label for="userEmail" style="display: block">E-Mail</label>
                         <div class="alertRing"><input type="text" name="userEmail" id="userEmail"></div>
@@ -71,11 +71,9 @@
                 <h3>Passwort-Reset-Mail anfordern</h3>
             </div>
             <form id="sendResetPasswordMailForm" method="post">
-                <div class="flex halfGap marginTop" class="formBody">
-                    <div>
-                        <label for="resetPasswordMail" style="display: block">E-Mail-Adresse</label>
-                        <div class="alertRing"><input type="mail" name="resetPasswordMail" id="resetPasswordMail"></div>
-                    </div>
+                <div class="flex column halfGap marginTop" class="formBody">
+                    <label for="resetPasswordMail" style="display: block">E-Mail-Adresse</label>
+                    <div class="alertRing"><input type="mail" name="resetPasswordMail" id="resetPasswordMail"></div>
                 </div>
                 <div id="sendResetPasswordMailErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
                 <div class="flex spaceBetween alignEnd marginTop">
