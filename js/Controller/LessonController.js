@@ -45,7 +45,6 @@ export default class LessonController {
         }
 
         lesson.save();
-        // View.renderNewLesson(lesson);
         View.renderLesson()
 
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
@@ -72,7 +71,6 @@ export default class LessonController {
         lesson.update();
 
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
-        // View.renderNewLesson(lesson);
         View.renderLesson();
     }
 

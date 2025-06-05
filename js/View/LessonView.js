@@ -119,39 +119,6 @@ export default class LessonView {
         });
     }
 
-    static renderNewLesson(lesson) {
-        let timeslot = LessonView.#getTimeslotOfLesson(lesson);
-
-        //is the lesson a appointement, use change the undefined cssColorClass to appointement
-        if (lesson.subject == 'Termin') lesson.cssColorClass = 'appointement';
-
-        timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
-                    <div class="lessonHasTaskIndicator"></div>
-                    <div class="lessonContentContainer" style="width: 100%;">
-                        <div class="spacerBlock"></div>
-                        <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
-                        <div class="lessonMenuWrapper">
-                            <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
-                                <button class="lessonOptionsButton">&#x2630;</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="display: none;" class="${lesson.cssColorClass} light lessonOptionsWrapper">
-                        <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
-                        <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
-                        <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
-                    </div>    
-                </div>`;
-
-        this.showLessonHasTaskIndicator();
-
-        timeslot.querySelector('.lessonOptionsButton').addEventListener('click', LessonView.showLessonOptions);
-        timeslot.querySelector('.lesson').addEventListener('mouseleave', LessonView.hideLessonsOptions);
-        timeslot.querySelector('.lesson').addEventListener('mouseenter', AbstractView.highlightTask);
-        timeslot.querySelector('.lesson').addEventListener('mouseleave', AbstractView.removeTaskHighlight);
-    }
-
     static showLessonHasTaskIndicator() {
         let taskContainer = document.querySelector('#taskContainer')
         let allLessons = document.querySelectorAll('.lesson');
