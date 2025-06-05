@@ -36,7 +36,7 @@ export default class SettingsController {
         View.renderSelectableLessonColors();
     }
 
-    static saveNewTimetable(validFrom, lessons) {
+    static async saveNewTimetable(validFrom, lessons) {
         let model = new Settings;
         let oldTimetable = LessonController.getOldTimetableCopy();
         let oldTimetableChanges = LessonController.getOldTimetableChanges();
@@ -56,7 +56,7 @@ export default class SettingsController {
             return;
         }
 
-        model.saveNewTimetable(lessons);
+        await model.saveNewTimetable(lessons);
 
         //triggers reordering of tasks for each lesson
         LessonController.renderLesson();

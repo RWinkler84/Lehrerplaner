@@ -300,7 +300,6 @@ export default class SettingsView {
         });
 
         Controller.saveNewTimetable(validFrom, lessons);
-        SettingsView.setDateOfTimetableToDisplay();
     }
 
     static discardNewTimetable() {
@@ -318,6 +317,7 @@ export default class SettingsView {
         document.querySelector('#validFromPickerWrapper').value = '';
         document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
         document.querySelector('#timetableForwardButton').style.visibility = 'visible';
+        SettingsView.setDateOfTimetableToDisplay();
         SettingsView.setDateOfTimetableToDisplay();
         SettingsView.renderLessons();
     }

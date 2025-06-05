@@ -41,6 +41,7 @@ export default class TaskController {
         task.fixedTime = taskData.fixedTime
 
         task.save();
+        LessonController.renderLesson();
     }
 
     static updateTask(taskData) {
@@ -74,6 +75,7 @@ export default class TaskController {
 
         Task.reorderTasks(oldTimetable, oldTimetableChanges);
         this.renderTaskChanges();
+        LessonController.renderLesson();
     }
 
 }

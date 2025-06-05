@@ -65,22 +65,6 @@ export default class Task extends AbstractModel {
         if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
-    async updateDate() {
-        allTasksArray.forEach(element => {
-            if (element.id == this.id) {
-                element.date = this.date;
-            }
-        });
-
-        let taskData = {
-            'id': this.id,
-            'date': this.formatDate(this.date),
-        }
-
-        let result = await this.makeAjaxQuery('task', 'updateDate', taskData);
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
-    }
-
     async save() {
         let taskData = {
             'id': this.id,
@@ -232,7 +216,7 @@ export default class Task extends AbstractModel {
                         if (allNewLessonDates[indexInOldDates]) {
                             task.date = allNewLessonDates[indexInOldDates].date;
                             task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                            task.updateDate();
+                            task.update();
                         }
                     })
                 })
