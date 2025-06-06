@@ -150,6 +150,7 @@ export default class Settings extends AbstractModel {
         let result = await this.makeAjaxQuery('user', 'logout');
 
         if (result.status == 'success') {
+            document.cookie = `lprm=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${location.href}`;
             location.reload();
         }
     }

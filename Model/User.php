@@ -15,6 +15,8 @@ class User extends AbstractModel
     private $password;
     private $emailConfirmed;
     private $activeUntil;
+    private $rememberMeToken;
+    private $rememberMeUntil;
 
     private $tableName = TABLEPREFIX . 'users';
 
@@ -50,6 +52,8 @@ class User extends AbstractModel
         if (password_verify($loginData['password'], $user->getPassword())) {
             $_SESSION['isLoggedIn'] = true;
             $_SESSION['userId'] = $user->getId();
+            
+            $user->setRememberMeCookie();
 
             //if the user has requested a password reset, but still logs in with the old data the token needs to be wiped
             $query = "UPDATE $this->tableName SET resetToken = NULL, resetTokenValidUntil = NULL WHERE id = :userId";
@@ -62,6 +66,22 @@ class User extends AbstractModel
                 'status' => 'wrong login data'
             ];
         }
+    }
+
+    public function isRemembered($rememberMeToken) :void
+    {
+        $user = $this->getUserByRememberMeToken($rememberMeToken);
+
+        if (!is_null($user)) {
+            $today = (new DateTime())->getTimestamp();
+            $rememberMeUntil = strtotime($user->rememberMeUntil);
+
+            if ($today <= $rememberMeUntil){
+                $_SESSION['userId'] = $user->getId();
+                $_SESSION['isLoggedIn'] = true;
+            }
+        }
+
     }
 
     public function createAccount($accountData)
@@ -205,11 +225,13 @@ class User extends AbstractModel
         return $this->email;
     }
 
-    private function getPassword(){
+    private function getPassword()
+    {
         return $this->password;
     }
 
-    public function getActiveUntil() {
+    public function getActiveUntil()
+    {
         return $this->activeUntil;
     }
 
@@ -232,6 +254,8 @@ class User extends AbstractModel
             $user->password = $result[0]['password'];
             $user->emailConfirmed = $result[0]['emailConfirmed'];
             $user->activeUntil = $result[0]['activeUntil'];
+            $user->rememberMeToken = $result[0]['rememberMeToken'];
+            $user->rememberMeUntil = $result[0]['rememberMeUntil'];
 
             return $user;
         }
@@ -249,7 +273,48 @@ class User extends AbstractModel
             $user->password = $result[0]['password'];
             $user->emailConfirmed = $result[0]['emailConfirmed'];
             $user->activeUntil = $result[0]['activeUntil'];
+            $user->rememberMeToken = $result[0]['rememberMeToken'];
+            $user->rememberMeUntil = $result[0]['rememberMeUntil'];
+
             return $user;
+        }
+    }
+
+    public function getUserByRememberMeToken($rememberMeToken)
+    {
+        $query = "SELECT * FROM $this->tableName WHERE rememberMeToken = :rememberMeToken";
+        $result = $this->read($query, ['rememberMeToken' => $rememberMeToken]);
+
+        if (!empty($result)) {
+            $user = new User($result[0]['id']);
+            $user->email = $result[0]['userEmail'];
+            $user->password = $result[0]['password'];
+            $user->emailConfirmed = $result[0]['emailConfirmed'];
+            $user->activeUntil = $result[0]['activeUntil'];
+            $user->rememberMeToken = $result[0]['rememberMeToken'];
+            $user->rememberMeUntil = $result[0]['rememberMeUntil'];
+
+            return $user;
+        }
+    }
+
+    private function setRememberMeCookie(){
+        $rememberMeToken = bin2hex(random_bytes(20));
+        $rememberMeUntil = (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s'); 
+        $rememberMeUntilTimestamp = strtotime($rememberMeUntil);
+        
+        
+        $query = "UPDATE $this->tableName SET rememberMeToken = :rememberMeToken, rememberMeUntil = :rememberMeUntil WHERE id = :id";
+        $params = [
+            'rememberMeToken' => $rememberMeToken,
+            'rememberMeUntil' => $rememberMeUntil,
+            'id' => $this->getId()
+        ];
+
+        $result = $this->write($query, $params);
+
+        if ($result['status'] == 'success'){
+            setcookie('lprm', $rememberMeToken, $rememberMeUntilTimestamp);
         }
     }
 
