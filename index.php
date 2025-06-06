@@ -5,10 +5,15 @@ require_once './vendor/autoload.php';
 
 use Model\User;
 
-session_start();
+session_start(['cookie_secure' => true]);
 
 if (isset($_SESSION['userId'])) {
     $user = new User($_SESSION['userId']);
+}
+
+if (isset($_COOKIE['lprm']) && !isset($_SESSION['isLoggedIn'])){
+    $emptyUser = new User;
+    $isRemembered = $emptyUser->isRemembered($_COOKIE['lprm']);
 }
 
 if (isset($_GET['c']) && isset($_GET['a'])) {
@@ -26,11 +31,6 @@ if (isset($_GET['c']) && isset($_GET['a'])) {
 
     $controller->$action();
     exit;
-}
-
-if (isset($_COOKIE['lprm']) && !isset($_SESSION['isLoggedIn'])){
-    $emptyUser = new User;
-    $isRemembered = $emptyUser->isRemembered($_COOKIE['lprm']);
 }
 
 if (isset($_SESSION['isLoggedIn']) && isset($_SESSION['userId'])) {

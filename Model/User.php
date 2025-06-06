@@ -298,9 +298,18 @@ class User extends AbstractModel
         }
     }
 
+    private function getUserDataByPasswordResetToken($token): array
+    {
+        $query = "SELECT * FROM $this->tableName WHERE resetToken = :token";
+
+        $result = $this->read($query, ['token' => $token]);
+
+        return $result;
+    }
+
     private function setRememberMeCookie(){
         $rememberMeToken = bin2hex(random_bytes(20));
-        $rememberMeUntil = (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s'); 
+        $rememberMeUntil = (new DateTime())->setTime(3,0)->modify('+1 day')->format('Y-m-d H:i:s'); 
         $rememberMeUntilTimestamp = strtotime($rememberMeUntil);
         
         
@@ -314,17 +323,8 @@ class User extends AbstractModel
         $result = $this->write($query, $params);
 
         if ($result['status'] == 'success'){
-            setcookie('lprm', $rememberMeToken, $rememberMeUntilTimestamp);
+            setcookie('lprm', $rememberMeToken, $rememberMeUntilTimestamp,"", "", true);
         }
-    }
-
-    private function getUserDataByPasswordResetToken($token): array
-    {
-        $query = "SELECT * FROM $this->tableName WHERE resetToken = :token";
-
-        $result = $this->read($query, ['token' => $token]);
-
-        return $result;
     }
 
     private function userExists($newUserData)
