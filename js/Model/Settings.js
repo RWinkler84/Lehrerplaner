@@ -154,4 +154,10 @@ export default class Settings extends AbstractModel {
             location.reload();
         }
     }
+
+    async deleteAccount() {
+        let result = await this.makeAjaxQuery('user', 'deleteAccount');
+
+        return result;
+    }
 }

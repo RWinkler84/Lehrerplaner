@@ -59,6 +59,12 @@ class UserController extends AbstractController
         echo json_encode(['message' => 'Da ist etwas schief gelaufen.']);
     }
 
+    public function deleteAccount() {
+        $result = $this->model->deleteAccount();
+
+        echo json_encode($result);
+    }
+
     public function resetPassword()
     {
         $passwordData = json_decode(file_get_contents('php://input'), true);

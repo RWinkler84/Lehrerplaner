@@ -81,7 +81,6 @@ class User extends AbstractModel
                 $_SESSION['isLoggedIn'] = true;
             }
         }
-
     }
 
     public function createAccount($accountData)
@@ -112,6 +111,14 @@ class User extends AbstractModel
         }
 
         return ['message' => 'Etwas ist schief gelaufen...'];
+    }
+
+    public function deleteAccount() {
+        global $user;
+
+        $query = "DELETE FROM $this->tableName WHERE id = :id";
+
+        return $this->delete($query, ['id' => $user->getId()]);
     }
 
     public function authenticateMail($userId, $emailHash)

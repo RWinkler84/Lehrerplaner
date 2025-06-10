@@ -4,6 +4,7 @@ import Fn from "../inc/utils.js";
 
 export default class SettingsView {
 
+    //timetable settings functions
     static renderSelectableLessonColors() {
         let allColorsArray = [
             'subjectColorOne',
@@ -443,6 +444,44 @@ export default class SettingsView {
         weekday.querySelectorAll('.settingsTimeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot });
 
         return timeslot;
+    }
+
+    //account settings functions
+    static openTimetableSettings(){
+        document.querySelector('#openAccountSettingsButton').classList.remove('selected');
+        document.querySelector('#accountSettingsContainer').style.display = 'none';
+
+        document.querySelector('#openTimetableSettingsButton').classList.add('selected');
+        document.querySelector('#timetableSettingsContainer').style.display = 'block';
+    }
+
+    static openAccountSettings(){
+        let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
+        let timetableSettingsContainer = document.querySelector('#timetableSettingsContainer');
+        let containerHeight = timetableSettingsContainer.clientHeight;
+
+        accountSettingsContainer.style.height = containerHeight + 'px';
+        document.querySelector('#openAccountSettingsButton').classList.add('selected');
+        accountSettingsContainer.style.display = 'block';
+
+        document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
+        timetableSettingsContainer.style.display = 'none';
+    }
+
+
+    static toogleAccountDeletionMenu(event) {
+        let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
+        let requestDeletionMenu = document.querySelector('#requestDeletionContainer');
+        
+        if (event.target.id == 'deleteAccountButton'){
+            requestDeletionMenu.style.display = 'none';
+            deleteAccountMenu.style.display = 'block';
+        }
+
+        if (event.target.id == 'cancelAccountDeletionButton'){
+            requestDeletionMenu.style.display = 'block';
+            deleteAccountMenu.style.display = 'none';
+        }
     }
 
     //validation functions

@@ -1,9 +1,9 @@
+import SettingsView from './View/SettingsView.js';
+import TaskView from './View/TaskView.js';
+import LessonView from './View/LessonView.js';
 import AbstractView from './View/AbstractView.js';
 import AbstractController from './Controller/AbstractController.js';
 import SettingsController from './Controller/SettingsController.js';
-import TaskView from './View/TaskView.js';
-import LessonView from './View/LessonView.js';
-import SettingsView from './View/SettingsView.js';
 import Fn from './inc/utils.js';
 
 //config
@@ -77,21 +77,11 @@ async function startApp() {
     })
 
     //handlers for settings
+    document.querySelector('#settingsContainer').addEventListener('click', AbstractView.settingsClickEventHandler);
     document.querySelector('#openSettingsButton').addEventListener('click', AbstractView.openSettings);
     document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
-    document.querySelector('#createSubjectButton').addEventListener('click', SettingsView.saveSubject);
-
-    document.querySelector('#timetableBackwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
-    document.querySelector('#timetableForwardButton').addEventListener('click', SettingsView.changeDisplayedTimetable);
 
     document.querySelector('#validFromPicker').addEventListener('change', SettingsView.isDateTaken);
-    document.querySelector('#createNewTimetableButton').addEventListener('click', SettingsView.makeTimetableEditable);
-    document.querySelector('#saveNewTimetableButton').addEventListener('click', SettingsView.saveNewTimetable);
-    document.querySelector('#discardNewTimetableButton').addEventListener('click', SettingsView.discardNewTimetable);
-
-    document.querySelector('#editTimetableButton').addEventListener('click', SettingsView.makeLessonsEditable);
-    document.querySelector('#saveTimetableChangesButton').addEventListener('click', SettingsView.saveTimetableChanges);
-    document.querySelector('#discardTimetableChangesButton').addEventListener('click', SettingsView.discardNewTimetable);
 
     //logout
     document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);

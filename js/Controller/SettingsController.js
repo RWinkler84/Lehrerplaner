@@ -88,6 +88,18 @@ export default class SettingsController {
         model.logout();
     }
 
+    static async deleteAccount(){
+        let model = new Settings;
+        let result = await model.deleteAccount();
+
+        console.log(result);
+
+        if (result.status == 'success') {
+            alert('Das Konto wurde erfolgreich entfernt.');
+            model.logout();
+            }
+    }
+
     static getScheduledLessons() {
         return LessonController.getScheduledLessons();
     }

@@ -55,6 +55,7 @@ select {
 
 #settingsSubjectsContainer,
 #settingsTimetableContainer,
+#deleteAccountContainer,
 #timetableContainer,
 #taskContainer {
     position: relative;
@@ -421,7 +422,33 @@ tr[data-new]:has(td[data-taskDescription]) td {
     display: none;
 }
 
+#approveAccountDeletionContainer {
+    display: none;
+}
+
 /* Buttons */
+.approvalButton,
+.cancelButton {
+    border: none;
+    padding: 0.25rem 1rem;
+    border-radius: var(--smallRadius);
+    background-color: var(--lightMatteGreen);
+    font-size: 1rem;
+    color: var(--lighterText);
+}
+
+.cancelButton {
+    background-color: var(--lightMatteRed);
+}
+
+.approvalButton:hover {
+    background-color: var(--matteGreen);
+}
+
+.cancelButton:hover {
+    background-color: var(--matteRed);
+}
+
 .taskDone button,
 .discardNewLessonButton,
 .saveNewLessonButton {
@@ -483,9 +510,10 @@ tr[data-new]:has(td[data-taskDescription]) td {
 .deleteLessonButton,
 #closeSettingsButton,
 #openSettingsButton,
+#openTimetableSettingsButton,
+#openAccountSettingsButton,
 #logoutButton {
     color: var(--lightgrey);
-    /* flex-grow: 1; */
     border: none;
     border-radius: var(--smallRadius);
     padding: 0 0.2em;
@@ -496,6 +524,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 .deleteSubjectButton:hover,
 .deleteLessonButton:hover,
 #closeSettingsButton:hover,
+#timetableSettingsButton:hover,
+#accountSettingsButton:hover,
 #openSettingsButton:hover {
     background-color: rgba(256, 256, 256, 0.1);
 }
@@ -510,6 +540,18 @@ tr[data-new]:has(td[data-taskDescription]) td {
     width: 2rem;
     height: 2rem;
     font-size: 1.5rem;
+}
+
+#openTimetableSettingsButton,
+#openAccountSettingsButton {
+    font-size: 1rem;
+    padding: 0 1rem;
+
+}
+
+#openTimetableSettingsButton.selected,
+#openAccountSettingsButton.selected {
+    background-color: rgba(256, 256, 256, 0.1);
 }
 
 .lessonOption.lessonPastMessage.responsive {
