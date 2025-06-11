@@ -1,16 +1,16 @@
 import Model from "../Model/AbstractModel.js";
+import AbstractView from "../View/AbstractView.js";
 
 export default class AbstractController {
 
     #db
 
-    constructor()
-    {
+    constructor() {
         this.#db = new Model();
     }
 
-    async getSubjectsFromDatabase(){
-       return await this.#db.makeAjaxQuery('abstract','getSubjects');
+    async getSubjectsFromDatabase() {
+        return await this.#db.makeAjaxQuery('abstract', 'getSubjects');
     }
 
     async getTimetableFromDatabase() {
@@ -25,11 +25,37 @@ export default class AbstractController {
         return await this.#db.makeAjaxQuery('abstract', 'getAllTasks');
     }
 
-    static getAllSubjects(){
+    static getAllSubjects() {
         return Model.getAllSubjects();
     }
 
-    checkDataState(){
+    static openLoginDialog() {
+        AbstractView.openLoginDialog()
+    }
+
+    async attemptLogin(loginData) {
+        if (loginData.userEmail == '') {
+            AbstractView.alertLoginDialogEmailInput();
+            return {'status': 'failed'};
+            }
+
+        if (loginData.password == '') {
+            AbstractView.alertLoginDialogPasswordInput();
+            return {'status': 'failed'};
+            }
+
+        let result =  await this.#db.makeAjaxQuery('user', 'login', loginData);
+
+        console.log(result);
+
+        if (result.status == 'success') {
+            AbstractView.closeLoginDialog();
+        } else {
+            AbstractView.showLoginErrorMessage(result.message);
+        }
+    }
+
+    checkDataState() {
         this.#db.checkDataState();
     }
 }

@@ -56,7 +56,7 @@ async function attemptLogin(event) {
     if (loginData) {
         result = await makeAjaxQuery('index.php?c=user&a=login', loginData);
 
-        if (result.message === 'Successfully logged in') {
+        if (result.status === 'success') {
             window.location = 'index.php';
         } else {
             errorMessageDisplay.style.color = 'var(--matteRed)';
@@ -67,7 +67,7 @@ async function attemptLogin(event) {
                 errorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
             }
 
-            if (result.status == 'wrong login data') {
+            if (result.status == 'failed') {
                 errorMessageDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
                 errorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', openSendResetPasswordMailDialog);
             }
@@ -140,8 +140,6 @@ async function resendAuthMail(event) {
 
         result = await makeAjaxQuery('index.php?c=user&a=resendAuthMail', { 'userEmail': userEmail });
         errorMessageDisplay.innerText = result.message;
-
-        console.log(result);
 
         if (result.status == 'success') {
             errorMessageDisplay.style.color = 'var(--matteGreen)';

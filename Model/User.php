@@ -33,7 +33,7 @@ class User extends AbstractModel
         if (empty($user)) {
             return [
                 'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
-                'status' => 'wrong login data'
+                'status' => 'failed'
             ];
             exit();
         }
@@ -59,11 +59,14 @@ class User extends AbstractModel
             $query = "UPDATE $this->tableName SET resetToken = NULL, resetTokenValidUntil = NULL WHERE id = :userId";
             $this->write($query, ['userId' => $user->getId()]);
 
-            return ['message' => 'Successfully logged in'];
+            return [
+                'status' => 'success',
+                'message' => 'Successfully logged in'
+                ];
         } else {
             return [
                 'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
-                'status' => 'wrong login data'
+                'status' => 'failed'
             ];
         }
     }

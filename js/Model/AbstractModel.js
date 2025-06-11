@@ -1,6 +1,7 @@
 import { allSubjects, timetableChanges, ONEDAY, allTasksArray, unsyncedDeletedSubjects } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
+import AbstractController from "../Controller/AbstractController.js";
 
 export default class AbstractModel {
 
@@ -19,7 +20,11 @@ export default class AbstractModel {
             return { 'status': 'failed' };
         }
 
-        return response.json();
+        let result = await response.json();
+
+        if (result.status == 'failed' && result.message == 'User not logged in!') AbstractController.openLoginDialog();
+
+        return result;
     }
 
     static calculateAllLessonDates(className, subject, endDate, timetable = standardTimetable, lessonChanges = timetableChanges) {

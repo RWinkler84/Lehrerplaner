@@ -2,6 +2,7 @@ import { allSubjects } from "../index.js";
 import Fn from '../inc/utils.js';
 import SettingsView from "./SettingsView.js";
 import SettingsController from "../Controller/SettingsController.js";
+import AbstractController from "../Controller/AbstractController.js";
 
 export default class AbstractView {
 
@@ -129,6 +130,41 @@ export default class AbstractView {
 
     }
 
+    static openLoginDialog() {
+        let loginDialog = document.querySelector('#loginDialog');
+
+        loginDialog.setAttribute('open', '');
+    }
+
+    static closeLoginDialog() {
+        let loginDialog = document.querySelector('#loginDialog');
+
+        loginDialog.removeAttribute('open');
+        loginDialog.querySelector('#userEmail').value = '';
+        loginDialog.querySelector('#password').value = '';
+        loginDialog.querySelector('#loginErrorMessageDisplay').innerText = '';
+    }
+
+    static attemptLogin(event) {
+        event.preventDefault();
+        let controller = new AbstractController;
+        let loginDialog = document.querySelector('#loginDialog');
+
+        let loginData = {
+            'userEmail': loginDialog.querySelector('#userEmail').value,
+            'password': loginDialog.querySelector('#password').value  
+        }
+
+        controller.attemptLogin(loginData);
+    }
+
+    static showLoginErrorMessage(message) {
+        let loginErrorDisplay = document.querySelector('#loginErrorMessageDisplay');
+        
+        loginErrorDisplay.style.color = 'var(--matteRed)';
+        loginErrorDisplay.innerText = message;
+    }
+
     static settingsClickEventHandler(event) {
         let target = event.target.id;
 
@@ -195,5 +231,24 @@ export default class AbstractView {
                 SettingsView.toogleAccountDeletionMenu(event);
                 break;
         }
+    }
+
+    //form validation errors
+    static alertLoginDialogEmailInput() {
+        let alertRing = document.querySelector('#userEmail').parentElement;
+        
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertLoginDialogPasswordInput() {
+        let alertRing = document.querySelector('#password').parentElement;
+        
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
     }
 }

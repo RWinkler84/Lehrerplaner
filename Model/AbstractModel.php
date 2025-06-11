@@ -199,6 +199,14 @@ class AbstractModel
     {
         global $user;
 
+        if (!isset($user)){
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'User not logged in!'
+            ]);
+            exit();
+        }
+
         //sometimes dataArray will be a set of associative arrays, sometimes it will just be a single associative array
         if (isset($dataArray[0])) {
 

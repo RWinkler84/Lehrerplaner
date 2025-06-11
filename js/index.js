@@ -83,6 +83,9 @@ async function startApp() {
 
     document.querySelector('#validFromPicker').addEventListener('change', SettingsView.isDateTaken);
 
+    //on site login
+    document.querySelector('#loginForm').addEventListener('submit', AbstractView.attemptLogin);
+
     //logout
     document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);
 

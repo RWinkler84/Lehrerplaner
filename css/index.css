@@ -93,6 +93,36 @@ select {
     background-color: var(--matteGreen);
 }
 
+/* login dialog */
+dialog {
+    top: 25%;
+    background-color: var(--contentContainerBackground);
+    min-width: 460px;
+    max-width: 460px;
+}
+
+dialog .alertRing {
+    width: 100%;
+}
+
+dialog input {
+    width: 100%;
+}
+
+dialog .errorMessageDisplay {
+    width: 100% !important;
+    margin-top: 0.5rem;
+    color: var(--matteRed);
+    text-align: center;
+    text-wrap: wrap;
+}
+
+#headline {
+    background-color: var(--topMenuBackgound);
+    margin: -1rem -1rem 0 -1rem;
+    padding: 0.5rem 1rem ;
+}
+
 /* Time Table */
 
 #weekBackwardButton,
@@ -432,7 +462,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 /* Buttons */
-.approvalButton,
+.confirmationButton,
 .cancelButton {
     border: none;
     padding: 0.25rem 1rem;
@@ -446,7 +476,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--lightMatteRed);
 }
 
-.approvalButton:hover {
+.confirmationButton:hover {
     background-color: var(--matteGreen);
 }
 

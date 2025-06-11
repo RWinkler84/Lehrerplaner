@@ -20,6 +20,7 @@
             </div>
         </div>
     </nav>
+
     <main>
         <div id="timetableContainer">
             <div class="flex doubleGap spaceBetween" style="margin-bottom: 1rem;">
@@ -400,23 +401,50 @@
                 <div id="deleteAccountContainer">
                     <label>Konto löschen:</label>
                     <div id="requestDeletionContainer">
-                    <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt.</p>
-                    <button id="deleteAccountButton" class="cancelButton">Konto löschen</button>
+                        <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt.</p>
+                        <button id="deleteAccountButton" class="cancelButton">Konto löschen</button>
                     </div>
                     <div id="approveAccountDeletionContainer">
-                        <p>Bitte bestätige, dass du dein Konto endgültig löschen möchtest. Dieser Schritt kann nicht rückgängig gemacht werden!</p>
-                        <button id="approveAccountDeletionButton" class="approvalButton">Bestätigen</button>
+                        <p>Bitte bestätige, dass du dein Konto endgültig löschen möchtest. Dieser Schritt kann nicht
+                            rückgängig gemacht werden!</p>
+                        <button id="approveAccountDeletionButton" class="confirmationButton">Bestätigen</button>
                         <button id="cancelAccountDeletionButton" class="cancelButton">Abbrechen</button>
                     </div>
                     <div id="deletionErrorDisplay">
-                    <p>Etwas ist schief gelaufen. Bitte versuche es später noch einmal.</p>
-                    <button id="cancelFailedAccountDeletionButton" class="cancelButton">zurück</button>
+                        <p>Etwas ist schief gelaufen. Bitte versuche es später noch einmal.</p>
+                        <button id="cancelFailedAccountDeletionButton" class="cancelButton">zurück</button>
                     </div>
                 </div>
             </div>
 
         </div>
     </settings>
+
+    <dialog id="loginDialog" open>
+        <div id="headline">
+            <h3>Login</h3>
+        </div>
+        <form id="loginForm" method="post">
+            <div class="flex column halfGap marginTop" class="formBody">
+                <div>
+                    <label for="userEmail" style="display: block">E-Mail</label>
+                    <div class="alertRing"><input type="text" name="userEmail" id="userEmail"></div>
+                </div>
+                <div>
+                    <label for="password" style="display: block">Passwort</label>
+                    <div class="alertRing"><input type="password" name="password" id="password"></div>
+                </div>
+            </div>
+            <div id="loginErrorMessageDisplay" class="errorMessageDisplay alertRing">
+                Du wurdest wegen Inaktivität ausgeloggt. Melde dich erneut an, um Datenverlust zu vermeiden.
+            </div>
+            <div class="flex justifyEnd alignEnd marginTop">
+                <button type="submit" id="loginButton" class="confirmationButton"
+                    style="margin-right: 3px">Login</button>
+            </div>
+        </form>
+    </dialog>
+
     <script src="./js/index.js" type="module"></script>
 </body>
 
