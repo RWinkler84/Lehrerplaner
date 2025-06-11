@@ -190,6 +190,10 @@ export default class AbstractView {
             case 'cancelAccountDeletionButton':
                 SettingsView.toogleAccountDeletionMenu(event);
                 break;
+
+            case 'cancelFailedAccountDeletionButton':
+                SettingsView.toogleAccountDeletionMenu(event);
+                break;
         }
     }
 }

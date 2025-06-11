@@ -83,21 +83,22 @@ export default class SettingsController {
         View.discardNewTimetable();
     }
 
-    static logout(){
+    static logout() {
         let model = new Settings;
         model.logout();
     }
 
-    static async deleteAccount(){
+    static async deleteAccount() {
         let model = new Settings;
         let result = await model.deleteAccount();
 
         console.log(result);
 
         if (result.status == 'success') {
-            alert('Das Konto wurde erfolgreich entfernt.');
-            model.logout();
-            }
+            View.showAccountDeletionResult('success');
+        } else {
+            View.showAccountDeletionResult('failed');
+        }
     }
 
     static getScheduledLessons() {

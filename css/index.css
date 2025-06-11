@@ -422,8 +422,13 @@ tr[data-new]:has(td[data-taskDescription]) td {
     display: none;
 }
 
-#approveAccountDeletionContainer {
+#approveAccountDeletionContainer{
     display: none;
+}
+
+#deletionErrorDisplay {
+    display: none;
+    color: var(--matteRed);
 }
 
 /* Buttons */

@@ -472,15 +472,36 @@ export default class SettingsView {
     static toogleAccountDeletionMenu(event) {
         let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
         let requestDeletionMenu = document.querySelector('#requestDeletionContainer');
+        let deletionErrorDisplay = document.querySelector('#deletionErrorDisplay');
         
         if (event.target.id == 'deleteAccountButton'){
             requestDeletionMenu.style.display = 'none';
+            deletionErrorDisplay.style.display = 'none';
             deleteAccountMenu.style.display = 'block';
         }
 
         if (event.target.id == 'cancelAccountDeletionButton'){
             requestDeletionMenu.style.display = 'block';
             deleteAccountMenu.style.display = 'none';
+            deletionErrorDisplay.style.display = 'none';
+        }
+
+        if (event.target.id == 'cancelFailedAccountDeletionButton'){
+            requestDeletionMenu.style.display = 'block';
+            deleteAccountMenu.style.display = 'none';
+            deletionErrorDisplay.style.display = 'none';      
+        }
+    }
+
+    static showAccountDeletionResult(status) {
+        if (status == 'success') {
+            alert('Dein Account wurde erfolgreich gelöscht.');
+            Controller.logout();
+        }
+
+        if (status == 'failed') {
+            document.querySelector('#deletionErrorDisplay').style.display = 'block';
+            document.querySelector('#approveAccountDeletionContainer').style.display = 'none';
         }
     }
 

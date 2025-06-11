@@ -116,6 +116,7 @@ async function attemptAccountCreation(event) {
     let accountData = getAccountDataFromForm();
 
     if (accountData) {
+        document.querySelector('#submitNewAccountDataButton').style.display = 'none';
         result = await makeAjaxQuery('index.php?c=user&a=createAccount', accountData);
 
         if (result.message == 'Confirmation email send') {
@@ -123,6 +124,8 @@ async function attemptAccountCreation(event) {
             accountCreationErrorMessageDisplay.innerText = 'Erfolg! Eine Bestätigungsmail wurde an die angegebene Adresse gesendet. Bitte klicke den darin enthaltenen Link, damit du loslegen kannst.'
         } else {
             accountCreationErrorMessageDisplay.innerText = result.message;
+            createAccountDialog.querySelector('#submitNewAccountDataButton').removeAttribute('style');
+
             alertAccountCreationErrorMessageDisplay();
         }
     }
@@ -300,6 +303,8 @@ function openLoginForm(event) {
     resetPasswordDialog.removeAttribute('open');
     sendResetPasswordMailDialog.removeAttribute('open');
 
+    createAccountDialog.querySelector('#submitNewAccountDataButton').removeAttribute('style');
+
     loginDialog.setAttribute('open', '');
     loginErrorMessageDisplay.style.color = 'var(--matteRed)';
     loginErrorMessageDisplay.innerText = '';
@@ -327,6 +332,8 @@ function openSendResetPasswordMailDialog(event) {
 
 
 async function makeAjaxQuery(url, dataToSend) {
+    let result = {}; 
+
     try {
         response = await fetch(url, {
             method: 'POST',
@@ -337,7 +344,10 @@ async function makeAjaxQuery(url, dataToSend) {
         if (!response.ok) throw new Error(`Response status: ${response.status}`)
     }
     catch (error) {
-        console.log(error.message);
+        result.status = 'failed';
+        result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später noch einmal.';
+
+        return result;
     }
 
     result = await response.json();
