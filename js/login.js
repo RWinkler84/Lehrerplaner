@@ -67,7 +67,6 @@ async function attemptLogin(event) {
                 errorMessageDisplay.querySelector('#resendAuthMail').addEventListener('click', resendAuthMail);
             }
 
-            console.log(result.status)
             if (result.status == 'wrong login data') {
                 errorMessageDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
                 errorMessageDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', openSendResetPasswordMailDialog);
@@ -91,8 +90,6 @@ async function attemptPasswordReset(event) {
         formData['token'] = token;
 
         let result = await makeAjaxQuery('index.php?c=user&a=resetPassword', formData);
-
-        console.log(result);
 
         if (result.status == 'success') {
             errorMessageDisplay.style.color = 'var(--matteGreen)';
@@ -144,10 +141,14 @@ async function resendAuthMail(event) {
         result = await makeAjaxQuery('index.php?c=user&a=resendAuthMail', { 'userEmail': userEmail });
         errorMessageDisplay.innerText = result.message;
 
+        console.log(result);
+
         if (result.status == 'success') {
-            errorMessageDisplay.style.color = 'var(--matteGreen';
+            errorMessageDisplay.style.color = 'var(--matteGreen)';
         } else {
             authMailAlreadySend = false;
+            errorMessageDisplay.style.color = 'var(--matteRed)';
+            errorMessageDisplay.innerText = result.message;
         }
 
         setTimeout(() => { authMailAlreadySend = false; }, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
@@ -175,10 +176,12 @@ async function sendResetPasswordMail(event) {
         result = await makeAjaxQuery('index.php?c=user&a=sendPasswortResetMail', { 'userEmail': userEmail });
 
         if (result.status == 'success') {
-            errorMessageDisplay.style.color = 'var(--matteGreen';
+            errorMessageDisplay.style.color = 'var(--matteGreen)';
             errorMessageDisplay.innerText = result.message;
         } else {
             resetMailAlreadySend = false;
+            errorMessageDisplay.style.color = 'var(--matteRed)';
+            errorMessageDisplay.innerText = result.message;
         }
 
         setTimeout(() => { resetMailAlreadySend = false; }, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
@@ -332,7 +335,7 @@ function openSendResetPasswordMailDialog(event) {
 
 
 async function makeAjaxQuery(url, dataToSend) {
-    let result = {}; 
+    let result = {};
 
     try {
         response = await fetch(url, {
