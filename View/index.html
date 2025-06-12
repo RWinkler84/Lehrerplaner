@@ -420,7 +420,8 @@
         </div>
     </settings>
 
-    <dialog id="loginDialog" open>
+    <!-- dialogs -->
+    <dialog id="loginDialog">
         <div id="headline">
             <h3>Login</h3>
         </div>
@@ -441,6 +442,23 @@
             <div class="flex justifyEnd alignEnd marginTop">
                 <button type="submit" id="loginButton" class="confirmationButton"
                     style="margin-right: 3px">Login</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="sendResetPasswordMailDialog">
+        <div id="headline">
+            <h3>Passwort-Reset-Mail anfordern</h3>
+        </div>
+        <form id="sendResetPasswordMailForm" method="post">
+            <div class="flex column halfGap marginTop" class="formBody">
+                <label for="resetPasswordMail" style="display: block">E-Mail-Adresse</label>
+                <div class="alertRing"><input type="mail" name="resetPasswordMail" id="resetPasswordMail"></div>
+            </div>
+            <div id="sendResetPasswordMailErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
+            <div class="flex spaceBetween alignEnd marginTop">
+                <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
+                <button type="submit" id="sendResetPasswordMailButton" class="confirmationButton" style="margin-right: 3px">Anfordern</button>
             </div>
         </form>
     </dialog>

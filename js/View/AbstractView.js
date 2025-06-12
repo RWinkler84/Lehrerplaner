@@ -131,8 +131,8 @@ export default class AbstractView {
     }
 
     static openLoginDialog() {
+        AbstractController.closeSendResetPasswordMailDialog();
         let loginDialog = document.querySelector('#loginDialog');
-
         loginDialog.setAttribute('open', '');
     }
 
@@ -142,7 +142,29 @@ export default class AbstractView {
         loginDialog.removeAttribute('open');
         loginDialog.querySelector('#userEmail').value = '';
         loginDialog.querySelector('#password').value = '';
-        loginDialog.querySelector('#loginErrorMessageDisplay').innerText = '';
+        loginDialog.querySelector('#loginErrorMessageDisplay').innerText = 'Du wurdest wegen Inaktivität ausgeloggt. Melde dich erneut an, um Datenverlust zu vermeiden.';
+    }
+
+    static openSendResetPasswordMailDialog(event) {
+        event.preventDefault();
+        AbstractController.closeLoginDialog();
+
+        let sendResetPasswordMailDialog = document.querySelector('#sendResetPasswordMailDialog');
+
+        document.querySelector('#loginDialog').removeAttribute('open');
+
+        sendResetPasswordMailDialog.setAttribute('open', '');
+        sendResetPasswordMailErrorMessageDisplay.style.color = 'var(--matteRed)';
+        sendResetPasswordMailErrorMessageDisplay.innerText = '';
+
+        sendResetPasswordMailDialog.querySelector('.backToLoginLink').addEventListener('click', AbstractController.openLoginDialog);
+    }
+
+    static closeSendResetPasswordMailDialog() {
+        let dialog = document.querySelector('#sendResetPasswordMailDialog');
+
+        dialog.querySelector('#resetPasswordMail').value = '';
+        dialog.removeAttribute('open');
     }
 
     static attemptLogin(event) {
@@ -152,7 +174,7 @@ export default class AbstractView {
 
         let loginData = {
             'userEmail': loginDialog.querySelector('#userEmail').value,
-            'password': loginDialog.querySelector('#password').value  
+            'password': loginDialog.querySelector('#password').value
         }
 
         controller.attemptLogin(loginData);
@@ -160,9 +182,11 @@ export default class AbstractView {
 
     static showLoginErrorMessage(message) {
         let loginErrorDisplay = document.querySelector('#loginErrorMessageDisplay');
-        
+
         loginErrorDisplay.style.color = 'var(--matteRed)';
         loginErrorDisplay.innerText = message;
+        loginErrorDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
+        loginErrorDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', AbstractView.openSendResetPasswordMailDialog);
     }
 
     static settingsClickEventHandler(event) {
@@ -236,7 +260,7 @@ export default class AbstractView {
     //form validation errors
     static alertLoginDialogEmailInput() {
         let alertRing = document.querySelector('#userEmail').parentElement;
-        
+
         alertRing.classList.add('validationError');
         setTimeout(() => {
             alertRing.classList.remove('validationError');
@@ -245,7 +269,16 @@ export default class AbstractView {
 
     static alertLoginDialogPasswordInput() {
         let alertRing = document.querySelector('#password').parentElement;
-        
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertSendAccountResetMailInput() {
+        let alertRing = document.querySelector('#resetPasswordMail').parentElement;
+
         alertRing.classList.add('validationError');
         setTimeout(() => {
             alertRing.classList.remove('validationError');

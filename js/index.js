@@ -85,6 +85,7 @@ async function startApp() {
 
     //on site login
     document.querySelector('#loginForm').addEventListener('submit', AbstractView.attemptLogin);
+    document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', abstCtrl.sendResetPasswordMail.bind(abstCtrl));
 
     //logout
     document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);
