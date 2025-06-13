@@ -1,6 +1,8 @@
 import Controller from "../Controller/SettingsController.js";
 import AbstractView from "./AbstractView.js";
 import Fn from "../inc/utils.js";
+import SettingsController from "../Controller/SettingsController.js";
+import { allTasksArray, timetableChanges } from "../index.js";
 
 export default class SettingsView {
 
@@ -53,7 +55,7 @@ export default class SettingsView {
             subjectsHTML += `
                 <div class="subjectListItem ${entry.colorCssClass} flex spaceBetween" data-id="${entry.id}">
                 ${entry.subject}
-                <button class="deleteSubjectButton" style="width: 1.5rem">&#215;</button>
+                <button class="deleteItemButton" style="width: 1.5rem">&#215;</button>
                 </div>
             `;
         });
@@ -64,7 +66,7 @@ export default class SettingsView {
 
         subjectsContainer.innerHTML = subjectsHTML;
 
-        subjectsContainer.querySelectorAll('.deleteSubjectButton').forEach(element => element.addEventListener('click', SettingsView.deleteSubject));
+        subjectsContainer.querySelectorAll('.deleteItemButton').forEach(element => element.addEventListener('click', SettingsView.deleteSubject));
 
     }
 
@@ -314,7 +316,7 @@ export default class SettingsView {
         Controller.saveNewTimetable(validFrom, lessons);
 
 
-        if (editTimetableButton.hasAttribute('style')) editTimetableButton.removeAttribute('style'); 
+        if (editTimetableButton.hasAttribute('style')) editTimetableButton.removeAttribute('style');
     }
 
     static discardNewTimetable() {
@@ -358,6 +360,87 @@ export default class SettingsView {
         });
 
         Controller.saveTimetableChanges(validFrom, lessons);
+    }
+
+    static renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks) {
+        let dialog = document.querySelector('#LessonChangesAndTasksToKeepDialog');
+        let lessonConflictsContainer = dialog.querySelector('#lessonChangesConflictsContainer');
+        let taskConflictsContainer = dialog.querySelector('#taskConflictsContainer');
+        let descriptionText = 'Du hast in der Vergangenheit Vertretungsstunden, Termine und Aufgaben angelegt, deren Datum im Gültigkeitsbereich des neuen Stundenplans liegen. Sollten diese durch die Änderung hinfällig sein, lösche die entsprechenden Einträge bitte.';
+        let lessonChangesHTML = '';
+        let tasksHTML = '';
+
+        if (affectedLessonChanges.length == 0) {
+            descriptionText = 'Du hast Aufgaben zu älteren Stundenplänen angelegt, deren Termin im Gültigkeitsbereich des neuen Stundenplans liegen. Sollten Aufgaben durch die Änderung hinfällig sein, lösche sie bitte.';
+            lessonConflictsContainer.style.display = 'none';
+        } else if (affectedTasks.length == 0) {
+            descriptionText = 'Du hast Vertretungsstunden oder Termine angelegt, deren Datum im Gültigkeitsbereich des neuen Stundenplans liegen. Sollten Vertretungen oder Termine durch die Änderung hinfällig sein, lösche sie bitte.';
+            taskConflictsContainer.style.display = 'none';
+        }
+
+        dialog.querySelector('#descriptionPara').innerText = descriptionText;
+
+        affectedLessonChanges.forEach(entry => {
+            let type = entry.type == 'sub' ? 'Vertretung' : 'Termin';
+            let subject = entry.subject == 'Termin' ? ' - ' : entry.subject; 
+            let date = Fn.formatDate(entry.date)
+
+            let html = `
+                <tr data-type="lessonChange" data-id="${entry.id}">
+                    <td>${entry.class}</td>
+                    <td>${subject}</td>
+                    <td>${date}</td>
+                    <td>${type}</td>
+                    <td style="border: none;"><button class="deleteItemButton" style="width: 1.5rem">&#215;</button></td>
+                </tr>
+            `;
+
+            lessonChangesHTML += html;
+        })
+
+        affectedTasks.forEach(entry => {
+            let date = Fn.formatDate(entry.date)
+
+            let html = `
+                <tr data-type="task" data-id="${entry.id}">
+                    <td>${entry.class}</td>
+                    <td>${entry.subject}</td>
+                    <td>${date}</td>
+                    <td>${entry.description}</td>
+                    <td style="border: none;"><button class="deleteItemButton" style="width: 1.5rem">&#215;</button></td>
+                </tr>
+            `;
+
+            tasksHTML += html;
+        })
+
+        lessonConflictsContainer.querySelector('table tbody').innerHTML = lessonChangesHTML;
+        taskConflictsContainer.querySelector('table tbody').innerHTML = tasksHTML;
+
+        dialog.querySelectorAll('.deleteItemButton').forEach(button => {
+            button.addEventListener('click', SettingsView.deleteLessonChangeOrTaskConflict)
+        });
+        dialog.querySelector('#closeLessonChangesAndTasksToKeepDialogButton').addEventListener('click', SettingsView.closeLessonChangesAndTasksToKeepDialog);
+
+        dialog.setAttribute('open', '');
+    }
+
+    static closeLessonChangesAndTasksToKeepDialog(){
+        document.querySelector('#LessonChangesAndTasksToKeepDialog').removeAttribute('open');
+    }
+
+    static deleteLessonChangeOrTaskConflict(event) {
+        let itemTr = event.target.closest('tr');
+        let itemType = itemTr.dataset.type;
+        let itemId = itemTr.dataset.id;
+
+        if (itemType == 'task') SettingsController.deleteTaskById(itemId);
+        if (itemType == 'lessonChange') SettingsController.deleteLessonChangeById(itemId);
+
+        console.log(allTasksArray);
+        console.log(timetableChanges);
+        itemTr.remove();
+
     }
 
     static makeTimetableEditable() {
@@ -447,7 +530,7 @@ export default class SettingsView {
     }
 
     //account settings functions
-    static openTimetableSettings(){
+    static openTimetableSettings() {
         document.querySelector('#openAccountSettingsButton').classList.remove('selected');
         document.querySelector('#accountSettingsContainer').style.display = 'none';
 
@@ -455,7 +538,7 @@ export default class SettingsView {
         document.querySelector('#timetableSettingsContainer').style.display = 'block';
     }
 
-    static openAccountSettings(){
+    static openAccountSettings() {
         let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
         let timetableSettingsContainer = document.querySelector('#timetableSettingsContainer');
         let containerHeight = timetableSettingsContainer.clientHeight;
@@ -473,23 +556,23 @@ export default class SettingsView {
         let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
         let requestDeletionMenu = document.querySelector('#requestDeletionContainer');
         let deletionErrorDisplay = document.querySelector('#deletionErrorDisplay');
-        
-        if (event.target.id == 'deleteAccountButton'){
+
+        if (event.target.id == 'deleteAccountButton') {
             requestDeletionMenu.style.display = 'none';
             deletionErrorDisplay.style.display = 'none';
             deleteAccountMenu.style.display = 'block';
         }
 
-        if (event.target.id == 'cancelAccountDeletionButton'){
+        if (event.target.id == 'cancelAccountDeletionButton') {
             requestDeletionMenu.style.display = 'block';
             deleteAccountMenu.style.display = 'none';
             deletionErrorDisplay.style.display = 'none';
         }
 
-        if (event.target.id == 'cancelFailedAccountDeletionButton'){
+        if (event.target.id == 'cancelFailedAccountDeletionButton') {
             requestDeletionMenu.style.display = 'block';
             deleteAccountMenu.style.display = 'none';
-            deletionErrorDisplay.style.display = 'none';      
+            deletionErrorDisplay.style.display = 'none';
         }
     }
 

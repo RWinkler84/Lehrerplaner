@@ -11,17 +11,15 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 
 export let unsyncedDeletedSubjects = [];
+export let unsyncedDeletedTasks = [];
+export let unsyncedDeletedTimetableChanges = [];
 
 let abstCtrl = new AbstractController();
 
 export let allSubjects = [];
-
 export let allTasksArray = [];
-
 export let standardTimetable = [];
-
 export let timetableChanges = [];
-
 export let taskBackupArray = [];
 
 async function loadData() {

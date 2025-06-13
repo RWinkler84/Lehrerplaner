@@ -54,12 +54,12 @@ export default class Settings extends AbstractModel {
         });
 
         let result = await this.makeAjaxQuery('settings', 'saveTimetable', lessons);
-            console.log(result);
-            if (result.status == 'failed') {
-                lessons.forEach(entry => {
-                    this.markUnsynced(entry.id, standardTimetable);
-                });
-            }
+
+        if (result.status == 'failed') {
+            lessons.forEach(entry => {
+                this.markUnsynced(entry.id, standardTimetable);
+            });
+        }
     }
 
     async saveTimetableChanges(validFrom, lessons) {

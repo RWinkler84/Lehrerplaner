@@ -24,11 +24,11 @@ class SettingsController extends AbstractController
         echo json_encode($result);
     }
 
-    public function deleteSubject()
+    public function deleteSubjects()
     {
         $subjectIds = json_decode(file_get_contents('php://input'), true);
 
-        $result = $this->model->deleteSubject($subjectIds);
+        $result = $this->model->deleteSubjects($subjectIds);
 
         echo json_encode($result);
     }

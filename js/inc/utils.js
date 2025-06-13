@@ -19,12 +19,12 @@ export default class Utils {
         return bool;
     }
 
-    static isDateInWeek(date, mondayDate, sundayDate) {
+    static isDateInTimespan(date, startDate, endDate) {
         let dateToTest = new Date(date).setHours(12, 0, 0, 0);
-        let monday = new Date(mondayDate);
-        let sunday = new Date(sundayDate);
+        let start = new Date(startDate).setHours(12, 0, 0, 0);
+        let end = new Date(endDate).setHours(12, 0, 0, 0);
 
-        if (monday <= dateToTest && dateToTest <= sunday) return true;
+        if (start <= dateToTest && dateToTest <= end) return true;
 
         return false;
     }

@@ -31,6 +31,14 @@ class TaskController extends AbstractController {
         echo json_encode($result);
     }
 
+    public function delete(){
+        $taskData = json_decode(file_get_contents('php://input'), true);
+
+        $result = $this->model->deleteTaskById($taskData['id']);
+
+        echo json_encode($result);
+    }
+
     public function setInProgress() {
         $taskId = json_decode(file_get_contents('php://input'), true);
 
@@ -54,5 +62,11 @@ class TaskController extends AbstractController {
         if (!empty($tasks)) $result = $model->syncTasks($tasks);
 
         return $result;
+    }
+
+    public function deleteTasks(){
+        $tasks = json_decode(file_get_contents('php://input'));
+
+        error_log(print_r($tasks, true));
     }
 }

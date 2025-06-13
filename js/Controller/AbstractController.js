@@ -30,7 +30,6 @@ export default class AbstractController {
     }
 
     static openLoginDialog(event) {
-        console.log(event);
         if (event != undefined) event.preventDefault();
         AbstractView.openLoginDialog();
     }

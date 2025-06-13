@@ -33,6 +33,14 @@ class Task extends AbstractModel
         return $this->write($query, $taskData);
     }
 
+    public function deleteTaskById($taskId) {
+        global $user;
+
+        $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
+
+        return $this->delete($query, ['userId' => $user->getId(), 'itemId' => $taskId]);
+    }
+
     public function setInProgress($taskId)
     {
         $taskId = $this->preprocessDataToWrite($taskId);

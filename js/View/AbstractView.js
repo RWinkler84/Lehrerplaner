@@ -109,7 +109,7 @@ export default class AbstractView {
         let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"').dataset.date;
         let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"').dataset.date;
 
-        if (Fn.isDateInWeek(today, mondayOfDisplayedWeek, sundayOfDisplayedWeek)) {
+        if (Fn.isDateInTimespan(today, mondayOfDisplayedWeek, sundayOfDisplayedWeek)) {
             document.querySelector('#isCurrentWeekDot').style.display = "block";
             return;
         }

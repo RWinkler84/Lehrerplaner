@@ -93,7 +93,7 @@ select {
     background-color: var(--matteGreen);
 }
 
-/* login dialog */
+/* dialogs */
 dialog {
     top: 25%;
     background-color: var(--contentContainerBackground);
@@ -117,10 +117,45 @@ dialog .errorMessageDisplay {
     text-wrap: wrap;
 }
 
-#headline {
+.headline {
     background-color: var(--topMenuBackgound);
     margin: -1rem -1rem 0 -1rem;
-    padding: 0.5rem 1rem ;
+    padding: 0.5rem 1rem;
+}
+
+/* tasks and timetable changes conflicts dialog */
+#LessonChangesAndTasksToKeepDialog {
+    width: fit-content;
+    min-width: 700px;
+}
+
+.dialogBody {
+    padding: 0 1.5rem 1rem;
+}
+
+#LessonChangesAndTasksToKeepDialog label {
+    color: var(--labelgrey);
+    font-weight: bold;
+    display: block;
+}
+
+#LessonChangesAndTasksToKeepDialog table {
+    width: 100%;
+}
+
+#LessonChangesAndTasksToKeepDialog .deleteItemButton {
+    background-color: var(--lightMatteRed);
+    color: var(--lighterText);
+    font-size: 1rem;
+}
+
+#LessonChangesAndTasksToKeepDialog .deleteItemButton:hover {
+    background-color: var(--matteRed);
+}
+
+#lessonChangesConflictsContainer,
+#taskConflictsContainer {
+    padding: 1rem 0;
 }
 
 /* Time Table */
@@ -259,7 +294,6 @@ dialog .errorMessageDisplay {
     padding: 1rem 1.5rem;
     border-radius: var(--standardRadius);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-    /* transition: all 0.3s ease-out; */
 }
 
 .lessonOptionsWrapper.canceled button {
@@ -316,7 +350,7 @@ dialog .errorMessageDisplay {
     display: flex;
 }
 
-/* Task Container */
+/* Task Container and Settings tables*/
 
 #upcomingTasksContainer,
 #inProgressTasksContainer {
@@ -325,12 +359,16 @@ dialog .errorMessageDisplay {
 }
 
 #upcomingTasksTable,
-#inProgressTasksTable {
+#inProgressTasksTable,
+#lessonChangesConflictsTable,
+#taskConflictsTable {
     border-spacing: 0;
 }
 
 #upcomingTasksTable tbody tr:hover,
-#inProgressTasksTable tbody tr:hover {
+#inProgressTasksTable tbody tr:hover,
+#lessonChangesConflictsTable tbody tr:hover,
+#taskConflictsTable tbody tr:hover {
     background-color: var(--lightergrey);
 }
 
@@ -342,7 +380,12 @@ dialog .errorMessageDisplay {
 #upcomingTasksTable td,
 #inProgressTasksTable td,
 #upcomingTasksTable th,
-#inProgressTasksTable th {
+#inProgressTasksTable th,
+#lessonChangesConflictsTable td,
+#taskConflictsTable td,
+#lessonChangesConflictsTable th,
+#taskConflictsTable th {
+    min-width: 3.5rem;
     padding: 0.5rem 1rem;
     border-right: solid 1px var(--lightgrey);
     user-select: none;
@@ -354,7 +397,6 @@ dialog .errorMessageDisplay {
 #inProgressTasksTable .taskDone,
 #inProgressTasksTable .taskDescription {
     border-right: none;
-    transition: all 0.3s ease-out;
 }
 
 .taskSubject {
@@ -452,7 +494,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     display: none;
 }
 
-#approveAccountDeletionContainer{
+#approveAccountDeletionContainer {
     display: none;
 }
 
@@ -541,7 +583,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 .lessonOptionsButton,
-.deleteSubjectButton,
+.deleteItemButton,
 .deleteLessonButton,
 #closeSettingsButton,
 #openSettingsButton,
@@ -556,7 +598,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 .lessonOptionsButton:hover,
-.deleteSubjectButton:hover,
+.deleteItemButton:hover,
 .deleteLessonButton:hover,
 #closeSettingsButton:hover,
 #timetableSettingsButton:hover,
@@ -625,7 +667,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--matteRed) !important;
 }
 
-#taskContainer th {
+#taskContainer th,
+#LessonChangesAndTasksToKeepDialog th {
     color: var(--lightgrey);
     text-align: left;
     padding: 0.5rem 1rem;

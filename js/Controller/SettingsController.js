@@ -1,3 +1,4 @@
+import { ONEDAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import AbstractController from "./AbstractController.js";
@@ -58,6 +59,16 @@ export default class SettingsController {
 
         await model.saveNewTimetable(lessons);
 
+        // check, whether lesson Changes exist after the validFrom date of the new timetable
+        let validUntil = lessons[0].validUntil ? lessons[0].validUntil : (new Date().setHours(12) + ONEDAY * 365);
+
+        let affectedLessonChanges = LessonController.getTimetableChanges(validFrom, validUntil);
+        let affectedTasks = TaskController.getAllTasksInTimespan(validFrom, validUntil);
+        console.log('changes', affectedLessonChanges);
+        console.log('tasks', affectedTasks);
+
+        if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
+
         //triggers reordering of tasks for each lesson
         LessonController.renderLesson();
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
@@ -99,6 +110,14 @@ export default class SettingsController {
         } else {
             View.showAccountDeletionResult('failed');
         }
+    }
+
+    static deleteTaskById(id){
+        TaskController.deleteTaskById(id);
+    }
+
+    static deleteLessonChangeById(id){
+        LessonController.deleteLessonById(id);
     }
 
     static getScheduledLessons() {

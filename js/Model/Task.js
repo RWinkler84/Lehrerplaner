@@ -1,6 +1,6 @@
 import Fn from '../inc/utils.js';
 import Controller from '../Controller/TaskController.js';
-import { taskBackupArray } from '../index.js';
+import { taskBackupArray, unsyncedDeletedTasks } from '../index.js';
 import { allTasksArray } from '../index.js';
 import { ONEDAY } from '../index.js';
 import AbstractModel from './AbstractModel.js';
@@ -83,6 +83,16 @@ export default class Task extends AbstractModel {
         if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
+    async delete() {
+        allTasksArray.forEach(entry => {
+            if (entry.id != this.id) return;
+            allTasksArray.splice(allTasksArray.indexOf(entry), 1); 
+        });
+
+        let result = await this.makeAjaxQuery('task', 'delete', {'id': this.id});
+        if (result == 'failed') unsyncedDeletedTasks.push(this);
+    }
+
     async setInProgress() {
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
@@ -163,6 +173,16 @@ export default class Task extends AbstractModel {
         });
 
         return allTasks;
+    }
+
+    static getAllTasksInTimespan(startDate, endDate){
+        let selectedTasks = [];
+
+        allTasksArray.forEach(element => {
+            if (Fn.isDateInTimespan(element.date, startDate, endDate)) selectedTasks.push(new Task(element.id));
+        });
+
+        return selectedTasks;
     }
 
     //adding a new timetable reorders tasks by changing their date while maintaining the number of lessons between them.

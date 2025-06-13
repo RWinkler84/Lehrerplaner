@@ -12,8 +12,8 @@ export default class LessonController {
         return Lesson.getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday);
     }
 
-    static getTimetableChanges(mondayDate, sundayDate) {
-        return Lesson.getTimetableChanges(mondayDate, sundayDate);
+    static getTimetableChanges(startDate, endDate) {
+        return Lesson.getTimetableChanges(startDate, endDate);
     }
 
     static getLessonObject(lessonData) {
@@ -49,6 +49,12 @@ export default class LessonController {
 
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
 
+    }
+
+    static deleteLessonById(id) {
+        let lesson = Lesson.getLessonById(id);
+
+        lesson.delete();
     }
 
     static updateLesson(lessonData, oldLessonData) {
@@ -95,7 +101,6 @@ export default class LessonController {
         lesson.uncancel();
 
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
-
     }
 
     static createNewTask(event) {

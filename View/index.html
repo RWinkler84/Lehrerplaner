@@ -422,7 +422,7 @@
 
     <!-- dialogs -->
     <dialog id="loginDialog">
-        <div id="headline">
+        <div class="headline">
             <h3>Login</h3>
         </div>
         <form id="loginForm" method="post">
@@ -447,7 +447,7 @@
     </dialog>
 
     <dialog id="sendResetPasswordMailDialog">
-        <div id="headline">
+        <div class="headline">
             <h3>Passwort-Reset-Mail anfordern</h3>
         </div>
         <form id="sendResetPasswordMailForm" method="post">
@@ -458,9 +458,58 @@
             <div id="sendResetPasswordMailErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
             <div class="flex spaceBetween alignEnd marginTop">
                 <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
-                <button type="submit" id="sendResetPasswordMailButton" class="confirmationButton" style="margin-right: 3px">Anfordern</button>
+                <button type="submit" id="sendResetPasswordMailButton" class="confirmationButton"
+                    style="margin-right: 3px">Anfordern</button>
             </div>
         </form>
+    </dialog>
+
+    <dialog id="LessonChangesAndTasksToKeepDialog">
+        <div class="headline">
+            <h3>Terminkonflikte</h3>
+        </div>
+        <div class="dialogBody">
+            <p id="descriptionPara"></p>
+            <div class="marginTop">
+                <div id="lessonChangesConflictsContainer">
+                    <label>Konflikte bei Vertretungen und Terminen:</label>
+                    <table id="lessonChangesConflictsTable">
+                        <thead>
+                            <tr>
+                                <th>Kl.</th>
+                                <th>Fach</th>
+                                <th>Datum</th>
+                                <th class="taskDescription">Typ</th>
+                                <th style="border: none"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="marginTop">
+                <div id="taskConflictsContainer">
+                    <label>Konflikte bei Aufgaben:</label>
+                    <table id="taskConflictsTable">
+                        <thead>
+                            <tr>
+                                <th>Kl.</th>
+                                <th>Fach</th>
+                                <th>Datum</th>
+                                <th class="taskDescription">Beschreibung</th>
+                                <th style="border: none"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="marginTop flex justifyEnd">
+                <button id="closeLessonChangesAndTasksToKeepDialogButton" class="confirmationButton">Erledigt</button>
+                </div>
+            </div>
+        </div>
     </dialog>
 
     <script src="./js/index.js" type="module"></script>

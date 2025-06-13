@@ -1,4 +1,4 @@
-import { allSubjects, timetableChanges, ONEDAY, allTasksArray, unsyncedDeletedSubjects } from "../index.js";
+import { allSubjects, timetableChanges, ONEDAY, allTasksArray, unsyncedDeletedSubjects, unsyncedDeletedTasks, unsyncedDeletedTimetableChanges } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
@@ -249,12 +249,30 @@ export default class AbstractModel {
         });
 
         console.log('data to sync', dataToSync);
+        console.log('undeleted subjects', unsyncedDeletedSubjects);
+        console.log('undeleted lessons', unsyncedDeletedTimetableChanges);
+        console.log('undeleted tasks', unsyncedDeletedTasks);
 
-        if (!isUnsyncedData && unsyncedDeletedSubjects.length == 0) return;
+        if (!isUnsyncedData && unsyncedDeletedSubjects.length == 0 && unsyncedDeletedTasks.length == 0 && unsyncedDeletedTimetableChanges.length == 0) return;
 
         // first delete, what needs to be deleted 
         if (unsyncedDeletedSubjects.length > 0) {
-            result = await this.makeAjaxQuery('settings', 'deleteSubject', unsyncedDeletedSubjects);
+            result = await this.makeAjaxQuery('settings', 'deleteSubjects', unsyncedDeletedSubjects);
+
+            // if the server can not be contacted, the result will just be an object, else it will be an array of objects
+            if (result.status !== 'failed') {
+                result.forEach(entry => {
+                    if (entry.status == 'success') {
+                        for (let i = unsyncedDeletedSubjects.length - 1; i >= 0; i--) {
+                            if (entry.id == unsyncedDeletedSubjects[i].id) unsyncedDeletedSubjects.splice(unsyncedDeletedSubjects[i], 1);
+                        }
+                    }
+                });
+            }
+        }
+
+        if (unsyncedDeletedTasks.length > 0) {
+            result = await this.makeAjaxQuery('task', 'deleteSubjects', unsyncedDeletedTasks);
 
             // if the server can not be contacted, the result will just be an object, else it will be an array of objects
             if (result.status !== 'failed') {
@@ -269,15 +287,19 @@ export default class AbstractModel {
         }
 
         //if the deletion worked, go on to sync the rest
-        if (unsyncedDeletedSubjects.length == 0) {
+        if (
+            unsyncedDeletedSubjects.length == 0 &&
+            unsyncedDeletedTasks.length == 0 &&
+            unsyncedDeletedTimetableChanges.length == 0
+        ) {
             result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
-            if (result.status && result.status == 'failed'){
+            if (result.status && result.status == 'failed') { //will be the case, if the server is not responding
                 result = {
-                    'subjects': {'status': 'failed'},
-                    'timetable': {'status': 'failed'},
-                    'timetableChanges': [{'status': 'failed'}],
-                    'tasks': [{'status': 'failed'}],
+                    'subjects': { 'status': 'failed' },
+                    'timetable': { 'status': 'failed' },
+                    'timetableChanges': [{ 'status': 'failed' }],
+                    'tasks': [{ 'status': 'failed' }],
                 }
             }
 

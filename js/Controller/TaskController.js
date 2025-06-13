@@ -12,6 +12,10 @@ export default class TaskController {
         return Task.getAllInProgressTasks();
     }
 
+    static getAllTasksInTimespan(startDate, endDate) {
+        return Task.getAllTasksInTimespan(startDate, endDate);
+    }
+
     static setTaskBackupData(taskId) {
         let task = new Task(taskId);
 
@@ -42,6 +46,12 @@ export default class TaskController {
 
         task.save();
         LessonController.renderLesson();
+    }
+
+    static deleteTaskById(id){
+        let task = Task.getTaskById(id);
+
+        task.delete();
     }
 
     static updateTask(taskData) {

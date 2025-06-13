@@ -17,7 +17,7 @@ class Settings extends AbstractModel
         return $this->write($query, $subject);
     }
 
-    public function deleteSubject($ids)
+    public function deleteSubjects($ids)
     {
         global $user;
 

@@ -1,4 +1,4 @@
-import { allSubjects, ONEDAY } from "../index.js";
+import { allSubjects, ONEDAY, unsyncedDeletedTimetableChanges } from "../index.js";
 import { timetableChanges } from "../index.js";
 import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
@@ -18,8 +18,6 @@ export default class Lesson extends AbstractModel {
     #canceled = false;
     #validFrom = undefined; //date a regular lesson was added to to the scheduled timetable
     #validUntil = undefined;
-
-    #controller = 'lesson';
 
     constructor(className, subject) {
         super();
@@ -96,7 +94,7 @@ export default class Lesson extends AbstractModel {
         return validLessons;
     }
 
-    static getTimetableChanges(mondayDate, sundayDate) {
+    static getTimetableChanges(startDate, endDate) {
         let changes = [];
 
         timetableChanges.forEach((entry) => {
@@ -107,8 +105,7 @@ export default class Lesson extends AbstractModel {
             lesson.type = entry.type;
             lesson.timeslot = entry.timeslot;
 
-
-            if (Fn.isDateInWeek(lesson.date, mondayDate, sundayDate)) changes.push(lesson);
+            if (Fn.isDateInTimespan(lesson.date, startDate, endDate)) changes.push(lesson);
         });
 
         return changes;
@@ -161,6 +158,16 @@ export default class Lesson extends AbstractModel {
         let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
 
         if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+    }
+
+    async delete() {
+        timetableChanges.forEach(entry => {
+            if (entry.id != this.id) return;
+            timetableChanges.splice(timetableChanges.indexOf(entry), 1);
+        });
+
+        let result = await this.makeAjaxQuery('lesson', 'delete', { 'id': this.id });
+        if (result == 'failed') unsyncedDeletedTimetableChanges.push(this);
     }
 
     async update() {
