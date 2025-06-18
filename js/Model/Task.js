@@ -89,8 +89,11 @@ export default class Task extends AbstractModel {
             allTasksArray.splice(allTasksArray.indexOf(entry), 1); 
         });
 
-        let result = await this.makeAjaxQuery('task', 'delete', {'id': this.id});
-        if (result == 'failed') unsyncedDeletedTasks.push(this);
+        let result = await this.makeAjaxQuery('task', 'delete', [{'id': this.id}]);
+
+        console.log('task', result, this);
+
+        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTasks.push({id: this.id});
     }
 
     async setInProgress() {
@@ -181,6 +184,8 @@ export default class Task extends AbstractModel {
         allTasksArray.forEach(element => {
             if (Fn.isDateInTimespan(element.date, startDate, endDate)) selectedTasks.push(new Task(element.id));
         });
+
+        selectedTasks.sort(Fn.sortByDate);
 
         return selectedTasks;
     }

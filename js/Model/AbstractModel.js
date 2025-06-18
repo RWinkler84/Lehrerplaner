@@ -272,14 +272,29 @@ export default class AbstractModel {
         }
 
         if (unsyncedDeletedTasks.length > 0) {
-            result = await this.makeAjaxQuery('task', 'deleteSubjects', unsyncedDeletedTasks);
+            result = await this.makeAjaxQuery('task', 'delete', unsyncedDeletedTasks);
 
             // if the server can not be contacted, the result will just be an object, else it will be an array of objects
             if (result.status !== 'failed') {
                 result.forEach(entry => {
                     if (entry.status == 'success') {
-                        for (let i = unsyncedDeletedSubjects.length - 1; i >= 0; i--) {
-                            if (entry.id == unsyncedDeletedSubjects[i].id) unsyncedDeletedSubjects.splice(unsyncedDeletedSubjects[i], 1);
+                        for (let i = unsyncedDeletedTasks.length - 1; i >= 0; i--) {
+                            if (entry.id == unsyncedDeletedTasks[i].id) unsyncedDeletedTasks.splice(unsyncedDeletedTasks[i], 1);
+                        }
+                    }
+                });
+            }
+        }
+
+        if (unsyncedDeletedTimetableChanges.length > 0) {
+            result = await this.makeAjaxQuery('lesson', 'delete', unsyncedDeletedTimetableChanges);
+
+            // if the server can not be contacted, the result will just be an object, else it will be an array of objects
+            if (result.status !== 'failed') {
+                result.forEach(entry => {
+                    if (entry.status == 'success') {
+                        for (let i = unsyncedDeletedTimetableChanges.length - 1; i >= 0; i--) {
+                            if (entry.id == unsyncedDeletedTimetableChanges[i].id) unsyncedDeletedTimetableChanges.splice(unsyncedDeletedTimetableChanges[i], 1);
                         }
                     }
                 });

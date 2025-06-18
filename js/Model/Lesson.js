@@ -108,6 +108,8 @@ export default class Lesson extends AbstractModel {
             if (Fn.isDateInTimespan(lesson.date, startDate, endDate)) changes.push(lesson);
         });
 
+        if (changes.length > 1) changes.sort(Fn.sortByDate);
+
         return changes;
     }
 
@@ -166,8 +168,11 @@ export default class Lesson extends AbstractModel {
             timetableChanges.splice(timetableChanges.indexOf(entry), 1);
         });
 
-        let result = await this.makeAjaxQuery('lesson', 'delete', { 'id': this.id });
-        if (result == 'failed') unsyncedDeletedTimetableChanges.push(this);
+        let result = await this.makeAjaxQuery('lesson', 'delete', [{ 'id': this.id }]);
+
+        console.log('lesson', result, this);
+
+        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTimetableChanges.push({id: this.id});
     }
 
     async update() {

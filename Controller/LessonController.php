@@ -34,7 +34,7 @@ class LessonController extends AbstractController
         echo json_encode($result);
     }
 
-//this function adds regular lessons to the timetablechanges, whilst subistute lessons that are canceled only get updated via cancel()
+    //this function adds regular lessons to the timetablechanges, whilst subistute lessons that are canceled only get updated via cancel()
     public function addcanceled()
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
@@ -62,10 +62,28 @@ class LessonController extends AbstractController
         echo json_encode($result);
     }
 
-    public static function syncTimetableChanges($timetableChanges) {
+    public function delete()
+    {
+        $lessonData = json_decode(file_get_contents('php://input'), true);
+        $results = [];
+
+        error_log(print_r($lessonData, true));
+
+        foreach ($lessonData as $lesson) {
+            $result = $this->model->deleteLessonById($lesson['id']);
+            
+            $result['id'] = $lesson['id'];
+            array_push($results, $result);
+            }
+
+        echo json_encode($results);
+    }
+
+    public static function syncTimetableChanges($timetableChanges)
+    {
         $result = [];
         $model = new Lesson;
-        
+
         if (!empty($timetableChanges)) $result = $model->syncTimetableChanges($timetableChanges);
 
         return $result;

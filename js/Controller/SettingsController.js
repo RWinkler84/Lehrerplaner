@@ -102,9 +102,7 @@ export default class SettingsController {
     static async deleteAccount() {
         let model = new Settings;
         let result = await model.deleteAccount();
-
-        console.log(result);
-
+        
         if (result.status == 'success') {
             View.showAccountDeletionResult('success');
         } else {

@@ -1,11 +1,12 @@
-<?php 
+<?php
 
 namespace Controller;
 
 use Controller\AbstractController;
 use Model\Task;
 
-class TaskController extends AbstractController {
+class TaskController extends AbstractController
+{
 
     private $model;
 
@@ -15,7 +16,8 @@ class TaskController extends AbstractController {
         $this->model = new Task;
     }
 
-    public function save(){
+    public function save()
+    {
         $taskData = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->save($taskData);
@@ -23,7 +25,8 @@ class TaskController extends AbstractController {
         echo json_encode($result);
     }
 
-    public function update(){
+    public function update()
+    {
         $taskData = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->update($taskData);
@@ -31,15 +34,23 @@ class TaskController extends AbstractController {
         echo json_encode($result);
     }
 
-    public function delete(){
+    public function delete()
+    {
         $taskData = json_decode(file_get_contents('php://input'), true);
+        $results = [];
 
-        $result = $this->model->deleteTaskById($taskData['id']);
+        foreach ($taskData as $task) {
+            $result = $this->model->deleteTaskById($task['id']);
 
-        echo json_encode($result);
+            $result['id'] = $task['id'];
+            array_push($results, $result);
+        }
+
+        echo json_encode($results);
     }
 
-    public function setInProgress() {
+    public function setInProgress()
+    {
         $taskId = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->setInProgress($taskId);
@@ -47,7 +58,8 @@ class TaskController extends AbstractController {
         echo json_encode($result);
     }
 
-    public function setDone() {
+    public function setDone()
+    {
         $taskId = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->setDone($taskId);
@@ -55,16 +67,18 @@ class TaskController extends AbstractController {
         echo json_encode($result);
     }
 
-    public static function syncTasks($tasks) {
+    public static function syncTasks($tasks)
+    {
         $result = [];
         $model = new Task;
-        
+
         if (!empty($tasks)) $result = $model->syncTasks($tasks);
 
         return $result;
     }
 
-    public function deleteTasks(){
+    public function deleteTasks()
+    {
         $tasks = json_decode(file_get_contents('php://input'));
 
         error_log(print_r($tasks, true));

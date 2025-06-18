@@ -33,7 +33,17 @@ class Lesson extends AbstractModel
         return $this->write($query, $lessonData);
     }
 
-    public function syncTimetableChanges($timetableChanges) {
+    public function deleteLessonById($lessonId)
+    {
+        global $user;
+
+        $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
+
+        return $this->delete($query, ['userId' => $user->getId(), 'itemId' => $lessonId]);
+    }
+
+    public function syncTimetableChanges($timetableChanges)
+    {
         $timetableChanges = $this->preprocessDataToWrite($timetableChanges);
         $results = [];
 
@@ -49,7 +59,7 @@ class Lesson extends AbstractModel
                 canceled = IF (VALUES(lastEdited) > lastEdited, VALUES(canceled), canceled),
                 lastEdited = IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
             ";
-        
+
         foreach ($timetableChanges as $lesson) {
             $result = $this->write($query, $lesson);
             $result['id'] = $lesson['itemId'];

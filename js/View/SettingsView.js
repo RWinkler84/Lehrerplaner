@@ -3,6 +3,8 @@ import AbstractView from "./AbstractView.js";
 import Fn from "../inc/utils.js";
 import SettingsController from "../Controller/SettingsController.js";
 import { allTasksArray, timetableChanges } from "../index.js";
+import LessonController from "../Controller/LessonController.js";
+import TaskController from "../Controller/TaskController.js";
 
 export default class SettingsView {
 
@@ -427,6 +429,8 @@ export default class SettingsView {
 
     static closeLessonChangesAndTasksToKeepDialog(){
         document.querySelector('#LessonChangesAndTasksToKeepDialog').removeAttribute('open');
+        LessonController.renderLesson();
+        TaskController.renderTaskChanges();
     }
 
     static deleteLessonChangeOrTaskConflict(event) {
