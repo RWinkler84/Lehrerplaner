@@ -41,7 +41,6 @@ export default class LessonView {
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
                     <div class="lessonContentContainer" style="width: 100%;">
                         <div class="lessonHasTaskIndicator"></div>
-                        <div class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
@@ -91,7 +90,6 @@ export default class LessonView {
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
                     <div class="lessonContentContainer" style="width: 100%;">
                         <div class="lessonHasTaskIndicator"></div>
-                        <div class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
