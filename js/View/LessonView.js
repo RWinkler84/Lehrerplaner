@@ -39,8 +39,8 @@ export default class LessonView {
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
-                    <div class="lessonHasTaskIndicator"></div>
                     <div class="lessonContentContainer" style="width: 100%;">
+                        <div class="lessonHasTaskIndicator"></div>
                         <div class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
@@ -89,8 +89,8 @@ export default class LessonView {
 
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
-                    <div class="lessonHasTaskIndicator"></div>
                     <div class="lessonContentContainer" style="width: 100%;">
+                        <div class="lessonHasTaskIndicator"></div>
                         <div class="spacerBlock"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
