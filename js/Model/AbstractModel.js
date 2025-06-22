@@ -89,7 +89,7 @@ export default class AbstractModel {
             allLessonDates.push(data);
         })
 
-        allLessonDates.sort(Fn.sortByDate);
+        allLessonDates = Fn.sortByDateAndTimeslot(allLessonDates);
 
         AbstractModel.#removeInvalidAndCanceledLessons(allLessonDates);
 

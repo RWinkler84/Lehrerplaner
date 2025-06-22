@@ -231,7 +231,10 @@ export default class Task extends AbstractModel {
                         let indexInOldDates = 0;
 
                         //search for the task.date and get its index
-                        while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
+                        while (
+                            taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0) &&
+                            task.timeslot != allOldLessonDates[indexInOldDates].timeslot
+                        ) {
                             indexInOldDates++
 
                             if (!allOldLessonDates[indexInOldDates]) break;
