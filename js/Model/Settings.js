@@ -15,12 +15,6 @@ export default class Settings extends AbstractModel {
         subject.id = Fn.generateId(allSubjects);
 
         allSubjects.push(subject);
-
-        let result = await this.makeAjaxQuery('settings', 'saveSubject', subject);
-
-        if (result.status == 'failed') {
-            this.markUnsynced(subject.id, allSubjects);
-        }
     }
 
     async deleteSubject(id) {
@@ -28,13 +22,6 @@ export default class Settings extends AbstractModel {
         for (let i = 0; i < allSubjects.length; i++) {
             if (allSubjects[i].id == id) {
                 let deletedSubject = allSubjects.splice(i, 1);
-
-                let result = await this.makeAjaxQuery('settings', 'deleteSubject', [{ 'id': id }]);
-
-                if (result.status == 'failed') {
-                    deletedSubject[0].lastEdited = new Date();
-                    unsyncedDeletedSubjects.push(deletedSubject[0]);
-                }
 
                 return;
             }
@@ -52,14 +39,6 @@ export default class Settings extends AbstractModel {
         standardTimetable.sort((a, b) => {
             return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
         });
-
-        let result = await this.makeAjaxQuery('settings', 'saveTimetable', lessons);
-
-        if (result.status == 'failed') {
-            lessons.forEach(entry => {
-                this.markUnsynced(entry.id, standardTimetable);
-            });
-        }
     }
 
     async saveTimetableChanges(validFrom, lessons) {
@@ -86,14 +65,6 @@ export default class Settings extends AbstractModel {
 
             standardTimetable.push(lesson);
         })
-
-        let result = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
-
-        if (result.status == 'failed') {
-            lessons.forEach(entry => {
-                this.markUnsynced(entry.id, standardTimetable);
-            });
-        }
     }
 
     // sets the valid until date on the old timetable and checks, if the new one is an
@@ -119,18 +90,6 @@ export default class Settings extends AbstractModel {
             if (entry.validFrom == previousTimetableValidFromDate) entry.validUntil = prevTimetableValidUntil;
         })
 
-        let result = await this.makeAjaxQuery('settings', 'updateValidUntil', {
-            'dateOfAffectedLessons': previousTimetableValidFromDate,
-            'validUntil': prevTimetableValidUntil
-        });
-
-        if (result.status == 'failed') {
-            standardTimetable.forEach(entry => {
-                if (entry.validFrom != previousTimetableValidFromDate) return;
-                this.markUnsynced(entry.id, standardTimetable);
-            })
-        }
-
         //intermediate timetable
         allValidDates.forEach(entry => {
             let date = new Date(entry).setHours(12, 0, 0, 0);
@@ -144,20 +103,5 @@ export default class Settings extends AbstractModel {
         });
 
         return lessons;
-    }
-
-    async logout() {
-        let result = await this.makeAjaxQuery('user', 'logout');
-
-        if (result.status == 'success') {
-            document.cookie = `lprm=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${location.href}`;
-            location.reload();
-        }
-    }
-
-    async deleteAccount() {
-        let result = await this.makeAjaxQuery('user', 'deleteAccount');
-
-        return result;
     }
 }

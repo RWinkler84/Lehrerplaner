@@ -60,9 +60,6 @@ export default class Task extends AbstractModel {
             'status': this.status,
             'fixedTime': this.fixedTime
         }
-
-        let result = await this.makeAjaxQuery('task', 'update', taskData);
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
     async save() {
@@ -78,9 +75,6 @@ export default class Task extends AbstractModel {
         }
 
         allTasksArray.push(taskData);
-        
-        let result = await this.makeAjaxQuery('task', 'save', taskData);
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
     async delete() {
@@ -88,12 +82,6 @@ export default class Task extends AbstractModel {
             if (entry.id != this.id) return;
             allTasksArray.splice(allTasksArray.indexOf(entry), 1); 
         });
-
-        let result = await this.makeAjaxQuery('task', 'delete', [{'id': this.id}]);
-
-        console.log('task', result, this);
-
-        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTasks.push({id: this.id});
     }
 
     async setInProgress() {
@@ -101,10 +89,6 @@ export default class Task extends AbstractModel {
             if (entry.id != this.id) return;
             entry.status = 'inProgress';
         });
-
-        let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
-
     }
 
     async setDone() {
@@ -113,9 +97,6 @@ export default class Task extends AbstractModel {
 
             entry.status = 'done';
         })
-
-        let result = await this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
     // Getter

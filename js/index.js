@@ -22,39 +22,8 @@ export let standardTimetable = [];
 export let timetableChanges = [];
 export let taskBackupArray = [];
 
-async function loadData() {
-    let subjects = await abstCtrl.getSubjectsFromDatabase();
-    let timetable = await abstCtrl.getTimetableFromDatabase();
-    let changes = await abstCtrl.getTimetableChangesFromDatabase();
-    let tasks = await abstCtrl.getAllTasksFromDatabase();
-
-    subjects.forEach(entry => {
-        allSubjects.push(entry)
-    });
-
-    timetable.forEach(entry => {
-        standardTimetable.push(entry);
-    });
-
-    changes.forEach(entry => {
-        timetableChanges.push(entry);
-    });
-
-    tasks.forEach(entry => {
-        allTasksArray.push(entry);
-    })
-
-    standardTimetable.sort((a, b) => {
-        return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
-    });
-
-}
 
 async function startApp() {
-    await loadData();
-
-    //checking for unsynced changes
-    setInterval(abstCtrl.checkDataState.bind(abstCtrl), ONEMIN);
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
@@ -80,13 +49,6 @@ async function startApp() {
     document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
 
     document.querySelector('#validFromPicker').addEventListener('change', SettingsView.isDateTaken);
-
-    //on site login
-    document.querySelector('#loginForm').addEventListener('submit', AbstractView.attemptLogin);
-    document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', abstCtrl.sendResetPasswordMail.bind(abstCtrl));
-
-    //logout
-    document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);
 
 
     setDateForWeekdays();

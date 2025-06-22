@@ -157,9 +157,6 @@ export default class Lesson extends AbstractModel {
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
-        let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
-
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
     async delete() {
@@ -167,12 +164,6 @@ export default class Lesson extends AbstractModel {
             if (entry.id != this.id) return;
             timetableChanges.splice(timetableChanges.indexOf(entry), 1);
         });
-
-        let result = await this.makeAjaxQuery('lesson', 'delete', [{ 'id': this.id }]);
-
-        console.log('lesson', result, this);
-
-        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTimetableChanges.push({id: this.id});
     }
 
     async update() {
@@ -192,9 +183,6 @@ export default class Lesson extends AbstractModel {
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
-        let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
-
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
     async cancel() {
@@ -214,9 +202,6 @@ export default class Lesson extends AbstractModel {
                 if (entry.id == this.id) entry.canceled = 'true';
             })
 
-            let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
-            if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
-
             return;
         }
 
@@ -224,9 +209,6 @@ export default class Lesson extends AbstractModel {
         lessonData.id = this.id;
 
         timetableChanges.push(lessonData);
-        let result = await this.makeAjaxQuery('lesson', 'addCanceled', lessonData);
-
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
     async uncancel() {
@@ -236,10 +218,6 @@ export default class Lesson extends AbstractModel {
                 entry.canceled = 'false';
             }
         })
-
-        let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
-
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
 
