@@ -93,7 +93,7 @@ export default class AbstractView {
     static greyOutPassedDays() {
         document.querySelectorAll('.weekday').forEach(weekday => {
             weekday.classList.remove('passed');
-            if (new Date(weekday.dataset.date).setHours(12, 0, 0, 0) < new Date('2025-06-16').setHours(12, 0, 0, 0)) weekday.classList.add('passed');
+            if (new Date(weekday.dataset.date).setHours(12, 0, 0, 0) < new Date('2025-06-23').setHours(12, 0, 0, 0)) weekday.classList.add('passed');
         })
     }
 
