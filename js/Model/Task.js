@@ -215,19 +215,17 @@ export default class Task extends AbstractModel {
                         //search for the task.date and get its index
                         while (!match) {
                             if (
-                                taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0) &&
-                                task.timeslot != allOldLessonDates[indexInOldDates].timeslot
+                                taskDate == new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0) &&
+                                task.timeslot == allOldLessonDates[indexInOldDates].timeslot
                             ) {
-                                indexInOldDates++
-                            } else {
                                 match = true;
+                            } else {
+                                indexInOldDates++
                             }
 
                             if (!allOldLessonDates[indexInOldDates]) break;
                             if (indexInOldDates > 1000) break;
                         }
-
-                        console.log(indexInOldDates)
 
                         if (allNewLessonDates[indexInOldDates]) {
                             task.date = allNewLessonDates[indexInOldDates].date;
