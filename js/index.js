@@ -124,7 +124,7 @@ async function startApp() {
         let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
         let weekCounter = 1;
         let currentYear = 2025;
-        let referenceDate = new Date('2025-06-23').setHours(12, 0, 0, 0);
+        let referenceDate = new Date('2025-06-24').setHours(12, 0, 0, 0);
         let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
         let monday = firstThursday - ONEDAY * 3
         let sunday = firstThursday + ONEDAY * 3;
@@ -141,7 +141,7 @@ async function startApp() {
     }
 
     function setDateForWeekdays() {
-        let todayUnix = new Date('2025-06-23').setHours(12, 0, 0, 0);
+        let todayUnix = new Date('2025-06-24').setHours(12, 0, 0, 0);
 
         //go back to monday of given week
         while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;
