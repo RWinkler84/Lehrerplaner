@@ -90,7 +90,6 @@ export default class AbstractModel {
         })
 
         allLessonDates = Fn.sortByDateAndTimeslot(allLessonDates);
-        console.log(task.class, task.subject, allLessonDates)
         AbstractModel.#removeInvalidAndCanceledLessons(allLessonDates);
 
         return allLessonDates;
