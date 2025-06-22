@@ -228,14 +228,18 @@ export default class Task extends AbstractModel {
                         if (task.subject != subject) return;
 
                         let taskDate = new Date(task.date).setHours(12, 0, 0, 0)
+                        let match = false;
                         let indexInOldDates = 0;
 
                         //search for the task.date and get its index
-                        while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
-                            if (task.timeslot != allOldLessonDates[indexInOldDates].timeslot){
-                            indexInOldDates++
+                        while (!match) {
+                            if (
+                                taskDate == new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0) &&
+                                task.timeslot == allOldLessonDates[indexInOldDates].timeslot
+                            ) {
+                                match = true;
                             } else {
-                                break;
+                                indexInOldDates++
                             }
 
                             if (!allOldLessonDates[indexInOldDates]) break;
