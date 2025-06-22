@@ -29,7 +29,7 @@ export default class TaskView extends AbstractView {
             let checked = task.fixedTime == '1' ? 'checked' : '';
             let subjectDate = Fn.formatDate(task.date);
 
-            if (new Date(task.date) < new Date()) {
+            if (new Date(task.date) < new Date('2025-06-23')) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
             }
 
