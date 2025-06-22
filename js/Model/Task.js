@@ -222,6 +222,8 @@ export default class Task extends AbstractModel {
                             if (indexInOldDates > 1000) break;
                         }
 
+                        console.log(indexInOldDates)
+
                         if (allNewLessonDates[indexInOldDates]) {
                             task.date = allNewLessonDates[indexInOldDates].date;
                             task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
