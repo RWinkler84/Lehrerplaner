@@ -17,10 +17,7 @@ export let unsyncedDeletedTimetableChanges = [];
 let abstCtrl = new AbstractController();
 
 export let allSubjects = [
-    { "id": "1", "subject": "de", "colorCssClass": "subjectColorOne", "lastEdited": "2025-06-10 18:10:48" },
-    { "id": "2", "subject": "ge", "colorCssClass": "subjectColorThree", "lastEdited": "2025-06-10 18:10:50" },
     { "id": "1", "subject": "De", "colorCssClass": "subjectColorOne", "lastEdited": "2025-06-13 12:14:18" },
-    { "id": "2", "subject": "Ge", "colorCssClass": "subjectColorTwo", "lastEdited": "2025-06-13 12:14:23" },
     { "id": "3", "subject": "Sk", "colorCssClass": "subjectColorFive", "lastEdited": "2025-06-19 13:18:25" },
     { "id": "4", "subject": "Ge", "colorCssClass": "subjectColorThree", "lastEdited": "2025-06-19 13:54:17" }
 ];
