@@ -78,7 +78,7 @@ export default class Task extends AbstractModel {
         }
 
         allTasksArray.push(taskData);
-        
+
         let result = await this.makeAjaxQuery('task', 'save', taskData);
         if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
@@ -86,14 +86,14 @@ export default class Task extends AbstractModel {
     async delete() {
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
-            allTasksArray.splice(allTasksArray.indexOf(entry), 1); 
+            allTasksArray.splice(allTasksArray.indexOf(entry), 1);
         });
 
-        let result = await this.makeAjaxQuery('task', 'delete', [{'id': this.id}]);
+        let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id }]);
 
         console.log('task', result, this);
 
-        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTasks.push({id: this.id});
+        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTasks.push({ id: this.id });
     }
 
     async setInProgress() {
@@ -178,7 +178,7 @@ export default class Task extends AbstractModel {
         return allTasks;
     }
 
-    static getAllTasksInTimespan(startDate, endDate){
+    static getAllTasksInTimespan(startDate, endDate) {
         let selectedTasks = [];
 
         allTasksArray.forEach(element => {
@@ -231,11 +231,12 @@ export default class Task extends AbstractModel {
                         let indexInOldDates = 0;
 
                         //search for the task.date and get its index
-                        while (
-                            taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0) &&
-                            task.timeslot != allOldLessonDates[indexInOldDates].timeslot
-                        ) {
+                        while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
+                            if (task.timeslot != allOldLessonDates[indexInOldDates].timeslot){
                             indexInOldDates++
+                            } else {
+                                break;
+                            }
 
                             if (!allOldLessonDates[indexInOldDates]) break;
                             if (indexInOldDates > 1000) break;
