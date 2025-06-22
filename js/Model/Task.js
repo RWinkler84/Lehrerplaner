@@ -80,7 +80,7 @@ export default class Task extends AbstractModel {
     async delete() {
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
-            allTasksArray.splice(allTasksArray.indexOf(entry), 1); 
+            allTasksArray.splice(allTasksArray.indexOf(entry), 1);
         });
     }
 
@@ -159,7 +159,7 @@ export default class Task extends AbstractModel {
         return allTasks;
     }
 
-    static getAllTasksInTimespan(startDate, endDate){
+    static getAllTasksInTimespan(startDate, endDate) {
         let selectedTasks = [];
 
         allTasksArray.forEach(element => {
@@ -212,11 +212,12 @@ export default class Task extends AbstractModel {
                         let indexInOldDates = 0;
 
                         //search for the task.date and get its index
-                        while (
-                            taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0) &&
-                            task.timeslot != allOldLessonDates[indexInOldDates].timeslot
-                        ) {
+                        while (taskDate != new Date(allOldLessonDates[indexInOldDates].date).setHours(12, 0, 0, 0)) {
+                            if (task.timeslot != allOldLessonDates[indexInOldDates].timeslot){
                             indexInOldDates++
+                            } else {
+                                break;
+                            }
 
                             if (!allOldLessonDates[indexInOldDates]) break;
                             if (indexInOldDates > 1000) break;
