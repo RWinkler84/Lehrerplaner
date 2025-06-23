@@ -22,16 +22,16 @@ export let allSubjects = [
     { "id": "4", "subject": "Ge", "colorCssClass": "subjectColorThree", "lastEdited": "2025-06-19 13:54:17" }
 ];
 export let allTasksArray = [
-    // { "id": "1", "date": "2025-06-11", "timeslot": "5", "class": "6a", "subject": "Termin", "description": "Klassenkonferenz vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-10 18:11:26" },
-    // { "id": "3", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "Ge", "description": "Römische Expansion Germanien vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:46:50" },
-    // { "id": "5", "date": "2025-06-20", "timeslot": "1", "class": "Fobi", "subject": "Termin", "description": "digitale Medien", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:44:27" },
-    // { "id": "6", "date": "2025-06-23", "timeslot": "4", "class": "7c", "subject": "Ge", "description": "Steckbrief Ludwig XIV", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:47:26" },
-    // { "id": "7", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "De", "description": "Arbeitsblatt Wortarten", "status": "inProgress", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
-    // { "id": "8", "date": "2025-06-25", "timeslot": "3", "class": "8b", "subject": "Sk", "description": "Leben in der Gemeinde", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:48:42" },
-    // { "id": "9", "date": "2025-06-25", "timeslot": "4", "class": "6a", "subject": "De", "description": "Kk Wortarten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
-    // { "id": "10", "date": "2025-06-25", "timeslot": "2", "class": "6b", "subject": "De", "description": "Kk Wortarten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:49:23" },
-    // { "id": "11", "date": "2025-06-27", "timeslot": "1", "class": "6b", "subject": "De", "description": "Rückgabe Kk", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:49:58" },
-    // { "id": "12", "date": "2025-06-27", "timeslot": "5", "class": "6a", "subject": "De", "description": "Rückgabe Kk", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
+    { "id": "1", "date": "2025-06-11", "timeslot": "5", "class": "6a", "subject": "Termin", "description": "Klassenkonferenz vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-10 18:11:26" },
+    { "id": "3", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "Ge", "description": "Römische Expansion Germanien vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:46:50" },
+    { "id": "5", "date": "2025-06-20", "timeslot": "1", "class": "Fobi", "subject": "Termin", "description": "digitale Medien", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:44:27" },
+    { "id": "6", "date": "2025-06-23", "timeslot": "4", "class": "7c", "subject": "Ge", "description": "Steckbrief Ludwig XIV", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:47:26" },
+    { "id": "7", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "De", "description": "Arbeitsblatt Wortarten", "status": "inProgress", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
+    { "id": "8", "date": "2025-06-25", "timeslot": "3", "class": "8b", "subject": "Sk", "description": "Leben in der Gemeinde", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:48:42" },
+    { "id": "9", "date": "2025-06-25", "timeslot": "4", "class": "6a", "subject": "De", "description": "Kk Wortarten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
+    { "id": "10", "date": "2025-06-25", "timeslot": "2", "class": "6b", "subject": "De", "description": "Kk Wortarten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:49:23" },
+    { "id": "11", "date": "2025-06-27", "timeslot": "1", "class": "6b", "subject": "De", "description": "Rückgabe Kk", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:49:58" },
+    { "id": "12", "date": "2025-06-27", "timeslot": "5", "class": "6a", "subject": "De", "description": "Rückgabe Kk", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
     { "id": "13", "date": "2025-06-26", "timeslot": "4", "class": "10a", "subject": "Ge", "description": "Gruppen Wiedervereinigung", "status": "inProgress", "fixedTime": "0", "lastEdited": "2025-06-19 13:51:02" }
 ];
 export let standardTimetable = [
