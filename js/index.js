@@ -71,6 +71,8 @@ export let taskBackupArray = [];
 
 async function startApp() {
 
+    document.querySelector('#logoutButton').addEventListener('click', () => {window.location = './'});
+
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
         element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
