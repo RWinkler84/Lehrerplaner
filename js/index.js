@@ -22,7 +22,6 @@ export let allSubjects = [
     { "id": "4", "subject": "Ge", "colorCssClass": "subjectColorThree", "lastEdited": "2025-06-19 13:54:17" }
 ];
 export let allTasksArray = [
-    { "id": "1", "date": "2025-06-11", "timeslot": "5", "class": "6a", "subject": "Termin", "description": "Klassenkonferenz vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-10 18:11:26" },
     { "id": "3", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "Ge", "description": "Römische Expansion Germanien vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:46:50" },
     { "id": "6", "date": "2025-06-23", "timeslot": "4", "class": "7c", "subject": "Ge", "description": "Steckbrief Ludwig XIV", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:47:26" },
     { "id": "7", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "De", "description": "Arbeitsblatt Wortarten", "status": "inProgress", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
