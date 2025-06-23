@@ -7,6 +7,7 @@ document.querySelectorAll('.backToLoginLink').forEach(link => { link.addEventLis
 
 window.addEventListener('DOMContentLoaded', isAuth);
 window.addEventListener('DOMContentLoaded', isReset);
+window.addEventListener('DOMContentLoaded', isRegister);
 
 const ONEMIN = 60000;
 
@@ -41,6 +42,16 @@ function isReset() {
 
     if (token) {
         resetPasswordDialog.setAttribute('open', '');
+        loginDialog.removeAttribute('open');
+    }
+}
+
+function isRegister() {
+    let params = new URLSearchParams(window.location.search);
+    let token = params.get('register');
+
+    if (token != null) {
+        createAccountDialog.setAttribute('open', '');
         loginDialog.removeAttribute('open');
     }
 }
