@@ -16,6 +16,8 @@ export let unsyncedDeletedTimetableChanges = [];
 
 let abstCtrl = new AbstractController();
 
+let introRunning = false;
+
 export let allSubjects = [
     { "id": "1", "subject": "De", "colorCssClass": "subjectColorOne", "lastEdited": "2025-06-13 12:14:18" },
     { "id": "3", "subject": "Sk", "colorCssClass": "subjectColorFive", "lastEdited": "2025-06-19 13:18:25" },
@@ -71,8 +73,9 @@ export let taskBackupArray = [];
 
 async function startApp() {
 
-    document.querySelector('#logoutButton').addEventListener('click', () => {window.location = '../'});
+    document.addEventListener('click', runTour);
 
+    document.querySelector('#logoutButton').addEventListener('click', () => { window.location = '../' });
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
         element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
@@ -286,6 +289,152 @@ async function startApp() {
             document.querySelector('#weekOverviewContainer').style.left = 'auto';
         }
     }
+
+    function runTour(event) {
+        const window1 = document.querySelector('#window1');
+        const window2 = document.querySelector('#window2');
+        const window3 = document.querySelector('#window3');
+        const window4 = document.querySelector('#window4');
+        const window5 = document.querySelector('#window5');
+        const window6 = document.querySelector('#window6');
+        const window7 = document.querySelector('#window7');
+        const window8 = document.querySelector('#window8');
+        const window9 = document.querySelector('#window9');
+        const window10 = document.querySelector('#window10');
+
+        if (event.target.classList && event.target.classList.contains('cancelTour')) {
+            introRunning = false;
+            event.target.closest('.introWindow').style.display = 'none';
+        }
+
+        console.log(event.target.id);
+
+        switch (event.target.id) {
+
+            case 'window1Confirm':
+                introRunning = true;
+                event.target.closest('.introWindow').style.display = 'none';
+
+                window2.style.display = 'block';
+                document.querySelector('#topMenuButtonContainer').classList.add('highlighted');
+                break;
+
+            case 'window2Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#topMenuButtonContainer').classList.remove('highlighted');
+
+                window3.style.display = 'block';
+                document.querySelector('#switchWeekContainer').classList.add('highlighted');
+                break;
+
+            case 'window3Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#switchWeekContainer').remove('highlighted');
+
+                window4.style.display = 'block';
+                document.querySelector('#weekOverviewContainer').classList.add('highlighted');
+                break;
+
+            case 'window4Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                window5.style.display = 'block';
+                break;
+
+            case 'window5Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#weekOverviewContainer').addEventListener('click', continueTourAfterOpeningLessonForm);
+                break;
+
+            case 'lessonFormOpened':
+                document.querySelector('#weekOverviewContainer').classList.remove('highlighted');
+                document.querySelector('#weekOverviewContainer').removeEventListener('click', continueTourAfterOpeningLessonForm);
+                window6.style.display = 'block';
+                document.querySelector('.lessonForm').classList.add('highlighted');
+                break;
+
+            case 'window6Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+
+                window7.style.display = 'block';
+                break;
+
+            case 'window7Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('.lessonForm').classList.remove('highlighted');
+
+                window8.style.display = 'block';
+                document.querySelectorAll('.lessonForm').forEach(lessonForm => lessonForm.remove());
+                document.querySelector('#markedSlot>.lesson').classList.add('highlighted');
+                break;
+
+            case 'window8Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#markedSlot>.lesson').classList.remove('highlighted');
+
+                window9.style.display = 'block';
+                document.querySelector('#taskContainer').classList.add('highlighted');
+                break;
+
+            case 'window9Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#taskContainer').classList.remove('highlighted');
+
+                window10.style.display = 'block';
+                document.querySelectorAll('tr[data-taskid="3"]>td').forEach(td => {
+                    td.classList.add('highlighted');
+
+                    if (td.classList.contains('taskSubjectContainer')) {
+                        td.style.borderLeft = 'none';
+                        td.style.borderRight = 'none';
+                    }
+
+                    if (td.classList.contains('taskDescription')) {
+                        td.style.borderLeft = 'none';
+                        td.style.borderRight = 'none';
+                    }
+
+                    if (td.classList.contains('taskDone')) {
+                        td.style.borderLeft = 'none';
+                        td.style.borderRight = '3px';
+                        td.style.height = '55px';
+                    }
+                });
+
+                document.querySelectorAll('tr[data-taskid="3"]>td.taskDone button').forEach(button => button.style.height = '1.25rem')
+
+                break;
+
+            case 'window10Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelectorAll('.highlighted').forEach(td => {
+                    td.classList.remove('highlighted');
+                    td.removeAttribute('style');
+                })
+
+                document.querySelector('#taskContainer').addEventListener('dblclick', continueTourAfterMakingTaskEditable);
+                break;
+
+            case 'taskEdited':
+
+            break;
+        }
+    }
+
+    function continueTourAfterOpeningLessonForm(event) {
+        if (
+            event.target.classList.contains('addLessonButtonWrapper') ||
+            event.target.classList.contains('addLessonButton')
+        ) {
+            runTour({ target: { id: 'lessonFormOpened' } });
+        }
+    }
+
+    function continueTourAfterMakingTaskEditable(event) {
+        if (event.target.closest('tr')){
+            runTour({target: {id: 'taskEdited'}})
+        }
+    }
 }
+
 
 startApp();

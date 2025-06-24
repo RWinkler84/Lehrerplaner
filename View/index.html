@@ -14,7 +14,7 @@
             <div>
                 <h1>Schulplaner</h1>
             </div>
-            <div class="flex gap">
+            <div id="topMenuButtonContainer" class="flex gap">
                 <div><button id="openSettingsButton">&#x2630;</button></div>
                 <div><button id="logoutButton">&#x279C;</button></div>
             </div>
@@ -28,7 +28,7 @@
                     <h2>Wochenplan KW <span id="calendarWeekCounter" data-split_first_week="false">-</span></h2>
                     <div id="isCurrentWeekDot"></div>
                 </div>
-                <div class="flex gap">
+                <div id="switchWeekContainer" class="flex gap">
                     <button id="weekBackwardButton">&#9664</button>
                     <div id="dateSpan" class="flex alignEnd"><span id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span
                             id="weekEndDate">Sonntag</span></div>
@@ -85,7 +85,7 @@
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
                         <div class="timeslot" data-timeslot="3"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
+                        <div class="timeslot" data-timeslot="4" id="markedSlot"></div>
                         <div class="timeslot" data-timeslot="5"></div>
                         <div class="timeslot" data-timeslot="6"></div>
                         <div class="timeslot" data-timeslot="7"></div>
@@ -506,11 +506,153 @@
                     </table>
                 </div>
                 <div class="marginTop flex justifyEnd">
-                <button id="closeLessonChangesAndTasksToKeepDialogButton" class="confirmationButton">Erledigt</button>
+                    <button id="closeLessonChangesAndTasksToKeepDialogButton"
+                        class="confirmationButton">Erledigt</button>
                 </div>
             </div>
         </div>
     </dialog>
+
+    <!-- Introduction -->
+
+    <div id="window1" class="introWindow flex column" style="display:block">
+        <h4>Neu hier?</h4>
+        <p>Willst du eine kleine Tour?</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Nein, danke...</button>
+            <button id='window1Confirm' class="confirmationButton">Klar!</button>
+        </div>
+    </div>
+
+    <div id="window2" class="introWindow flex column">
+        <h4>Die Hauptansicht</h4>
+        <p>Alles klar!</p>
+        <p>Aktuell befindest du dich auf der Hauptansicht. Hier wirst du die meiste Zeit verbringen, wenn du mit dem
+            Lehrerplaner arbeitest.
+            Wie du siehst, ist sie dreigeteilt. Ganz oben findest du die Menüleiste. </p>
+        <p>Rechts kannst du über das <span class="introTextItem">&#x2630;</span>-Symbol die Einstellungen aufrufen.
+            Dazu später mehr. Über den <span class="introTextItem">&#x279C;</span>-Button daneben kannst du dich
+            ausloggen.
+        </p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window2Confirm' class="confirmationButton">Verstanden!</button>
+        </div>
+    </div>
+
+    <div id="window3" class="introWindow flex column">
+        <h4>Die Wochenübersicht 1/6</h4>
+        <p>Direkt darunter findest du die Wochenansicht. Sie zeigt dir den Stundenplan der aktuell gewählten Woche an.
+            Rechts oben kannst du
+            mit <span class="introTextItem">&#9664</span> und <span class="introTextItem">&#9654</span> die Wochen
+            wechseln.
+        </p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window3Confirm' class="confirmationButton">Macht Sinn!</button>
+        </div>
+    </div>
+
+    <div id="window4" class="introWindow flex column">
+        <h4>Die Wochenübersicht 2/6</h4>
+        <p>Öffnest du den Schulplaner zum ersten Mal, ist die Wochenübersicht leer. Das ändert sich, sobald du in den
+            Einstellungen deinen festen Stundenplan angelegt hast. Für die Demo haben wir das bereits übernommen.</p>
+        <p>Wichtig ist zu wissen, dass du nicht alles über die Einstellungen eintragen musst. Für kurzfristige
+            Änderungen am Plan, die sich nicht regelmäßig wiederholen, ist die Wochenübersicht da.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window4Confirm' class="confirmationButton">Verstanden!</button>
+        </div>
+    </div>
+
+    <div id="window5" class="introWindow flex column">
+        <h4>Die Wochenübersicht 3/6</h4>
+        <p>Wenn du einen Termin oder eine Vertretungsstunde anlegen willst, klicke einfach auf das <span
+                class="introTextItem">+</span>, das auftaucht, sobald du den
+            Mauszeiger über ein leeres Stundenfeld in der Übersicht bewegst.
+        </p>
+        <p>Suche dir eine leere Stunde und versuch es doch einfach mal.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window5Confirm' class="confirmationButton">Okay!</button>
+        </div>
+    </div>
+
+    <div id="window6" class="introWindow flex column">
+        <h4>Die Wochenübersicht 4/6</h4>
+        <p>Im Stundenfeld hat sich jetzt das Formular zum Anlegen einer neuen Stunde geöffnet. In das linke Feld kannst
+            du den Namen der Klasse eintragen. Klickst du auf das rechte Feld, öffnet sich ein Dropdown mit den von dir
+            angelegten Fächern.
+        </p>
+        <p>Am Ende der Liste findest du außerdem den Eintrag "Termin". Dieser ist standardmäßig vorhanden. Um Details zu
+            einem
+            Termin zu speichern, kannst du ebenfalls das Feld "Klasse" nutzen und zum Beispiel ein Kürzel eintragen,
+            das den Termin beschreibt. Wie so etwas aussehen kann, siehst du am Dienstag in der 6. Stunde. Hier steht
+            "Egs" für Elterngespräch.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window6Confirm' class="confirmationButton">Verstanden!</button>
+        </div>
+    </div>
+
+    <div id="window7" class="introWindow flex column">
+        <h4>Die Wochenübersicht 5/6</h4>
+        <p>Hast du deine Eintragungen gemacht, kannst die Stunde über <button
+                class="confirmationButton">&#x2714;</button>
+            speichern. Willst du doch keine Stunde anlegen, drücke auf <button class="cancelButton">&#x2718;</button>.
+        </p>
+        <p>Hast du das Formular gespeichert, taucht deine neu angelegte Stunde in der Wochenübersicht auf. Ihre Farbe
+            hängt vom Fach ab, wobei du selbst aus einer Reihe von Farben wählen kannst, welches Fach wie dargestellt
+            wird. Festgelegt ist es nur für Termine (weiß) und ausfallende Stunden. Diese sind grau.</p>
+        <p>Aber schauen wir uns die Stunden noch einmal genauer an.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window7Confirm' class="confirmationButton">Okay!</button>
+        </div>
+    </div>
+
+    <div id="window8" class="introWindow flex column">
+        <h4>Die Wochenübersicht 6/6</h4>
+        <p>Auch einmal angelegte Stunden lassen sich bearbeiten. Das ist über den <span
+                class="introTextItem">&#x2630;</span>-Button möglich, der das Stunden-Menü öffnet. Hier kannst du eine
+            Stunde als ausfallend markieren oder Klasse und Fach ändern, wenn sich dein Plan ändert und du eine
+            Vertretung hast. Außerdem kannst du hier Aufgaben anlegen, die der Stunde zugeordnet sind.
+        </p>
+        <p>Vielleicht ist dir der Punkt in der linken Ecke der Stunde aufgefallen. Er wird nur angezeigt, wenn der
+            jeweiligen Stunde eine Aufgabe zugeordnet ist. So siehst du bereits in der Wochenansicht nicht nur, welche
+            Stunden du hast, sondern auch, für welche du noch etwas zu erledigen hast.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window8Confirm' class="confirmationButton">Okay!</button>
+        </div>
+    </div>
+
+    <div id="window9" class="introWindow flex column">
+        <h4>Die Aufgabenübersicht 1/</h4>
+        <p>Apropos Aufgaben: Unter der Wochenübersicht findest du den dritten Abschnitt der Hauptansicht: die
+            Aufgabenübersicht. Hier werden alle aktuell aktiven Aufgaben angezeigt, die du angelegt hast.
+        </p>
+        <p>Die Ansicht selbst ist zweiteilig. Auf der linken Seite findest du die anstehenden Aufgaben. Rechts werden
+            Aufgaben gelistet, mit denen du bereits begonnen hast, die aber noch nicht abgeschlossen sind. Das macht bei
+            größeren Projekten Sinn.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window9Confirm' class="confirmationButton">Logisch!</button>
+        </div>
+    </div>
+
+    <div id="window10" class="introWindow flex column">
+        <h4>Die Aufgabenübersicht 2/</h4>
+        <p>Zu jeder Aufgabe findest du alle nötigen Informationen. Klasse, Fach, Falligkeitsdatum und eine kurze
+            Beschreibung, die du selbst anlegen und jederzeit editieren kannst. Der Umfang der Beschreibung liegt ganz
+            bei dir. Es ganz ein Wort, theoretisch aber auch ein mehrseitiger Text sein.
+        </p>
+        <p>Um eine Aufgabe zu bearbeiten, musst du sie per Doppelklick editierbar machen. Versuche es einmal.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window10Confirm' class="confirmationButton">Und los!</button>
+        </div>
+    </div>
 
     <script src="./js/index.js" type="module"></script>
 </body>
