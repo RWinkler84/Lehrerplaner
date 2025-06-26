@@ -530,9 +530,10 @@
         <p>Aktuell befindest du dich auf der Hauptansicht. Hier wirst du die meiste Zeit verbringen, wenn du mit dem
             Lehrerplaner arbeitest.
             Wie du siehst, ist sie dreigeteilt. Ganz oben findest du die Menüleiste. </p>
-        <p>Rechts kannst du über das <span class="introTextItem">&#x2630;</span>-Symbol die Einstellungen aufrufen.
-            Dazu später mehr. Über den <span class="introTextItem">&#x279C;</span>-Button daneben kannst du dich
-            ausloggen.
+        <p>Rechts kannst du über das <span class="introTextItem">&#x2630;</span>-Symbol die Einstellungen aufrufen, wo
+            du deine Fächer, deren Farben und deinen Stundenplan anlegen kannst. Über den <span
+                class="introTextItem">&#x279C;</span>-Button daneben loggst du dich
+            aus dem Schulplaner aus.
         </p>
         <div class="buttons flex gap alignEnd justifyEnd">
             <button class="cancelButton cancelTour">Reicht schon...</button>
@@ -587,7 +588,7 @@
         <p>Am Ende der Liste findest du außerdem den Eintrag "Termin". Dieser ist standardmäßig vorhanden. Um Details zu
             einem
             Termin zu speichern, kannst du ebenfalls das Feld "Klasse" nutzen und zum Beispiel ein Kürzel eintragen,
-            das den Termin beschreibt. Wie so etwas aussehen kann, siehst du am Dienstag in der 6. Stunde. Hier steht
+            das den Termin beschreibt. Wie so etwas aussehen kann, siehst du am Freitag in der 6. Stunde. Hier steht
             "Egs" für Elterngespräch.</p>
         <div class="buttons flex gap alignEnd justifyEnd">
             <button class="cancelButton cancelTour">Reicht schon...</button>
@@ -619,8 +620,8 @@
             Vertretung hast. Außerdem kannst du hier Aufgaben anlegen, die der Stunde zugeordnet sind.
         </p>
         <p>Vielleicht ist dir der Punkt in der linken Ecke der Stunde aufgefallen. Er wird nur angezeigt, wenn der
-            jeweiligen Stunde eine Aufgabe zugeordnet ist. So siehst du bereits in der Wochenansicht nicht nur, welche
-            Stunden du hast, sondern auch, für welche du noch etwas zu erledigen hast.</p>
+            jeweiligen Stunde eine Aufgabe zugeordnet ist. So siehst du in der Wochenansicht nicht nur sofort, welche
+            Stunden du hast, sondern auch, für welche du noch etwas erledigen musst.</p>
         <div class="buttons flex gap alignEnd justifyEnd">
             <button class="cancelButton cancelTour">Reicht schon...</button>
             <button id='window8Confirm' class="confirmationButton">Okay!</button>
@@ -628,11 +629,11 @@
     </div>
 
     <div id="window9" class="introWindow flex column">
-        <h4>Die Aufgabenübersicht 1/</h4>
-        <p>Apropos Aufgaben: Unter der Wochenübersicht findest du den dritten Abschnitt der Hauptansicht: die
+        <h4>Die Aufgabenübersicht 1/6</h4>
+        <p>Apropos Aufgaben: Unter der Wochenübersicht befindet sich der dritte Abschnitt der Hauptansicht: die
             Aufgabenübersicht. Hier werden alle aktuell aktiven Aufgaben angezeigt, die du angelegt hast.
         </p>
-        <p>Die Ansicht selbst ist zweiteilig. Auf der linken Seite findest du die anstehenden Aufgaben. Rechts werden
+        <p>Die Ansicht selbst ist zweiteilig. Im ersten Abschnitt findest du die anstehenden Aufgaben. Im zweiten werden
             Aufgaben gelistet, mit denen du bereits begonnen hast, die aber noch nicht abgeschlossen sind. Das macht bei
             größeren Projekten Sinn.</p>
         <div class="buttons flex gap alignEnd justifyEnd">
@@ -642,15 +643,76 @@
     </div>
 
     <div id="window10" class="introWindow flex column">
-        <h4>Die Aufgabenübersicht 2/</h4>
+        <h4>Die Aufgabenübersicht 2/6</h4>
         <p>Zu jeder Aufgabe findest du alle nötigen Informationen. Klasse, Fach, Falligkeitsdatum und eine kurze
-            Beschreibung, die du selbst anlegen und jederzeit editieren kannst. Der Umfang der Beschreibung liegt ganz
-            bei dir. Es ganz ein Wort, theoretisch aber auch ein mehrseitiger Text sein.
+            Beschreibung, die du jederzeit editieren kannst. Der Umfang der Beschreibung liegt ganz
+            bei dir. Es kann ein Wort, theoretisch aber auch ein mehrseitiger Text sein.
         </p>
         <p>Um eine Aufgabe zu bearbeiten, musst du sie per Doppelklick editierbar machen. Versuche es einmal.</p>
         <div class="buttons flex gap alignEnd justifyEnd">
             <button class="cancelButton cancelTour">Reicht schon...</button>
             <button id='window10Confirm' class="confirmationButton">Und los!</button>
+        </div>
+    </div>
+
+    <div id="window11" class="introWindow flex column">
+        <h4>Die Aufgabenübersicht 3/6</h4>
+        <p>Dir ist sicher aufgefallen, dass du jetzt nicht nur den Text der Beschreibung bearbeiten kannst, sondern dass
+            sich auch die Buttons verändert haben. Mit dem <button class="confirmationButton">&#x2714;</button>
+            speicherst du deine Änderungen. Mit <button class="cancelButton">&#x2718;</button> verwirfst du sie.
+        </p>
+        <p>Wie du siehst, gibt es den <button class="confirmationButton">&#x2714;</button>-Button auch bei anderen
+            Aufgaben. Hier hat er allerdings einen anderen Zweck. Klickst du ihn, wird die Aufgabe auf 'erledigt'
+            gesetzt und verschwindet aus der Liste. In der Liste der anstehenden Aufgaben gibt es außerdem den <button
+                class="confirmationButton">&#x279C;</button>-Button. Ein Klick auf diesen ändert den Status der Aufgabe
+            auf "in Bearbeitung".</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window11Confirm' class="confirmationButton">Weiter geht's!</button>
+        </div>
+    </div>
+
+    <div id="window12" class="introWindow flex column">
+        <h4>Die Aufgabenübersicht 4/6</h4>
+        <p>In der bearbeitbaren Aufgabe ist außerdem eine zweite Zeile aufgetaucht, die vorher nicht sichtbar war. Dort
+            kannst du einstellen, ob die Aufgabe einen festen Termin haben soll oder nicht. Feste Termine zu vergeben,
+            ist immer dann sinnvoll, wenn eine Stundenplanänderung keine Auswirkungen auf eine Aufgabe haben soll.
+        </p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window12Confirm' class="confirmationButton">Warum?</button>
+        </div>
+    </div>
+
+    <div id="window13" class="introWindow flex column">
+        <h4>Die Aufgabenübersicht 5/6</h4>
+        <p>Viele Aufgaben im Schulalltag sind terminlich flexibel. Wenn eine Stunde ausfällt, braucht die dafür
+            nötige Stundenvorbereitung nicht zum ursprünglichen Termin fertig sein, sondern kann später erledigt werden.
+            Wenn man mit vielen Aufgaben jongliert, wird es herausfordernd, genau im Blick zu behalten, was wann
+            erledigt sein muss.
+        </p>
+        <p>Um dir genau das zu erleichtern, wurde der Schulplaner entwickelt. Ändert sich etwas an deinem Stundenplan,
+            prüft
+            die Software selbstständig, ob davon Aufgaben ohne fixen Termin betroffen sind und sucht den nächstmöglichen
+            Termin. Sei es, weil eine Stunde dazu gekommen oder entfallen ist. Die Aufgaben sortieren sich automatisch
+            neu.</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button class="cancelButton cancelTour">Reicht schon...</button>
+            <button id='window13Confirm' class="confirmationButton">Klingt gut.</button>
+        </div>
+    </div>
+
+    <div id="window14" class="introWindow flex column">
+        <h4>Die Aufgabenübersicht 6/6</h4>
+        <p>Was passiert, wenn du eine Aufgabe nicht rechtzeitig erledigen konntest, siehst du beim obersten Eintrag in
+            den anstehenden Aufgaben. Ein roter Balken markiert diesen als überfällig. Was sich in diesem Fall
+            allerdings nicht ändert, ist der Termin.
+        </p>
+        <p>Damit sind die Grundfunktionen des Schulplaners erklärt. Nimm dir ruhig ein paar Minuten und probiere selbst
+            aus, Stunden und Aufgaben einzutragen, Stunden ausfallen zu lassen oder einen neuen Stundenplan anzulegen.
+            Deine Änderungen werden nicht dauerhaft gespeichert. Also keine Scheu!</p>
+        <div class="buttons flex gap alignEnd justifyEnd">
+            <button id='window14Confirm' class="confirmationButton">Alles klar!</button>
         </div>
     </div>
 
