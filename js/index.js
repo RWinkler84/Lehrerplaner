@@ -416,12 +416,12 @@ async function startApp() {
                 break;
 
             case 'window9Confirm':
-                event.target.closest('.introWindow').style.display = 'none';
+                event.target.closest('.introWindow').style.visibility = 'hidden';
                 document.querySelector('#taskContainer').classList.remove('highlighted');
 
                 window10.style.display = 'block';
                 window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="3"]'), 'bottom') + window.scrollY + 3 + 'px';
-                window.scroll(0, getElementProperty(window10, 'top'));
+                window.scroll(0, getElementProperty(window10, 'bottom'));
 
                 document.querySelectorAll('tr[data-taskid="3"]>td').forEach(td => {
                     td.classList.add('highlighted');
@@ -505,6 +505,7 @@ async function startApp() {
 
             case 'window14Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
+                window9.style.display = 'none';
                 window.scroll(0,0);
         }
     }
