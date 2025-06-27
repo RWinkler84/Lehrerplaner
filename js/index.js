@@ -291,6 +291,8 @@ async function startApp() {
     }
 
     function runTour(event) {
+        if (event.preventDefault && document.querySelector('#window6').style.display == 'block') event.preventDefault();
+        
         const window1 = document.querySelector('#window1');
         const window2 = document.querySelector('#window2');
         const window3 = document.querySelector('#window3');
@@ -371,6 +373,8 @@ async function startApp() {
                 window6.style.left = translateLeft + 'px';
 
                 document.querySelector('.lessonForm').classList.add('highlighted');
+                document.querySelector('#lessonForm').removeEventListener('submit', LessonView.saveNewLesson);
+                document.querySelector('.discardNewLessonButton').removeEventListener('click', LessonView.removeLessonForm);
 
                 window.scroll(0, getElementProperty(window6, 'bottom'));
                 break;
@@ -386,11 +390,13 @@ async function startApp() {
                 window7.style.left = translateLeft + 'px';
 
                 document.querySelector('.lessonForm').classList.add('highlighted');
+                document.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
+                document.querySelector('.discardNewLessonButton').addEventListener('click', LessonView.removeLessonForm);
                 break;
 
             case 'window7Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
-                document.querySelector('.lessonForm').classList.remove('highlighted');
+                if (document.querySelector('.lessonForm')) document.querySelector('.lessonForm').classList.remove('highlighted');
 
                 translateLeft = getElementProperty(document.querySelector('#markedSlot>.lesson'), 'left') + getElementProperty(document.querySelector('#markedSlot>.lesson'), 'width') / 2;
 
@@ -462,7 +468,7 @@ async function startApp() {
 
                 window11.style.display = 'block';
                 translateLeft = getElementProperty(document.querySelector('.discardUpdateTaskButton'), 'right') - getElementProperty(window11, 'width');
-                window11.style.top = getElementProperty(document.querySelector('.discardUpdateTaskButton'), 'bottom') + window.scrollY + 10 + 'px';
+                window11.style.top = getElementProperty(document.querySelector('.discardUpdateTaskButton'), 'bottom') + window.scrollY + 15 + 'px';
                 window11.style.left = translateLeft + 'px';
                 window.scroll(0, getElementProperty(window11, 'bottom'));
 

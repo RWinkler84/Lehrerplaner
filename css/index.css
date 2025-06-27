@@ -1032,6 +1032,11 @@ h3 {
     padding: 1rem 2rem;
 }
 
+.introWindow p>button.confirmationButton,
+.introWindow p>button.cancelButton {
+    padding: 0 1rem;
+}
+
 #window6,
 #window7,
 #window8 {

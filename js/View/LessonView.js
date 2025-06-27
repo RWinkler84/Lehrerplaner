@@ -168,7 +168,7 @@ export default class LessonView {
 
         timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
 
-        timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => LessonView.removeLessonForm(event));
+        timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', LessonView.removeLessonForm);
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
 
         //timeslot event handlers
