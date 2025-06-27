@@ -1081,6 +1081,9 @@ p {
         padding: 0.2rem;
 
     }
+    .lesson {
+        padding: 0.35rem;
+    }
 
     .lessonContentContainer {
         height: 1rem;
