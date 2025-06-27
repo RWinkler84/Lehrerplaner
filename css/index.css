@@ -983,10 +983,19 @@ h3 {
         font-size: 14px;
     }
 
+    html {
+        min-width: 500px;
+    }
+
+    #topMenuContainer,
     #timetableContainer,
     #taskContainer {
         padding: 1rem 0.5rem;
 
+    }
+
+    #wochenplanText {
+        display: none;
     }
 
     .timeslot,
