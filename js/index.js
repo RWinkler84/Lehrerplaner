@@ -309,7 +309,6 @@ async function startApp() {
         let translateLeft;
 
         if (event.target.classList && event.target.classList.contains('cancelTour')) {
-            introRunning = false;
             event.target.closest('.introWindow').style.display = 'none';
         }
 
@@ -455,9 +454,7 @@ async function startApp() {
                 
                 window10.style.display = 'block';
                 window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="3"]'), 'bottom') + window.scrollY + 3 + 'px';
-                window.scroll(0, getElementProperty(window10, 'bottom'));
-
-                console.log(getElementProperty(window10, 'bottom'));
+                window.scroll(0, getElementProperty(window10, 'top') + getElementProperty(window10, 'height') / 2);
 
                 break;
 
@@ -505,7 +502,7 @@ async function startApp() {
 
                 window13.style.display = 'block';
                 window13.style.top = getElementProperty(document.querySelector('.discardUpdateTaskButton').closest('tr').nextElementSibling.firstElementChild, 'bottom') + window.scrollY + 10 + 'px';
-                window.scroll(0, getElementProperty(window13, 'bottom'));
+                window.scroll(0, getElementProperty(window13, 'top') + getElementProperty(window13, 'height') / 2);
 
                 break;
 
@@ -516,7 +513,7 @@ async function startApp() {
 
                 window14.style.display = 'block';
                 window14.style.top = getElementProperty(document.querySelector('tr[data-taskid="6"]'), 'bottom') + window.scrollY + 10 + 'px';
-                window.scroll(0, getElementProperty(window14, 'bottom'));
+                window.scroll(0, getElementProperty(window14, 'top') + getElementProperty(window14, 'height') / 2);
 
                 break;
 

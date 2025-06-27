@@ -1095,6 +1095,12 @@ p {
     .introWindow {
         width: 100%;
     }
+    
+    .introWindow .buttons {
+    flex-grow: 1;
+    margin-top: 2rem;
+    flex-direction: column;
+}
 
     #window1,
     #window4,
