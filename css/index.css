@@ -23,7 +23,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -935,6 +935,77 @@ h3 {
     border: solid 3px rgba(0, 0, 0, 0);
 }
 
+
+/* demo tour */
+.introWindow {
+    display: none;
+    position: absolute;
+    width: 500px;
+    min-height: 200px;
+    background-color: var(--contentContainerBackground);
+    border: solid 1px var(--bodyBackground);
+    padding: 1rem 2rem;
+}
+
+.introWindow p>button.confirmationButton,
+.introWindow p>button.cancelButton {
+    padding: 0 1rem;
+}
+
+#window6,
+#window7,
+#window8 {
+    transform: translate(-50%);
+}
+
+#window1,
+#window4,
+#window5,
+#window9,
+#window10,
+#window12,
+#window13,
+#window14 {
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.introWindow .buttons {
+    flex-grow: 1;
+    margin-top: 2rem;
+}
+
+.introTextItem {
+    background-color: var(--lightergrey);
+    border-radius: 3px;
+    padding: 0 0.5rem;
+}
+
+p {
+    margin: 0.5rem;
+}
+
+.highlighted {
+    border: solid 3px transparent;
+    animation-name: blinking;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes blinking {
+    0% {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: var(--matteRed);
+    }
+
+    100% {
+        border-color: transparent
+    }
+}
+
 /* responsiveness */
 
 .responsive {
@@ -1020,64 +1091,23 @@ h3 {
         width: 48%;
         margin: 0;
     }
-}
 
-.introWindow {
-    display: none;
-    position: absolute;
-    width: 500px;
-    min-height: 200px;
-    background-color: var(--contentContainerBackground);
-    border: solid 1px var(--bodyBackground);
-    padding: 1rem 2rem;
-}
+    .introWindow {
+        width: 100%;
+    }
 
-.introWindow p>button.confirmationButton,
-.introWindow p>button.cancelButton {
-    padding: 0 1rem;
-}
-
-#window6,
-#window7,
-#window8 {
-    transform: translate(-50%);
-}
-#window1,
-#window4,
-#window5,
-#window9,
-#window10,
-#window12,
-#window13,
-#window14 {
-    left: 50%;
-    transform: translate(-50%);
-}
-
-.introWindow .buttons {
-    flex-grow: 1;
-    margin-top: 2rem;
-}
-
-.introTextItem {
-    background-color: var(--lightergrey);
-    border-radius: 3px;
-    padding: 0 0.5rem;
-}
-
-p {
-    margin: 0.5rem;
-}
-
-.highlighted {
-    border: solid 3px transparent;
-    animation-name: blinking;
-    animation-duration: 3s;
-    animation-iteration-count: infinite;
-}
-
-@keyframes blinking {
-    0% {border-color: transparent}
-    50% {border-color: var(--matteRed);}
-    100% {border-color: transparent}
+    #window1,
+    #window4,
+    #window5,
+    #window6,
+    #window7,
+    #window8,
+    #window9,
+    #window10,
+    #window12,
+    #window13,
+    #window14 {
+        transform: translate(0px);
+        left: 0px;
+    }
 }

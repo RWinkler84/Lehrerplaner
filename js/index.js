@@ -16,8 +16,6 @@ export let unsyncedDeletedTimetableChanges = [];
 
 let abstCtrl = new AbstractController();
 
-let introRunning = false;
-
 export let allSubjects = [
     { "id": "1", "subject": "De", "colorCssClass": "subjectColorOne", "lastEdited": "2025-06-13 12:14:18" },
     { "id": "3", "subject": "Sk", "colorCssClass": "subjectColorFive", "lastEdited": "2025-06-19 13:18:25" },
@@ -292,7 +290,7 @@ async function startApp() {
 
     function runTour(event) {
         if (event.preventDefault && document.querySelector('#window6').style.display == 'block') event.preventDefault();
-        
+
         const window1 = document.querySelector('#window1');
         const window2 = document.querySelector('#window2');
         const window3 = document.querySelector('#window3');
@@ -315,17 +313,17 @@ async function startApp() {
             event.target.closest('.introWindow').style.display = 'none';
         }
 
-        console.log(event.target.id);
-
         switch (event.target.id) {
 
             case 'window1Confirm':
-                introRunning = true;
                 event.target.closest('.introWindow').style.display = 'none';
 
                 window2.style.display = 'block';
                 window2.style.top = getElementProperty(document.querySelector('#topMenuContainer'), 'bottom') + window.scrollY + 'px';
                 window2.style.left = getElementProperty(document.querySelector('#topMenuButtonContainer'), 'right') - getElementProperty(window2, 'width') + 'px';
+
+                checkPosition(window2);
+
                 document.querySelector('#topMenuButtonContainer').classList.add('highlighted');
                 break;
 
@@ -336,6 +334,9 @@ async function startApp() {
                 window3.style.display = 'block';
                 window3.style.top = getElementProperty(document.querySelector('#switchWeekContainer'), 'bottom') + window.scrollY + 'px';
                 window3.style.left = getElementProperty(document.querySelector('#topMenuButtonContainer'), 'right') - getElementProperty(window3, 'width') + 'px';
+
+                checkPosition(window3);
+
                 document.querySelector('#switchWeekContainer').classList.add('highlighted');
                 break;
 
@@ -372,11 +373,13 @@ async function startApp() {
                 window6.style.top = getElementProperty(document.querySelector('.lessonForm'), 'bottom') + window.scrollY + 10 + 'px';
                 window6.style.left = translateLeft + 'px';
 
+                checkPosition(window6);
+
                 document.querySelector('.lessonForm').classList.add('highlighted');
                 document.querySelector('#lessonForm').removeEventListener('submit', LessonView.saveNewLesson);
                 document.querySelector('.discardNewLessonButton').removeEventListener('click', LessonView.removeLessonForm);
 
-                window.scroll(0, getElementProperty(window6, 'bottom'));
+                window.scroll(0, getElementProperty(window6, 'top'));
                 break;
 
             case 'window6Confirm':
@@ -384,10 +387,11 @@ async function startApp() {
 
                 translateLeft = getElementProperty(document.querySelector('.lessonForm'), 'left') + getElementProperty(document.querySelector('.lessonForm'), 'width') / 2;
 
-
                 window7.style.display = 'block';
                 window7.style.top = getElementProperty(document.querySelector('.lessonForm'), 'bottom') + window.scrollY + 10 + 'px';
                 window7.style.left = translateLeft + 'px';
+
+                checkPosition(window7);
 
                 document.querySelector('.lessonForm').classList.add('highlighted');
                 document.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
@@ -404,7 +408,9 @@ async function startApp() {
                 window8.style.top = getElementProperty(document.querySelector('#markedSlot>.lesson'), 'bottom') + window.scrollY + 10 + 'px';
                 window8.style.left = translateLeft + 'px';
 
-                window.scroll(0, getElementProperty(window8, 'top') + 100);
+                checkPosition(window8);
+
+                window.scroll(0, getElementProperty(window8, 'top') + getElementProperty(window8, 'height') / 2);
 
                 document.querySelectorAll('.lessonForm').forEach(lessonForm => lessonForm.remove());
                 document.querySelector('#markedSlot>.lesson').classList.add('highlighted');
@@ -416,7 +422,7 @@ async function startApp() {
 
                 window9.style.display = 'block';
                 window9.style.top = getElementProperty(document.querySelector('#taskContainer'), 'bottom') + window.scrollY + 3 + 'px';
-                window.scroll(0, getElementProperty(window9, 'top'));
+                window.scroll(0, getElementProperty(window9, 'top') + getElementProperty(window9, 'height') / 2);
 
                 document.querySelector('#taskContainer').classList.add('highlighted');
                 break;
@@ -424,10 +430,6 @@ async function startApp() {
             case 'window9Confirm':
                 event.target.closest('.introWindow').style.visibility = 'hidden';
                 document.querySelector('#taskContainer').classList.remove('highlighted');
-
-                window10.style.display = 'block';
-                window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="3"]'), 'bottom') + window.scrollY + 3 + 'px';
-                window.scroll(0, getElementProperty(window10, 'bottom'));
 
                 document.querySelectorAll('tr[data-taskid="3"]>td').forEach(td => {
                     td.classList.add('highlighted');
@@ -450,6 +452,12 @@ async function startApp() {
                 });
 
                 document.querySelectorAll('tr[data-taskid="3"]>td.taskDone button').forEach(button => button.style.height = '1.25rem')
+                
+                window10.style.display = 'block';
+                window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="3"]'), 'bottom') + window.scrollY + 3 + 'px';
+                window.scroll(0, getElementProperty(window10, 'bottom'));
+
+                console.log(getElementProperty(window10, 'bottom'));
 
                 break;
 
@@ -470,7 +478,10 @@ async function startApp() {
                 translateLeft = getElementProperty(document.querySelector('.discardUpdateTaskButton'), 'right') - getElementProperty(window11, 'width');
                 window11.style.top = getElementProperty(document.querySelector('.discardUpdateTaskButton'), 'bottom') + window.scrollY + 15 + 'px';
                 window11.style.left = translateLeft + 'px';
-                window.scroll(0, getElementProperty(window11, 'bottom'));
+
+                checkPosition(window11);
+
+                window.scroll(0, getElementProperty(window11, 'top') + getElementProperty(window11, 'height') / 2);
 
                 document.querySelector('.discardUpdateTaskButton').closest('td').classList.add('highlighted');
                 document.querySelector('.discardUpdateTaskButton').closest('td').style.borderRight = 'solid 3px';
@@ -483,7 +494,7 @@ async function startApp() {
 
                 document.querySelector('.discardUpdateTaskButton').closest('tr').nextElementSibling.firstElementChild.classList.add('highlighted');
                 document.querySelector('.discardUpdateTaskButton').closest('tr').nextElementSibling.firstElementChild.style.borderRight = 'solid 3px';
-                
+
                 window12.style.display = 'block';
                 window12.style.top = getElementProperty(document.querySelector('.discardUpdateTaskButton').closest('tr').nextElementSibling.firstElementChild, 'bottom') + window.scrollY + 10 + 'px';
 
@@ -512,7 +523,7 @@ async function startApp() {
             case 'window14Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
                 window9.style.display = 'none';
-                window.scroll(0,0);
+                window.scroll(0, 0);
         }
     }
 
@@ -534,6 +545,22 @@ async function startApp() {
     function getElementProperty(element, prop) {
         let rect = element.getBoundingClientRect()
         return rect[prop];
+    }
+
+    function checkPosition(windowElem) {
+        if (window.outerWidth <= 600) {
+            windowElem.style.left = '0px';
+            return;
+        }
+
+        let rect = windowElem.getBoundingClientRect();
+
+        if (rect.right > window.outerWidth) {
+            windowElem.style.left = '';
+            windowElem.style.right = '16px';
+            windowElem.style.transform = 'translate(0px)';
+        }
+
     }
 }
 
