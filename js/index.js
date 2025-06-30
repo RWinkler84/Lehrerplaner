@@ -34,7 +34,7 @@ export let allTasksArray = [
 export let standardTimetable = [
     { "id": "1", "validFrom": "2025-06-13", "validUntil": null, "class": "6a", "subject": "De", "weekdayNumber": "1", "timeslot": "1", "lastEdited": "2025-06-19 13:36:09" },
     { "id": "2", "validFrom": "2025-06-13", "validUntil": null, "class": "6b", "subject": "De", "weekdayNumber": "1", "timeslot": "3", "lastEdited": "2025-06-19 13:36:09" },
-    { "id": "3", "validFrom": "2025-06-13", "validUntil": null, "class": "7c", "subject": "Ge", "weekdayNumber": "1", "timeslot": "4", "lastEdited": "2025-06-19 13:36:09" },
+    { "id": "3", "validFrom": "2025-06-13", "validUntil": null, "class": "7c", "subject": "Sk", "weekdayNumber": "1", "timeslot": "4", "lastEdited": "2025-06-19 13:36:09" },
     { "id": "4", "validFrom": "2025-06-13", "validUntil": null, "class": "9b", "subject": "Ge", "weekdayNumber": "1", "timeslot": "5", "lastEdited": "2025-06-19 13:36:09" },
     { "id": "5", "validFrom": "2025-06-13", "validUntil": null, "class": "6b", "subject": "De", "weekdayNumber": "2", "timeslot": "1", "lastEdited": "2025-06-19 13:36:09" },
     { "id": "6", "validFrom": "2025-06-13", "validUntil": null, "class": "8a", "subject": "Ge", "weekdayNumber": "2", "timeslot": "2", "lastEdited": "2025-06-19 13:36:09" },
@@ -593,23 +593,24 @@ async function startApp() {
                     break;
 
                 case 'lessonFormOpened':
-                    window.scroll(0, getElementProperty(document.querySelector('.lesson'), 'top'));
+                    document.querySelector('#lessonForm').scrollIntoView({block: 'start'});
                     break;
 
                 case 'window7Confirm':
-                    window.scroll(0, 0);
+                    document.querySelector('#markedSlot>.lesson').scrollIntoView();
                     break;
 
                 case 'window8Confirm':
-                    window.scroll(0, getElementProperty(document.querySelector('#taskContainer'), 'top') - 50);
+                    document.querySelector('#taskContainer').scrollIntoView();
                     break;
 
                 case 'window9Confirm':
-                    window.scroll(0, getElementProperty(window10, 'top') + getElementProperty(window10, 'height') / 2);
+                    document.querySelector('tr[data-taskid="3"]').scrollIntoView({block: 'start'});
                     break;
 
                 case 'taskEdited':
-                    window.scroll(0, getElementProperty(window11, 'top') + getElementProperty(window11, 'height') / 2);
+                    window.requestAnimationFrame();
+                    document.querySelector('.discardUpdateTaskButton').scrollIntoView({block: 'start'});
                     break;
 
                 case 'window14Confirm':

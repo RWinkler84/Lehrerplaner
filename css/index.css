@@ -20,6 +20,9 @@
 
     --standardRadius: 5px;
     --smallRadius: 3px;
+
+      scroll-margin-top: 60px;
+
 }
 
 html {
@@ -1056,9 +1059,9 @@ p {
         font-size: 14px;
     }
 
-    html {
+    /* html {
         min-width: 500px;
-    }
+    } */
 
     #topMenuContainer,
     #timetableContainer,
