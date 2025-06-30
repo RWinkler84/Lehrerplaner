@@ -343,10 +343,12 @@ async function startApp() {
                 event.target.closest('.introWindow').style.display = 'none';
                 document.querySelector('#switchWeekContainer').remove('highlighted');
 
-                window.scroll(0, getElementProperty(document.querySelector('#timetableContainer'), 'top') + 100);
-
                 window4.style.display = 'block';
                 window4.style.top = getElementProperty(document.querySelector('#weekOverviewContainer'), 'bottom') - 50 + window.scrollY + 'px';
+
+                checkPosition(window4);
+                scrollToPosition(event.target.id);
+
                 document.querySelector('#weekOverviewContainer').classList.add('highlighted');
                 break;
 
@@ -355,6 +357,9 @@ async function startApp() {
 
                 window5.style.display = 'block';
                 window5.style.top = getElementProperty(document.querySelector('#weekOverviewContainer'), 'bottom') - 50 + window.scrollY + 'px';
+
+                checkPosition(window5);
+
                 break;
 
             case 'window5Confirm':
@@ -373,12 +378,12 @@ async function startApp() {
                 window6.style.left = translateLeft + 'px';
 
                 checkPosition(window6);
+                scrollToPosition('lessonFormOpened');
 
                 document.querySelector('.lessonForm').classList.add('highlighted');
                 document.querySelector('#lessonForm').removeEventListener('submit', LessonView.saveNewLesson);
                 document.querySelector('.discardNewLessonButton').removeEventListener('click', LessonView.removeLessonForm);
 
-                window.scroll(0, getElementProperty(window6, 'top'));
                 break;
 
             case 'window6Confirm':
@@ -408,8 +413,7 @@ async function startApp() {
                 window8.style.left = translateLeft + 'px';
 
                 checkPosition(window8);
-
-                window.scroll(0, getElementProperty(window8, 'top') + getElementProperty(window8, 'height') / 2);
+                scrollToPosition(event.target.id);
 
                 document.querySelectorAll('.lessonForm').forEach(lessonForm => lessonForm.remove());
                 document.querySelector('#markedSlot>.lesson').classList.add('highlighted');
@@ -421,7 +425,9 @@ async function startApp() {
 
                 window9.style.display = 'block';
                 window9.style.top = getElementProperty(document.querySelector('#taskContainer'), 'bottom') + window.scrollY + 3 + 'px';
-                window.scroll(0, getElementProperty(window9, 'top') + getElementProperty(window9, 'height') / 2);
+
+                checkPosition(window9);
+                scrollToPosition(event.target.id);
 
                 document.querySelector('#taskContainer').classList.add('highlighted');
                 break;
@@ -451,11 +457,12 @@ async function startApp() {
                 });
 
                 document.querySelectorAll('tr[data-taskid="3"]>td.taskDone button').forEach(button => button.style.height = '1.25rem')
-                
+
                 window10.style.display = 'block';
                 window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="3"]'), 'bottom') + window.scrollY + 3 + 'px';
-                window.scroll(0, getElementProperty(window10, 'top') + getElementProperty(window10, 'height') / 2);
 
+                checkPosition(window10);
+                scrollToPosition(event.target.id);
                 break;
 
             case 'window10Confirm':
@@ -477,8 +484,7 @@ async function startApp() {
                 window11.style.left = translateLeft + 'px';
 
                 checkPosition(window11);
-
-                window.scroll(0, getElementProperty(window11, 'top') + getElementProperty(window11, 'height') / 2);
+                scrollToPosition(event.target.id);
 
                 document.querySelector('.discardUpdateTaskButton').closest('td').classList.add('highlighted');
                 document.querySelector('.discardUpdateTaskButton').closest('td').style.borderRight = 'solid 3px';
@@ -495,6 +501,8 @@ async function startApp() {
                 window12.style.display = 'block';
                 window12.style.top = getElementProperty(document.querySelector('.discardUpdateTaskButton').closest('tr').nextElementSibling.firstElementChild, 'bottom') + window.scrollY + 10 + 'px';
 
+                checkPosition(window12);
+
                 break;
 
             case 'window12Confirm':
@@ -502,7 +510,9 @@ async function startApp() {
 
                 window13.style.display = 'block';
                 window13.style.top = getElementProperty(document.querySelector('.discardUpdateTaskButton').closest('tr').nextElementSibling.firstElementChild, 'bottom') + window.scrollY + 10 + 'px';
-                window.scroll(0, getElementProperty(window13, 'top') + getElementProperty(window13, 'height') / 2);
+
+                checkPosition(window13);
+                scrollToPosition(event.target.id);
 
                 break;
 
@@ -513,14 +523,15 @@ async function startApp() {
 
                 window14.style.display = 'block';
                 window14.style.top = getElementProperty(document.querySelector('tr[data-taskid="6"]'), 'bottom') + window.scrollY + 10 + 'px';
-                window.scroll(0, getElementProperty(window14, 'top') + getElementProperty(window14, 'height') / 2);
+                checkPosition(window14);
+                scrollToPosition(event.target.id);
 
                 break;
 
             case 'window14Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
                 window9.style.display = 'none';
-                window.scroll(0, 0);
+                scrollToPosition(event.target.id);
         }
     }
 
@@ -546,7 +557,11 @@ async function startApp() {
 
     function checkPosition(windowElem) {
         if (window.outerWidth <= 600) {
+            windowElem.style.position = 'fixed';
+            windowElem.style.top = '';
+
             windowElem.style.left = '0px';
+            windowElem.style.bottom = '0px';
             return;
         }
 
@@ -558,6 +573,90 @@ async function startApp() {
             windowElem.style.transform = 'translate(0px)';
         }
 
+    }
+
+    function scrollToPosition(buttonClicked) {
+
+        const window6 = document.querySelector('#window6');
+        const window8 = document.querySelector('#window8');
+        const window9 = document.querySelector('#window9');
+        const window10 = document.querySelector('#window10');
+        const window11 = document.querySelector('#window11');
+        const window13 = document.querySelector('#window13');
+        const window14 = document.querySelector('#window14');
+
+        if (window.outerWidth <= 600) {
+            console.log('monole');
+            switch (buttonClicked) {
+                case 'window3Confirm':
+                    window.scroll(0, getElementProperty(document.querySelector('#timetableContainer'), 'top'));
+                    break;
+
+                case 'lessonFormOpened':
+                    window.scroll(0, getElementProperty(document.querySelector('.lesson'), 'top'));
+                    break;
+
+                case 'window7Confirm':
+                    window.scroll(0, 0);
+                    break;
+
+                case 'window8Confirm':
+                    window.scroll(0, getElementProperty(document.querySelector('#taskContainer'), 'top') - 50);
+                    break;
+
+                case 'window9Confirm':
+                    window.scroll(0, getElementProperty(window10, 'top') + getElementProperty(window10, 'height') / 2);
+                    break;
+
+                case 'taskEdited':
+                    window.scroll(0, getElementProperty(window11, 'top') + getElementProperty(window11, 'height') / 2);
+                    break;
+
+                case 'window14Confirm':
+                    window.scroll(0, 0);
+                    break;
+            }
+
+            return;
+        }
+
+        switch (buttonClicked) {
+            case 'window3Confirm':
+                window.scroll(0, getElementProperty(document.querySelector('#timetableContainer'), 'top') + 100);
+                break;
+
+            case 'lessonFormOpened':
+                window.scroll(0, getElementProperty(window6, 'top'));
+                break;
+
+            case 'window7Confirm':
+                window.scroll(0, getElementProperty(window8, 'top') + getElementProperty(window8, 'height') / 2);
+                break;
+
+            case 'window8Confirm':
+                window.scroll(0, getElementProperty(window9, 'top') + getElementProperty(window9, 'height') / 2);
+                break;
+
+            case 'window9Confirm':
+                window.scroll(0, getElementProperty(window10, 'top') + getElementProperty(window10, 'height') / 2);
+                break;
+
+            case 'taskEdited':
+                window.scroll(0, getElementProperty(window11, 'top') + getElementProperty(window11, 'height') / 2);
+                break;
+
+            case 'window12Confirm':
+                window.scroll(0, getElementProperty(window13, 'top') + getElementProperty(window13, 'height') / 2);
+                break;
+
+            case 'window13Confirm':
+                window.scroll(0, getElementProperty(window14, 'top') + getElementProperty(window14, 'height') / 2);
+                break;
+
+            case 'window14Confirm':
+                window.scroll(0, 0);
+                break;
+        }
     }
 }
 

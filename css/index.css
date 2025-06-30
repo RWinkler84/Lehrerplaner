@@ -1125,7 +1125,9 @@ p {
     #window12,
     #window13,
     #window14 {
-        transform: translate(0px);
+        position: fixed;
+        transform: translate(0,0);
+        bottom: 0px;
         left: 0px;
     }
 }
