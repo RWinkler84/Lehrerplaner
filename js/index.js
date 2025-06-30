@@ -341,7 +341,7 @@ async function startApp() {
 
             case 'window3Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
-                document.querySelector('#switchWeekContainer').remove('highlighted');
+                document.querySelector('#switchWeekContainer').classList.remove('highlighted');
 
                 window4.style.display = 'block';
                 window4.style.top = getElementProperty(document.querySelector('#weekOverviewContainer'), 'bottom') - 50 + window.scrollY + 'px';
@@ -573,6 +573,11 @@ async function startApp() {
             windowElem.style.transform = 'translate(0px)';
         }
 
+        if (rect.left <= 0) {
+            windowElem.style.left = '16px';
+            windowElem.style.transform = 'translate(0px)';
+        }
+
     }
 
     function scrollToPosition(buttonClicked) {
@@ -593,7 +598,7 @@ async function startApp() {
                     break;
 
                 case 'lessonFormOpened':
-                    document.querySelector('#lessonForm').scrollIntoView({block: 'start'});
+                    document.querySelector('#lessonForm').scrollIntoView({ block: 'start' });
                     break;
 
                 case 'window7Confirm':
@@ -605,12 +610,12 @@ async function startApp() {
                     break;
 
                 case 'window9Confirm':
-                    document.querySelector('tr[data-taskid="3"]').scrollIntoView({block: 'start'});
+                    document.querySelector('tr[data-taskid="3"]').scrollIntoView({ block: 'start' });
                     break;
 
                 case 'taskEdited':
                     window.requestAnimationFrame();
-                    document.querySelector('.discardUpdateTaskButton').scrollIntoView({block: 'start'});
+                    document.querySelector('.discardUpdateTaskButton').scrollIntoView({ block: 'start' });
                     break;
 
                 case 'window14Confirm':
