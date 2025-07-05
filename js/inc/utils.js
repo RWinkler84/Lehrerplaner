@@ -79,10 +79,12 @@ export default class Utils {
     }
 
     static getNumberOfWeeksPerYear(year) {
-        let nextNewYear = new Date((year + 1) + '01-01').getTime();
+        let nextNewYear = new Date((year + 1), 0 ,1).getTime();
         let firstThursday = Utils.getFirstThirsdayOfTheYear(year);
 
         let weeksPerYear = 0;
+
+        console.log(nextNewYear)
 
         //count up until it is the next year starting with 0 because the first 
         while (firstThursday < nextNewYear) {
