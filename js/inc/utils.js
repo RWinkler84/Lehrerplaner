@@ -84,8 +84,6 @@ export default class Utils {
 
         let weeksPerYear = 0;
 
-        console.log(nextNewYear)
-
         //count up until it is the next year starting with 0 because the first 
         while (firstThursday < nextNewYear) {
             firstThursday = firstThursday + ONEDAY * 7;
