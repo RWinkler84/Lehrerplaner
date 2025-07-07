@@ -64,7 +64,7 @@ export default class Settings extends AbstractModel {
 
     async saveTimetableChanges(validFrom, lessons) {
         let timetableHasValidUntil = false;
-        let validUntilDate;
+        let validUntilDate = null;
 
         for (let i = standardTimetable.length - 1; i > 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {

@@ -248,11 +248,6 @@ export default class AbstractModel {
             }
         });
 
-        console.log('data to sync', dataToSync);
-        console.log('undeleted subjects', unsyncedDeletedSubjects);
-        console.log('undeleted lessons', unsyncedDeletedTimetableChanges);
-        console.log('undeleted tasks', unsyncedDeletedTasks);
-
         if (!isUnsyncedData && unsyncedDeletedSubjects.length == 0 && unsyncedDeletedTasks.length == 0 && unsyncedDeletedTimetableChanges.length == 0) return;
 
         // first delete, what needs to be deleted 
