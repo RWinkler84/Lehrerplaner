@@ -143,6 +143,13 @@ export default class Settings extends AbstractModel {
             }
         });
 
+        //validUntil can be an 'undefined'-string which causes problems
+        lessons.forEach(lesson => {
+            if (lesson.validUntil === 'undefinded') {
+                lesson.validUntil = null;
+            } 
+        }); 
+
         return lessons;
     }
 
