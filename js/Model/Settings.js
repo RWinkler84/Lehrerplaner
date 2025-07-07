@@ -104,22 +104,4 @@ export default class Settings extends AbstractModel {
 
         return lessons;
     }
-<<<<<<< HEAD
-=======
-
-    async logout() {
-        let result = await this.makeAjaxQuery('user', 'logout');
-
-        if (result.status == 'success') {
-            document.cookie = `lprm=; expires=Thu, 01 Jan 1970 00:00:00 UTC;}`;
-            location.reload();
-        }
-    }
-
-    async deleteAccount() {
-        let result = await this.makeAjaxQuery('user', 'deleteAccount');
-
-        return result;
-    }
->>>>>>> origin/main
 }
