@@ -73,6 +73,8 @@ export default class Settings extends AbstractModel {
         }
 
         lessons.forEach(lesson => {
+            if (lesson.validUntil === 'undefined') lesson.validUntil = undefined;
+
             if (lesson.validUntil != undefined) {
                 timetableHasValidUntil = true;
                 validUntilDate = lesson.validUntil;
@@ -145,8 +147,8 @@ export default class Settings extends AbstractModel {
 
         //validUntil can be an 'undefined'-string which causes problems
         lessons.forEach(lesson => {
-            if (lesson.validUntil === 'undefinded') {
-                lesson.validUntil = null;
+            if (lesson.validUntil === 'undefined') {
+                lesson.validUntil = undefined;
             } 
         }); 
 
