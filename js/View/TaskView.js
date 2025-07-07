@@ -26,11 +26,46 @@ export default class TaskView extends AbstractView {
 
         allUpcomingTasks.forEach((task) => {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
-            let checked = task.fixedTime == '1' ? 'checked' : '';
+            let fixedTimeChecked = task.fixedTime == '1' ? 'checked' : '';
+            let reoccuringChecked = task.reoccuring == '1' ? 'checked' : '';
             let subjectDate = Fn.formatDate(task.date);
+            let reoccuringIntervalOptions = `
+                    <option>-</option>
+                    <option value="weekly">wöchentlich</option>
+                    <option value="biweekly">zweiwöchentlich</option>
+                    <option value="monthly">monatlich</option>
+                `;
 
             if (new Date(task.date) < new Date()) {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
+            }
+
+            if (task.interval) {
+                switch (task.interval) {
+                    case 'weekly':
+                        reoccuringIntervalOptions = `
+                        <option value="weekly" selected>wöchentlich</option>
+                        <option value="biweekly">zweiwöchentlich</option>
+                        <option value="monthly">monatlich</option>
+                    `;
+                        break;
+
+                    case 'biweekly':
+                        reoccuringIntervalOptions = `
+                        <option value="weekly">wöchentlich</option>
+                        <option value="biweekly" selected>zweiwöchentlich</option>
+                        <option value="monthly">monatlich</option>
+                    `;
+                        break;
+
+                    case 'monthly':
+                        reoccuringIntervalOptions = `
+                        <option value="weekly">wöchentlich</option>
+                        <option value="biweekly">zweiwöchentlich</option>
+                        <option value="monthly" selected>monatlich</option>
+                    `;
+                        break;
+                }
             }
 
             taskTrHTML += `
@@ -48,8 +83,17 @@ export default class TaskView extends AbstractView {
                     </tr>
                     <tr data-checkboxTr style="display: none;">
                         <td colspan="4" style="border-right: none;">
-                            <input type="checkbox" name="fixedDate" ${checked}>
-                            <label>fester Termin?</label>
+                            <div class="flex spaceBetween">
+                                <div>
+                                    <input type="checkbox" name="fixedDate" ${fixedTimeChecked}>
+                                    <label>fester Termin?</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="reoccuringTask" ${reoccuringChecked}>
+                                    <label>wiederholender Termin?</label>
+                                    <select name="reoccuringInterval">${reoccuringIntervalOptions}</select>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     <tr>

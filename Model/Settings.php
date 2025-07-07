@@ -41,8 +41,6 @@ class Settings extends AbstractModel
 
     public function saveTimetable($timetableData)
     {
-        error_log(print_r($timetableData, true));
-
         $tableName = TABLEPREFIX . 'timetable';
         $timetableData = $this->preprocessDataToWrite($timetableData);
         $finalResult['status'] = 'success';
