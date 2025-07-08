@@ -136,7 +136,7 @@ export default class TaskView extends AbstractView {
                 borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
             }
 
-            if (task.interval) reoccuringIntervalSelect = this.getReoccuringIntervalSelectHTML(task);
+            if (task.reoccuringInterval) reoccuringIntervalSelect = this.getReoccuringIntervalSelectHTML(task);
 
             taskTrHTML += `
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
@@ -467,8 +467,8 @@ export default class TaskView extends AbstractView {
         taskTr.querySelector('td[data-subject]').innerHTML = `<div class="taskSubject">${task.subject}</div><div class="smallDate">${taskDate}</div>`;
         taskTr.querySelector('td[data-taskDescription]').innerHTML = task.description;
 
-        selectTr.querySelector('input[name="fixedDate"]').checked = task.fixedTime;
-        selectTr.querySelector('input[name="reoccuringTask"]').checked = task.reoccuring;
+        selectTr.querySelector('input[name="fixedDate"]').checked = task.fixedTime == 1 ? true: false;
+        selectTr.querySelector('input[name="reoccuringTask"]').checked = task.reoccuring == 1 ? true : false;
         selectTr.querySelector('.alertRing').innerHTML = TaskView.getReoccuringIntervalSelectHTML(task);
 
         TaskView.#removeEditability(event);
