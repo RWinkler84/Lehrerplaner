@@ -118,6 +118,11 @@ export default class Task extends AbstractModel {
     }
 
     async setDone() {
+        if (this.reoccuring) {
+            this.resetDateAccordingToInterval();
+            return;
+        }
+        
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
 
@@ -126,6 +131,26 @@ export default class Task extends AbstractModel {
 
         let result = await this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
         if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
+    }
+
+    resetDateAccordingToInterval() {
+        let oldDate = new Date(this.date).setHours(12, 0, 0, 0);
+
+        switch (this.#reoccuringInterval) {
+            case 'weekly':
+                this.date = oldDate + ONEDAY * 7;
+                break;
+
+            case 'biweekly':
+                this.date = oldDate + ONEDAY * 14;
+                break;
+
+            case 'monthly':
+                this.date = oldDate * 28;
+                break;
+        }
+        this.status = 'open';
+        this.update();
     }
 
     // Getter
