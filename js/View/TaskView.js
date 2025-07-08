@@ -15,7 +15,6 @@ export default class TaskView extends AbstractView {
         let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
         let taskTrHTML = '';
 
-
         if (allUpcomingTasks.length == 0) {
             document.querySelector('#upcomingTasksTable thead').style.display = 'none';
             document.querySelector('#upcomingTasksTable tbody').innerHTML = '';

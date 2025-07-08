@@ -16,7 +16,9 @@ class Task extends AbstractModel
 
         $taskData = $this->preprocessDataToWrite($taskData);
 
-        $query = "INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime) VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime)";
+        $query = "INSERT INTO $this->tableName 
+            (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval) 
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval)";
         return $this->write($query, $taskData);
     }
 
@@ -26,9 +28,13 @@ class Task extends AbstractModel
             $taskData['fixedTime'] = 0;
         }
 
+        if ($taskData['reoccuring'] == '') {
+            $taskData['reoccuring'] = 0;
+        }
+
         $taskData = $this->preprocessDataToWrite($taskData);
 
-        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime WHERE userId = :userId AND itemId=:itemId";
+        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval WHERE userId = :userId AND itemId=:itemId";
 
         return $this->write($query, $taskData);
     }
