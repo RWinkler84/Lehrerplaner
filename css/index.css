@@ -40,6 +40,15 @@ select {
     height: 1.5rem;
 }
 
+select {
+    text-align: center;
+    padding: 0 0.5rem;
+}
+
+input[type="checkbox"] {
+    vertical-align: middle;
+}
+
 /* Top Menu */
 
 #topMenuContainer,
@@ -574,12 +583,18 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--matteRed);
 }
 
-.lessonSelect {
+.lessonSelect,
+.reoccuringIntervalSelect {
     appearance: none;
 }
 
-.lessonSelect option:first-child {
+.lessonSelect option:first-child,
+.reoccuringIntervalSelect option:first-child {
     text-align: center;
+}
+
+.reoccuringIntervalSelect[disabled] {
+    background-color: var(--lightergrey);
 }
 
 .lessonOptionsButton,

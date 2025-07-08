@@ -15,6 +15,8 @@ export default class Task extends AbstractModel {
     #timeslot;
     #status;
     #fixedTime = false;
+    #reoccuring = false;
+    #reoccuringInterval;
 
     constructor(id = undefined) {
         super()
@@ -30,7 +32,9 @@ export default class Task extends AbstractModel {
                     this.#date = new Date(task.date);
                     this.#timeslot = task.timeslot;
                     this.#status = task.status;
-                    this.fixedTime = task.fixedTime;
+                    this.#fixedTime = task.fixedTime;
+                    this.#reoccuring = task.reoccuring;
+                    this.#reoccuringInterval = task.reoccuringInterval;
                 }
             });
         }
@@ -47,6 +51,8 @@ export default class Task extends AbstractModel {
                 element.timeslot = this.timeslot;
                 element.description = this.description;
                 element.fixedTime = this.fixedTime;
+                element.reoccuring = this.reoccuring;
+                element.reoccuringInterval = this.reoccuringInterval;
             }
         });
 
@@ -58,7 +64,9 @@ export default class Task extends AbstractModel {
             'timeslot': this.timeslot,
             'description': this.description,
             'status': this.status,
-            'fixedTime': this.fixedTime
+            'fixedTime': this.fixedTime,
+            'reoccuring': this.reoccuring,
+            'reoccuringInterval': this.reoccuringInterval
         }
 
         let result = await this.makeAjaxQuery('task', 'update', taskData);
@@ -74,7 +82,9 @@ export default class Task extends AbstractModel {
             'timeslot': this.timeslot,
             'description': this.description,
             'status': this.status,
-            'fixedTime': this.fixedTime
+            'fixedTime': this.fixedTime,
+            'reoccuring': this.reoccuring,
+            'reoccuringInterval': this.reoccuringInterval
         }
 
         allTasksArray.push(taskData);
@@ -171,6 +181,8 @@ export default class Task extends AbstractModel {
             task.timeslot = element.timeslot;
             task.status = element.status;
             task.fixedTime = element.fixedTime;
+            task.reoccuring = element.reoccuring;
+            task.reoccuringInterval = element.reoccuringInterval;
 
             allTasks.push(task)
         });
@@ -282,7 +294,9 @@ export default class Task extends AbstractModel {
             'date': this.#date,
             'timeslot': this.#timeslot,
             'description': this.#description,
-            'fixedTime': this.#fixedTime
+            'fixedTime': this.#fixedTime,
+            'reoccuring': this.#reoccuring,
+            'reoccuringInterval': this.#reoccuringInterval
         }
     }
 
@@ -323,6 +337,14 @@ export default class Task extends AbstractModel {
         return this.#fixedTime;
     }
 
+    get reoccuring() {
+        return this.#reoccuring;
+    }
+
+    get reoccuringInterval() {
+        return this.#reoccuringInterval;
+    }
+
     // Setter
 
     set id(id) {
@@ -355,5 +377,13 @@ export default class Task extends AbstractModel {
 
     set fixedTime(fixedTime) {
         this.#fixedTime = fixedTime;
+    }
+
+    set reoccuring(reoccuring) {
+        this.#reoccuring = reoccuring;
+    }
+
+    set reoccuringInterval(reoccuringInterval) {
+        this.#reoccuringInterval = reoccuringInterval;
     }
 }
