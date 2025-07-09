@@ -43,7 +43,7 @@ export default class Settings extends AbstractModel {
 
     async saveTimetableChanges(validFrom, lessons) {
         let timetableHasValidUntil = false;
-        let validUntilDate;
+        let validUntilDate = null;
 
         for (let i = standardTimetable.length - 1; i > 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {
@@ -52,6 +52,8 @@ export default class Settings extends AbstractModel {
         }
 
         lessons.forEach(lesson => {
+            if (lesson.validUntil === 'undefined') lesson.validUntil = undefined;
+
             if (lesson.validUntil != undefined) {
                 timetableHasValidUntil = true;
                 validUntilDate = lesson.validUntil;
@@ -101,6 +103,13 @@ export default class Settings extends AbstractModel {
                 lessons.forEach(lesson => lesson.validUntil = validUntilDate);
             }
         });
+
+        //validUntil can be an 'undefined'-string which causes problems
+        lessons.forEach(lesson => {
+            if (lesson.validUntil === 'undefined') {
+                lesson.validUntil = undefined;
+            } 
+        }); 
 
         return lessons;
     }

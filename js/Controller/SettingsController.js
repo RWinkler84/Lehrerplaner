@@ -102,7 +102,7 @@ export default class SettingsController {
     static async deleteAccount() {
         let model = new Settings;
         let result = await model.deleteAccount();
-        
+
         if (result.status == 'success') {
             View.showAccountDeletionResult('success');
         } else {
@@ -110,11 +110,11 @@ export default class SettingsController {
         }
     }
 
-    static deleteTaskById(id){
+    static deleteTaskById(id) {
         TaskController.deleteTaskById(id);
     }
 
-    static deleteLessonChangeById(id){
+    static deleteLessonChangeById(id) {
         LessonController.deleteLessonById(id);
     }
 
