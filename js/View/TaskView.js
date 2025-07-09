@@ -88,8 +88,8 @@ export default class TaskView extends AbstractView {
         upcomingTasksTableBody.querySelectorAll('input[name="reoccuringTask"]').forEach(checkbox => checkbox.addEventListener('change', TaskView.toggleReoccuringIntervalSelect))
 
         //make editable
-        upcomingTasksTableBody.querySelectorAll('#taskContainer td').forEach((td) => {
-            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        upcomingTasksTableBody.querySelectorAll('#taskContainer tr[data-taskid]').forEach((tr) => {
+            tr.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
         });
 
         //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
@@ -180,8 +180,8 @@ export default class TaskView extends AbstractView {
         inProgressTasksTableBody.querySelectorAll('input[name="reoccuringTask"]').forEach(checkbox => checkbox.addEventListener('change', TaskView.toggleReoccuringIntervalSelect))
 
         //make editable
-        document.querySelectorAll('#taskContainer td').forEach((td) => {
-            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        inProgressTasksTableBody.querySelectorAll('#taskContainer tr[data-taskid]').forEach((tr) => {
+            tr.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
         });
 
         //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
@@ -359,8 +359,6 @@ export default class TaskView extends AbstractView {
             TaskView.#removeEditability(event);
             TaskView.#createSetDoneOrInProgressButtons(event);
             TaskView.renderUpcomingTasks();
-
-            taskElement.querySelectorAll('td').forEach((td) => { td.addEventListener('dblclick', event => TaskView.makeEditable(event)) });
         }
     }
 
@@ -387,11 +385,6 @@ export default class TaskView extends AbstractView {
     static makeEditable(event) {
 
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
-        if (event.target.isContentEditable) return;
-
-        //check for other editable tasks and revert the changes
-        let editableTasks = document.querySelector('td[contenteditable]');
-        if (editableTasks && event.target.closest('tr')) TaskView.revertChanges({target: editableTasks});
 
         this.#backupTaskData(event);
 
@@ -403,6 +396,7 @@ export default class TaskView extends AbstractView {
 
         window.getSelection().removeAllRanges();
         TaskView.#createSaveOrDiscardChangesButtons(event);
+        parentTr.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
     }
 
     static highlightCheckboxTrPreviousSibling(event) {
@@ -466,6 +460,13 @@ export default class TaskView extends AbstractView {
         if (event.target.closest('td').classList.contains('responsive')) {
             taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
             selectTr = event.target.closest('tr').previousElementSibling;
+        }
+
+        if (taskTr.hasAttribute('data-new')){
+            taskTr.remove();
+            selectTr.remove();
+
+            return;
         }
 
         let taskId = taskTr.dataset.taskid;
