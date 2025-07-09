@@ -56,7 +56,6 @@ export default class TaskController {
 
         task.save();
         LessonController.renderLesson();
-        console.log(task)
 
         return true;
     }
@@ -83,7 +82,6 @@ export default class TaskController {
         }
 
         if (!task.reoccuring && task.reoccuringInterval != '') task.reoccuringInterval = null;
-        console.log(task)
 
         task.update();
 
@@ -95,10 +93,12 @@ export default class TaskController {
         task.setInProgress();
     }
 
-    static setTaskDone(id) {
+    static async setTaskDone(id) {
         let task = Task.getTaskById(id);
 
         task.setDone();
+        this.renderTaskChanges();
+        LessonController.renderLesson();
     }
 
     static renderTaskChanges() {

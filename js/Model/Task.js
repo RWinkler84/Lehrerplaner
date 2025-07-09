@@ -50,6 +50,7 @@ export default class Task extends AbstractModel {
                 element.subject = this.subject;
                 element.timeslot = this.timeslot;
                 element.description = this.description;
+                element.status = this.status;
                 element.fixedTime = this.fixedTime;
                 element.reoccuring = this.reoccuring;
                 element.reoccuringInterval = this.reoccuringInterval;
@@ -118,7 +119,7 @@ export default class Task extends AbstractModel {
     }
 
     async setDone() {
-        if (this.reoccuring) {
+        if (this.reoccuring == true) {
             this.resetDateAccordingToInterval();
             return;
         }
@@ -133,7 +134,7 @@ export default class Task extends AbstractModel {
         if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
     }
 
-    resetDateAccordingToInterval() {
+    async resetDateAccordingToInterval() {
         let oldDate = new Date(this.date).setHours(12, 0, 0, 0);
 
         switch (this.#reoccuringInterval) {
@@ -146,7 +147,7 @@ export default class Task extends AbstractModel {
                 break;
 
             case 'monthly':
-                this.date = oldDate * 28;
+                this.date = oldDate + ONEDAY * 28;
                 break;
         }
         this.status = 'open';

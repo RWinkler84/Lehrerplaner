@@ -147,7 +147,6 @@ export default class TaskView extends AbstractView {
                         <td class="taskDescription" data-taskDescription="">${task.description}</td>
                         <td class="taskDone">
                             <button class="setTaskDoneButton">&#x2714;</button>
-                            <button class="setTaskInProgressButton">&#x279C;</button>                        
                         </td>
                     </tr>
                     <tr data-checkboxTr style="display: none;">
@@ -165,7 +164,7 @@ export default class TaskView extends AbstractView {
                     </tr>
                     <tr>
                         <td class="taskDone responsive" colspan="3">
-                            <button class="setTaskDoneButton">&#x2714;</button>
+                            <button class="setTaskDoneButton" style="width: 100%">&#x2714;</button>
                         </td>
                     </tr>
                 `;
