@@ -25,7 +25,8 @@
         <div id="timetableContainer">
             <div class="flex doubleGap spaceBetween" style="margin-bottom: 1rem;">
                 <div id="calendarWeek" class="flex alignCenter">
-                    <h2><span id="wochenplanText">Wochenplan</span> KW <span id="calendarWeekCounter" data-split_first_week="false">-</span></h2>
+                    <h2><span id="wochenplanText">Wochenplan</span> KW <span id="calendarWeekCounter"
+                            data-split_first_week="false">-</span></h2>
                     <div id="isCurrentWeekDot"></div>
                 </div>
                 <div class="flex gap">
@@ -164,7 +165,8 @@
                 <table id="upcomingTasksTable">
                     <thead>
                         <tr>
-                            <th>Kl.</th>
+                            <th class="taskAdditionalInfo"></th>
+                            <th class="taskClassName">Kl.</th>
                             <th>Fach</th>
                             <th class="taskDescription">Beschreibung</th>
                             <th class="taskDone"></th>
@@ -192,7 +194,8 @@
                     <table id="inProgressTasksTable">
                         <thead>
                             <tr>
-                                <th>Kl.</th>
+                                <th class="taskAdditionalInfo"></th>
+                                <th class="taskClassName">Kl.</th>
                                 <th>Fach</th>
                                 <th class="taskDescription">Beschreibung</th>
                                 <th class="taskDone"></th>
@@ -506,7 +509,8 @@
                     </table>
                 </div>
                 <div class="marginTop flex justifyEnd">
-                <button id="closeLessonChangesAndTasksToKeepDialogButton" class="confirmationButton">Erledigt</button>
+                    <button id="closeLessonChangesAndTasksToKeepDialogButton"
+                        class="confirmationButton">Erledigt</button>
                 </div>
             </div>
         </div>

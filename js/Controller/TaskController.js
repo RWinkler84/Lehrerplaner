@@ -85,6 +85,8 @@ export default class TaskController {
 
         task.update();
 
+        this.renderTaskChanges();
+
         return true;
     }
 

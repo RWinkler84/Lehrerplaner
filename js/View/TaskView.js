@@ -2,7 +2,6 @@ import AbstractView from './AbstractView.js';
 import Controller from '../Controller/TaskController.js';
 import Fn from '../inc/utils.js';
 import { allTasksArray } from '../index.js';
-import Task from '../Model/Task.js';
 
 export default class TaskView extends AbstractView {
 
@@ -29,6 +28,7 @@ export default class TaskView extends AbstractView {
             let fixedTimeChecked = task.fixedTime == '1' ? 'checked' : '';
             let reoccuringChecked = task.reoccuring == '1' ? 'checked' : '';
             let subjectDate = Fn.formatDate(task.date);
+            let additionalInfo = this.getAdditionalInfoHTML(task);
             let reoccuringIntervalSelect = `
                 <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
                     <option value="">-</option>
@@ -46,7 +46,8 @@ export default class TaskView extends AbstractView {
 
             taskTrHTML += `
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
-                        <td ${borderLeft} data-class="${task.class}">${task.class}</td>
+                        <td class="taskAdditionalInfo" ${borderLeft}>${additionalInfo}</td>
+                        <td class="taskClassName" data-class="${task.class}">${task.class}</td>
                         <td class="taskSubjectContainer" data-subject="${task.subject}">
                             <div class="taskSubject">${task.subject}</div>
                             <div class="smallDate">${subjectDate}</div>
@@ -58,7 +59,7 @@ export default class TaskView extends AbstractView {
                         </td>
                     </tr>
                     <tr data-checkboxTr style="display: none;">
-                        <td colspan="4" style="border-right: none;">
+                        <td colspan="5" style="border-right: none;">
                             <div class="flex doubleGap">
                                 <div>
                                     <label><input type="checkbox" name="fixedDate" ${fixedTimeChecked}>fester Termin?</label>
@@ -71,7 +72,7 @@ export default class TaskView extends AbstractView {
                         </td>
                     </tr>
                     <tr>
-                        <td class="taskDone responsive" colspan="3">
+                        <td class="taskDone responsive" colspan="4">
                             <button class="setTaskDoneButton">&#x2714;</button>
                             <button class="setTaskInProgressButton">&#x279C;</button>                        
                         </td>
@@ -121,6 +122,7 @@ export default class TaskView extends AbstractView {
             let borderLeft = 'style="border-left: 3px solid transparent;"';
             let fixedTimeChecked = task.fixedTime == '1' ? 'checked' : '';
             let reoccuringChecked = task.reoccuring == '1' ? 'checked' : '';
+            let additionalInfo = this.getAdditionalInfoHTML(task);
             let subjectDate = Fn.formatDate(task.date);
             let reoccuringIntervalSelect = `
                 <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
@@ -139,7 +141,8 @@ export default class TaskView extends AbstractView {
 
             taskTrHTML += `
                     <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
-                        <td ${borderLeft} data-class="${task.class}">${task.class}</td>
+                        <td class="taskAdditionalInfo" ${borderLeft}>${additionalInfo}</td>
+                        <td class="taskClassName" data-class="${task.class}">${task.class}</td>
                         <td class="taskSubjectContainer" data-subject="${task.subject}">
                             <div class="taskSubject">${task.subject}</div>
                             <div class="smallDate">${subjectDate}</div>
@@ -150,7 +153,7 @@ export default class TaskView extends AbstractView {
                         </td>
                     </tr>
                     <tr data-checkboxTr style="display: none;">
-                        <td colspan="4" style="border-right: none;">
+                        <td colspan="5" style="border-right: none;">
                             <div class="flex doubleGap">
                                 <div>
                                     <label><input type="checkbox" name="fixedDate" ${fixedTimeChecked}>fester Termin?</label>
@@ -163,7 +166,7 @@ export default class TaskView extends AbstractView {
                         </td>
                     </tr>
                     <tr>
-                        <td class="taskDone responsive" colspan="3">
+                        <td class="taskDone responsive" colspan="4">
                             <button class="setTaskDoneButton" style="width: 100%">&#x2714;</button>
                         </td>
                     </tr>
@@ -201,7 +204,8 @@ export default class TaskView extends AbstractView {
 
         let trContent = `
             <tr data-taskid="${id}" data-date="${date}" data-timeslot="${timeslot}" data-new>
-                <td data-class="${className}">${className}</td>
+                <td class="taskAdditionalInfo"></td>
+                <td class="taskClassName" data-class="${className}">${className}</td>
                 <td data-subject="${subject}"><div  class="taskSubject">${subject}</div></td>
                 <td class="taskDescription" data-taskDescription contenteditable></td>
                 <td class="taskDone">
@@ -210,7 +214,7 @@ export default class TaskView extends AbstractView {
                 </td>
             </tr>
             <tr data-checkboxTr data-new>
-                <td colspan="4" style="border-right: none;">
+                <td colspan="5" style="border-right: none;">
                     <div class="flex doubleGap">
                         <div>
                             <label><input type="checkbox" name="fixedDate" value="fixed">fester Termin?</label>
@@ -230,7 +234,7 @@ export default class TaskView extends AbstractView {
                 </td>
             </tr>
             <tr data-new>
-                <td class="taskDone responsive" colspan="3">
+                <td class="taskDone responsive" colspan="4">
                     <button class="saveNewTaskButton">&#x2714;</button>
                     <button class="discardNewTaskButton">&#x2718;</button>
                 </td>
@@ -311,6 +315,14 @@ export default class TaskView extends AbstractView {
         return reoccuringIntervalSelect;
     }
 
+    static getAdditionalInfoHTML(task) {
+        let additionalInfoHTML = '';
+
+        if (task.reoccuring == true) additionalInfoHTML = '&#x27F3;';
+
+        return additionalInfoHTML;
+    }
+
     static toggleReoccuringIntervalSelect(event) {
 
         let selectInput = event.target.closest('div').querySelector('select');
@@ -369,17 +381,17 @@ export default class TaskView extends AbstractView {
             'reoccuringInterval': taskTr.nextElementSibling.querySelector('select').value
         }
 
-        if (Controller.updateTask(taskData, event)) {
-            TaskView.#removeEditability(event);
-            TaskView.#createSetDoneOrInProgressButtons(event);
-            taskTr.nextElementSibling.style.display = 'none';
-        }
+        Controller.updateTask(taskData, event);
     }
 
     static makeEditable(event) {
 
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
         if (event.target.isContentEditable) return;
+
+        //check for other editable tasks and revert the changes
+        let editableTasks = document.querySelector('td[contenteditable]');
+        if (editableTasks && event.target.closest('tr')) TaskView.revertChanges({target: editableTasks});
 
         this.#backupTaskData(event);
 
@@ -423,7 +435,6 @@ export default class TaskView extends AbstractView {
             }
         };
 
-
         buttonWrapper.closest('tr').removeAttribute('data-new');
         buttonWrapperSibling.closest('tr').removeAttribute('data-new');
         fixedDateTr().removeAttribute('data-new');
@@ -459,7 +470,7 @@ export default class TaskView extends AbstractView {
 
         let taskId = taskTr.dataset.taskid;
         let task = Controller.getTaskBackupData(taskId);
-        let taskDate = Fn.formatDate(task.date)
+        let taskDate = Fn.formatDate(task.date);
 
         taskTr.querySelector('td[data-class]').innerText = task.class;
         taskTr.querySelector('td[data-subject]').innerHTML = `<div class="taskSubject">${task.subject}</div><div class="smallDate">${taskDate}</div>`;
@@ -520,7 +531,7 @@ export default class TaskView extends AbstractView {
     }
 
     static #createSetDoneOrInProgressButtons(event) {
-        let buttonWrapper = event.target.closest('td');
+        let buttonWrapper = event.target.closest('tr').lastElementChild;
         let buttonWrapperSibling = TaskView.#getButtonWrapperSibling(buttonWrapper);
 
         let buttonHTML = `

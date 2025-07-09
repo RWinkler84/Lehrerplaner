@@ -408,6 +408,17 @@ dialog .errorMessageDisplay {
     border-right: none;
 }
 
+.taskAdditionalInfo {
+    min-width: 1rem !important;
+    width: 1rem !important;
+    padding: 0 0 0 0.25rem !important;
+    border-right: none !important;
+}
+
+.taskClassName {
+    padding-left: 0.5rem !important;
+}
+
 .taskSubject {
     max-width: 4rem;
     overflow: hidden;
@@ -427,6 +438,10 @@ dialog .errorMessageDisplay {
     gap: 0.5rem;
     justify-content: center;
     vertical-align: center;
+}
+
+.reoccuring::before {
+    content: "&#x27F3;";
 }
 
 tr[data-new] {
