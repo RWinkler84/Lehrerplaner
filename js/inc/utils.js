@@ -52,6 +52,7 @@ export default class Utils {
     }
 
     static formatDate(date) {
+        date = new Date(date);
         let formatter = new Intl.DateTimeFormat('de-DE', {
             month: '2-digit',
             day: '2-digit'

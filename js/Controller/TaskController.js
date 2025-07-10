@@ -129,5 +129,8 @@ export default class TaskController {
 
         if (event.target.classList.contains('setTaskDoneButton')) View.setTaskDone(event);
         if (event.target.classList.contains('setTaskInProgressButton')) View.setTaskInProgress(event);
+        if (event.target.classList.contains('discardUpdateTaskButton')) View.revertChanges(event);
+        if (event.target.classList.contains('saveNewTaskButton')) View.saveNewTask(event);
+        if (event.target.classList.contains('discardNewTaskButton')) View.removeTaskForm(event);
     }
 }

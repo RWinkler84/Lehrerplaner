@@ -101,10 +101,6 @@ export default class TaskView extends AbstractView {
 
         inProgressTasksTableBody.append(tableBodyFragment);
 
-        //buttons
-        inProgressTasksTableBody.querySelectorAll('.setTaskDoneButton').forEach(button => button.addEventListener('click', TaskView.setTaskDone))
-        inProgressTasksTableBody.querySelectorAll('input[name="reoccuringTask"]').forEach(checkbox => checkbox.addEventListener('change', TaskView.toggleReoccuringIntervalSelect))
-
         //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
         document.querySelectorAll('tr[data-checkboxtr]').forEach(tr => {
             tr.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
@@ -115,77 +111,58 @@ export default class TaskView extends AbstractView {
     static createTaskForm(event) {
 
         let lessonElement = event.target.closest('.lesson');
-        let id = Fn.generateId(allTasksArray);
-        let className = lessonElement.dataset.class;
-        let subject = lessonElement.dataset.subject;
-        let date = lessonElement.closest('.weekday').dataset.date;
-        let timeslot = lessonElement.closest('.timeslot').dataset.timeslot;
-
         let taskTable = document.querySelector('#upcomingTasksTable tbody');
 
+        let task = {
+            id: Fn.generateId(allTasksArray),
+            class: lessonElement.dataset.class,
+            subject: lessonElement.dataset.subject,
+            date: lessonElement.closest('.weekday').dataset.date,
+            timeslot: lessonElement.closest('.timeslot').dataset.timeslot,
+            description: ''
+        }
+
+        let checkBoxTR = this.getCheckboxTR();
+        let responsiveButtonTR = this.getResponsiveButtonTR('newTask');
+        let formTr = document.createElement('tr');
+
+        checkBoxTR.setAttribute('data-new', '');
+        responsiveButtonTR.setAttribute('data-new', '');
+        
+        formTr.setAttribute('data-new', '');
+        formTr.setAttribute('data-taskId', task.id);
+        formTr.setAttribute('data-date', task.date);
+        formTr.setAttribute('data-timeslot', task.timeslot);
+
+        formTr.innerHTML = this.getTaskTrHTML(task);
+        formTr.querySelector('.taskDescription').contentEditable = true;
+        formTr.querySelectorAll('.setTaskDoneButton').forEach(button => {
+            button.classList.remove('setTaskDoneButton');
+            button.classList.add('saveNewTaskButton');
+        });
+        formTr.querySelectorAll('.setTaskInProgressButton').forEach(button => {
+            button.classList.remove('setTaskInProgressButton');
+            button.classList.add('discardNewTaskButton');
+            button.innerHTML = '&#x2718;';
+        });
+
         let trContent = `
-            <tr data-taskid="${id}" data-date="${date}" data-timeslot="${timeslot}" data-new>
-                <td class="taskAdditionalInfo"></td>
-                <td class="taskClassName" data-class="${className}">${className}</td>
-                <td data-subject="${subject}"><div  class="taskSubject">${subject}</div></td>
-                <td class="taskDescription" data-taskDescription contenteditable></td>
-                <td class="taskDone">
                     <button class="saveNewTaskButton">&#x2714;</button>
                     <button class="discardNewTaskButton">&#x2718;</button>
-                </td>
-            </tr>
-            <tr data-checkboxTr data-new>
-                <td colspan="5" style="border-right: none;">
-                    <div class="flex doubleGap">
-                        <div>
-                            <label><input type="checkbox" name="fixedDate" value="fixed">fester Termin?</label>
-                        </div>
-                        <div class="flex">
-                            <label><input type="checkbox" name="reoccuringTask" value="reoccuring">wiederholen?</label>
-                            <div class="alertRing">
-                                <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
-                                    <option value="" selected>-</option>
-                                    <option value="weekly">wöchentlich</option>
-                                    <option value="biweekly">zweiwöchentlich</option>
-                                    <option value="monthly">monatlich</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr data-new>
-                <td class="taskDone responsive" colspan="4">
-                    <button class="saveNewTaskButton">&#x2714;</button>
-                    <button class="discardNewTaskButton">&#x2718;</button>
-                </td>
-            </tr>
         `;
 
-        taskTable.innerHTML += trContent;
+        taskTable.append(formTr);
+        taskTable.append(checkBoxTR);
+        taskTable.append(responsiveButtonTR);
+
         if (taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
             taskTable.parentElement.querySelector('thead').removeAttribute('style');
             taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display = 'none';
         }
 
-        // button event listeners
-        taskTable.querySelectorAll('tr[data-new]').forEach((tr) => {
-            if (tr.hasAttribute('data-checkboxTr')) {
-                tr.querySelector('input[name="reoccuringTask"]').addEventListener('change', TaskView.toggleReoccuringIntervalSelect);
-                return;
-            }
-            tr.querySelector('.saveNewTaskButton').addEventListener('click', TaskView.saveNewTask);
-            tr.querySelector('.discardNewTaskButton').addEventListener('click', TaskView.removeTaskForm);
-        });
-
         //make sure that the last task description field added gets the focus
         let newTaskDescriptionTds = taskTable.querySelectorAll('tr[data-new] td[data-taskDescription]');
         newTaskDescriptionTds[newTaskDescriptionTds.length - 1].focus();
-
-        //make all tasks editable again
-        document.querySelectorAll('#taskContainer td').forEach((td) => {
-            td.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
-        });
     }
 
     static getTaskTrHTML(task) {
