@@ -413,6 +413,11 @@ dialog .errorMessageDisplay {
     width: 1rem !important;
     padding: 0 0 0 0.25rem !important;
     border-right: none !important;
+    border-left: 3px solid transparent !important;
+}
+
+.taskAdditionalInfo.overdue {
+    border-left: solid 3px var(--matteRed) !important;
 }
 
 .taskClassName {

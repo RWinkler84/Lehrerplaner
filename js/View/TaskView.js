@@ -12,7 +12,6 @@ export default class TaskView extends AbstractView {
     static renderUpcomingTasks() {
         let allUpcomingTasks = Controller.getAllOpenTasks();
         let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
-        let taskTrHTML = '';
 
         if (allUpcomingTasks.length == 0) {
             document.querySelector('#upcomingTasksTable thead').style.display = 'none';
@@ -21,76 +20,33 @@ export default class TaskView extends AbstractView {
             return;
         }
 
+        let tableBodyFragment = document.createDocumentFragment();
+        let responsiveButtonTR = this.getResponsiveButtonTR('upcomingTask');
+        let checkBoxTR = this.getCheckboxTR();
+
         allUpcomingTasks = Fn.sortByDateAndTimeslot(allUpcomingTasks);
 
         allUpcomingTasks.forEach((task) => {
-            let borderLeft = 'style="border-left: 3px solid transparent;"';
-            let fixedTimeChecked = task.fixedTime == '1' ? 'checked' : '';
-            let reoccuringChecked = task.reoccuring == '1' ? 'checked' : '';
-            let subjectDate = Fn.formatDate(task.date);
-            let additionalInfo = this.getAdditionalInfoHTML(task);
-            let reoccuringIntervalSelect = `
-                <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
-                    <option value="">-</option>
-                    <option value="weekly">wöchentlich</option>
-                    <option value="biweekly">zweiwöchentlich</option>
-                    <option value="monthly">monatlich</option>
-                </select>
-                `;
+            let taskTr = document.createElement('tr');
+            let checkBoxTrClone = checkBoxTR.cloneNode(true);
+            let responsiveButtonTRClone = responsiveButtonTR.cloneNode(true);
 
-            if (new Date(task.date) < new Date()) {
-                borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
-            }
+            if (task.fixedTime == '1') checkBoxTrClone.querySelector('input[name="fixedDate"]').checked = true;
+            if (task.reoccuring == '1') checkBoxTrClone.querySelector('input[name="reoccuringTask"]').checked = true;
 
-            if (task.reoccuringInterval) reoccuringIntervalSelect = this.getReoccuringIntervalSelectHTML(task);
+            taskTr.innerHTML = this.getTaskTrHTML(task);
+            taskTr.setAttribute('data-taskId', task.id);
+            taskTr.setAttribute('data-date', task.date);
+            taskTr.setAttribute('data-timeslot', task.timeslot);
 
-            taskTrHTML += `
-                    <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
-                        <td class="taskAdditionalInfo" ${borderLeft}>${additionalInfo}</td>
-                        <td class="taskClassName" data-class="${task.class}">${task.class}</td>
-                        <td class="taskSubjectContainer" data-subject="${task.subject}">
-                            <div class="taskSubject">${task.subject}</div>
-                            <div class="smallDate">${subjectDate}</div>
-                        </td>
-                        <td class="taskDescription" data-taskDescription="">${task.description}</td>
-                        <td class="taskDone">
-                            <button class="setTaskDoneButton">&#x2714;</button>
-                            <button class="setTaskInProgressButton">&#x279C;</button>                        
-                        </td>
-                    </tr>
-                    <tr data-checkboxTr style="display: none;">
-                        <td colspan="5" style="border-right: none;">
-                            <div class="flex doubleGap">
-                                <div>
-                                    <label><input type="checkbox" name="fixedDate" ${fixedTimeChecked}>fester Termin?</label>
-                                </div>
-                                <div class="flex">
-                                    <label><input type="checkbox" name="reoccuringTask" ${reoccuringChecked}>wiederholen?</label>
-                                    <div class="alertRing">${reoccuringIntervalSelect}</div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="taskDone responsive" colspan="4">
-                            <button class="setTaskDoneButton">&#x2714;</button>
-                            <button class="setTaskInProgressButton">&#x279C;</button>                        
-                        </td>
-                    </tr>
-                `;
+            if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
+
+            tableBodyFragment.append(taskTr);
+            tableBodyFragment.append(checkBoxTrClone);
+            tableBodyFragment.append(responsiveButtonTRClone);
         });
 
-        upcomingTasksTableBody.innerHTML = taskTrHTML;
-
-        //buttons
-        upcomingTasksTableBody.querySelectorAll('.setTaskDoneButton').forEach(button => button.addEventListener('click', TaskView.setTaskDone));
-        upcomingTasksTableBody.querySelectorAll('.setTaskInProgressButton').forEach(button => button.addEventListener('click', TaskView.setTaskInProgress));
-        upcomingTasksTableBody.querySelectorAll('input[name="reoccuringTask"]').forEach(checkbox => checkbox.addEventListener('change', TaskView.toggleReoccuringIntervalSelect))
-
-        //make editable
-        upcomingTasksTableBody.querySelectorAll('#taskContainer tr[data-taskid]').forEach((tr) => {
-            tr.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
-        });
+        upcomingTasksTableBody.append(tableBodyFragment);
 
         //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
         document.querySelectorAll('tr[data-checkboxtr]').forEach(tr => {
@@ -102,7 +58,6 @@ export default class TaskView extends AbstractView {
     static renderInProgressTasks() {
         let allInProgressTasks = Controller.getAllInProgressTasks();
         let inProgressTasksTableBody = document.querySelector('#inProgressTasksTable tbody');
-        let taskTrHTML = '';
 
         if (allInProgressTasks.length == 0) {
             document.querySelector('#inProgressTasksTable thead').style.display = 'none';
@@ -116,73 +71,39 @@ export default class TaskView extends AbstractView {
             document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'none';
         }
 
+        let tableBodyFragment = document.createDocumentFragment();
+        let responsiveButtonTR = this.getResponsiveButtonTR('upcomingTask');
+        let checkBoxTR = this.getCheckboxTR();
+
         allInProgressTasks = Fn.sortByDateAndTimeslot(allInProgressTasks);
 
         allInProgressTasks.forEach((task) => {
-            let borderLeft = 'style="border-left: 3px solid transparent;"';
-            let fixedTimeChecked = task.fixedTime == '1' ? 'checked' : '';
-            let reoccuringChecked = task.reoccuring == '1' ? 'checked' : '';
-            let additionalInfo = this.getAdditionalInfoHTML(task);
-            let subjectDate = Fn.formatDate(task.date);
-            let reoccuringIntervalSelect = `
-                <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
-                    <option value="">-</option>
-                    <option value="weekly">wöchentlich</option>
-                    <option value="biweekly">zweiwöchentlich</option>
-                    <option value="monthly">monatlich</option>
-                </select>
-                `;
+            let taskTr = document.createElement('tr');
+            let checkBoxTrClone = checkBoxTR.cloneNode(true);
+            let responsiveButtonTRClone = responsiveButtonTR.cloneNode(true);
 
-            if (new Date(task.date) < new Date()) {
-                borderLeft = 'style="border-left: solid 3px var(--matteRed)"'
-            }
+            if (task.fixedTime == '1') checkBoxTrClone.querySelector('input[name="fixedDate"]').checked = true;
+            if (task.reoccuring == '1') checkBoxTrClone.querySelector('input[name="reoccuringTask"]').checked = true;
 
-            if (task.reoccuringInterval) reoccuringIntervalSelect = this.getReoccuringIntervalSelectHTML(task);
+            taskTr.innerHTML = this.getTaskTrHTML(task);
+            taskTr.setAttribute('data-taskId', task.id);
+            taskTr.setAttribute('data-date', task.date);
+            taskTr.setAttribute('data-timeslot', task.timeslot);
 
-            taskTrHTML += `
-                    <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
-                        <td class="taskAdditionalInfo" ${borderLeft}>${additionalInfo}</td>
-                        <td class="taskClassName" data-class="${task.class}">${task.class}</td>
-                        <td class="taskSubjectContainer" data-subject="${task.subject}">
-                            <div class="taskSubject">${task.subject}</div>
-                            <div class="smallDate">${subjectDate}</div>
-                        </td>
-                        <td class="taskDescription" data-taskDescription="">${task.description}</td>
-                        <td class="taskDone">
-                            <button class="setTaskDoneButton">&#x2714;</button>
-                        </td>
-                    </tr>
-                    <tr data-checkboxTr style="display: none;">
-                        <td colspan="5" style="border-right: none;">
-                            <div class="flex doubleGap">
-                                <div>
-                                    <label><input type="checkbox" name="fixedDate" ${fixedTimeChecked}>fester Termin?</label>
-                                </div>
-                                <div class="flex">
-                                    <label><input type="checkbox" name="reoccuringTask" ${reoccuringChecked}>wiederholen?</label>
-                                    <div class="alertRing">${reoccuringIntervalSelect}</div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="taskDone responsive" colspan="4">
-                            <button class="setTaskDoneButton" style="width: 100%">&#x2714;</button>
-                        </td>
-                    </tr>
-                `;
+            taskTr.querySelector('.setTaskInProgressButton').remove();
+
+            if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
+
+            tableBodyFragment.append(taskTr);
+            tableBodyFragment.append(checkBoxTrClone);
+            tableBodyFragment.append(responsiveButtonTRClone);
         });
 
-        inProgressTasksTableBody.innerHTML = taskTrHTML;
+        inProgressTasksTableBody.append(tableBodyFragment);
 
         //buttons
         inProgressTasksTableBody.querySelectorAll('.setTaskDoneButton').forEach(button => button.addEventListener('click', TaskView.setTaskDone))
         inProgressTasksTableBody.querySelectorAll('input[name="reoccuringTask"]').forEach(checkbox => checkbox.addEventListener('change', TaskView.toggleReoccuringIntervalSelect))
-
-        //make editable
-        inProgressTasksTableBody.querySelectorAll('#taskContainer tr[data-taskid]').forEach((tr) => {
-            tr.addEventListener('dblclick', (event) => TaskView.makeEditable(event));
-        });
 
         //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
         document.querySelectorAll('tr[data-checkboxtr]').forEach(tr => {
@@ -267,52 +188,89 @@ export default class TaskView extends AbstractView {
         });
     }
 
-    static getReoccuringIntervalSelectHTML(task) {
-        let reoccuringIntervalSelect;
+    static getTaskTrHTML(task) {
+        let subjectDate = Fn.formatDate(task.date);
+        let additionalInfo = this.getAdditionalInfoHTML(task);
 
-        switch (task.reoccuringInterval) {
-            case 'weekly':
-                reoccuringIntervalSelect = `
-                        <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect">
-                            <option value="weekly" selected>wöchentlich</option>
-                            <option value="biweekly">zweiwöchentlich</option>
-                            <option value="monthly">monatlich</option>
-                        </select>
-                    `;
+        return `
+            <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
+                <td class="taskAdditionalInfo">${additionalInfo}</td>
+                <td class="taskClassName" data-class="${task.class}">${task.class}</td>
+                <td class="taskSubjectContainer" data-subject="${task.subject}">
+                    <div class="taskSubject">${task.subject}</div>
+                    <div class="smallDate">${subjectDate}</div>
+                </td>
+                <td class="taskDescription" data-taskDescription="">${task.description}</td>
+                <td class="taskDone">
+                    <button class="setTaskDoneButton">&#x2714;</button>
+                    <button class="setTaskInProgressButton">&#x279C;</button>                        
+                </td>
+            </tr>
+            `;
+    }
+
+    static getCheckboxTR() {
+        let checkboxTr = document.createElement('tr');
+
+        checkboxTr.style.display = 'none';
+        checkboxTr.setAttribute('data-checkboxTr', '');
+        checkboxTr.innerHTML = `
+            <td colspan="5" style="border-right: none;">
+                <div class="flex doubleGap">
+                    <div>
+                        <label><input type="checkbox" name="fixedDate" value="fixed">fester Termin?</label>
+                    </div>
+                    <div class="flex">
+                        <label><input type="checkbox" name="reoccuringTask" value="reoccuring">wiederholen?</label>
+                        <div class="alertRing">
+                            <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
+                                <option value="" selected>-</option>
+                                <option value="weekly">wöchentlich</option>
+                                <option value="biweekly">zweiwöchentlich</option>
+                                <option value="monthly">monatlich</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        `;
+
+        return checkboxTr;
+    }
+
+    static getResponsiveButtonTR(whereToUse) {
+        let buttonTR = document.createElement('tr');
+        let htmlContent = '';
+
+        switch (whereToUse) {
+            case 'upcomingTask':
+                htmlContent = `
+                    <td class="taskDone responsive" colspan="4">
+                        <button class="setTaskDoneButton">&#x2714;</button>
+                        <button class="setTaskInProgressButton">&#x279C;</button>                        
+                    </td>
+                `;
                 break;
 
-            case 'biweekly':
-                reoccuringIntervalSelect = `
-                        <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect">
-                            <option value="weekly">wöchentlich</option>
-                            <option value="biweekly" selected>zweiwöchentlich</option>
-                            <option value="monthly">monatlich</option>
-                        </select>
-                    `;
+            case 'inProgressTask':
+                htmlContent = `
+                    <td class="taskDone responsive" colspan="4">
+                        <button class="setTaskDoneButton" style="width: 100%">&#x2714;</button>
+                    </td>
+                `;
                 break;
-
-            case 'monthly':
-                reoccuringIntervalSelect = `
-                        <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect">
-                            <option value="weekly">wöchentlich</option>
-                            <option value="biweekly">zweiwöchentlich</option>
-                            <option value="monthly" selected>monatlich</option>
-                        </select>
-                    `;
-                break;
-
-            default:
-                reoccuringIntervalSelect = `
-                        <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect">
-                            <option value="" selected>-</option>
-                            <option value="weekly">wöchentlich</option>
-                            <option value="biweekly">zweiwöchentlich</option>
-                            <option value="monthly">monatlich</option>
-                        </select>
-                    `;
+            case 'newTask':
+                htmlContent = `
+                    <td class="taskDone responsive" colspan="4">
+                        <button class="saveNewTaskButton">&#x2714;</button>
+                        <button class="discardNewTaskButton">&#x2718;</button>
+                    </td>
+                `;
         }
 
-        return reoccuringIntervalSelect;
+        buttonTR.innerHTML = htmlContent;
+
+        return buttonTR;
     }
 
     static getAdditionalInfoHTML(task) {
@@ -462,7 +420,7 @@ export default class TaskView extends AbstractView {
             selectTr = event.target.closest('tr').previousElementSibling;
         }
 
-        if (taskTr.hasAttribute('data-new')){
+        if (taskTr.hasAttribute('data-new')) {
             taskTr.remove();
             selectTr.remove();
 
@@ -477,7 +435,7 @@ export default class TaskView extends AbstractView {
         taskTr.querySelector('td[data-subject]').innerHTML = `<div class="taskSubject">${task.subject}</div><div class="smallDate">${taskDate}</div>`;
         taskTr.querySelector('td[data-taskDescription]').innerHTML = task.description;
 
-        selectTr.querySelector('input[name="fixedDate"]').checked = task.fixedTime == 1 ? true: false;
+        selectTr.querySelector('input[name="fixedDate"]').checked = task.fixedTime == 1 ? true : false;
         selectTr.querySelector('input[name="reoccuringTask"]').checked = task.reoccuring == 1 ? true : false;
         selectTr.querySelector('.alertRing').innerHTML = TaskView.getReoccuringIntervalSelectHTML(task);
 
@@ -486,6 +444,7 @@ export default class TaskView extends AbstractView {
     }
 
     static setTaskInProgress(event) {
+        console.log(event.target);
 
         let taskId = event.target.closest('tr').dataset.taskid;
 

@@ -115,4 +115,19 @@ export default class TaskController {
         LessonController.renderLesson();
     }
 
+    static tasksTableEventHandler(event) {
+
+        if (event.type == 'dblclick') {
+            View.makeEditable(event);
+            return;
+        }
+
+        if (event.type == 'change') {
+            View.toggleReoccuringIntervalSelect(event);
+            return;
+        }
+
+        if (event.target.classList.contains('setTaskDoneButton')) View.setTaskDone(event);
+        if (event.target.classList.contains('setTaskInProgressButton')) View.setTaskInProgress(event);
+    }
 }
