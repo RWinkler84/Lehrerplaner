@@ -12,8 +12,6 @@ class Task extends AbstractModel
     {
         $taskData = $this->preprocessDataToWrite($taskData);
 
-        error_log(print_r($taskData, true));
-
         $query = "INSERT INTO $this->tableName 
             (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval) 
             VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval)";

@@ -20,8 +20,6 @@ class TaskController extends AbstractController
     {
         $taskData = json_decode(file_get_contents('php://input'), true);
 
-        error_log(print_r($taskData, true));
-
         $result = $this->model->save($taskData);
 
         echo json_encode($result);
