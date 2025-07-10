@@ -218,8 +218,8 @@ class AbstractModel
                 if (isset($data['id'])) $data['itemId'] = $data['id'];
                 if (isset($data['lastEdited'])) $data['lastEdited'] = (new DateTime($data['lastEdited']))->modify('+2 hours')->format('Y-m-d H:i:s');
 
-                if ($data['fixedTime'] == '') $data['fixedTime'] = 0;
-                if ($data['reoccuring'] == '') $data['reoccuring'] = 0;
+                if (isset($data['fixedTime']) && $data['fixedTime'] == '') $data['fixedTime'] = 0;
+                if (isset($data['reoccuring']) && $data['reoccuring'] == '') $data['reoccuring'] = 0;
 
                 unset($data['id']);
                 if (isset($data['synced'])) unset($data['synced']);
@@ -231,8 +231,8 @@ class AbstractModel
             if (isset($dataArray['id'])) $dataArray['itemId'] = $dataArray['id'];
             if (isset($dataArray['lastEdited'])) $dataArray['lastEdited'] = (new DateTime($dataArray['lastEdited']))->modify('+2 hours')->format('Y-m-d H:i:s');
 
-            if ($dataArray['fixedTime'] == '') $dataArray['fixedTime'] = 0;
-            if ($dataArray['reoccuring'] == '') $dataArray['reoccuring'] = 0;
+            if (isset($dataArray['fixedTime']) && $dataArray['fixedTime'] == '') $dataArray['fixedTime'] = 0;
+            if (isset($dataArray['reoccuring']) && $dataArray['reoccuring'] == '') $dataArray['reoccuring'] = 0;
 
             unset($dataArray['id']);
             if (isset($dataArray['synced'])) unset($dataArray['synced']);
