@@ -151,7 +151,7 @@ class User extends AbstractModel
                 Du hast erfolgreich einen Account bei Lehrerplaner angelegt. Um ihn nutzen zu können, musst du deine E-Mail-Adresse bestätigen.
                 Klicke dazu nachfolgenden Link: <br>
                 <br>
-                $mailConfirmationLink
+                <a href="$mailConfirmationLink">$mailConfirmationLink</a>
             MAIL;
 
         return $this->sendMail($this->getEmail(), $mailSubject, $mailMessage);
@@ -169,7 +169,7 @@ class User extends AbstractModel
                 <br>
                 Um ein neues Passwort anzulegen, klicke folgenden Link. Der Link ist eine Stunde gültig.<br>
                 <br>
-                $passwordResetLink
+                <a href="$passwordResetLink">$passwordResetLink</a>
             MAIL;
 
             return $this->sendMail($user->getEmail(), $mailSubject, $mailMessage);

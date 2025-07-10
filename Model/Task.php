@@ -10,10 +10,6 @@ class Task extends AbstractModel
 
     public function save($taskData)
     {
-        if ($taskData['fixedTime'] == '') {
-            $taskData['fixedTime'] = 0;
-        }
-
         $taskData = $this->preprocessDataToWrite($taskData);
 
         $query = "INSERT INTO $this->tableName 
@@ -24,14 +20,6 @@ class Task extends AbstractModel
 
     public function update($taskData)
     {
-        if ($taskData['fixedTime'] == '') {
-            $taskData['fixedTime'] = 0;
-        }
-
-        if ($taskData['reoccuring'] == '') {
-            $taskData['reoccuring'] = 0;
-        }
-
         $taskData = $this->preprocessDataToWrite($taskData);
 
         $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval WHERE userId = :userId AND itemId=:itemId";

@@ -29,7 +29,7 @@ export default class Settings extends AbstractModel {
             if (allSubjects[i].id == id) {
                 let deletedSubject = allSubjects.splice(i, 1);
 
-                let result = await this.makeAjaxQuery('settings', 'deleteSubject', [{ 'id': id }]);
+                let result = await this.makeAjaxQuery('settings', 'deleteSubjects', [{ 'id': id }]);
 
                 if (result.status == 'failed') {
                     deletedSubject[0].lastEdited = new Date();
