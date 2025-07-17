@@ -85,14 +85,18 @@ export default class TaskController {
 
         task.update();
 
-        this.renderTaskChanges();
+        this.renderTaskChanges();            
+        View.removeEditability(event);
+        View.createSetDoneOrInProgressButtons(event);
 
         return true;
     }
 
-    static setTaskInProgress(taskId) {
+    static setTaskInProgress(taskId, event) {
         let task = Task.getTaskById(taskId);
         task.setInProgress();
+        this.renderTaskChanges();
+        View.createSetDoneOrInProgressButtons(event);
     }
 
     static async setTaskDone(id) {
@@ -104,8 +108,7 @@ export default class TaskController {
     }
 
     static renderTaskChanges() {
-        View.renderUpcomingTasks();
-        View.renderInProgressTasks();
+        View.rerenderTasks();
     }
 
     static reorderTasks(oldTimetable, oldTimetableChanges) {
@@ -116,21 +119,21 @@ export default class TaskController {
     }
 
     static tasksTableEventHandler(event) {
-
         if (event.type == 'dblclick') {
             View.makeEditable(event);
             return;
         }
 
-        if (event.type == 'change') {
+        if (event.type == 'change' && event.target.name == 'reoccuringTask') {
             View.toggleReoccuringIntervalSelect(event);
             return;
         }
 
         if (event.target.classList.contains('setTaskDoneButton')) View.setTaskDone(event);
         if (event.target.classList.contains('setTaskInProgressButton')) View.setTaskInProgress(event);
-        if (event.target.classList.contains('discardUpdateTaskButton')) View.revertChanges(event);
         if (event.target.classList.contains('saveNewTaskButton')) View.saveNewTask(event);
+        if (event.target.classList.contains('discardUpdateTaskButton')) View.revertChanges(event);
+        if (event.target.classList.contains('updateTaskButton')) View.updateTask(event);
         if (event.target.classList.contains('discardNewTaskButton')) View.removeTaskForm(event);
     }
 }

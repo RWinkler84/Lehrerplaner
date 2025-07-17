@@ -59,8 +59,8 @@ class Task extends AbstractModel
         $tasks = $this->preprocessDataToWrite($tasks);
 
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, lastEdited) 
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, lastEdited) 
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :lastEdited)
             ON DUPLICATE KEY UPDATE
                 date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
                 timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
@@ -69,6 +69,8 @@ class Task extends AbstractModel
                 description = IF (VALUES(lastEdited) > lastEdited, VALUES(description), description),
                 status = IF (VALUES(lastEdited) > lastEdited, VALUES(status), status),
                 fixedTime = IF (VALUES(lastEdited) > lastEdited, VALUES(fixedTime), fixedTime),
+                reoccuring = IF (VALUES(lastEdited) > lastEdited, VALUES(reoccuring), reoccuring),
+                reoccuringInterval = IF (VALUES(lastEdited) > lastEdited, VALUES(reoccuringInterval), reoccuringInterval),
                 lastEdited = IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
         ";
 
