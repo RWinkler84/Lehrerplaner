@@ -515,6 +515,7 @@ export default class TaskView extends AbstractView {
 
         selectTr.querySelector('input[name="fixedDate"]').checked = task.fixedTime == 1 ? true : false;
         selectTr.querySelector('input[name="reoccuringTask"]').checked = task.reoccuring == 1 ? true : false;
+        selectTr.querySelector('select[name="reoccuringIntervalSelect"]').disabled = task.reoccuring == 1 ? false : true;
         selectTr.querySelectorAll('option').forEach(option => {
             option.selected = false;
             if (option.value == task.reoccuringInterval) option.selected = true;
