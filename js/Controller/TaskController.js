@@ -99,11 +99,13 @@ export default class TaskController {
         View.createSetDoneOrInProgressButtons(event);
     }
 
-    static async setTaskDone(id) {
+    static async setTaskDone(id, event) {
         let task = Task.getTaskById(id);
 
         task.setDone();
         this.renderTaskChanges();
+
+        if (task.reoccuring == 1) View.createSetDoneOrInProgressButtons(event);
         LessonController.renderLesson();
     }
 

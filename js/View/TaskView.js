@@ -147,7 +147,13 @@ export default class TaskView extends AbstractView {
             allInProgressTaskIds.push(0) //the two zeros represent the checkbox and the responsive Button trs
         });
 
-        document.querySelectorAll('.taskList').forEach(taskList => taskList.querySelectorAll('tr').forEach(tr => allRenderedTaskTrs.push(tr)));
+        document.querySelectorAll('.taskList')
+            .forEach(taskList => taskList.querySelectorAll('tr')
+                .forEach(tr => {
+                    allRenderedTaskTrs.push(tr);
+                    tr.remove();
+                })
+            );
 
         allOpenTaskIds.forEach(taskId => {
             if (taskId == 0) return;
@@ -161,6 +167,16 @@ export default class TaskView extends AbstractView {
                     taskElement = element;
                     checkBoxElement = allRenderedTaskTrs[index + 1];
                     responsiveButtonElement = allRenderedTaskTrs[index + 2];
+
+                    //reoccuring tasks change their date after being set done, so the task element needs to be updated before reappending it
+                    if (checkBoxElement.querySelector('input[name="reoccuringTask"]').checked == true) {
+                        allOpenTasks.forEach(task => {
+                            if (task.id == taskId) {
+                                taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
+                                taskElement.dataset.date = task.date;
+                                }
+                        }) 
+                    }
                 }
             });
 
@@ -181,6 +197,13 @@ export default class TaskView extends AbstractView {
                     taskElement = element;
                     checkBoxElement = allRenderedTaskTrs[index + 1];
                     responsiveButtonElement = allRenderedTaskTrs[index + 2];
+
+                    //reoccuring tasks change their date after being set done, so the task element needs to be updated before reappending it
+                    if (checkBoxElement.querySelector('input[name="reoccuringTask"]').checked == true) {
+                        allInProgressTasks.forEach(task => {
+                            if (task.id == taskId) taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date)
+                        }) 
+                    }
                 }
             });
 
@@ -512,8 +535,7 @@ export default class TaskView extends AbstractView {
     static setTaskDone(event) {
         let taskId = event.target.closest('tr').dataset.taskid;
 
-        Controller.setTaskDone(taskId);
-        Controller.renderTaskChanges();
+        Controller.setTaskDone(taskId, event);
     }
 
     static #backupTaskData(event) {

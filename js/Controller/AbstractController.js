@@ -1,5 +1,6 @@
 import Model from "../Model/AbstractModel.js";
 import AbstractView from "../View/AbstractView.js";
+import SettingsView from "../View/SettingsView.js";
 
 export default class AbstractController {
 
