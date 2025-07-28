@@ -297,7 +297,7 @@ export default class TaskView extends AbstractView {
                     <div>
                         <label><input type="checkbox" name="fixedDate" value="fixed">fester Termin?</label>
                     </div>
-                    <div class="flex">
+                    <div class="flex reoccuringTaskContainer" >
                         <label><input type="checkbox" name="reoccuringTask" value="reoccuring">wiederholen?</label>
                         <div class="alertRing">
                             <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>

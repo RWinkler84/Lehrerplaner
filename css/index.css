@@ -445,8 +445,8 @@ dialog .errorMessageDisplay {
     vertical-align: center;
 }
 
-.reoccuring::before {
-    content: "&#x27F3;";
+.reoccuringTaskContainer {
+    flex-wrap: wrap;
 }
 
 tr[data-new] {
@@ -1054,12 +1054,10 @@ h3 {
 
     .taskDone.responsive {
         display: table-cell;
-        column-span: 4;
-        justify-content: space-around;
     }
 
     .taskDone.responsive button {
-        width: 48%;
+        width: 49%;
         margin: 0;
     }
 }
