@@ -50,9 +50,8 @@ class AbstractModel
                         $date = new DateTime($value);
                         $value = $date->format('Y-m-d');
                     }
-
-                    if (isset($key['validUntil']) && $key['validUntil'] === null) {
-                        $stmt->bindValue($key, $value, PDO::PARAM_NULL);
+                    if ($key == 'validUntil' && $value == 'null') {
+                        $stmt->bindValue($key, null, PDO::PARAM_NULL);
                     } else {
                         $stmt->bindValue($key, $value);
                     }
@@ -175,7 +174,9 @@ class AbstractModel
     {
         foreach ($data as $k => $dataset) {
             foreach ($dataset as $key => $value) {
-                $data[$k][$key] = htmlspecialchars($value);
+                if (!is_null($value)) {
+                    $data[$k][$key] = htmlspecialchars($value);
+                }
             }
         }
 

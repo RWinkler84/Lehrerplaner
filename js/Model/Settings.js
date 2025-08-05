@@ -89,6 +89,8 @@ export default class Settings extends AbstractModel {
             standardTimetable.push(lesson);
         })
 
+        console.log(lessons);
+
         let result = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
 
         if (result.status == 'failed') {
