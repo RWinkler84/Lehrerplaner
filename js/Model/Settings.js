@@ -66,7 +66,7 @@ export default class Settings extends AbstractModel {
         let timetableHasValidUntil = false;
         let validUntilDate = null;
 
-        for (let i = standardTimetable.length - 1; i > 0; i--) {
+        for (let i = standardTimetable.length - 1; i >= 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {
                 standardTimetable.splice(i, 1);
             }
