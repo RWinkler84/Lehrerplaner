@@ -102,45 +102,50 @@ export default class AbstractModel {
 
         //filters out regular lesson dates, that have been marked as canceled
         allLessonDates.forEach(lessonDate => {
-
             if (lessonDate.canceled == 'true') entriesToFilterOut.push(lessonDate);
         });
 
         entriesToFilterOut.forEach(lessonToRemove => {
-            for (let i = allLessonDates.length - 1; i >= 0; i--) {
+            //check whether all lesson dates must be removed or if one is still valid 
+            //(last entry for a given date and timeslot is not canceled)
+            let lastEntryOfLesson = null;
 
-                if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) == new Date(lessonToRemove.date).setHours(12, 0, 0, 0)
-                    && allLessonDates[i].timeslot == lessonToRemove.timeslot
+            for (let i = allLessonDates.length - 1; i >= 0; i--) {
+                if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) == new Date(lessonToRemove.date).setHours(12, 0, 0, 0) &&
+                    allLessonDates[i].timeslot == lessonToRemove.timeslot &&
+                    allLessonDates[i].canceled == 'false' &&
+                    lastEntryOfLesson === null
                 ) {
+                    lastEntryOfLesson = allLessonDates[i].canceled == 'false' ? allLessonDates[i] : 'false';
+                }
+            }
+
+            for (let i = allLessonDates.length - 1; i >= 0; i--) {
+                if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) == new Date(lessonToRemove.date).setHours(12, 0, 0, 0) &&
+                    allLessonDates[i].timeslot == lessonToRemove.timeslot
+                ) {
+                    //spare the last entry, if it is set and equal to the current entry in allLessonDates
+                    if (lastEntryOfLesson != allLessonDates[i])
                     allLessonDates.splice(i, 1);
                 }
             }
         });
 
-        //filters out lessons belonging to timetables that are not yet valid or not valid anymore
-
-        // not yet valid
+        // //filters out lessons belonging to timetables that are not yet valid or not valid anymore
         for (let i = allLessonDates.length - 1; i >= 0; i--) {
-            if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) < new Date(allLessonDates[i].validFrom).setHours(12, 0, 0, 0)) {
-                allLessonDates.splice(i, 1);
-            }
-        }
+            let lessonDate = new Date(allLessonDates[i].date).setHours(12, 0, 0, 0);
+            let validFromDate = new Date(allLessonDates[i].validFrom).setHours(12, 0, 0, 0);
+            let validUntilDate = new Date(allLessonDates[i].validUntil).setHours(12, 0, 0, 0);
 
-        //not valid anymore
-        for (let i = allLessonDates.length - 1; i >= 0; i--) {
-            if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) > new Date(allLessonDates[i].validUntil).setHours(12, 0, 0, 0)
-                && allLessonDates[i].validUntil != undefined
+            if (
+                lessonDate < validFromDate ||   //is not valid yet
+                (lessonDate > validUntilDate && allLessonDates[i].validUntil != undefined) || //not valid anymore
+                (allLessonDates[i].type == 'normal' && allLessonDates[i].canceled == 'false' && allLessonDates[i].source == 'timetableChanges') //duplicate
             ) {
                 allLessonDates.splice(i, 1);
             }
         }
 
-        //filters out duplicates
-        allLessonDates.forEach(lesson => {
-            if (lesson.type == 'normal' && lesson.canceled == 'false' && lesson.source == 'timetableChanges') {
-                allLessonDates.splice(allLessonDates.indexOf(lesson), 1);
-            }
-        })
     }
 
     formatDate(date) {

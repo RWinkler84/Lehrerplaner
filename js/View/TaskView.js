@@ -168,15 +168,13 @@ export default class TaskView extends AbstractView {
                     checkBoxElement = allRenderedTaskTrs[index + 1];
                     responsiveButtonElement = allRenderedTaskTrs[index + 2];
 
-                    //reoccuring tasks change their date after being set done, so the task element needs to be updated before reappending it
-                    if (checkBoxElement.querySelector('input[name="reoccuringTask"]').checked == true) {
-                        allOpenTasks.forEach(task => {
-                            if (task.id == taskId) {
-                                taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
-                                taskElement.dataset.date = task.date;
-                                }
-                        }) 
-                    }
+                    //task dates my change and need to be updated while reordering
+                    allOpenTasks.forEach(task => {
+                        if (task.id == taskId) {
+                            taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
+                            taskElement.dataset.date = task.date;
+                        }
+                    })
                 }
             });
 
@@ -198,12 +196,11 @@ export default class TaskView extends AbstractView {
                     checkBoxElement = allRenderedTaskTrs[index + 1];
                     responsiveButtonElement = allRenderedTaskTrs[index + 2];
 
-                    //reoccuring tasks change their date after being set done, so the task element needs to be updated before reappending it
-                    if (checkBoxElement.querySelector('input[name="reoccuringTask"]').checked == true) {
-                        allInProgressTasks.forEach(task => {
-                            if (task.id == taskId) taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date)
-                        }) 
-                    }
+                    //task dates my change and need to be updated while reordering
+                    allInProgressTasks.forEach(task => {
+                        if (task.id == taskId) taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
+                        taskElement.dataset.date = task.date;
+                    })
                 }
             });
 
