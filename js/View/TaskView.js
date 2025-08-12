@@ -173,6 +173,12 @@ export default class TaskView extends AbstractView {
                         if (task.id == taskId) {
                             taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
                             taskElement.dataset.date = task.date;
+
+                            if (new Date(task.date) < new Date()) {
+                                taskElement.querySelector('.taskAdditionalInfo').classList.add('overdue');
+                            } else {
+                                taskElement.querySelector('.taskAdditionalInfo').classList.remove('overdue');
+                            }
                         }
                     })
                 }
