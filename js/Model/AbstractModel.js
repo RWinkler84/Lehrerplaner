@@ -108,25 +108,15 @@ export default class AbstractModel {
         entriesToFilterOut.forEach(lessonToRemove => {
             //check whether all lesson dates must be removed or if one is still valid 
             //(last entry for a given date and timeslot is not canceled)
-            let lastEntryOfLesson = null;
-
-            for (let i = allLessonDates.length - 1; i >= 0; i--) {
-                if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) == new Date(lessonToRemove.date).setHours(12, 0, 0, 0) &&
-                    allLessonDates[i].timeslot == lessonToRemove.timeslot &&
-                    allLessonDates[i].canceled == 'false' &&
-                    lastEntryOfLesson === null
-                ) {
-                    lastEntryOfLesson = allLessonDates[i].canceled == 'false' ? allLessonDates[i] : 'false';
-                }
-            }
+            let lessonDateToKeep = this.checkForLessonToKeep(lessonToRemove, allLessonDates);
 
             for (let i = allLessonDates.length - 1; i >= 0; i--) {
                 if (new Date(allLessonDates[i].date).setHours(12, 0, 0, 0) == new Date(lessonToRemove.date).setHours(12, 0, 0, 0) &&
                     allLessonDates[i].timeslot == lessonToRemove.timeslot
                 ) {
                     //spare the last entry, if it is set and equal to the current entry in allLessonDates
-                    if (lastEntryOfLesson != allLessonDates[i])
-                    allLessonDates.splice(i, 1);
+                    if (lessonDateToKeep != allLessonDates[i])
+                        allLessonDates.splice(i, 1);
                 }
             }
         });
@@ -146,6 +136,25 @@ export default class AbstractModel {
             }
         }
 
+    }
+
+    //In some situations lessons can have multiple entries in allLessonDates, being canceled and reactiveted later on
+    //Canceled lessons need to be removed, but with reactivated once, the latest entry needs to be kept as it holds the final 
+    //cancelation state
+    //if a date must be kept, the function returns the lesson, else it returns false
+    static checkForLessonToKeep(lessonToRemove, allLessonDates) {
+        let lessonEntries = [];
+
+        allLessonDates.forEach(lesson => {
+            if (new Date(lesson.date).setHours(12, 0, 0, 0) != new Date(lessonToRemove.date).setHours(12,0,0,0)) return;
+            if (lesson.timeslot != lessonToRemove.timeslot) return;
+
+            lessonEntries.push(lesson);
+        })
+
+        if (lessonEntries.length != 0 && lessonEntries[lessonEntries.length - 1].canceled == 'false') return lessonEntries[lessonEntries.length -1];
+
+        return false;
     }
 
     formatDate(date) {
