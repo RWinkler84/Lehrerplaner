@@ -129,4 +129,72 @@ export default class SettingsController {
     static getAllSubjects() {
         return AbstractController.getAllSubjects();
     }
+
+        static settingsClickEventHandler(event) {
+        let target = event.target.id;
+
+        switch (target) {
+            //top menu
+            case 'openTimetableSettingsButton':
+                View.openTimetableSettings();
+                break;
+
+            case 'openAccountSettingsButton':
+                View.openAccountSettings();
+                break;
+
+            //timetable settings
+            case 'createSubjectButton':
+                View.saveSubject();
+                break;
+
+            case 'timetableBackwardButton':
+                View.changeDisplayedTimetable(event);
+                break;
+
+            case 'timetableForwardButton':
+                View.changeDisplayedTimetable(event);
+                break;
+
+            case 'createNewTimetableButton':
+                View.makeTimetableEditable();
+                break;
+
+            case 'saveNewTimetableButton':
+                View.saveNewTimetable();
+                break;
+
+            case 'discardNewTimetableButton':
+                View.discardNewTimetable();
+                break;
+
+            case 'editTimetableButton':
+                View.makeLessonsEditable();
+                break;
+
+            case 'saveTimetableChangesButton':
+                View.saveTimetableChanges();
+                break;
+
+            case 'discardTimetableChangesButton':
+                View.discardNewTimetable();
+                break;
+
+            //account settings
+            case 'deleteAccountButton':
+                View.toogleAccountDeletionMenu(event);
+                break;
+
+            case 'approveAccountDeletionButton':
+                SettingsController.deleteAccount();
+
+            case 'cancelAccountDeletionButton':
+                View.toogleAccountDeletionMenu(event);
+                break;
+
+            case 'cancelFailedAccountDeletionButton':
+                View.toogleAccountDeletionMenu(event);
+                break;
+        }
+    }
 }

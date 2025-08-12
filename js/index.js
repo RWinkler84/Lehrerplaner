@@ -84,7 +84,7 @@ async function startApp() {
     document.querySelector('#inProgressTasksTable tbody').addEventListener('change', TaskController.tasksTableEventHandler);
 
     //handlers for settings
-    document.querySelector('#settingsContainer').addEventListener('click', AbstractController.settingsClickEventHandler);
+    document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
     document.querySelector('#openSettingsButton').addEventListener('click', AbstractView.openSettings);
     document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
 
