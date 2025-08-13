@@ -331,6 +331,9 @@ export default class SettingsView {
         document.querySelector('#saveDiscardTimetableButtonContainer').style.display = 'none';
         document.querySelector('#saveDiscardTimetableChangesButtonContainer').style.display = 'none';
 
+        document.querySelector('#saveNewTimetableButton').removeAttribute('style');
+        document.querySelector('#noSubjectsAlertTooltip').removeAttribute('style');
+
         document.querySelector('#validFrom').style.display = 'inline';
         document.querySelector('#validFromPickerWrapper').style.display = 'none';
         document.querySelector('#validFromPickerWrapper').value = '';
@@ -465,6 +468,8 @@ export default class SettingsView {
 
         if (SettingsView.isAllSubjectsEmpty()) {
             SettingsView.alertTimetable(true);
+
+            document.querySelector('#saveNewTimetableButton').style.display = 'none';
 
             document.querySelectorAll('.settingsTimeslot').forEach((element) => {
                 element.innerHTML = '';

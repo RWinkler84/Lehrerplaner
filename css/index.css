@@ -418,6 +418,11 @@ dialog .errorMessageDisplay {
     width: 1rem !important;
     padding: 0 0 0 0.25rem !important;
     border-right: none !important;
+    border-left: 3px solid transparent !important;
+}
+
+.taskAdditionalInfo.overdue {
+    border-left: solid 3px var(--matteRed) !important;
 }
 
 .taskClassName {
@@ -445,8 +450,8 @@ dialog .errorMessageDisplay {
     vertical-align: center;
 }
 
-.reoccuring::before {
-    content: "&#x27F3;";
+.reoccuringTaskContainer {
+    flex-wrap: wrap;
 }
 
 tr[data-new] {
@@ -1128,12 +1133,10 @@ p {
 
     .taskDone.responsive {
         display: table-cell;
-        column-span: 4;
-        justify-content: space-around;
     }
 
     .taskDone.responsive button {
-        width: 48%;
+        width: 49%;
         margin: 0;
     }
 

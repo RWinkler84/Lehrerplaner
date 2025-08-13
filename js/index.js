@@ -4,11 +4,13 @@ import LessonView from './View/LessonView.js';
 import AbstractView from './View/AbstractView.js';
 import AbstractController from './Controller/AbstractController.js';
 import SettingsController from './Controller/SettingsController.js';
+import TaskController from './Controller/TaskController.js';
 import Fn from './inc/utils.js';
 
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
+export const TODAY = '2025-06-24';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
@@ -92,8 +94,16 @@ async function startApp() {
         label.addEventListener('mouseenter', AbstractView.removeAddLessonButton);
     })
 
+    //handler for task tables
+    document.querySelector('#upcomingTasksTable tbody').addEventListener('click', TaskController.tasksTableEventHandler);
+    document.querySelector('#inProgressTasksTable tbody').addEventListener('click', TaskController.tasksTableEventHandler);
+    document.querySelector('#upcomingTasksTable tbody').addEventListener('dblclick', TaskController.tasksTableEventHandler);
+    document.querySelector('#inProgressTasksTable tbody').addEventListener('dblclick', TaskController.tasksTableEventHandler);
+    document.querySelector('#upcomingTasksTable tbody').addEventListener('change', TaskController.tasksTableEventHandler);
+    document.querySelector('#inProgressTasksTable tbody').addEventListener('change', TaskController.tasksTableEventHandler);
+
     //handlers for settings
-    document.querySelector('#settingsContainer').addEventListener('click', AbstractView.settingsClickEventHandler);
+    document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
     document.querySelector('#openSettingsButton').addEventListener('click', AbstractView.openSettings);
     document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
 

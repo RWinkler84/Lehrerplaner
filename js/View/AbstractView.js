@@ -1,4 +1,4 @@
-import { allSubjects } from "../index.js";
+import { allSubjects, TODAY } from "../index.js";
 import Fn from '../inc/utils.js';
 import SettingsView from "./SettingsView.js";
 import SettingsController from "../Controller/SettingsController.js";
@@ -105,7 +105,7 @@ export default class AbstractView {
     }
 
     static toogleIsCurrentWeekDot() {
-        let today = new Date();
+        let today = new Date(TODAY);
         let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"').dataset.date;
         let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"').dataset.date;
 
@@ -187,74 +187,6 @@ export default class AbstractView {
         loginErrorDisplay.innerText = message;
         loginErrorDisplay.innerHTML += '<p><a href="" id="sendResetPasswordMail" style="text-decoration: none;">Passwort vergessen?</a></p>';
         loginErrorDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', AbstractView.openSendResetPasswordMailDialog);
-    }
-
-    static settingsClickEventHandler(event) {
-        let target = event.target.id;
-
-        switch (target) {
-            //top menu
-            case 'openTimetableSettingsButton':
-                SettingsView.openTimetableSettings();
-                break;
-
-            case 'openAccountSettingsButton':
-                SettingsView.openAccountSettings();
-                break;
-
-            //timetable settings
-            case 'createSubjectButton':
-                SettingsView.saveSubject();
-                break;
-
-            case 'timetableBackwardButton':
-                SettingsView.changeDisplayedTimetable(event);
-                break;
-
-            case 'timetableForwardButton':
-                SettingsView.changeDisplayedTimetable(event);
-                break;
-
-            case 'createNewTimetableButton':
-                SettingsView.makeTimetableEditable();
-                break;
-
-            case 'saveNewTimetableButton':
-                SettingsView.saveNewTimetable();
-                break;
-
-            case 'discardNewTimetableButton':
-                SettingsView.discardNewTimetable();
-                break;
-
-            case 'editTimetableButton':
-                SettingsView.makeLessonsEditable();
-                break;
-
-            case 'saveTimetableChangesButton':
-                SettingsView.saveTimetableChanges();
-                break;
-
-            case 'discardTimetableChangesButton':
-                SettingsView.discardNewTimetable();
-                break;
-
-            //account settings
-            case 'deleteAccountButton':
-                SettingsView.toogleAccountDeletionMenu(event);
-                break;
-
-            case 'approveAccountDeletionButton':
-                SettingsController.deleteAccount();
-
-            case 'cancelAccountDeletionButton':
-                SettingsView.toogleAccountDeletionMenu(event);
-                break;
-
-            case 'cancelFailedAccountDeletionButton':
-                SettingsView.toogleAccountDeletionMenu(event);
-                break;
-        }
     }
 
     //form validation errors

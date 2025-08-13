@@ -45,16 +45,16 @@ export default class Settings extends AbstractModel {
         let timetableHasValidUntil = false;
         let validUntilDate = null;
 
-        for (let i = standardTimetable.length - 1; i > 0; i--) {
+        for (let i = standardTimetable.length - 1; i >= 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {
                 standardTimetable.splice(i, 1);
             }
         }
 
         lessons.forEach(lesson => {
-            if (lesson.validUntil === 'undefined') lesson.validUntil = undefined;
+            if (lesson.validUntil === 'null' || lesson.validUntil === 'undefined') lesson.validUntil = null;
 
-            if (lesson.validUntil != undefined) {
+            if (lesson.validUntil != null) {
                 timetableHasValidUntil = true;
                 validUntilDate = lesson.validUntil;
             }
@@ -104,10 +104,10 @@ export default class Settings extends AbstractModel {
             }
         });
 
-        //validUntil can be an 'undefined'-string which causes problems
+        //validUntil can be an 'null'-string which causes problems
         lessons.forEach(lesson => {
-            if (lesson.validUntil === 'undefined') {
-                lesson.validUntil = undefined;
+            if (lesson.validUntil === 'null') {
+                lesson.validUntil = null;
             } 
         }); 
 
