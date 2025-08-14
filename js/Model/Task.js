@@ -17,6 +17,7 @@ export default class Task extends AbstractModel {
     #fixedTime = false;
     #reoccuring = false;
     #reoccuringInterval;
+    #lastEdited;
 
     constructor(id = undefined) {
         super()
@@ -89,6 +90,8 @@ export default class Task extends AbstractModel {
         }
 
         allTasksArray.push(taskData);
+        
+        this.writeToLocalDB('tasks', taskData);
 
         let result = await this.makeAjaxQuery('task', 'save', taskData);
         if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
@@ -100,21 +103,28 @@ export default class Task extends AbstractModel {
             allTasksArray.splice(allTasksArray.indexOf(entry), 1);
         });
 
-        let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id }]);
+        this.deleteFromLocalDB('tasks', this.id);
 
-        console.log('task', result, this);
+        let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id }]);
 
         if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTasks.push({ id: this.id });
     }
 
     async setInProgress() {
+        let task = JSON.stringify(this);
+
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
             entry.status = 'inProgress';
+            // task = entry;
         });
 
-        let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
+        console.log(task)
+
+        // this.updateOnLocalDB('tasks', task);
+
+        // let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
+        // if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
 
     }
 
@@ -124,6 +134,8 @@ export default class Task extends AbstractModel {
             return;
         }
         
+        let task;
+
         allTasksArray.forEach(entry => {
             if (entry.id != this.id) return;
 

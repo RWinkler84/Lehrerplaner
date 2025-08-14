@@ -7,17 +7,18 @@ import AbstractModel from "./AbstractModel.js";
 
 export default class Lesson extends AbstractModel {
 
-    #id = undefined;
+    #id;
     #class;
     #subject;
-    #cssColorClass = undefined;
-    #weekday = undefined;
-    #date = undefined;
-    #timeslot = undefined;
-    #type = undefined;
-    #canceled = false;
-    #validFrom = undefined; //date a regular lesson was added to to the scheduled timetable
-    #validUntil = undefined;
+    #cssColorClass;
+    #weekday;
+    #date;
+    #timeslot;
+    #type;
+    #canceled ;
+    #validFrom; //date a regular lesson was added to the scheduled timetable
+    #validUntil;
+    #lastEdited;
 
     constructor(className, subject) {
         super();
@@ -29,7 +30,7 @@ export default class Lesson extends AbstractModel {
 
     getCssColorClass() {
 
-        let match = undefined;
+        let match;
 
         allSubjects.forEach((subject) => {
             if (subject.subject == this.#subject) match = subject.colorCssClass;

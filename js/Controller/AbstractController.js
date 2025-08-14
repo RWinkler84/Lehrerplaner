@@ -97,6 +97,10 @@ export default class AbstractController {
 
     }
 
+    async syncDataOnStart() {
+        await this.#db.syncDataOnStart();
+    }
+
     checkDataState() {
         this.#db.checkDataState();
     }

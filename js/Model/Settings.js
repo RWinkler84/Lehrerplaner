@@ -13,6 +13,7 @@ export default class Settings extends AbstractModel {
 
     async saveSubject(subject) {
         subject.id = Fn.generateId(allSubjects);
+        subject.lastEdited = 
 
         allSubjects.push(subject);
 

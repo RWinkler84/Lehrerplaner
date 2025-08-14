@@ -27,6 +27,147 @@ export default class AbstractModel {
         return result;
     }
 
+    async readFromLocalDB(store, id) {
+        let db = await this.openIndexedDB();
+        let transaction = db.transaction(store, 'readwrite');
+        let objectStore = transaction.objectStore(store);
+        let request = objectStore.get(id);
+
+        return new Promise((resolve, reject) => {
+            request.onsuccess = () => {
+                resolve(request.result);
+            }
+
+            request.onerror = () => {
+                reject(request.error);
+            }
+        });
+    }
+
+    async readAllFromLocalDB(store) {
+        let db = await this.openIndexedDB();
+        let transaction = db.transaction(store, 'readwrite');
+        let objectStore = transaction.objectStore(store);
+        let request = objectStore.getAll();
+
+        return new Promise((resolve, reject) => {
+            request.onsuccess = () => {
+                resolve(request.result);
+            }
+
+            request.onerror = () => {
+                reject(request.error);
+            }
+        });
+    }
+
+    async writeToLocalDB(store, dataToStore) {
+        let db = await this.openIndexedDB();
+
+        if (dataToStore.length > 1) {
+            dataToStore.forEach((entry) => {
+                let transaction = db.transaction(store, 'readwrite').objectStore(store).add(entry);
+                transaction.onsuccess = () => { console.log('stored', entry) }
+            });
+
+            return; 
+        }
+
+        let transaction = db.transaction(store, 'readwrite').objectStore(store).add(dataToStore);
+
+        transaction.onsuccess = () => { console.log('stored', dataToStore) }
+    }
+
+    async updateOnLocalDB(store, dataToStore) {
+        let db = await this.openIndexedDB();
+
+        if (dataToStore.length > 1) {
+            dataToStore.forEach((entry) => {
+                let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
+                transaction.onsuccess = () => { console.log('stored', entry) }
+            });
+            
+            return; 
+        }
+
+        let transaction = db.transaction(store, 'readwrite').objectStore(store).put(dataToStore);
+
+        transaction.onsuccess = () => { console.log('updated', dataToStore) }
+    }
+
+    async deleteFromLocalDB(store, id) {
+        let db = await this.openIndexedDB();
+        let transaction = db.transaction(store, 'readwrite').objectStore(store).delete(id);
+
+        transaction.onsuccess = () => { console.log('deleted') };
+    }
+
+    async openIndexedDB() {
+        return new Promise((resolve, reject) => {
+            let request = window.indexedDB.open('eduplanio', 1);
+
+            request.onupgradeneeded = (event) => {
+                let db = request.result;
+
+                switch (event.oldVersion) {
+                    case 0:
+                        db.createObjectStore('timetable', { keyPath: 'id' });
+                        db.createObjectStore('timetableChanges', { keyPath: 'id' });
+                        db.createObjectStore('tasks', { keyPath: 'id' });
+                        db.createObjectStore('subjects', { keyPath: 'id' });
+                        db.createObjectStore('settings', { keyPath: 'id' });
+                        break;
+                }
+            }
+
+            request.onerror = () => {
+                reject('Database could not be opened' + request.error);
+            }
+
+            request.onsuccess = () => {
+                resolve(request.result);
+            }
+        })
+    }
+
+    async syncDataOnStart() {
+        let abstCtrl = new AbstractController();
+
+        let localSettings = await this.readAllFromLocalDB('settings');
+        let subjects = await abstCtrl.getSubjectsFromDatabase();
+        let timetable = await abstCtrl.getTimetableFromDatabase();
+        let timetableChanges = await abstCtrl.getTimetableChangesFromDatabase();
+        let tasks = await abstCtrl.getAllTasksFromDatabase();
+        let lastLocalUpdateTimestamp;
+
+        localSettings.forEach(entry => {
+            if (!entry.lastUpdated) return;
+            lastLocalUpdateTimestamp = entry.lastUpdated;
+        })
+
+        if (!lastLocalUpdateTimestamp) {
+            await this.writeRemoteToLocalDB(subjects, timetable, timetableChanges, tasks);
+            return;
+        }
+
+        if (lastLocalUpdateTimestamp) {
+            let localOutdated = false;
+
+
+            if (localOutdated) {
+                await this.writeRemoteToLocalDB(subjects, timetable, timetableChanges, tasks);
+            }
+        }
+    }
+
+    async writeRemoteToLocalDB(subjects, timetable, timetableChanges, tasks) {
+        await this.updateOnLocalDB('subjects', subjects);
+        await this.updateOnLocalDB('timetable', timetable);
+        await this.updateOnLocalDB('timetableChanges', timetableChanges);
+        await this.updateOnLocalDB('tasks', tasks);
+        await this.updateOnLocalDB('settings', { id: 0, lastUpdated: this.formatDateTime(new Date()) })
+    }
+
     static calculateAllLessonDates(className, subject, endDate, timetable = standardTimetable, lessonChanges = timetableChanges) {
 
         let dateIterator = new Date().setHours(12, 0, 0, 0);
@@ -146,22 +287,30 @@ export default class AbstractModel {
         let lessonEntries = [];
 
         allLessonDates.forEach(lesson => {
-            if (new Date(lesson.date).setHours(12, 0, 0, 0) != new Date(lessonToRemove.date).setHours(12,0,0,0)) return;
+            if (new Date(lesson.date).setHours(12, 0, 0, 0) != new Date(lessonToRemove.date).setHours(12, 0, 0, 0)) return;
             if (lesson.timeslot != lessonToRemove.timeslot) return;
 
             lessonEntries.push(lesson);
         })
 
-        if (lessonEntries.length != 0 && lessonEntries[lessonEntries.length - 1].canceled == 'false') return lessonEntries[lessonEntries.length -1];
+        if (lessonEntries.length != 0 && lessonEntries[lessonEntries.length - 1].canceled == 'false') return lessonEntries[lessonEntries.length - 1];
 
         return false;
     }
 
     formatDate(date) {
         let dateObject = new Date(date);
-        let timeString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
+        let dateString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
 
-        return timeString;
+        return dateString;
+    }
+
+    formatDateTime(date) {
+        let dateObject = new Date(date);
+        let dateString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
+        let timeString = dateObject.getHours() + ':' + dateObject.getMinutes().toString().padStart(2, '0') + ':' + dateObject.getSeconds().toString().padStart(2, '0');
+
+        return `${dateString} ${timeString}`;
     }
 
     static getAllSubjects() {
