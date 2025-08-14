@@ -60,6 +60,10 @@ export default class TaskController {
         return true;
     }
 
+    static getTaskById(id) {
+        return Task.getTaskById(id);
+    }
+
     static deleteTaskById(id) {
         let task = Task.getTaskById(id);
 
@@ -128,6 +132,7 @@ export default class TaskController {
 
         if (event.type == 'change' && event.target.name == 'reoccuringTask') {
             View.toggleReoccuringIntervalSelect(event);
+            View.toggleFixedDate(event); //if a task is reoccuring, it also has a fixed date in the week
             return;
         }
 
