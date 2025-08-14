@@ -168,18 +168,9 @@ export default class TaskView extends AbstractView {
                     checkBoxElement = allRenderedTaskTrs[index + 1];
                     responsiveButtonElement = allRenderedTaskTrs[index + 2];
 
-                    //task dates my change and need to be updated while reordering
+                    //task dates and timeslots and additional infos may change and need to be updated
                     allOpenTasks.forEach(task => {
-                        if (task.id == taskId) {
-                            taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
-                            taskElement.dataset.date = task.date;
-
-                            if (new Date(task.date) < new Date()) {
-                                taskElement.querySelector('.taskAdditionalInfo').classList.add('overdue');
-                            } else {
-                                taskElement.querySelector('.taskAdditionalInfo').classList.remove('overdue');
-                            }
-                        }
+                        if (task.id == taskId) this.updateTaskElementOnRerender(taskElement, task);
                     })
                 }
             });
@@ -204,8 +195,7 @@ export default class TaskView extends AbstractView {
 
                     //task dates my change and need to be updated while reordering
                     allInProgressTasks.forEach(task => {
-                        if (task.id == taskId) taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
-                        taskElement.dataset.date = task.date;
+                        if (task.id == taskId) this.updateTaskElementOnRerender(taskElement, task);
                     })
                 }
             });
@@ -214,6 +204,20 @@ export default class TaskView extends AbstractView {
             inProgressTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
             inProgressTaskTableBody.insertBefore(responsiveButtonElement, taskElement.nextElementSibling.nextElementSibling);
         })
+    }
+
+    static updateTaskElementOnRerender(taskElement, task) {
+        taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
+        taskElement.dataset.date = task.date;
+        taskElement.dataset.timeslot = task.timeslot;
+
+        taskElement.querySelector('.taskAdditionalInfo').innerHTML = this.getAdditionalInfoHTML(task);
+
+        if (new Date(task.date) < new Date()) {
+            taskElement.querySelector('.taskAdditionalInfo').classList.add('overdue');
+        } else {
+            taskElement.querySelector('.taskAdditionalInfo').classList.remove('overdue');
+        }
     }
 
     static createTaskForm(event) {
@@ -369,6 +373,21 @@ export default class TaskView extends AbstractView {
             selectInput.removeAttribute('disabled')
         } else {
             selectInput.setAttribute('disabled', '');
+        }
+    }
+
+    static toggleFixedDate(event) {
+        let taskId = event.target.closest('tr').previousElementSibling.dataset.taskid;
+        let fixedDateCheckbox = event.target.closest('td').querySelector('input[name="fixedDate"]');
+        let task = Controller.getTaskById(taskId)
+        let checkboxOriginalState = task.fixedTime == '1' ? true : false;
+
+        if (event.target.checked) {
+            fixedDateCheckbox.checked = true;
+            fixedDateCheckbox.disabled = true;
+        } else {
+            fixedDateCheckbox.checked = checkboxOriginalState;
+            fixedDateCheckbox.disabled = false;
         }
     }
 
