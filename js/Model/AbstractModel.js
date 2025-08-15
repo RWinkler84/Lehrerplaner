@@ -153,6 +153,22 @@ export default class AbstractModel {
         if (lastLocalUpdateTimestamp) {
             let localOutdated = false;
 
+            subjects.forEach(entry => {
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+            })
+            
+            timetable.forEach(entry => {
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+            })
+            
+            timetableChanges.forEach(entry => {
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+            })
+            
+            tasks.forEach(entry => {
+                console.log(entry);
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+            })
 
             if (localOutdated) {
                 await this.writeRemoteToLocalDB(subjects, timetable, timetableChanges, tasks);
@@ -165,6 +181,11 @@ export default class AbstractModel {
         await this.updateOnLocalDB('timetable', timetable);
         await this.updateOnLocalDB('timetableChanges', timetableChanges);
         await this.updateOnLocalDB('tasks', tasks);
+
+        await this.markLocalDBUpdated();
+    }
+
+    async markLocalDBUpdated() {
         await this.updateOnLocalDB('settings', { id: 0, lastUpdated: this.formatDateTime(new Date()) })
     }
 
