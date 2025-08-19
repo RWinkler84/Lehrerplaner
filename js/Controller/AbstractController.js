@@ -1,4 +1,5 @@
 import Model from "../Model/AbstractModel.js";
+import Settings from "../Model/Settings.js";
 import AbstractView from "../View/AbstractView.js";
 import SettingsView from "../View/SettingsView.js";
 import SettingsController from "./SettingsController.js";
@@ -27,8 +28,8 @@ export default class AbstractController {
         return await this.#db.makeAjaxQuery('abstract', 'getAllTasks');
     }
 
-    static getAllSubjects() {
-        return Model.getAllSubjects();
+    static async getAllSubjects() {
+        return await SettingsController.getAllSubjects();
     }
 
     static openLoginDialog(event) {

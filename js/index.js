@@ -17,29 +17,17 @@ export let unsyncedDeletedTimetableChanges = [];
 
 let abstCtrl = new AbstractController();
 
-export let allSubjects = [];
+// export let allSubjects = [];
+// export let standardTimetable = [];
 export let allTasksArray = [];
-export let standardTimetable = [];
 export let timetableChanges = [];
 export let taskBackupArray = [];
 
 async function loadData() {
     await abstCtrl.syncDataOnStart();
     
-    let subjects = await abstCtrl.getSubjectsFromDatabase();
-    let timetable = await abstCtrl.getTimetableFromDatabase();
     let changes = await abstCtrl.getTimetableChangesFromDatabase();
     let tasks = await abstCtrl.getAllTasksFromDatabase();
-
-
-
-    subjects.forEach(entry => {
-        allSubjects.push(entry)
-    });
-
-    timetable.forEach(entry => {
-        standardTimetable.push(entry);
-    });
 
     changes.forEach(entry => {
         timetableChanges.push(entry);
@@ -48,11 +36,6 @@ async function loadData() {
     tasks.forEach(entry => {
         allTasksArray.push(entry);
     })
-
-    standardTimetable.sort((a, b) => {
-        return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
-    });
-
 }
 
 async function startApp() {

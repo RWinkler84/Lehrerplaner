@@ -1,64 +1,57 @@
-import { allSubjects, unsyncedDeletedSubjects } from "../index.js";
-import { standardTimetable } from "../index.js";
 import { ONEDAY } from "../index.js";
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js"
 import AbstractController from "../Controller/AbstractController.js";
 
 export default class Settings extends AbstractModel {
-
     constructor() {
         super();
     }
 
     async saveSubject(subject) {
+        let allSubjects = await this.getAllSubjects();
         subject.id = Fn.generateId(allSubjects);
-        subject.lastEdited = 
+        subject.lastEdited = this.formatDateTime(new Date());
 
-        allSubjects.push(subject);
+        this.writeToLocalDB('subjects', subject);
 
         let result = await this.makeAjaxQuery('settings', 'saveSubject', subject);
 
         if (result.status == 'failed') {
-            this.markUnsynced(subject.id, allSubjects);
+            this.writeRemoteToLocalDB('unsyncedSubjects', subject);
         }
     }
 
     async deleteSubject(id) {
+        let deletedSubject = await this.readFromLocalDB('subjects', id);
 
-        for (let i = 0; i < allSubjects.length; i++) {
-            if (allSubjects[i].id == id) {
-                let deletedSubject = allSubjects.splice(i, 1);
+        this.deleteFromLocalDB('subjects', id);
 
-                let result = await this.makeAjaxQuery('settings', 'deleteSubjects', [{ 'id': id }]);
+        let result = await this.makeAjaxQuery('settings', 'deleteSubjects', [{ 'id': id }]);
 
-                if (result.status == 'failed') {
-                    deletedSubject[0].lastEdited = new Date();
-                    unsyncedDeletedSubjects.push(deletedSubject[0]);
-                }
-
-                return;
-            }
+        if (result.status == 'failed') {
+            deletedSubject.lastEdited = this.formatDateTime(new Date());
+            this.writeToLocalDB('unsyncedDeletedSubjects', deletedSubject);
         }
+
+        return;
     }
 
     async saveNewTimetable(lessons) {
+        let standardTimetable = await this.readAllFromLocalDB('timetable');
         lessons = await this.setValidUntilDates(lessons);
 
         lessons.forEach(entry => {
             entry.id = Fn.generateId(standardTimetable);
+            entry.lastEdited = this.formatDateTime(new Date());
             standardTimetable.push(entry);
-        });
-
-        standardTimetable.sort((a, b) => {
-            return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
         });
 
         let result = await this.makeAjaxQuery('settings', 'saveTimetable', lessons);
 
         if (result.status == 'failed') {
             lessons.forEach(entry => {
-                this.markUnsynced(entry.id, standardTimetable);
+                this.writeToLocalDB('unsyncedTimetables', lessons);
             });
         }
     }
@@ -89,8 +82,6 @@ export default class Settings extends AbstractModel {
 
             standardTimetable.push(lesson);
         })
-
-        console.log(lessons);
 
         let result = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
 
@@ -152,8 +143,8 @@ export default class Settings extends AbstractModel {
         lessons.forEach(lesson => {
             if (lesson.validUntil === 'null') {
                 lesson.validUntil = null;
-            } 
-        }); 
+            }
+        });
 
         return lessons;
     }
@@ -171,5 +162,9 @@ export default class Settings extends AbstractModel {
         let result = await this.makeAjaxQuery('user', 'deleteAccount');
 
         return result;
+    }
+
+    async getAllSubjects() {
+        return await this.readAllFromLocalDB('subjects');
     }
 }

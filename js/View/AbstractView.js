@@ -1,17 +1,14 @@
-import { allSubjects } from "../index.js";
 import Fn from '../inc/utils.js';
-import SettingsView from "./SettingsView.js";
-import SettingsController from "../Controller/SettingsController.js";
 import AbstractController from "../Controller/AbstractController.js";
 
 export default class AbstractView {
 
-    static getSubjectSelectHTML(event = undefined) {
-        //make an fetch-query to get all subject the teacher is teaching and create an select with those as options
-        //for now it is static and stored in the global const allSubjects
+    static async getSubjectSelectHTML(event = undefined) {
+        let allSubjects = await AbstractController.getAllSubjects();
         let optionsHTML = '<option value="">-</option>';
 
         allSubjects.forEach((entry) => {
+        console.log(entry);
             optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
         });
 

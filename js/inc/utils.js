@@ -168,4 +168,14 @@ export default class Utils {
 
         return sorted;
     }
+
+    static getCssColorClass(lesson, allSubjects) {
+            let match;
+
+            allSubjects.forEach((subject) => {
+                if (subject.subject == lesson.subject) match = subject.colorCssClass;
+            })
+    
+            return match;
+        }
 }

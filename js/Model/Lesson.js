@@ -1,8 +1,8 @@
-import { allSubjects, ONEDAY, unsyncedDeletedTimetableChanges } from "../index.js";
+import { ONEDAY, unsyncedDeletedTimetableChanges } from "../index.js";
 import { timetableChanges } from "../index.js";
-import { standardTimetable } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractModel from "./AbstractModel.js";
+import LessonController from "../Controller/LessonController.js";
 
 
 export default class Lesson extends AbstractModel {
@@ -10,14 +10,14 @@ export default class Lesson extends AbstractModel {
     #id;
     #class;
     #subject;
-    #cssColorClass;
     #weekday;
     #date;
     #timeslot;
     #type;
-    #canceled ;
+    #canceled;
     #validFrom; //date a regular lesson was added to the scheduled timetable
     #validUntil;
+    #cssColorClass
     #lastEdited;
 
     constructor(className, subject) {
@@ -25,22 +25,12 @@ export default class Lesson extends AbstractModel {
 
         this.#class = className;
         this.#subject = subject;
-        this.#cssColorClass = this.getCssColorClass()
-    }
-
-    getCssColorClass() {
-
-        let match;
-
-        allSubjects.forEach((subject) => {
-            if (subject.subject == this.#subject) match = subject.colorCssClass;
-        })
-
-        return match;
     }
 
     // static class methods
-    static getScheduledLessons() {
+    static async getScheduledLessons() {
+        let db = new AbstractModel;
+        let standardTimetable = await db.readAllFromLocalDB('timetable');
         let regularLessons = [];
 
         standardTimetable.forEach((entry) => {
@@ -56,11 +46,15 @@ export default class Lesson extends AbstractModel {
             regularLessons.push(lesson);
         });
 
+        standardTimetable.sort((a, b) => {
+            return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
+        });
+
         return regularLessons;
     }
 
-    static getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday) {
-        let scheduledLessons = this.getScheduledLessons()
+    static async getScheduledLessonsForCurrentWeek(monday, sunday) {
+        let scheduledLessons = await this.getScheduledLessons()
         let mondayDate = new Date(monday).setHours(12, 0, 0, 0);
         let sundayDate = new Date(sunday).setHours(12, 0, 0, 0);
         let validLessons = [];
@@ -132,11 +126,13 @@ export default class Lesson extends AbstractModel {
         return lesson;
     }
 
-    static getOldTimetableCopy() {
+    static async getOldTimetableCopy() {
+        let db = new AbstractModel;
+        let standardTimetable = await db.readAllFromLocalDB('timetable');
         return JSON.parse(JSON.stringify(standardTimetable));
     };
 
-    static getOldTimetableChanges() {
+    static async getOldTimetableChanges() {
         return JSON.parse(JSON.stringify(timetableChanges));
 
     };
@@ -173,7 +169,7 @@ export default class Lesson extends AbstractModel {
 
         console.log('lesson', result, this);
 
-        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTimetableChanges.push({id: this.id});
+        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTimetableChanges.push({ id: this.id });
     }
 
     async update() {
@@ -277,16 +273,16 @@ export default class Lesson extends AbstractModel {
         return this.#type;
     }
 
-    get cssColorClass() {
-        return this.#cssColorClass;
-    }
-
     get validFrom() {
         return this.#validFrom;
     }
 
     get validUntil() {
         return this.#validUntil;
+    }
+
+    get cssColorClass() {
+        return this.#cssColorClass;
     }
 
     // generic setters
@@ -330,7 +326,7 @@ export default class Lesson extends AbstractModel {
         this.#validUntil = date;
     }
 
-    set cssColorClass(colorClass) {
-        this.#cssColorClass = colorClass;
+    set cssColorClass(cssClass) {
+        this.#cssColorClass = cssClass;
     }
 }

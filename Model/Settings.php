@@ -12,7 +12,7 @@ class Settings extends AbstractModel
         $tableName = TABLEPREFIX . 'subjects';
         $subject = $this->preprocessDataToWrite($subject);
 
-        $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass) VALUES (:userId, :itemId, :subject, :colorCssClass)";
+        $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :lastEdited)";
 
         return $this->write($query, $subject);
     }
@@ -23,7 +23,7 @@ class Settings extends AbstractModel
 
         $userId = $user->getId();
         $tableName = TABLEPREFIX . 'subjects';
-        $results = [];
+        $finalResult['status'] = 'success';
 
 
         $query = "DELETE FROM $tableName WHERE userId = $userId AND itemId=:id";
@@ -32,11 +32,11 @@ class Settings extends AbstractModel
             $item['id'] = $entry['id'];
 
             $result = $this->delete($query, $item);
-            $result['id'] = $entry['id'];
-            array_push($results, $result);
+
+            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         };
 
-        return $results;
+        return $finalResult;
     }
 
     public function saveTimetable($timetableData)

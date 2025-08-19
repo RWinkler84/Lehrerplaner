@@ -1,5 +1,4 @@
-import { allSubjects, timetableChanges, ONEDAY, allTasksArray, unsyncedDeletedSubjects, unsyncedDeletedTasks, unsyncedDeletedTimetableChanges } from "../index.js";
-import { standardTimetable } from "../index.js";
+import { timetableChanges, ONEDAY, allTasksArray, unsyncedDeletedSubjects, unsyncedDeletedTasks, unsyncedDeletedTimetableChanges } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -28,6 +27,8 @@ export default class AbstractModel {
     }
 
     async readFromLocalDB(store, id) {
+        id = Number(id);
+
         let db = await this.openIndexedDB();
         let transaction = db.transaction(store, 'readwrite');
         let objectStore = transaction.objectStore(store);
@@ -66,16 +67,24 @@ export default class AbstractModel {
 
         if (dataToStore.length > 1) {
             dataToStore.forEach((entry) => {
-                let transaction = db.transaction(store, 'readwrite').objectStore(store).add(entry);
-                transaction.onsuccess = () => { console.log('stored', entry) }
+                entry.id = Number(entry.id);
+                let transaction = db.transaction(store, 'readwrite').objectStore(store).add();
+                transaction.onsuccess = () => {
+                    console.log('stored', entry)
+                    this.markLocalDBUpdated()
+                }
             });
 
-            return; 
+            return;
         }
 
-        let transaction = db.transaction(store, 'readwrite').objectStore(store).add(dataToStore);
+        dataToStore.id = Number(dataToStore.id);
+        let transaction = db.transaction(store, 'readwrite').objectStore(store).add(dataToStore,);
 
-        transaction.onsuccess = () => { console.log('stored', dataToStore) }
+        transaction.onsuccess = () => {
+            console.log('stored', dataToStore);
+            this.markLocalDBUpdated()
+        }
     }
 
     async updateOnLocalDB(store, dataToStore) {
@@ -83,28 +92,39 @@ export default class AbstractModel {
 
         if (dataToStore.length > 1) {
             dataToStore.forEach((entry) => {
+                entry.id = Number(entry.id);
                 let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
-                transaction.onsuccess = () => { console.log('stored', entry) }
+                transaction.onsuccess = () => {
+                    console.log('stored', entry)
+                    this.markLocalDBUpdated()
+                }
             });
-            
-            return; 
+
+            return;
         }
 
+        dataToStore.id = Number(dataToStore.id);
         let transaction = db.transaction(store, 'readwrite').objectStore(store).put(dataToStore);
 
-        transaction.onsuccess = () => { console.log('updated', dataToStore) }
+        transaction.onsuccess = () => { console.log('updated', dataToStore) 
+        this.markLocalDBUpdated()
+        }
     }
 
     async deleteFromLocalDB(store, id) {
+        id = Number(id);
+
         let db = await this.openIndexedDB();
         let transaction = db.transaction(store, 'readwrite').objectStore(store).delete(id);
 
-        transaction.onsuccess = () => { console.log('deleted') };
+        transaction.onsuccess = () => { console.log('deleted') 
+        this.markLocalDBUpdated()
+        };
     }
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio', 1);
+            let request = window.indexedDB.open('eduplanio', 2);
 
             request.onupgradeneeded = (event) => {
                 let db = request.result;
@@ -116,6 +136,13 @@ export default class AbstractModel {
                         db.createObjectStore('tasks', { keyPath: 'id' });
                         db.createObjectStore('subjects', { keyPath: 'id' });
                         db.createObjectStore('settings', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedTasks', { keypath: 'id' });
+                        db.createObjectStore('unsyncedSubjects', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         break;
                 }
             }
@@ -140,6 +167,15 @@ export default class AbstractModel {
         let tasks = await abstCtrl.getAllTasksFromDatabase();
         let lastLocalUpdateTimestamp;
 
+        if (
+            subjects.status == 'failed' ||
+            timetable.status == 'failed' ||
+            timetableChanges.status == 'failed' ||
+            tasks.status == 'failed'
+        ) {
+            return;
+        }
+
         localSettings.forEach(entry => {
             if (!entry.lastUpdated) return;
             lastLocalUpdateTimestamp = entry.lastUpdated;
@@ -154,20 +190,20 @@ export default class AbstractModel {
             let localOutdated = false;
 
             subjects.forEach(entry => {
-                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true;
             })
-            
+
             timetable.forEach(entry => {
-                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true;
             })
-            
+
             timetableChanges.forEach(entry => {
-                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true;
             })
-            
+
             tasks.forEach(entry => {
                 console.log(entry);
-                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true; 
+                if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true;
             })
 
             if (localOutdated) {
@@ -334,11 +370,7 @@ export default class AbstractModel {
         return `${dateString} ${timeString}`;
     }
 
-    static getAllSubjects() {
-        return allSubjects;
-    }
-
-    static getAllValidDates() {
+    static getAllValidDates(standardTimetable) {
         let allValidDates = [];
 
         standardTimetable.forEach(entry => {
@@ -383,16 +415,21 @@ export default class AbstractModel {
         return validDates;
     }
 
-    markUnsynced(id, hostDataset) {
-        hostDataset.forEach(entry => {
+    async markUnsynced(objectStore, id) {
+        let dataset = await this.readAllFromLocalDB(objectStore);
+
+        dataset.forEach(entry => {
             if (entry.id != id) return;
+
             entry.synced = false;
-            entry.lastEdited = new Date();
+            entry.lastEdited = this.formatDateTime(new Date());
+
+            this.updateOnLocalDB(objectStore, entry);
         })
     }
 
     async checkDataState() {
-
+        let allSubjects = await this.readAllFromLocalDB('subjects');
         let isUnsyncedData = false;
 
         let dataToSync = {

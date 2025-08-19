@@ -51,10 +51,9 @@ class AbstractModel
                         $value = $date->format('Y-m-d');
                     }
 
-                    if ($key == 'lastEdited'){
-
+                    if ($key == 'lastEdited') {
                     }
-                    
+
                     if ($key == 'validUntil' && $value == 'null') {
                         $stmt->bindValue($key, null, PDO::PARAM_NULL);
                     } else {
@@ -126,6 +125,8 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
+        if (empty($dataFromDb)) return ['status' => 'failed'];
+
         return $this->escapeDbData($dataFromDb);
     }
 
@@ -140,6 +141,8 @@ class AbstractModel
 
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
+
+        if (empty($dataFromDb)) return ['status' => 'failed'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -156,6 +159,8 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
+        if (empty($dataFromDb)) return ['status' => 'failed'];
+
         return $this->escapeDbData($dataFromDb);
     }
 
@@ -171,16 +176,20 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
+        if (empty($dataFromDb)) return ['status' => 'failed'];
+
         return $this->escapeDbData($dataFromDb);
     }
 
     //escape
     private function escapeDbData($data)
     {
-        foreach ($data as $k => $dataset) {
-            foreach ($dataset as $key => $value) {
-                if (!is_null($value)) {
-                    $data[$k][$key] = htmlspecialchars($value);
+        if (!empty($data)) {
+            foreach ($data as $k => $dataset) {
+                foreach ($dataset as $key => $value) {
+                    if (!is_null($value)) {
+                        $data[$k][$key] = htmlspecialchars($value);
+                    }
                 }
             }
         }
@@ -190,15 +199,17 @@ class AbstractModel
 
     protected function preprocessReadData($dataArray)
     {
-        $dataArray = array_map(function ($data) {
-            $data['id'] = $data['itemId'];
-            unset($data['userId']);
-            unset($data['itemId']);
+        if (!isset($dataArray['status']) || $dataArray['status'] != 'failed') {
+            $dataArray = array_map(function ($data) {
+                $data['id'] = $data['itemId'];
+                unset($data['userId']);
+                unset($data['itemId']);
 
-            return $data;
-        }, $dataArray);
+                return $data;
+            }, $dataArray);
 
-        return $dataArray;
+            return $dataArray;
+        }
     }
 
     protected function preprocessDataToWrite($dataArray)

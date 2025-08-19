@@ -9,7 +9,8 @@ import TaskController from "../Controller/TaskController.js";
 export default class SettingsView {
 
     //timetable settings functions
-    static renderSelectableLessonColors() {
+    static async renderSelectableLessonColors() {
+        let allSubjects = await Controller.getAllSubjects();
         let allColorsArray = [
             'subjectColorOne',
             'subjectColorTwo',
@@ -20,7 +21,6 @@ export default class SettingsView {
 
         let selectionContainer = document.querySelector('#colourSelection');
         let selectableColorsHTML = '';
-        let allSubjects = Controller.getAllSubjects();
 
         allSubjects.forEach(entry => {
             let i = allColorsArray.indexOf(entry.colorCssClass);
@@ -48,16 +48,17 @@ export default class SettingsView {
         event.target.classList.add('selected')
     }
 
-    static renderExistingSubjects() {
+    static async renderExistingSubjects() {
         let subjectsContainer = document.querySelector('#subjectsListContainer');
-        let allSubjects = Controller.getAllSubjects();
+        let allSubjects = await Controller.getAllSubjects();
+        console.log(allSubjects);
         let subjectsHTML = '';
 
         allSubjects.forEach(entry => {
             subjectsHTML += `
                 <div class="subjectListItem ${entry.colorCssClass} flex spaceBetween" data-id="${entry.id}">
                 ${entry.subject}
-                <button class="deleteItemButton" style="width: 1.5rem">&#215;</button>
+                <button class="deleteSubjectButton deleteItemButton" style="width: 1.5rem">&#215;</button>
                 </div>
             `;
         });
@@ -68,7 +69,7 @@ export default class SettingsView {
 
         subjectsContainer.innerHTML = subjectsHTML;
 
-        subjectsContainer.querySelectorAll('.deleteItemButton').forEach(element => element.addEventListener('click', SettingsView.deleteSubject));
+        // subjectsContainer.querySelectorAll('.deleteItemButton').forEach(element => element.addEventListener('click', SettingsView.deleteSubject));
 
     }
 
@@ -95,8 +96,8 @@ export default class SettingsView {
 
     }
 
-    static setDateOfTimetableToDisplay() {
-        let regularLessons = Controller.getScheduledLessons();
+    static async setDateOfTimetableToDisplay() {
+        let regularLessons = await Controller.getScheduledLessons();
         let validFromElement = document.querySelector('#validFrom');
         let allValidDates = [];
         let date;
@@ -119,12 +120,13 @@ export default class SettingsView {
         if (date == undefined) document.querySelector('#editTimetableButton').style.display = 'none';
     }
 
-    static renderLessons() {
+    static async renderLessons() {
 
-        let regularLessons = Controller.getScheduledLessons();
+        let regularLessons = await Controller.getScheduledLessons();
         let validFromElement = document.querySelector('#validFrom');
         let timetableValidDates = [];
         let dateOfTimetableToDisplay = new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0);
+        let allSubjects = await SettingsController.getAllSubjects();
 
         //get the all validity dates
         regularLessons.forEach(lesson => {
@@ -142,6 +144,7 @@ export default class SettingsView {
             if (lesson.validFrom != dateOfTimetableToDisplay) return;
 
             let timeslot = SettingsView.#getTimeslotOfLesson(lesson);
+            lesson.cssColorClass = Fn.getCssColorClass(lesson, allSubjects);
 
             timeslot.innerHTML = `
                 <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-id="${lesson.id}" data-validuntil="${lesson.validUntil}">
@@ -157,13 +160,13 @@ export default class SettingsView {
 
     }
 
-    static createLessonForm(event) {
+    static async createLessonForm(event) {
 
         let timeslotElement = event.target.closest('.settingsTimeslot');
 
         let timeslotProps = timeslotElement.getBoundingClientRect()
         let timetableProps = document.querySelector('.settingsWeekOverview').getBoundingClientRect();
-        let subjectSelectHTML = AbstractView.getSubjectSelectHTML()
+        let subjectSelectHTML = await AbstractView.getSubjectSelectHTML()
 
         let lessonFormHTML = `
                 <form id="lessonForm">
@@ -248,9 +251,9 @@ export default class SettingsView {
 
     }
 
-    static createNewLesson(event) {
+    static async createNewLesson(event) {
         event.preventDefault();
-
+        let allSubjects = await Controller.getAllSubjects();
         let timeslotElement = event.target.closest('.settingsTimeslot');
 
         let lessonData = {
@@ -271,6 +274,8 @@ export default class SettingsView {
         }
 
         let lesson = Controller.getLessonObject(lessonData);
+        lesson.cssColorClass = Fn.getCssColorClass(lesson, allSubjects);
+
 
         timeslotElement.innerHTML = `
                 <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}">
@@ -387,7 +392,7 @@ export default class SettingsView {
 
         affectedLessonChanges.forEach(entry => {
             let type = entry.type == 'sub' ? 'Vertretung' : 'Termin';
-            let subject = entry.subject == 'Termin' ? ' - ' : entry.subject; 
+            let subject = entry.subject == 'Termin' ? ' - ' : entry.subject;
             let date = Fn.formatDate(entry.date)
 
             let html = `
@@ -430,7 +435,7 @@ export default class SettingsView {
         dialog.setAttribute('open', '');
     }
 
-    static closeLessonChangesAndTasksToKeepDialog(){
+    static closeLessonChangesAndTasksToKeepDialog() {
         document.querySelector('#LessonChangesAndTasksToKeepDialog').removeAttribute('open');
         LessonController.renderLesson();
         TaskController.renderTaskChanges();
@@ -500,9 +505,9 @@ export default class SettingsView {
         document.querySelector('#saveDiscardTimetableChangesButtonContainer').style.display = 'flex';
     }
 
-    static isDateTaken() {
+    static async isDateTaken() {
         let pickedDate = document.querySelector('#validFromPicker').value;
-        let timetables = Controller.getScheduledLessons();
+        let timetables = await Controller.getScheduledLessons();
 
         document.querySelector('#validFromPickerAlertTooltip').style.display = 'none';
 

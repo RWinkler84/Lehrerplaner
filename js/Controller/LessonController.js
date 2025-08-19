@@ -1,15 +1,16 @@
 import Lesson from '../Model/Lesson.js';
 import View from '../View/LessonView.js';
+import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
 
 export default class LessonController {
 
-    static getScheduledLessons() {
-        return Lesson.getScheduledLessons();
+    static async getScheduledLessons() {
+        return await Lesson.getScheduledLessons();
     }
 
-    static getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday){
-        return Lesson.getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday);
+    static async getScheduledLessonsForCurrentWeek(monday, sunday){
+        return await Lesson.getScheduledLessonsForCurrentWeek(monday, sunday);
     }
 
     static getTimetableChanges(startDate, endDate) {
@@ -114,6 +115,10 @@ export default class LessonController {
     static getOldTimetableChanges() {
         return Lesson.getOldTimetableChanges();
     };
+
+    static async getAllSubjects() {
+        return await SettingsController.getAllSubjects();
+    }
 
     static #lessonDataToLessonObject(lessonData) {
         let lesson = new Lesson(lessonData.class, lessonData.subject);

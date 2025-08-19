@@ -1,13 +1,12 @@
 import { ONEDAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
-import AbstractController from "./AbstractController.js";
 import LessonController from "./LessonController.js";
 import TaskController from "./TaskController.js";
 
 export default class SettingsController {
 
-    static saveSubject(subject) {
+    static async saveSubject(subject) {
         let model = new Settings;
 
         if (subject.subject == '') {
@@ -20,7 +19,7 @@ export default class SettingsController {
             return false;
         }
 
-        model.saveSubject(subject);
+        await model.saveSubject(subject);
 
         View.renderExistingSubjects();
         View.renderSelectableLessonColors();
@@ -28,10 +27,10 @@ export default class SettingsController {
         return true;
     }
 
-    static deleteSubject(id) {
+    static async deleteSubject(id) {
         let model = new Settings;
 
-        model.deleteSubject(id);
+        await model.deleteSubject(id);
 
         View.renderExistingSubjects();
         View.renderSelectableLessonColors();
@@ -118,16 +117,17 @@ export default class SettingsController {
         LessonController.deleteLessonById(id);
     }
 
-    static getScheduledLessons() {
-        return LessonController.getScheduledLessons();
+    static async getScheduledLessons() {
+        return await LessonController.getScheduledLessons();
     }
 
     static getLessonObject(lessonData) {
         return LessonController.getLessonObject(lessonData);
     }
 
-    static getAllSubjects() {
-        return AbstractController.getAllSubjects();
+    static async getAllSubjects() {
+        let model = new Settings;
+        return await model.getAllSubjects();
     }
 
         static settingsClickEventHandler(event) {
@@ -194,6 +194,13 @@ export default class SettingsController {
 
             case 'cancelFailedAccountDeletionButton':
                 View.toogleAccountDeletionMenu(event);
+                break;
+        }
+
+        //identify items by class
+        switch (true) {
+            case event.target.classList.contains('deleteItemButton'):
+                View.deleteSubject(event);
                 break;
         }
     }

@@ -4,19 +4,18 @@ import Fn from '../inc/utils.js'
 
 export default class LessonView {
 
-    static renderLesson() {
+    static async renderLesson() {
         this.removeAllLessons()
         
         let monday = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         let sunday = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
-        let regularLessons = Controller.getScheduledLessonsForCurrentlyDisplayedWeek(monday, sunday);
-        let lessonChanges = Controller.getTimetableChanges(monday, sunday);
+        let regularLessons = await Controller.getScheduledLessonsForCurrentWeek(monday, sunday);
+        let lessonChanges = await Controller.getTimetableChanges(monday, sunday);
+        let allSubjects = await Controller.getAllSubjects();
 
         //now render the lessons with the correct validity date
-        regularLessons.forEach((lesson) => {
-
-            // if (lesson.validFrom != validDateOfTimetableDisplayed) return;
+        regularLessons.forEach(lesson => {
 
             let timeslot = LessonView.#getTimeslotOfLesson(lesson);
             let lessonDate = timeslot.closest('.weekday').dataset.date;
@@ -25,6 +24,8 @@ export default class LessonView {
                         <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
                         <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
             `;
+
+            lesson.cssColorClass = Fn.getCssColorClass(lesson, allSubjects);
 
             //deactive the lesson options, when the weekday it is rendered on already passed
             if (timeslot.closest('.weekday').classList.contains('passed')) {
@@ -67,6 +68,8 @@ export default class LessonView {
                     <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
                     <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
             `;
+
+            lesson.cssColorClass = Fn.getCssColorClass(lesson, allSubjects);
 
             if (lesson.canceled == 'true') {
                 canceled = 'canceled';
@@ -134,7 +137,7 @@ export default class LessonView {
         });
     }
 
-    static createLessonForm(event, oldLessonData = undefined) {
+    static async createLessonForm(event, oldLessonData = undefined) {
 
         let timeslotElement = event.target.closest('.timeslot');
 
@@ -142,7 +145,7 @@ export default class LessonView {
 
         let timeslotProps = timeslotElement.getBoundingClientRect()
         let timetableProps = document.querySelector('.weekOverview').getBoundingClientRect();
-        let subjectSelectHTML = AbstractView.getSubjectSelectHTML()
+        let subjectSelectHTML = await AbstractView.getSubjectSelectHTML()
 
         let lessonFormHTML = `
             <form id="lessonForm">
@@ -176,12 +179,12 @@ export default class LessonView {
         timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
 
-    static createUpdateLessonForm(event, oldLessonData) {
+    static async createUpdateLessonForm(event, oldLessonData) {
         let timeslotElement = event.target.closest('.timeslot');
 
         let timeslotProps = timeslotElement.getBoundingClientRect()
         let timetableProps = document.querySelector('.weekOverview').getBoundingClientRect();
-        let subjectSelectHTML = AbstractView.getSubjectSelectHTML()
+        let subjectSelectHTML = await AbstractView.getSubjectSelectHTML()
 
         let lessonFormHTML = `
             <form id="lessonForm">
