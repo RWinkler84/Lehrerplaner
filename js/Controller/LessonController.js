@@ -5,12 +5,12 @@ import TaskController from './TaskController.js';
 
 export default class LessonController {
 
-    static async getScheduledLessons() {
-        return await Lesson.getScheduledLessons();
+    static async getAllRegularLessons() {
+        return await Lesson.getAllRegularLessons();
     }
 
-    static async getScheduledLessonsForCurrentWeek(monday, sunday){
-        return await Lesson.getScheduledLessonsForCurrentWeek(monday, sunday);
+    static async getRegularLessonsForCurrentWeek(monday, sunday){
+        return await Lesson.getRegularLessonsForCurrentWeek(monday, sunday);
     }
 
     static getTimetableChanges(startDate, endDate) {

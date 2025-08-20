@@ -10,7 +10,7 @@ export default class LessonView {
         let monday = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         let sunday = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
-        let regularLessons = await Controller.getScheduledLessonsForCurrentWeek(monday, sunday);
+        let regularLessons = await Controller.getRegularLessonsForCurrentWeek(monday, sunday);
         let lessonChanges = await Controller.getTimetableChanges(monday, sunday);
         let allSubjects = await Controller.getAllSubjects();
 

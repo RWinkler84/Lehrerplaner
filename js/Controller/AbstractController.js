@@ -1,8 +1,7 @@
 import Model from "../Model/AbstractModel.js";
-import Settings from "../Model/Settings.js";
 import AbstractView from "../View/AbstractView.js";
-import SettingsView from "../View/SettingsView.js";
 import SettingsController from "./SettingsController.js";
+import LessonController from "./LessonController.js";
 
 export default class AbstractController {
 
@@ -10,14 +9,6 @@ export default class AbstractController {
 
     constructor() {
         this.#db = new Model();
-    }
-
-    async getSubjectsFromDatabase() {
-        return await this.#db.makeAjaxQuery('abstract', 'getSubjects');
-    }
-
-    async getTimetableFromDatabase() {
-        return await this.#db.makeAjaxQuery('abstract', 'getTimetable');
     }
 
     async getTimetableChangesFromDatabase() {
@@ -30,6 +21,10 @@ export default class AbstractController {
 
     static async getAllSubjects() {
         return await SettingsController.getAllSubjects();
+    }
+
+    static async getAllRegularLessons() {
+        return await LessonController.getAllRegularLessons();
     }
 
     static openLoginDialog(event) {

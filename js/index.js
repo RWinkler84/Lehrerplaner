@@ -1,10 +1,10 @@
+import AbstractController from './Controller/AbstractController.js';
 import SettingsView from './View/SettingsView.js';
 import TaskView from './View/TaskView.js';
 import LessonView from './View/LessonView.js';
 import AbstractView from './View/AbstractView.js';
-import AbstractController from './Controller/AbstractController.js';
-import SettingsController from './Controller/SettingsController.js';
 import TaskController from './Controller/TaskController.js';
+import SettingsController from './Controller/SettingsController.js';
 import Fn from './inc/utils.js';
 
 //config
@@ -42,7 +42,7 @@ async function startApp() {
     await loadData();
 
     //checking for unsynced changes
-    setInterval(abstCtrl.checkDataState.bind(abstCtrl), ONEMIN);
+    // setInterval(abstCtrl.checkDataState.bind(abstCtrl), ONEMIN);
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {

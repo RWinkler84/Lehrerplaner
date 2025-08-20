@@ -6,6 +6,7 @@ export default class AbstractModel {
 
     async makeAjaxQuery(controller, action, content = '') {
         let response;
+        console.log(content)
 
         try {
             response = await fetch(`index.php?c=${controller}&a=${action}`,
@@ -82,7 +83,6 @@ export default class AbstractModel {
         let transaction = db.transaction(store, 'readwrite').objectStore(store).add(dataToStore,);
 
         transaction.onsuccess = () => {
-            console.log('stored', dataToStore);
             this.markLocalDBUpdated()
         }
     }
@@ -158,13 +158,12 @@ export default class AbstractModel {
     }
 
     async syncDataOnStart() {
-        let abstCtrl = new AbstractController();
 
         let localSettings = await this.readAllFromLocalDB('settings');
-        let subjects = await abstCtrl.getSubjectsFromDatabase();
-        let timetable = await abstCtrl.getTimetableFromDatabase();
-        let timetableChanges = await abstCtrl.getTimetableChangesFromDatabase();
-        let tasks = await abstCtrl.getAllTasksFromDatabase();
+        let subjects = await this.makeAjaxQuery('abstract', 'getSubjects');
+        let timetable = await this.makeAjaxQuery('abstract', 'getTimetable')
+        let timetableChanges = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
+        let tasks = await this.makeAjaxQuery('abstract', 'getAllTasks');
         let lastLocalUpdateTimestamp;
 
         if (
@@ -202,7 +201,6 @@ export default class AbstractModel {
             })
 
             tasks.forEach(entry => {
-                console.log(entry);
                 if (new Date(entry.lastEdited).getTime() > new Date(lastLocalUpdateTimestamp).getTime()) localOutdated = true;
             })
 
@@ -222,7 +220,8 @@ export default class AbstractModel {
     }
 
     async markLocalDBUpdated() {
-        await this.updateOnLocalDB('settings', { id: 0, lastUpdated: this.formatDateTime(new Date()) })
+        let db = await this.openIndexedDB();
+        db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 0, lastUpdated: this.formatDateTime(new Date()) })
     }
 
     static calculateAllLessonDates(className, subject, endDate, timetable = standardTimetable, lessonChanges = timetableChanges) {
@@ -239,7 +238,7 @@ export default class AbstractModel {
             if (!validTimetableDates.includes(entry.validFrom)) return;
 
             teachingWeekdays.push({
-                'weekday': entry.weekdayNumber,
+                'weekday': entry.weekday,
                 'timeslot': entry.timeslot,
                 'validFrom': entry.validFrom,
                 'validUntil': entry.validUntil
@@ -370,8 +369,9 @@ export default class AbstractModel {
         return `${dateString} ${timeString}`;
     }
 
-    static getAllValidDates(standardTimetable) {
+    static async getAllValidDates() {
         let allValidDates = [];
+        let standardTimetable = await AbstractController.getAllRegularLessons();
 
         standardTimetable.forEach(entry => {
             if (!allValidDates.includes(entry.validFrom)) allValidDates.push(entry.validFrom);
@@ -413,19 +413,6 @@ export default class AbstractModel {
         validDates.sort(Fn.sortByDate);
 
         return validDates;
-    }
-
-    async markUnsynced(objectStore, id) {
-        let dataset = await this.readAllFromLocalDB(objectStore);
-
-        dataset.forEach(entry => {
-            if (entry.id != id) return;
-
-            entry.synced = false;
-            entry.lastEdited = this.formatDateTime(new Date());
-
-            this.updateOnLocalDB(objectStore, entry);
-        })
     }
 
     async checkDataState() {

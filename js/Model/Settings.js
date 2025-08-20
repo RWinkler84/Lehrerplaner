@@ -1,7 +1,7 @@
 import { ONEDAY } from "../index.js";
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js"
-import AbstractController from "../Controller/AbstractController.js";
+import SettingsController from "../Controller/SettingsController.js";
 
 export default class Settings extends AbstractModel {
     constructor() {
@@ -38,20 +38,23 @@ export default class Settings extends AbstractModel {
     }
 
     async saveNewTimetable(lessons) {
-        let standardTimetable = await this.readAllFromLocalDB('timetable');
-        lessons = await this.setValidUntilDates(lessons);
+        let standardTimetable = await SettingsController.getAllRegularLessons();
+        lessons = await this.setValidUntilDates(lessons, standardTimetable);
 
         lessons.forEach(entry => {
             entry.id = Fn.generateId(standardTimetable);
             entry.lastEdited = this.formatDateTime(new Date());
             standardTimetable.push(entry);
+
+            this.writeToLocalDB('timetable', entry);
         });
+
 
         let result = await this.makeAjaxQuery('settings', 'saveTimetable', lessons);
 
         if (result.status == 'failed') {
             lessons.forEach(entry => {
-                this.writeToLocalDB('unsyncedTimetables', lessons);
+                this.writeToLocalDB('unsyncedTimetables', entry);
             });
         }
     }
@@ -94,10 +97,10 @@ export default class Settings extends AbstractModel {
 
     // sets the valid until date on the old timetable and checks, if the new one is an
     // intermediate timetable, that also needs a validUntil date
-    async setValidUntilDates(lessons) {
+    async setValidUntilDates(lessons, standardTimetable) {
 
         let previousTimetableValidFromDate;
-        let allValidDates = AbstractModel.getAllValidDates();
+        let allValidDates = await AbstractModel.getAllValidDates();
         let prevTimetableValidUntil = new Date(lessons[0].validFrom).setHours(12, 0, 0, 0) - ONEDAY;
         prevTimetableValidUntil = this.formatDate(prevTimetableValidUntil);
 
@@ -111,19 +114,27 @@ export default class Settings extends AbstractModel {
             previousTimetableValidFromDate = allValidDates[i];
         } while (new Date(allValidDates[i]).setHours(12, 0, 0, 0) > new Date(lessons[0].validFrom).setHours(12, 0, 0, 0))
 
+        console.log(standardTimetable);
+
         standardTimetable.forEach(entry => {
-            if (entry.validFrom == previousTimetableValidFromDate) entry.validUntil = prevTimetableValidUntil;
+            if (entry.validFrom == previousTimetableValidFromDate) {
+                entry.validUntil = prevTimetableValidUntil;
+                entry.lastEdited = this.formatDateTime(new Date());
+                this.updateOnLocalDB('timetable', entry.serialize());
+            }
         })
+
 
         let result = await this.makeAjaxQuery('settings', 'updateValidUntil', {
             'dateOfAffectedLessons': previousTimetableValidFromDate,
-            'validUntil': prevTimetableValidUntil
+            'validUntil': prevTimetableValidUntil,
+            'lastEdited': this.formatDateTime(new Date())
         });
 
         if (result.status == 'failed') {
             standardTimetable.forEach(entry => {
                 if (entry.validFrom != previousTimetableValidFromDate) return;
-                this.markUnsynced(entry.id, standardTimetable);
+                this.writeToLocalDB('unsyncedTimetables', entry.serialize());
             })
         }
 

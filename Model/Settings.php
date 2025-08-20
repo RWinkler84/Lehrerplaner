@@ -45,18 +45,12 @@ class Settings extends AbstractModel
         $timetableData = $this->preprocessDataToWrite($timetableData);
         $finalResult['status'] = 'success';
 
-        //edited timetables will have a lastEdited field, new timetables won't
-        $query = "
-            INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekdayNumber, timeslot) 
-            VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot)
-            ";
+        error_log(print_r($timetableData, true));
 
-        if (isset($timetableData[0]['lastEdited'])) {
-            $query = "
-            INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekdayNumber, timeslot, lastEdited) 
-            VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot, :lastEdited)
+        $query = "
+            INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekday, timeslot, lastEdited) 
+            VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekday, :timeslot, :lastEdited)
             ";
-        }
 
         foreach ($timetableData as $lesson) {
             if (empty($lesson['validUntil'])) {
@@ -128,8 +122,9 @@ class Settings extends AbstractModel
         $tableName = TABLEPREFIX . 'timetable';
         $validUntilDate = $dates['validUntil'];
         $validFromDate = $dates['dateOfAffectedLessons'];
+        $lastEdited = $dates['lastEdited'];
 
-        $query = "UPDATE $tableName SET validUntil = '$validUntilDate' WHERE userId = $userId AND validFrom = '$validFromDate'";
+        $query = "UPDATE $tableName SET validUntil = '$validUntilDate', lastEdited = '$lastEdited' WHERE userId = $userId AND validFrom = '$validFromDate'";
 
         return $this->write($query, []);
     }
@@ -164,14 +159,14 @@ class Settings extends AbstractModel
     //     $tableName = TABLEPREFIX . 'timetable';
 
     //     $query = "
-    //         INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekdayNumber, timeslot, lastEdited)
-    //         VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekdayNumber, :timeslot, :lastEdited)
+    //         INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekday, timeslot, lastEdited)
+    //         VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekday, :timeslot, :lastEdited)
     //         ON DUPLICATE KEY UPDATE
     //             validFrom = IF (VALUES(lastEdited) > lastEdited, VALUES(validFrom), validFrom),
     //             validUntil = IF (VALUES(lastEdited) > lastEdited, VALUES(validUntil), validUntil),
     //             class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
     //             subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
-    //             weekdayNumber = IF (VALUES(lastEdited) > lastEdited, VALUES(weekdayNumber), weekdayNumber),
+    //             weekday = IF (VALUES(lastEdited) > lastEdited, VALUES(weekday), weekday),
     //             timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
     //             lastEdited =  IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
     //         ";

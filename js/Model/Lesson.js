@@ -1,8 +1,7 @@
+import AbstractModel from "./AbstractModel.js";
 import { ONEDAY, unsyncedDeletedTimetableChanges } from "../index.js";
 import { timetableChanges } from "../index.js";
 import Fn from '../inc/utils.js';
-import AbstractModel from "./AbstractModel.js";
-import LessonController from "../Controller/LessonController.js";
 
 
 export default class Lesson extends AbstractModel {
@@ -28,7 +27,7 @@ export default class Lesson extends AbstractModel {
     }
 
     // static class methods
-    static async getScheduledLessons() {
+    static async getAllRegularLessons() {
         let db = new AbstractModel;
         let standardTimetable = await db.readAllFromLocalDB('timetable');
         let regularLessons = [];
@@ -36,7 +35,7 @@ export default class Lesson extends AbstractModel {
         standardTimetable.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
             lesson.id = entry.id;
-            lesson.weekday = entry.weekdayNumber;
+            lesson.weekday = entry.weekday;
             lesson.timeslot = entry.timeslot;
             lesson.validFrom = entry.validFrom;
             lesson.type = 'normal';
@@ -53,8 +52,8 @@ export default class Lesson extends AbstractModel {
         return regularLessons;
     }
 
-    static async getScheduledLessonsForCurrentWeek(monday, sunday) {
-        let scheduledLessons = await this.getScheduledLessons()
+    static async getRegularLessonsForCurrentWeek(monday, sunday) {
+        let scheduledLessons = await this.getAllRegularLessons()
         let mondayDate = new Date(monday).setHours(12, 0, 0, 0);
         let sundayDate = new Date(sunday).setHours(12, 0, 0, 0);
         let validLessons = [];
@@ -127,8 +126,7 @@ export default class Lesson extends AbstractModel {
     }
 
     static async getOldTimetableCopy() {
-        let db = new AbstractModel;
-        let standardTimetable = await db.readAllFromLocalDB('timetable');
+        let standardTimetable = await this.getAllRegularLessons();
         return JSON.parse(JSON.stringify(standardTimetable));
     };
 
@@ -156,7 +154,7 @@ export default class Lesson extends AbstractModel {
         timetableChanges.push(lessonData);
         let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
 
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
     async delete() {
@@ -191,7 +189,7 @@ export default class Lesson extends AbstractModel {
         timetableChanges.push(lessonData);
         let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
 
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
     async cancel() {
@@ -212,7 +210,7 @@ export default class Lesson extends AbstractModel {
             })
 
             let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
-            if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+            // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
 
             return;
         }
@@ -223,7 +221,7 @@ export default class Lesson extends AbstractModel {
         timetableChanges.push(lessonData);
         let result = await this.makeAjaxQuery('lesson', 'addCanceled', lessonData);
 
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
     async uncancel() {
@@ -236,9 +234,27 @@ export default class Lesson extends AbstractModel {
 
         let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
 
-        if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
     }
 
+    serialize() {
+        let serialized = {
+            id: this.id,
+            class: this.class,
+            subject: this.subject,
+            timeslot: this.timeslot,
+        }
+
+        if (this.weekday) serialized.weekday = this.weekday;
+        if (this.date) serialized.date = this.date;
+        if (this.type) serialized.type = this.type;
+        if (this.canceled) serialized.canceled = this.canceled;
+        if (this.validFrom) serialized.validFrom = this.validFrom;
+        if (this.validUntil) serialized.validUntil = this.validUntil;
+        if (this.lastEdited) serialized.lastEdited = this.lastEdited;
+
+        return serialized;
+    }
 
     //generic getters
     get id() {
@@ -285,6 +301,10 @@ export default class Lesson extends AbstractModel {
         return this.#cssColorClass;
     }
 
+    get lastEdited() {
+        return this.#lastEdited;
+    }
+
     // generic setters
     set id(id) {
         this.#id = id;
@@ -329,4 +349,9 @@ export default class Lesson extends AbstractModel {
     set cssColorClass(cssClass) {
         this.#cssColorClass = cssClass;
     }
+
+    set lastEdited(lastEdited) {
+        console.log(lastEdited);
+        this.#lastEdited = lastEdited;
+    } 
 }

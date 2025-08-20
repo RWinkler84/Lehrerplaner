@@ -51,7 +51,7 @@ export default class SettingsController {
             return;
         }
 
-        if (View.isDateTaken()) {
+        if (await View.isDateTaken()) {
             View.alertValidFromPicker();
             return;
         }
@@ -117,11 +117,11 @@ export default class SettingsController {
         LessonController.deleteLessonById(id);
     }
 
-    static async getScheduledLessons() {
-        return await LessonController.getScheduledLessons();
+    static async getAllRegularLessons() {
+        return await LessonController.getAllRegularLessons();
     }
 
-    static getLessonObject(lessonData) {
+    static async getLessonObject(lessonData) {
         return LessonController.getLessonObject(lessonData);
     }
 

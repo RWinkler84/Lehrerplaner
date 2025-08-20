@@ -1,5 +1,4 @@
 import Fn from '../inc/utils.js';
-import Controller from '../Controller/TaskController.js';
 import { taskBackupArray, unsyncedDeletedTasks } from '../index.js';
 import { allTasksArray } from '../index.js';
 import { ONEDAY } from '../index.js';

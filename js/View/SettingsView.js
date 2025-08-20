@@ -51,7 +51,6 @@ export default class SettingsView {
     static async renderExistingSubjects() {
         let subjectsContainer = document.querySelector('#subjectsListContainer');
         let allSubjects = await Controller.getAllSubjects();
-        console.log(allSubjects);
         let subjectsHTML = '';
 
         allSubjects.forEach(entry => {
@@ -97,7 +96,7 @@ export default class SettingsView {
     }
 
     static async setDateOfTimetableToDisplay() {
-        let regularLessons = await Controller.getScheduledLessons();
+        let regularLessons = await Controller.getAllRegularLessons();
         let validFromElement = document.querySelector('#validFrom');
         let allValidDates = [];
         let date;
@@ -122,7 +121,7 @@ export default class SettingsView {
 
     static async renderLessons() {
 
-        let regularLessons = await Controller.getScheduledLessons();
+        let regularLessons = await Controller.getAllRegularLessons();
         let validFromElement = document.querySelector('#validFrom');
         let timetableValidDates = [];
         let dateOfTimetableToDisplay = new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0);
@@ -200,8 +199,8 @@ export default class SettingsView {
         timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
 
-    static changeDisplayedTimetable(event) {
-        let allScheduledLessons = Controller.getScheduledLessons();
+    static async changeDisplayedTimetable(event) {
+        let allScheduledLessons = await Controller.getAllRegularLessons();
         let validFromElement = document.querySelector('#validFrom');
         let allValidDates = [];
         let currentlyDisplayedDate = new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0);
@@ -257,7 +256,7 @@ export default class SettingsView {
         let timeslotElement = event.target.closest('.settingsTimeslot');
 
         let lessonData = {
-            'weekdayNumber': timeslotElement.closest('.settingsWeekday').dataset.weekday_number,
+            'weekday': timeslotElement.closest('.settingsWeekday').dataset.weekday_number,
             'timeslot': timeslotElement.dataset.timeslot,
             'class': timeslotElement.querySelector('#class').value.toLowerCase(),
             'subject': timeslotElement.querySelector('#subject').value,
@@ -273,7 +272,7 @@ export default class SettingsView {
             return;
         }
 
-        let lesson = Controller.getLessonObject(lessonData);
+        let lesson = await Controller.getLessonObject(lessonData);
         lesson.cssColorClass = Fn.getCssColorClass(lesson, allSubjects);
 
 
@@ -313,7 +312,7 @@ export default class SettingsView {
                 'validFrom': validFrom,
                 'class': timeslot.firstElementChild.dataset.class,
                 'subject': timeslot.firstElementChild.dataset.subject,
-                'weekdayNumber': timeslot.closest('.settingsWeekday').dataset.weekday_number,
+                'weekday': timeslot.closest('.settingsWeekday').dataset.weekday_number,
                 'timeslot': timeslot.dataset.timeslot
             }
 
@@ -362,7 +361,7 @@ export default class SettingsView {
                 'validUntil': timeslot.firstElementChild.dataset.validuntil,
                 'class': timeslot.firstElementChild.dataset.class,
                 'subject': timeslot.firstElementChild.dataset.subject,
-                'weekdayNumber': timeslot.closest('.settingsWeekday').dataset.weekday_number,
+                'weekday': timeslot.closest('.settingsWeekday').dataset.weekday_number,
                 'timeslot': timeslot.dataset.timeslot
             }
 
@@ -507,7 +506,7 @@ export default class SettingsView {
 
     static async isDateTaken() {
         let pickedDate = document.querySelector('#validFromPicker').value;
-        let timetables = await Controller.getScheduledLessons();
+        let timetables = await Controller.getAllRegularLessons();
 
         document.querySelector('#validFromPickerAlertTooltip').style.display = 'none';
 
@@ -532,11 +531,9 @@ export default class SettingsView {
     }
 
     static #getTimeslotOfLesson(lesson) {
-
         let allWeekdays = document.querySelectorAll('.settingsWeekday');
         let weekday;
         let timeslot;
-
         allWeekdays.forEach((day) => { if (day.dataset.weekday_number == lesson.weekday) weekday = day });
         weekday.querySelectorAll('.settingsTimeslot').forEach((slot) => { if (slot.dataset.timeslot == lesson.timeslot) timeslot = slot });
 

@@ -8,7 +8,6 @@ export default class AbstractView {
         let optionsHTML = '<option value="">-</option>';
 
         allSubjects.forEach((entry) => {
-        console.log(entry);
             optionsHTML += `<option value="${entry.subject}">${entry.subject}</option>`;
         });
 
