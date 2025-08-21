@@ -1,7 +1,6 @@
 import AbstractView from './AbstractView.js';
 import Controller from '../Controller/TaskController.js';
 import Fn from '../inc/utils.js';
-import { allTasksArray } from '../index.js';
 
 export default class TaskView extends AbstractView {
 
@@ -9,8 +8,8 @@ export default class TaskView extends AbstractView {
         super()
     }
 
-    static renderUpcomingTasks() {
-        let allUpcomingTasks = Controller.getAllOpenTasks();
+    static async renderUpcomingTasks() {
+        let allUpcomingTasks = await Controller.getAllOpenTasks();
         let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
 
         if (allUpcomingTasks.length == 0) {
@@ -62,8 +61,8 @@ export default class TaskView extends AbstractView {
         });
     }
 
-    static renderInProgressTasks() {
-        let allInProgressTasks = Controller.getAllInProgressTasks();
+    static async renderInProgressTasks() {
+        let allInProgressTasks = await Controller.getAllInProgressTasks();
         let inProgressTasksTableBody = document.querySelector('#inProgressTasksTable tbody');
 
         if (allInProgressTasks.length == 0) {
@@ -122,18 +121,37 @@ export default class TaskView extends AbstractView {
         });
     }
 
-    static rerenderTasks() {
-        const openTaskTableBody = document.querySelector('#upcomingTasksTable tbody');
-        const inProgressTaskTableBody = document.querySelector('#inProgressTasksTable tbody');
+    static async rerenderTasks() {
+        const openTaskTable = document.querySelector('#upcomingTasksTable');
+        const inProgressTaskTable = document.querySelector('#inProgressTasksTable');
+        const openTaskTableBody = openTaskTable.querySelector('tbody');
+        const inProgressTaskTableBody = inProgressTaskTable.querySelector('tbody');
 
         //node lists and task objects
-        let allOpenTasks = Controller.getAllOpenTasks();
-        let allInProgressTasks = Controller.getAllInProgressTasks();
+        let allOpenTasks = await Controller.getAllOpenTasks();
+        let allInProgressTasks = await Controller.getAllInProgressTasks();
         let allRenderedTaskTrs = [];
 
         //array with task ids
         let allOpenTaskIds = [];
         let allInProgressTaskIds = [];
+
+        if (allOpenTasks.length > 0) {
+            openTaskTable.querySelector('thead').removeAttribute('style');
+            openTaskTable.querySelector('td[data-noentriesfound]').style.display = 'none';
+
+        } else {
+            openTaskTable.querySelector('thead').style.display = 'none';openTaskTable
+            openTaskTable.querySelector('td[data-noentriesfound]').style.display = 'table-cell';
+        }
+
+        if (allInProgressTasks.length > 0) {
+            inProgressTaskTable.querySelector('thead').removeAttribute('style');
+            inProgressTaskTable.querySelector('td[data-noentriesfound]').style.display = 'none';
+        } else {
+            inProgressTaskTable.querySelector('thead').style.display = 'none';
+            inProgressTaskTable.querySelector('td[data-noentriesfound]').style.display = 'table-cell';
+        }
 
         allOpenTasks.forEach(task => {
             allOpenTaskIds.push(task.id);
@@ -376,10 +394,10 @@ export default class TaskView extends AbstractView {
         }
     }
 
-    static toggleFixedDate(event) {
+    static async toggleFixedDate(event) {
         let taskId = event.target.closest('tr').previousElementSibling.dataset.taskid;
         let fixedDateCheckbox = event.target.closest('td').querySelector('input[name="fixedDate"]');
-        let task = Controller.getTaskById(taskId)
+        let task = await Controller.getById(taskId)
         let checkboxOriginalState = task.fixedTime == '1' ? true : false;
 
         if (event.target.checked) {
@@ -510,7 +528,7 @@ export default class TaskView extends AbstractView {
         }
     }
 
-    static revertChanges(event) {
+    static async revertChanges(event) {
 
         let taskTr = event.target.closest('tr');
         let selectTr = event.target.closest('tr').nextElementSibling;
@@ -528,7 +546,7 @@ export default class TaskView extends AbstractView {
         }
 
         let taskId = taskTr.dataset.taskid;
-        let task = Controller.getTaskBackupData(taskId);
+        let task = await Controller.getTaskBackupData(taskId);
         let taskDate = Fn.formatDate(task.date);
 
         taskTr.querySelector('td[data-class]').innerText = task.class;

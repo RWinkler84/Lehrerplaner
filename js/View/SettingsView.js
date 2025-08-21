@@ -2,7 +2,7 @@ import Controller from "../Controller/SettingsController.js";
 import AbstractView from "./AbstractView.js";
 import Fn from "../inc/utils.js";
 import SettingsController from "../Controller/SettingsController.js";
-import { allTasksArray, timetableChanges } from "../index.js";
+import { timetableChanges } from "../index.js";
 import LessonController from "../Controller/LessonController.js";
 import TaskController from "../Controller/TaskController.js";
 

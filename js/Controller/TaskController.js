@@ -4,26 +4,30 @@ import LessonController from './LessonController.js';
 
 export default class TaskController {
 
-    static getAllOpenTasks() {
-        return Task.getAllOpenTasks();
+    static async getAllTasks() {
+        return await Task.getAllTasks();
     }
 
-    static getAllInProgressTasks() {
-        return Task.getAllInProgressTasks();
+    static async getAllOpenTasks() {
+        return await Task.getAllOpenTasks();
     }
 
-    static getAllTasksInTimespan(startDate, endDate) {
-        return Task.getAllTasksInTimespan(startDate, endDate);
+    static async getAllInProgressTasks() {
+        return await Task.getAllInProgressTasks();
     }
 
-    static setTaskBackupData(taskId) {
-        let task = new Task(taskId);
+    static async getAllTasksInTimespan(startDate, endDate) {
+        return await Task.getAllTasksInTimespan(startDate, endDate);
+    }
+
+    static async setTaskBackupData(taskId) {
+        let task = await Task.getById(taskId);
 
         task.setBackupData();
     }
 
-    static getTaskBackupData(taskId) {
-        let task = new Task(taskId);
+    static async getTaskBackupData(taskId) {
+        let task = await Task.getById(taskId);
 
         return task.getBackupData();
     }
@@ -60,18 +64,18 @@ export default class TaskController {
         return true;
     }
 
-    static getTaskById(id) {
-        return Task.getTaskById(id);
+    static async getById(id) {
+        return await Task.getById(id);
     }
 
-    static deleteTaskById(id) {
-        let task = Task.getTaskById(id);
+    static async deleteTaskById(id) {
+        let task = await Task.getById(id);
 
         task.delete();
     }
 
-    static updateTask(taskData, event) {
-        let task = new Task(taskData.id);
+    static async updateTask(taskData, event) {
+        let task = await Task.getById(taskData.id);
 
         task.class = taskData.class;
         task.subject = taskData.subject;
@@ -89,22 +93,23 @@ export default class TaskController {
 
         task.update();
 
-        this.renderTaskChanges();            
+        this.renderTaskChanges();
         View.removeEditability(event);
         View.createSetDoneOrInProgressButtons(event);
 
         return true;
     }
 
-    static setTaskInProgress(taskId, event) {
-        let task = Task.getTaskById(taskId);
+    static async setTaskInProgress(taskId, event) {
+        let task = await Task.getById(taskId);
+
         task.setInProgress();
         this.renderTaskChanges();
         View.createSetDoneOrInProgressButtons(event);
     }
 
     static async setTaskDone(id, event) {
-        let task = Task.getTaskById(id);
+        let task = await Task.getById(id);
 
         task.setDone();
         this.renderTaskChanges();

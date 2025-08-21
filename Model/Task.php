@@ -22,7 +22,7 @@ class Task extends AbstractModel
     {
         $taskData = $this->preprocessDataToWrite($taskData);
 
-        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval WHERE userId = :userId AND itemId=:itemId";
+        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval, lastEdited=:lastEdited WHERE userId = :userId AND itemId=:itemId";
 
         return $this->write($query, $taskData);
     }

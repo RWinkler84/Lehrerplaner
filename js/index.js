@@ -27,15 +27,10 @@ async function loadData() {
     await abstCtrl.syncDataOnStart();
     
     let changes = await abstCtrl.getTimetableChangesFromDatabase();
-    let tasks = await abstCtrl.getAllTasksFromDatabase();
 
     changes.forEach(entry => {
         timetableChanges.push(entry);
     });
-
-    tasks.forEach(entry => {
-        allTasksArray.push(entry);
-    })
 }
 
 async function startApp() {

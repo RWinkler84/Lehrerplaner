@@ -1,6 +1,5 @@
 import Fn from '../inc/utils.js';
 import { taskBackupArray, unsyncedDeletedTasks } from '../index.js';
-import { allTasksArray } from '../index.js';
 import { ONEDAY } from '../index.js';
 import AbstractModel from './AbstractModel.js';
 
@@ -20,110 +19,43 @@ export default class Task extends AbstractModel {
 
     constructor(id = undefined) {
         super()
-        if (id == undefined) {
-            this.#id = id;
-        } else {
-            Task.getAllTasks().forEach((task) => {
-                if (id == task.id) {
-                    this.#id = id;
-                    this.#class = task.class;
-                    this.#subject = task.subject;
-                    this.#description = task.description;
-                    this.#date = new Date(task.date);
-                    this.#timeslot = task.timeslot;
-                    this.#status = task.status;
-                    this.#fixedTime = task.fixedTime;
-                    this.#reoccuring = task.reoccuring;
-                    this.#reoccuringInterval = task.reoccuringInterval;
-                }
-            });
-        }
     }
 
     //class methods
 
     async update() {
-        allTasksArray.forEach(element => {
-            if (element.id == this.id) {
-                element.date = this.date;
-                element.class = this.class;
-                element.subject = this.subject;
-                element.timeslot = this.timeslot;
-                element.description = this.description;
-                element.status = this.status;
-                element.fixedTime = this.fixedTime;
-                element.reoccuring = this.reoccuring;
-                element.reoccuringInterval = this.reoccuringInterval;
-            }
-        });
+        this.lastEdited = this.formatDateTime(new Date());
+        await this.updateOnLocalDB('tasks', this.serialize());        
 
-        let taskData = {
-            'id': this.id,
-            'class': this.class,
-            'subject': this.subject,
-            'date': this.formatDate(this.date),
-            'timeslot': this.timeslot,
-            'description': this.description,
-            'status': this.status,
-            'fixedTime': this.fixedTime,
-            'reoccuring': this.reoccuring,
-            'reoccuringInterval': this.reoccuringInterval
-        }
-
-        let result = await this.makeAjaxQuery('task', 'update', taskData);
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
+        let result = await this.makeAjaxQuery('task', 'update', this.serialize());
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTasks', this.serialize());
     }
 
     async save() {
-        let taskData = {
-            'id': this.id,
-            'class': this.class,
-            'subject': this.subject,
-            'date': this.formatDate(this.date),
-            'timeslot': this.timeslot,
-            'description': this.description,
-            'status': this.status,
-            'fixedTime': this.fixedTime,
-            'reoccuring': this.reoccuring,
-            'reoccuringInterval': this.reoccuringInterval
-        }
-
-        allTasksArray.push(taskData);
-        
-        this.writeToLocalDB('tasks', taskData);
+        this.lastEdited = this.formatDateTime(new Date());
+        await this.writeToLocalDB('tasks', this.serialize());
 
         let result = await this.makeAjaxQuery('task', 'save', taskData);
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTasks', this.serialize());
+
     }
 
     async delete() {
-        allTasksArray.forEach(entry => {
-            if (entry.id != this.id) return;
-            allTasksArray.splice(allTasksArray.indexOf(entry), 1);
-        });
-
-        this.deleteFromLocalDB('tasks', this.id);
+       await this.deleteFromLocalDB('tasks', this.id);
 
         let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id }]);
 
-        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTasks.push({ id: this.id });
+        if (result.status == 'failed' || result[0].status == 'failed') this.writeToLocalDB('unsyncedDeletedTasks', this.serialize());
     }
 
     async setInProgress() {
-        let task = JSON.stringify(this);
+        this.status = 'inProgress';
+        this.lastEdited = this.formatDateTime(new Date());
+        
+        await this.updateOnLocalDB('tasks', this.serialize());
 
-        allTasksArray.forEach(entry => {
-            if (entry.id != this.id) return;
-            entry.status = 'inProgress';
-            // task = entry;
-        });
-
-        console.log(task)
-
-        // this.updateOnLocalDB('tasks', task);
-
-        // let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
-        // if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
+        let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTasks', this.serialize());
 
     }
 
@@ -132,17 +64,14 @@ export default class Task extends AbstractModel {
             this.resetDateAccordingToInterval();
             return;
         }
-        
-        let task;
 
-        allTasksArray.forEach(entry => {
-            if (entry.id != this.id) return;
+        this.status = 'done';
+        this.lastEdited = this.formatDateTime(new Date);
 
-            entry.status = 'done';
-        })
+        await this.updateOnLocalDB('tasks', this.serialize());
 
         let result = await this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
-        if (result.status == 'failed') this.markUnsynced(this.id, allTasksArray);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTasks', this.serialize());
     }
 
     async resetDateAccordingToInterval() {
@@ -167,12 +96,12 @@ export default class Task extends AbstractModel {
 
     // Getter
 
-    static getAllOpenTasks() {
-
+    static async getAllOpenTasks() {
+        let allTasksArray = await this.getAllTasks();
         let openTasks = [];
 
         allTasksArray.forEach((task) => {
-            if (task.status == 'open') openTasks.push(new Task(task.id));
+            if (task.status == 'open') openTasks.push(task);
         })
 
         openTasks.sort(Fn.sortByDate);
@@ -180,12 +109,12 @@ export default class Task extends AbstractModel {
         return openTasks;
     }
 
-    static getAllInProgressTasks() {
-
+    static async getAllInProgressTasks() {
+        let allTasksArray = await this.getAllTasks();
         let inProgressTasks = [];
 
         allTasksArray.forEach((task) => {
-            if (task.status == 'inProgress') inProgressTasks.push(new Task(task.id));
+            if (task.status == 'inProgress') inProgressTasks.push(task);
         })
 
         inProgressTasks.sort(Fn.sortByDate);
@@ -193,19 +122,33 @@ export default class Task extends AbstractModel {
         return inProgressTasks;
     }
 
-    static getTaskById(id) {
+    static async getById(id) {
 
-        let task;
+        let task = new Task;
+        let allTasksArray = await this.getAllTasks();
 
-        allTasksArray.forEach(entry => {
-            if (entry.id != id) return;
-            task = new Task(id);
-        })
+        allTasksArray.forEach((entry) => {
+            if (id == entry.id) {
+                task.id = id;
+                task.class = entry.class;
+                task.subject = entry.subject;
+                task.description = entry.description;
+                task.date = new Date(entry.date);
+                task.timeslot = entry.timeslot;
+                task.status = entry.status;
+                task.fixedTime = entry.fixedTime;
+                task.reoccuring = entry.reoccuring;
+                task.reoccuringInterval = entry.reoccuringInterval;
+                task.lastEdited = entry.lastEdited
+            }
+        });
 
         return task;
     }
 
-    static getAllTasks() {
+    static async getAllTasks() {
+        let db = new AbstractModel;
+        let allTasksArray = await db.readAllFromLocalDB('tasks');
         let allTasks = [];
 
         allTasksArray.forEach((element) => {
@@ -220,18 +163,22 @@ export default class Task extends AbstractModel {
             task.fixedTime = element.fixedTime;
             task.reoccuring = element.reoccuring;
             task.reoccuringInterval = element.reoccuringInterval;
+            task.lastEdited = element.lastEdited;
 
             allTasks.push(task)
         });
 
+        allTasks.sort(Fn.sortByDate);
+
         return allTasks;
     }
 
-    static getAllTasksInTimespan(startDate, endDate) {
+    static async getAllTasksInTimespan(startDate, endDate) {
+        let allTasksArray = await this.getAllTasks();
         let selectedTasks = [];
 
         allTasksArray.forEach(element => {
-            if (Fn.isDateInTimespan(element.date, startDate, endDate)) selectedTasks.push(new Task(element.id));
+            if (Fn.isDateInTimespan(element.date, startDate, endDate)) selectedTasks.push(new Task().getById(element.id));
         });
 
         selectedTasks.sort(Fn.sortByDate);
@@ -242,9 +189,9 @@ export default class Task extends AbstractModel {
     //adding a new timetable reorders tasks by changing their date while maintaining the number of lessons between them.
     //It takes all old lesson dates and new dates, finds the index of the task.date and sets the date as the new task.date
     //that has the same index on allNewDates
-    static reorderTasks(oldTimetable, oldTimetableChanges) {
+    static async reorderTasks(oldTimetable, oldTimetableChanges) {
 
-        let allAffectedTasks = this.#getAllAffectedTasks() //all tasks after the date of the timetable change
+        let allAffectedTasks = await this.#getAllAffectedTasks() //all tasks after the date of the timetable change
 
         if (allAffectedTasks.length > 0) {
             let endDate = new Date(allAffectedTasks[allAffectedTasks.length - 1].date).setHours(12, 0, 0, 0) + ONEDAY * 30;
@@ -306,13 +253,12 @@ export default class Task extends AbstractModel {
         }
     }
 
-    static #getAllAffectedTasks() {
+    static async #getAllAffectedTasks() {
+        let allTasksArray = await this.getAllTasks();
         let affectedTasks = [];
 
-        allTasksArray.sort(Fn.sortByDate);
-
         allTasksArray.forEach(entry => {
-            let task = new Task(entry.id);
+            let task = new Task().getById(entry.id);
 
             if (task.date.setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) return;
             if (task.fixedTime == true) return;
@@ -328,12 +274,14 @@ export default class Task extends AbstractModel {
             'id': this.#id,
             'class': this.#class,
             'subject': this.#subject,
+            'status': this.#status,
             'date': this.#date,
             'timeslot': this.#timeslot,
             'description': this.#description,
             'fixedTime': this.#fixedTime,
             'reoccuring': this.#reoccuring,
-            'reoccuringInterval': this.#reoccuringInterval
+            'reoccuringInterval': this.#reoccuringInterval,
+            'lastEdited': this.#lastEdited
         }
     }
 
@@ -341,6 +289,21 @@ export default class Task extends AbstractModel {
         return taskBackupArray[this.#id];
     }
 
+    serialize() {
+        return {
+            id: this.id,
+            class: this.class,
+            subject: this.subject,
+            status: this.status,
+            date: this.date,
+            timeslot: this.timeslot,
+            description: this.description,
+            fixedTime: this.fixedTime,
+            reoccuring: this.reoccuring,
+            reoccuringInterval: this.reoccuringInterval,
+            lastEdited: this.lastEdited
+        }
+    }
 
     get id() {
         return this.#id;
@@ -380,6 +343,10 @@ export default class Task extends AbstractModel {
 
     get reoccuringInterval() {
         return this.#reoccuringInterval;
+    }
+
+    get lastEdited() {
+        return this.#lastEdited;
     }
 
     // Setter
@@ -422,5 +389,9 @@ export default class Task extends AbstractModel {
 
     set reoccuringInterval(reoccuringInterval) {
         this.#reoccuringInterval = reoccuringInterval;
+    }
+
+    set lastEdited(lastEdited) {
+        this.#lastEdited = lastEdited;
     }
 }

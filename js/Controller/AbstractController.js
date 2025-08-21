@@ -2,6 +2,7 @@ import Model from "../Model/AbstractModel.js";
 import AbstractView from "../View/AbstractView.js";
 import SettingsController from "./SettingsController.js";
 import LessonController from "./LessonController.js";
+import TaskController from "./TaskController.js";
 
 export default class AbstractController {
 
@@ -15,8 +16,8 @@ export default class AbstractController {
         return await this.#db.makeAjaxQuery('abstract', 'getTimetableChanges');
     }
 
-    async getAllTasksFromDatabase() {
-        return await this.#db.makeAjaxQuery('abstract', 'getAllTasks');
+    async getAllTasks() {
+        return await TaskController.getAllTasks();
     }
 
     static async getAllSubjects() {
