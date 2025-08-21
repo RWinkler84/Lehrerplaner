@@ -1,4 +1,4 @@
-import { allTasksArray, timetableChanges, ONEDAY } from "../index.js";
+import { ONEDAY } from "../index.js";
 
 export default class Utils {
 

@@ -348,7 +348,7 @@ export default class SettingsView {
         SettingsView.renderLessons();
     }
 
-    static saveTimetableChanges() {
+    static saveTimetableUpdates() {
         let validFrom = Fn.formatDateSqlCompatible(document.querySelector('#validFrom').dataset.date);
         let lessons = [];
 
@@ -368,7 +368,7 @@ export default class SettingsView {
             lessons.push(lessonData);
         });
 
-        Controller.saveTimetableChanges(validFrom, lessons);
+        Controller.saveTimetableUpdates(validFrom, lessons);
     }
 
     static renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks) {

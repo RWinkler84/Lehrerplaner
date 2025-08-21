@@ -45,8 +45,6 @@ class Settings extends AbstractModel
         $timetableData = $this->preprocessDataToWrite($timetableData);
         $finalResult['status'] = 'success';
 
-        error_log(print_r($timetableData, true));
-
         $query = "
             INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekday, timeslot, lastEdited) 
             VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekday, :timeslot, :lastEdited)
@@ -67,7 +65,7 @@ class Settings extends AbstractModel
 
     // saving timetable changes is devided in two parts: deleting the old timetable and saving the new one afterwards
     // only if this order is maintained, it is garantued that the timetable will be displayed correctly later
-    public function saveTimetableChanges($timetableData)
+    public function saveTimetableUpdates($timetableData)
     {
         global $user;
 
@@ -102,7 +100,7 @@ class Settings extends AbstractModel
         return $finalResult;
     }
 
-    //query function necessary for the saveTimetableChanges function
+    //query function necessary for the saveTimetableUpdates function
     private function executeQuery($query, $params)
     {
         try {

@@ -75,7 +75,7 @@ export default class SettingsController {
         View.discardNewTimetable();
     }
 
-    static saveTimetableChanges(validFrom, lessons) {
+    static async saveTimetableUpdates(validFrom, lessons) {
         let model = new Settings;
         let oldTimetable = LessonController.getOldTimetableCopy();
         let oldTimetableChanges = LessonController.getOldTimetableChanges();
@@ -85,7 +85,7 @@ export default class SettingsController {
             return;
         }
 
-        model.saveTimetableChanges(validFrom, lessons);
+        await model.saveTimetableUpdates(validFrom, lessons);
 
         LessonController.renderLesson();
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
@@ -172,8 +172,8 @@ export default class SettingsController {
                 View.makeLessonsEditable();
                 break;
 
-            case 'saveTimetableChangesButton':
-                View.saveTimetableChanges();
+            case 'saveTimetableUpdatesButton':
+                View.saveTimetableUpdates();
                 break;
 
             case 'discardTimetableChangesButton':

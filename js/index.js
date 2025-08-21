@@ -19,7 +19,7 @@ let abstCtrl = new AbstractController();
 
 // export let allSubjects = [];
 // export let standardTimetable = [];
-export let allTasksArray = [];
+// export let allTasksArray = [];
 export let timetableChanges = [];
 export let taskBackupArray = [];
 

@@ -6,7 +6,6 @@ export default class AbstractModel {
 
     async makeAjaxQuery(controller, action, content = '') {
         let response;
-        console.log(content)
 
         try {
             response = await fetch(`index.php?c=${controller}&a=${action}`,
@@ -85,6 +84,9 @@ export default class AbstractModel {
         transaction.onsuccess = () => {
             this.markLocalDBUpdated()
         }
+        transaction.onerror = () => {
+            console.log('storing failed', transaction.error)
+        }
     }
 
     async updateOnLocalDB(store, dataToStore) {
@@ -106,8 +108,9 @@ export default class AbstractModel {
         dataToStore.id = Number(dataToStore.id);
         let transaction = db.transaction(store, 'readwrite').objectStore(store).put(dataToStore);
 
-        transaction.onsuccess = () => { console.log('updated', dataToStore) 
-        this.markLocalDBUpdated()
+        transaction.onsuccess = () => {
+            console.log('updated', dataToStore)
+            this.markLocalDBUpdated()
         }
     }
 
@@ -117,8 +120,9 @@ export default class AbstractModel {
         let db = await this.openIndexedDB();
         let transaction = db.transaction(store, 'readwrite').objectStore(store).delete(id);
 
-        transaction.onsuccess = () => { console.log('deleted') 
-        this.markLocalDBUpdated()
+        transaction.onsuccess = () => {
+            console.log('deleted')
+            this.markLocalDBUpdated()
         };
     }
 
@@ -142,7 +146,7 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
-                        db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedTimetableLessons', { keyPath: 'id' });
                         break;
                 }
             }

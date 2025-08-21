@@ -51,11 +51,11 @@ class SettingsController extends AbstractController
         echo json_encode($result);
     }
 
-    public function saveTimetableChanges()
+    public function saveTimetableUpdates()
     {
         $timetableData = json_decode(file_get_contents('php://input'), true);
 
-        $result = $this->model->saveTimetableChanges($timetableData);
+        $result = $this->model->saveTimetableUpdates($timetableData);
 
         echo json_encode($result);
     }
@@ -77,7 +77,7 @@ class SettingsController extends AbstractController
 
         $model = new Settings;
 
-        if (!empty($timetableData)) $timetableResult = $model->saveTimetableChanges($timetableData);
+        if (!empty($timetableData)) $timetableResult = $model->saveTimetableUpdates($timetableData);
 
         return $timetableResult;
     }

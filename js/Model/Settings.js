@@ -49,7 +49,6 @@ export default class Settings extends AbstractModel {
             this.writeToLocalDB('timetable', entry);
         });
 
-
         let result = await this.makeAjaxQuery('settings', 'saveTimetable', lessons);
 
         if (result.status == 'failed') {
@@ -59,13 +58,17 @@ export default class Settings extends AbstractModel {
         }
     }
 
-    async saveTimetableChanges(validFrom, lessons) {
+    async saveTimetableUpdates(validFrom, lessons) {
+        let standardTimetable = await SettingsController.getAllRegularLessons();
         let timetableHasValidUntil = false;
         let validUntilDate = null;
+        let deletedLessons = [];
 
+        //remove the old timetable
         for (let i = standardTimetable.length - 1; i >= 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {
-                standardTimetable.splice(i, 1);
+                this.deleteFromLocalDB('timetable', standardTimetable[i].id)
+                deletedLessons.push((standardTimetable.splice(i, 1))[0]);
             }
         }
 
@@ -81,17 +84,23 @@ export default class Settings extends AbstractModel {
 
             // if a lesson is added to a timetable with a validUntil date, this date is missing on the new lesson and needs to be added
             if (timetableHasValidUntil) lesson.validUntil = validUntilDate;
-            lesson.lastEdited = new Date();
+            lesson.lastEdited = this.formatDateTime(new Date());
 
             standardTimetable.push(lesson);
+            this.writeToLocalDB('timetable', lesson);
         })
 
-        let result = await this.makeAjaxQuery('settings', 'saveTimetableChanges', lessons);
+        let result = await this.makeAjaxQuery('settings', 'saveTimetableUpdates', lessons);
 
         if (result.status == 'failed') {
             lessons.forEach(entry => {
-                this.markUnsynced(entry.id, standardTimetable);
+                console.log(entry)
+                this.writeToLocalDB('unsyncedTimetables', entry);
             });
+            deletedLessons.forEach(entry => {
+                console.log('undeleted', entry)
+                this.writeToLocalDB('unsyncedDeletedTimetableLessons', entry.serialize());
+            })
         }
     }
 
