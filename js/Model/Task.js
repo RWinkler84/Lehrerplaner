@@ -180,8 +180,8 @@ export default class Task extends AbstractModel {
         let allTasksArray = await this.getAllTasks();
         let selectedTasks = [];
 
-        allTasksArray.forEach(element => {
-            if (Fn.isDateInTimespan(element.date, startDate, endDate)) selectedTasks.push(new Task().getById(element.id));
+        allTasksArray.forEach(task => {
+            if (Fn.isDateInTimespan(task.date, startDate, endDate)) selectedTasks.push(task);
         });
 
         selectedTasks.sort(Fn.sortByDate);

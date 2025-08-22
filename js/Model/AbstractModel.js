@@ -229,7 +229,6 @@ export default class AbstractModel {
     }
 
     static async calculateAllLessonDates(className, subject, endDate, timetable, lessonChanges) {
-        console.log(lessonChanges);
 
         let dateIterator = new Date().setHours(12, 0, 0, 0);
         let validTimetableDates = await AbstractModel.getCurrentlyAndFutureValidTimetableDates();

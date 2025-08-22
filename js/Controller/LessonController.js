@@ -5,31 +5,7 @@ import TaskController from './TaskController.js';
 
 export default class LessonController {
 
-    static async getAllRegularLessons() {
-        return await Lesson.getAllRegularLessons();
-    }
-
-    static async getRegularLessonsForCurrentWeek(monday, sunday){
-        return await Lesson.getRegularLessonsForCurrentWeek(monday, sunday);
-    }
-
-    static async getAllTimetableChanges() {
-        return await Lesson.getAllTimetableChanges();
-    }
-
-    static async getTimetableChanges(startDate, endDate) {
-        return await Lesson.getTimetableChanges(startDate, endDate);
-    }
-
-    static getLessonObject(lessonData) {
-        return this.#lessonDataToLessonObject(lessonData);
-    }
-
-    static async getLessonById(id) {
-        return await Lesson.getLessonById(id);
-    }
-
-    static renderLesson(){
+    static renderLesson() {
         View.renderLesson();
     }
 
@@ -78,7 +54,7 @@ export default class LessonController {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
         let oldTimetable = await Lesson.getOldTimetableCopy();
         let oldTimetableChanges = await Lesson.getOldTimetableChanges();
-        
+
         await lesson.update();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
@@ -123,6 +99,34 @@ export default class LessonController {
 
     static async getAllSubjects() {
         return await SettingsController.getAllSubjects();
+    }
+
+    static async getAllRegularLessons() {
+        return await Lesson.getAllRegularLessons();
+    }
+
+    static async getRegularLessonsForCurrentWeek(monday, sunday) {
+        return await Lesson.getRegularLessonsForCurrentWeek(monday, sunday);
+    }
+
+    static async getAllTimetableChanges() {
+        return await Lesson.getAllTimetableChanges();
+    }
+
+    static async getTimetableChanges(startDate, endDate) {
+        return await Lesson.getTimetableChanges(startDate, endDate);
+    }
+
+    static getLessonObject(lessonData) {
+        return this.#lessonDataToLessonObject(lessonData);
+    }
+
+    static async getLessonById(id) {
+        return await Lesson.getLessonById(id);
+    }
+
+    static async getAllTasksInTimespan(startDate, endDate) {
+        return await TaskController.getAllTasksInTimespan(startDate, endDate);
     }
 
     static #lessonDataToLessonObject(lessonData) {

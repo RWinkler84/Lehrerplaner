@@ -166,7 +166,6 @@ export default class Lesson extends AbstractModel {
 
     //public class methods
     async save() {
-        console.log(this);
         let timetableChanges = await LessonController.getAllTimetableChanges();
         
         if (this.subject == 'Termin') this.type = 'appointement';
@@ -197,7 +196,7 @@ export default class Lesson extends AbstractModel {
         this.id = Fn.generateId(timetableChanges);
 
         this.writeToLocalDB('timetableChanges', this.serialize());
-        let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
+        let result = await this.makeAjaxQuery('lesson', 'save', this.serialize());
 
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
     }
@@ -228,7 +227,6 @@ export default class Lesson extends AbstractModel {
     }
 
     async uncancel() {
-        console.log(this);
         this.canceled = 'false';
         this.lastEdited = this.formatDateTime(new Date());
 

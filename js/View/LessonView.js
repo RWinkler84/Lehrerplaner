@@ -120,17 +120,19 @@ export default class LessonView {
         });
     }
 
-    static showLessonHasTaskIndicator() {
-        let taskContainer = document.querySelector('#taskContainer')
+    static async showLessonHasTaskIndicator() {
+        let monday = document.querySelector('div[data-weekday_number="1"]').dataset.date;
+        let sunday = document.querySelector('div[data-weekday_number="0"]').dataset.date;
+        let tasks = await Controller.getAllTasksInTimespan(monday, sunday);
         let allLessons = document.querySelectorAll('.lesson');
 
         allLessons.forEach(lesson => {
-            taskContainer.querySelectorAll('tr[data-date]').forEach((taskRow) => {
+            tasks.forEach((task) => {
 
-                if (new Date(taskRow.dataset.date).setHours(12, 0, 0, 0) != new Date(lesson.dataset.date).setHours(12, 0, 0, 0)) return;
-                if (taskRow.querySelector('td[data-class]').dataset.class != lesson.dataset.class) return;
-                if (taskRow.querySelector('td[data-subject').dataset.subject != lesson.dataset.subject) return;
-                if (taskRow.dataset.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
+                if (new Date(task.date).setHours(12, 0, 0, 0) != new Date(lesson.dataset.date).setHours(12, 0, 0, 0)) return;
+                if (task.class != lesson.dataset.class) return;
+                if (task.subject != lesson.dataset.subject) return;
+                if (task.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
 
                 lesson.querySelector('.lessonHasTaskIndicator').style.visibility = 'visible';
             });

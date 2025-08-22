@@ -16,7 +16,6 @@ export default class Settings extends AbstractModel {
         this.writeToLocalDB('subjects', subject);
 
         let result = await this.makeAjaxQuery('settings', 'saveSubject', subject);
-        console.log(result);
 
         if (result.status == 'failed') {
             this.writeToLocalDB('unsyncedSubjects', subject);
@@ -95,11 +94,9 @@ export default class Settings extends AbstractModel {
 
         if (result.status == 'failed') {
             lessons.forEach(entry => {
-                console.log(entry)
                 this.updateOnLocalDB('unsyncedTimetables', entry);
             });
             deletedLessons.forEach(entry => {
-                console.log('undeleted', entry)
                 this.writeToLocalDB('unsyncedDeletedTimetableLessons', entry.serialize());
             })
         }
