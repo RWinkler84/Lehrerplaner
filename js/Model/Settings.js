@@ -16,9 +16,10 @@ export default class Settings extends AbstractModel {
         this.writeToLocalDB('subjects', subject);
 
         let result = await this.makeAjaxQuery('settings', 'saveSubject', subject);
+        console.log(result);
 
         if (result.status == 'failed') {
-            this.writeRemoteToLocalDB('unsyncedSubjects', subject);
+            this.writeToLocalDB('unsyncedSubjects', subject);
         }
     }
 
@@ -61,13 +62,13 @@ export default class Settings extends AbstractModel {
     async saveTimetableUpdates(validFrom, lessons) {
         let standardTimetable = await SettingsController.getAllRegularLessons();
         let timetableHasValidUntil = false;
-        let validUntilDate = null;
+        let validUntilDate;
         let deletedLessons = [];
 
         //remove the old timetable
         for (let i = standardTimetable.length - 1; i >= 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {
-                this.deleteFromLocalDB('timetable', standardTimetable[i].id)
+                await this.deleteFromLocalDB('timetable', standardTimetable[i].id)
                 deletedLessons.push((standardTimetable.splice(i, 1))[0]);
             }
         }
@@ -75,7 +76,7 @@ export default class Settings extends AbstractModel {
         lessons.forEach(lesson => {
             if (lesson.validUntil === 'null' || lesson.validUntil === 'undefined') lesson.validUntil = null;
 
-            if (lesson.validUntil != null) {
+            if (lesson.validUntil) {
                 timetableHasValidUntil = true;
                 validUntilDate = lesson.validUntil;
             }
@@ -95,7 +96,7 @@ export default class Settings extends AbstractModel {
         if (result.status == 'failed') {
             lessons.forEach(entry => {
                 console.log(entry)
-                this.writeToLocalDB('unsyncedTimetables', entry);
+                this.updateOnLocalDB('unsyncedTimetables', entry);
             });
             deletedLessons.forEach(entry => {
                 console.log('undeleted', entry)
@@ -122,8 +123,6 @@ export default class Settings extends AbstractModel {
             i--
             previousTimetableValidFromDate = allValidDates[i];
         } while (new Date(allValidDates[i]).setHours(12, 0, 0, 0) > new Date(lessons[0].validFrom).setHours(12, 0, 0, 0))
-
-        console.log(standardTimetable);
 
         standardTimetable.forEach(entry => {
             if (entry.validFrom == previousTimetableValidFromDate) {

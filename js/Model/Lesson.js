@@ -199,7 +199,7 @@ export default class Lesson extends AbstractModel {
         this.writeToLocalDB('timetableChanges', this.serialize());
         let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
 
-        if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
+        if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
     }
 
     async cancel() {
@@ -212,7 +212,7 @@ export default class Lesson extends AbstractModel {
             this.updateOnLocalDB('timetableChanges', this.serialize());
             let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
 
-            if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
+            if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
 
             return;
         }
@@ -235,7 +235,7 @@ export default class Lesson extends AbstractModel {
         this.updateOnLocalDB('timetableChanges', this.serialize())
         let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
 
-        if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
+        if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
     }
 
     serialize() {

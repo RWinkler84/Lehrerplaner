@@ -85,7 +85,7 @@ export default class AbstractModel {
             this.markLocalDBUpdated()
         }
         transaction.onerror = () => {
-            console.log('storing failed', transaction.error)
+            console.error('storing failed', transaction.error)
         }
     }
 
@@ -326,8 +326,8 @@ export default class AbstractModel {
         // //filters out lessons belonging to timetables that are not yet valid or not valid anymore
         for (let i = allLessonDates.length - 1; i >= 0; i--) {
             let lessonDate = new Date(allLessonDates[i].date).setHours(12, 0, 0, 0);
-            let validFromDate = new Date(allLessonDates[i].validFrom).setHours(12, 0, 0, 0);
-            let validUntilDate = new Date(allLessonDates[i].validUntil).setHours(12, 0, 0, 0);
+            let validFromDate = allLessonDates[i].validFrom ? new Date(allLessonDates[i].validFrom).setHours(12, 0, 0, 0) : undefined;
+            let validUntilDate = allLessonDates[i].validUntil ? new Date(allLessonDates[i].validUntil).setHours(12, 0, 0, 0) : undefined;
 
             if (
                 (!isNaN(validFromDate) && lessonDate < validFromDate) ||//is not valid yet

@@ -279,7 +279,7 @@ export default class LessonView {
 
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
-        let lessonData = lessonElement.dataset.id == undefined ? LessonView.#getLessonDataFromElement(event) : await Controller.getLessonById(lessonElement.dataset.id);
+        let lessonData = lessonElement.dataset.id == undefined ? await LessonView.#getLessonDataFromElement(event) : await Controller.getLessonById(lessonElement.dataset.id);
 
         let lessonId = Controller.setLessonCanceled(lessonData);
 

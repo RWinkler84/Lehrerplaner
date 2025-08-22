@@ -238,8 +238,8 @@ export default class TaskView extends AbstractView {
         }
     }
 
-    static createTaskForm(event) {
-
+    static async createTaskForm(event) {
+        let allTasksArray = await Controller.getAllTasks();
         let lessonElement = event.target.closest('.lesson');
         let taskTable = document.querySelector('#upcomingTasksTable tbody');
 

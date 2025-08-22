@@ -29,14 +29,14 @@ export default class Task extends AbstractModel {
         await this.updateOnLocalDB('tasks', this.serialize());
 
         let result = await this.makeAjaxQuery('task', 'update', this.serialize());
-        if (result.status == 'failed') this.writeToLocalDB('unsyncedTasks', this.serialize());
+        if (result.status == 'failed') this.updateOnLocalDB('unsyncedTasks', this.serialize());
     }
 
     async save() {
         this.lastEdited = this.formatDateTime(new Date());
         await this.writeToLocalDB('tasks', this.serialize());
 
-        let result = await this.makeAjaxQuery('task', 'save', taskData);
+        let result = await this.makeAjaxQuery('task', 'save', this.serialize());
         if (result.status == 'failed') this.writeToLocalDB('unsyncedTasks', this.serialize());
 
     }
