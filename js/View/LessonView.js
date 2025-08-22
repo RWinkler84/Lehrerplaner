@@ -275,12 +275,11 @@ export default class LessonView {
         Controller.updateLesson(newLessonData, oldLessonData);
     }
 
-    static setLessonCanceled(event) {
+    static async setLessonCanceled(event) {
 
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
-        let lessonData = lessonElement.dataset.id == undefined ? LessonView.#getLessonDataFromElement(event) : Controller.getLessonById(lessonElement.dataset.id);
-        lessonData.canceled = 'true';
+        let lessonData = lessonElement.dataset.id == undefined ? LessonView.#getLessonDataFromElement(event) : await Controller.getLessonById(lessonElement.dataset.id);
 
         let lessonId = Controller.setLessonCanceled(lessonData);
 
@@ -295,10 +294,10 @@ export default class LessonView {
         optionsWrapper.querySelector('button[data-lesson_uncanceled]').addEventListener('click', LessonView.setLessonNotCanceled);
     }
 
-    static setLessonNotCanceled(event) {
+    static async setLessonNotCanceled(event) {
         let lessonElement = event.target.closest('.lesson');
         let optionsWrapper = lessonElement.querySelector('.lessonOptionsWrapper');
-        let lessonData = LessonView.#getLessonDataFromElement(event);
+        let lessonData = await LessonView.#getLessonDataFromElement(event);
 
         Controller.setLessonNotCanceled(lessonData);
 
@@ -400,12 +399,12 @@ export default class LessonView {
         return timeslot;
     }
 
-    static #getLessonDataFromElement(event) {
+    static async #getLessonDataFromElement(event) {
         let lessonElement = event.target.closest('.lesson');
         let isSubstitute = 'normal';
 
         if (lessonElement.dataset.id) {
-            let lessonData = Controller.getLessonById(lessonElement.dataset.id);
+            let lessonData = await Controller.getLessonById(lessonElement.dataset.id);
             isSubstitute = lessonData.type;
 
             return lessonData;

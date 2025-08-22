@@ -20,6 +20,14 @@ export default class TaskController {
         return await Task.getAllTasksInTimespan(startDate, endDate);
     }
 
+    static async getAllRegularLessons() {
+        return await LessonController.getAllRegularLessons();
+    }
+
+    static async getAllTimetableChanges() {
+        return await LessonController.getAllTimetableChanges();
+    }
+
     static async setTaskBackupData(taskId) {
         let task = await Task.getById(taskId);
 
@@ -122,11 +130,10 @@ export default class TaskController {
         View.rerenderTasks();
     }
 
-    static reorderTasks(oldTimetable, oldTimetableChanges) {
+    static async reorderTasks(oldTimetable, oldTimetableChanges) {
 
-        Task.reorderTasks(oldTimetable, oldTimetableChanges);
+        await Task.reorderTasks(oldTimetable, oldTimetableChanges);
         this.renderTaskChanges();
-        LessonController.renderLesson();
     }
 
     static tasksTableEventHandler(event) {

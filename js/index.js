@@ -20,17 +20,11 @@ let abstCtrl = new AbstractController();
 // export let allSubjects = [];
 // export let standardTimetable = [];
 // export let allTasksArray = [];
-export let timetableChanges = [];
+// export let timetableChanges = [];
 export let taskBackupArray = [];
 
 async function loadData() {
     await abstCtrl.syncDataOnStart();
-    
-    let changes = await abstCtrl.getTimetableChangesFromDatabase();
-
-    changes.forEach(entry => {
-        timetableChanges.push(entry);
-    });
 }
 
 async function startApp() {

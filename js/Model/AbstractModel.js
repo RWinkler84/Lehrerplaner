@@ -1,4 +1,4 @@
-import { timetableChanges, ONEDAY, unsyncedDeletedSubjects, unsyncedDeletedTasks, unsyncedDeletedTimetableChanges } from "../index.js";
+import { ONEDAY, unsyncedDeletedSubjects, unsyncedDeletedTasks, unsyncedDeletedTimetableChanges } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -228,10 +228,11 @@ export default class AbstractModel {
         db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 0, lastUpdated: this.formatDateTime(new Date()) })
     }
 
-    static calculateAllLessonDates(className, subject, endDate, timetable = standardTimetable, lessonChanges = timetableChanges) {
+    static async calculateAllLessonDates(className, subject, endDate, timetable, lessonChanges) {
+        console.log(lessonChanges);
 
         let dateIterator = new Date().setHours(12, 0, 0, 0);
-        let validTimetableDates = AbstractModel.getCurrentlyAndFutureValidTimetableDates();
+        let validTimetableDates = await AbstractModel.getCurrentlyAndFutureValidTimetableDates();
         let teachingWeekdays = [];
         let allLessonDates = [];
 
@@ -329,8 +330,8 @@ export default class AbstractModel {
             let validUntilDate = new Date(allLessonDates[i].validUntil).setHours(12, 0, 0, 0);
 
             if (
-                lessonDate < validFromDate ||   //is not valid yet
-                (lessonDate > validUntilDate && allLessonDates[i].validUntil != undefined) || //not valid anymore
+                (!isNaN(validFromDate) && lessonDate < validFromDate) ||//is not valid yet
+                (!isNaN(validUntilDate) && lessonDate > validUntilDate) || //not valid anymore
                 (allLessonDates[i].type == 'normal' && allLessonDates[i].canceled == 'false' && allLessonDates[i].source == 'timetableChanges') //duplicate
             ) {
                 allLessonDates.splice(i, 1);
@@ -374,8 +375,8 @@ export default class AbstractModel {
     }
 
     static async getAllValidDates() {
-        let allValidDates = [];
         let standardTimetable = await AbstractController.getAllRegularLessons();
+        let allValidDates = [];
 
         standardTimetable.forEach(entry => {
             if (!allValidDates.includes(entry.validFrom)) allValidDates.push(entry.validFrom);
@@ -402,8 +403,8 @@ export default class AbstractModel {
 
     // this function returns only valid timetable dates that are valid right now or will be
     // valid in the future
-    static getCurrentlyAndFutureValidTimetableDates() {
-        let allValidDates = AbstractModel.getAllValidDates();
+    static async getCurrentlyAndFutureValidTimetableDates() {
+        let allValidDates = await AbstractModel.getAllValidDates();
         let validDates = [];
         let today = new Date().setHours(12, 0, 0, 0);
 

@@ -38,8 +38,8 @@ export default class SettingsController {
 
     static async saveNewTimetable(validFrom, lessons) {
         let model = new Settings;
-        let oldTimetable = LessonController.getOldTimetableCopy();
-        let oldTimetableChanges = LessonController.getOldTimetableChanges();
+        let oldTimetable = await LessonController.getOldTimetableCopy();
+        let oldTimetableChanges = await LessonController.getOldTimetableChanges();
 
         if (validFrom == '') {
             View.alertValidFromPicker();
@@ -63,8 +63,6 @@ export default class SettingsController {
 
         let affectedLessonChanges = LessonController.getTimetableChanges(validFrom, validUntil);
         let affectedTasks = TaskController.getAllTasksInTimespan(validFrom, validUntil);
-        console.log('changes', affectedLessonChanges);
-        console.log('tasks', affectedTasks);
 
         if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
 
@@ -77,8 +75,8 @@ export default class SettingsController {
 
     static async saveTimetableUpdates(validFrom, lessons) {
         let model = new Settings;
-        let oldTimetable = LessonController.getOldTimetableCopy();
-        let oldTimetableChanges = LessonController.getOldTimetableChanges();
+        let oldTimetable = await LessonController.getOldTimetableCopy();
+        let oldTimetableChanges = await LessonController.getOldTimetableChanges();
 
         if (lessons.length == 0) {
             View.alertTimetable();

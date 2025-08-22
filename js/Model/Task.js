@@ -1,5 +1,6 @@
+import TaskController from '../Controller/TaskController.js';
 import Fn from '../inc/utils.js';
-import { taskBackupArray, unsyncedDeletedTasks } from '../index.js';
+import { taskBackupArray } from '../index.js';
 import { ONEDAY } from '../index.js';
 import AbstractModel from './AbstractModel.js';
 
@@ -25,7 +26,7 @@ export default class Task extends AbstractModel {
 
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
-        await this.updateOnLocalDB('tasks', this.serialize());        
+        await this.updateOnLocalDB('tasks', this.serialize());
 
         let result = await this.makeAjaxQuery('task', 'update', this.serialize());
         if (result.status == 'failed') this.writeToLocalDB('unsyncedTasks', this.serialize());
@@ -41,7 +42,7 @@ export default class Task extends AbstractModel {
     }
 
     async delete() {
-       await this.deleteFromLocalDB('tasks', this.id);
+        await this.deleteFromLocalDB('tasks', this.id);
 
         let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id }]);
 
@@ -51,7 +52,7 @@ export default class Task extends AbstractModel {
     async setInProgress() {
         this.status = 'inProgress';
         this.lastEdited = this.formatDateTime(new Date());
-        
+
         await this.updateOnLocalDB('tasks', this.serialize());
 
         let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
@@ -124,24 +125,26 @@ export default class Task extends AbstractModel {
 
     static async getById(id) {
 
+        let db = new AbstractModel;
         let task = new Task;
-        let allTasksArray = await this.getAllTasks();
+        let taskData = await db.readFromLocalDB('tasks', id);
 
-        allTasksArray.forEach((entry) => {
-            if (id == entry.id) {
-                task.id = id;
-                task.class = entry.class;
-                task.subject = entry.subject;
-                task.description = entry.description;
-                task.date = new Date(entry.date);
-                task.timeslot = entry.timeslot;
-                task.status = entry.status;
-                task.fixedTime = entry.fixedTime;
-                task.reoccuring = entry.reoccuring;
-                task.reoccuringInterval = entry.reoccuringInterval;
-                task.lastEdited = entry.lastEdited
-            }
-        });
+        if (!taskData) {
+            console.error('No task found');
+            return;
+        }
+
+        task.id = id;
+        task.class = taskData.class;
+        task.subject = taskData.subject;
+        task.description = taskData.description;
+        task.date = new Date(taskData.date);
+        task.timeslot = taskData.timeslot;
+        task.status = taskData.status;
+        task.fixedTime = taskData.fixedTime;
+        task.reoccuring = taskData.reoccuring;
+        task.reoccuringInterval = taskData.reoccuringInterval;
+        task.lastEdited = taskData.lastEdited
 
         return task;
     }
@@ -190,6 +193,8 @@ export default class Task extends AbstractModel {
     //It takes all old lesson dates and new dates, finds the index of the task.date and sets the date as the new task.date
     //that has the same index on allNewDates
     static async reorderTasks(oldTimetable, oldTimetableChanges) {
+        let currentTimetable = await TaskController.getAllRegularLessons();
+        let currentChanges = await TaskController.getAllTimetableChanges();
 
         let allAffectedTasks = await this.#getAllAffectedTasks() //all tasks after the date of the timetable change
 
@@ -205,17 +210,17 @@ export default class Task extends AbstractModel {
             });
 
             //calculate all lesson dates before and after the change for each class/subject combination
-            Object.keys(subjectsByClass).forEach(key => {
+            for (let key of Object.keys(subjectsByClass)) {
                 let className = key;
                 let subjectsArray = subjectsByClass[key];
 
-                subjectsArray.forEach(subject => {
-                    let allOldLessonDates = this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
-                    let allNewLessonDates = this.calculateAllLessonDates(className, subject, endDate);
+                for (let subject of subjectsArray) {
+                    let allOldLessonDates = await this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
+                    let allNewLessonDates = await this.calculateAllLessonDates(className, subject, endDate, currentTimetable, currentChanges);
 
                     //in the unlikely case, a tasks exists without a corresponding lesson, jump to the next subject
-                    if (allOldLessonDates.length == 0) return;
-                    if (allNewLessonDates.length == 0) return;
+                    if (allOldLessonDates.length == 0) continue;
+                    if (allNewLessonDates.length == 0) continue;
 
                     //find the index of the task.date for this class/subject combination on the old dates and then pick the
                     //date with the corresponding index on the new dates and asign it as the new task.date
@@ -247,9 +252,9 @@ export default class Task extends AbstractModel {
                             task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
                             task.update();
                         }
-                    })
-                })
-            });
+                    });
+                }
+            }
         }
     }
 
@@ -257,8 +262,7 @@ export default class Task extends AbstractModel {
         let allTasksArray = await this.getAllTasks();
         let affectedTasks = [];
 
-        allTasksArray.forEach(entry => {
-            let task = new Task().getById(entry.id);
+        allTasksArray.forEach(task => {
 
             if (task.date.setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) return;
             if (task.fixedTime == true) return;

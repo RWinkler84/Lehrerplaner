@@ -12,7 +12,7 @@ class Lesson extends AbstractModel
     public function save($lessonData)
     {
         $lessonData = $this->preprocessDataToWrite($lessonData);
-        $query = "INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, type, canceled) VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :type, :canceled)";
+        $query = "INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, type, canceled, lastEdited) VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :type, :canceled, :lastEdited)";
 
         return $this->write($query, $lessonData);
     }

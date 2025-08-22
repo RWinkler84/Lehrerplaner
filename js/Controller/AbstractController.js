@@ -12,10 +12,6 @@ export default class AbstractController {
         this.#db = new Model();
     }
 
-    async getTimetableChangesFromDatabase() {
-        return await this.#db.makeAjaxQuery('abstract', 'getTimetableChanges');
-    }
-
     async getAllTasks() {
         return await TaskController.getAllTasks();
     }
@@ -26,6 +22,10 @@ export default class AbstractController {
 
     static async getAllRegularLessons() {
         return await LessonController.getAllRegularLessons();
+    }
+
+    static async getAllTimetableChanges() {
+        return await LessonController.getAllTimetableChanges();
     }
 
     static openLoginDialog(event) {

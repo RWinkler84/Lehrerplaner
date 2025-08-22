@@ -2,7 +2,6 @@ import Controller from "../Controller/SettingsController.js";
 import AbstractView from "./AbstractView.js";
 import Fn from "../inc/utils.js";
 import SettingsController from "../Controller/SettingsController.js";
-import { timetableChanges } from "../index.js";
 import LessonController from "../Controller/LessonController.js";
 import TaskController from "../Controller/TaskController.js";
 
@@ -448,8 +447,6 @@ export default class SettingsView {
         if (itemType == 'task') SettingsController.deleteTaskById(itemId);
         if (itemType == 'lessonChange') SettingsController.deleteLessonChangeById(itemId);
 
-        console.log(allTasksArray);
-        console.log(timetableChanges);
         itemTr.remove();
 
     }

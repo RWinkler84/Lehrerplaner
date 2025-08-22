@@ -1,7 +1,7 @@
 import AbstractModel from "./AbstractModel.js";
-import { ONEDAY, unsyncedDeletedTimetableChanges } from "../index.js";
-import { timetableChanges } from "../index.js";
+import { ONEDAY} from "../index.js";
 import Fn from '../inc/utils.js';
+import LessonController from "../Controller/LessonController.js";
 
 
 export default class Lesson extends AbstractModel {
@@ -41,6 +41,7 @@ export default class Lesson extends AbstractModel {
             lesson.type = 'normal';
             lesson.validFrom = entry.validFrom;
             lesson.validUntil = entry.validUntil;
+            lesson.lastEdited = entry.lastEdited;
 
             regularLessons.push(lesson);
         });
@@ -88,12 +89,39 @@ export default class Lesson extends AbstractModel {
         return validLessons;
     }
 
-    static getTimetableChanges(startDate, endDate) {
+    static async getAllTimetableChanges() {
+        let db = new AbstractModel;
+        let dbData = await db.readAllFromLocalDB('timetableChanges');
+        let changes = [];
+
+        dbData.forEach((entry) => {
+            let lesson = new Lesson(entry.class, entry.subject);
+            lesson.id = entry.id;
+            lesson.weekday = entry.weekday;
+            lesson.date = new Date(entry.date);
+            lesson.timeslot = entry.timeslot;
+            lesson.validFrom = entry.validFrom;
+            lesson.type = entry.type;
+            lesson.canceled = entry.canceled;
+            lesson.validFrom = entry.validFrom;
+            lesson.validUntil = entry.validUntil;
+            lesson.lastEdited = entry.lastEdited;
+
+            changes.push(lesson);
+        });
+
+        changes.sort(Fn.sortByDate);
+
+        return changes;
+    }
+
+    static async getTimetableChanges(startDate, endDate) {
+        let timetableChanges = await this.getAllTimetableChanges();
         let changes = [];
 
         timetableChanges.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
-            lesson.date = new Date(entry.date);
+            lesson.date = entry.date;
             lesson.id = entry.id;
             lesson.canceled = entry.canceled;
             lesson.type = entry.type;
@@ -107,134 +135,107 @@ export default class Lesson extends AbstractModel {
         return changes;
     }
 
-    static getLessonById(id) {
+    static async getLessonById(id) {
+        let db = new AbstractModel;
+        let lessonData = await db.readFromLocalDB('timetableChanges', id)
 
-        let lesson;
+        if (!lessonData) {
+            console.error('No lesson found!');
+            return;
+        }
 
-        timetableChanges.forEach(entry => {
-            if (entry.id != id) return;
-
-            lesson = new Lesson(entry.class, entry.subject);
-            lesson.id = entry.id;
-            lesson.date = entry.date;
-            lesson.timeslot = entry.timeslot;
-            lesson.canceled = entry.canceled;
-            lesson.type = entry.type;
-        })
+        let lesson = new Lesson(lessonData.class, lessonData.subject);
+        lesson.id = lessonData.id;
+        lesson.date = lessonData.date;
+        lesson.timeslot = lessonData.timeslot;
+        lesson.canceled = lessonData.canceled;
+        lesson.type = lessonData.type;
+        lesson.lastEdited = lessonData.lastEdited;
 
         return lesson;
     }
 
     static async getOldTimetableCopy() {
-        let standardTimetable = await this.getAllRegularLessons();
-        return JSON.parse(JSON.stringify(standardTimetable));
+        return await this.getAllRegularLessons();
     };
 
     static async getOldTimetableChanges() {
-        return JSON.parse(JSON.stringify(timetableChanges));
+        return await this.getAllTimetableChanges();
 
     };
 
     //public class methods
     async save() {
+        console.log(this);
+        let timetableChanges = await LessonController.getAllTimetableChanges();
+        
         if (this.subject == 'Termin') this.type = 'appointement';
 
-        let lessonData = {
-            'date': this.formatDate(this.date),
-            'timeslot': this.timeslot,
-            'class': this.class,
-            'subject': this.subject,
-            'canceled': this.canceled,
-            'type': this.type
-        };
-
         this.id = Fn.generateId(timetableChanges);
-        lessonData.id = this.id;
+        this.lastEdited = this.formatDateTime(new Date());
 
-        timetableChanges.push(lessonData);
-        let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
+        await this.writeToLocalDB('timetableChanges', this.serialize());
+        let result = await this.makeAjaxQuery('lesson', 'save', this.serialize());
 
-        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
     }
 
     async delete() {
-        timetableChanges.forEach(entry => {
-            if (entry.id != this.id) return;
-            timetableChanges.splice(timetableChanges.indexOf(entry), 1);
-        });
+        let deletedItem = await this.readFromLocalDB('timetableChanges', this.id);
+        this.deleteFromLocalDB('timetableChanges', this.id);
 
         let result = await this.makeAjaxQuery('lesson', 'delete', [{ 'id': this.id }]);
 
-        console.log('lesson', result, this);
-
-        if (result.status == 'failed' || result[0].status == 'failed') unsyncedDeletedTimetableChanges.push({ id: this.id });
+        if (result.status == 'failed' || result[0].status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', deletedItem);
     }
 
     async update() {
+        let timetableChanges = await LessonController.getAllTimetableChanges();
+
         if (this.subject == 'Termin') this.type = 'appointement';
-
-        let lessonData = {
-            'date': this.formatDate(this.date),
-            'timeslot': this.timeslot,
-            'class': this.class,
-            'subject': this.subject,
-            'canceled': this.canceled,
-            'type': this.type
-        };
-
+        this.lastEdited = this.formatDateTime(new Date());
         this.id = Fn.generateId(timetableChanges);
 
-        lessonData.id = this.id;
-
-        timetableChanges.push(lessonData);
+        this.writeToLocalDB('timetableChanges', this.serialize());
         let result = await this.makeAjaxQuery('lesson', 'save', lessonData);
 
-        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
     }
 
     async cancel() {
-        let lessonData = {
-            'id': this.id,
-            'date': this.formatDate(this.date),
-            'timeslot': this.timeslot,
-            'class': this.class,
-            'subject': this.subject,
-            'canceled': this.canceled,
-            'type': this.type
-        };
+        this.canceled = 'true';
+        this.lastEdited = this.formatDateTime(new Date());
 
-        if (this.id != undefined) { //lessons with an id are already on the timetablechanges table and must be updated
+        //lessons with an id are already on the timetablechanges table and must be updated
+        if (this.id != undefined) {
 
-            timetableChanges.forEach(entry => {
-                if (entry.id == this.id) entry.canceled = 'true';
-            })
-
+            this.updateOnLocalDB('timetableChanges', this.serialize());
             let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
-            // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+
+            if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
 
             return;
         }
 
+        let timetableChanges = await LessonController.getAllTimetableChanges();
+
         this.id = Fn.generateId(timetableChanges);
-        lessonData.id = this.id;
 
-        timetableChanges.push(lessonData);
-        let result = await this.makeAjaxQuery('lesson', 'addCanceled', lessonData);
+        this.writeToLocalDB('timetableChanges', this.serialize());
+        let result = await this.makeAjaxQuery('lesson', 'addCanceled', this.serialize());
 
-        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
     }
 
     async uncancel() {
+        console.log(this);
+        this.canceled = 'false';
+        this.lastEdited = this.formatDateTime(new Date());
 
-        timetableChanges.forEach(entry => {
-            if (entry.id == this.id) {
-                entry.canceled = 'false';
-            }
-        })
-
+        this.updateOnLocalDB('timetableChanges', this.serialize())
         let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
 
-        // if (result.status == 'failed') this.markUnsynced(this.id, timetableChanges);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', this.serialize());
     }
 
     serialize() {
@@ -246,7 +247,7 @@ export default class Lesson extends AbstractModel {
         }
 
         if (this.weekday) serialized.weekday = this.weekday;
-        if (this.date) serialized.date = this.date;
+        if (this.date) serialized.date = this.formatDateTime(this.date);
         if (this.type) serialized.type = this.type;
         if (this.canceled) serialized.canceled = this.canceled;
         if (this.validFrom) serialized.validFrom = this.validFrom;
@@ -351,7 +352,6 @@ export default class Lesson extends AbstractModel {
     }
 
     set lastEdited(lastEdited) {
-        console.log(lastEdited);
         this.#lastEdited = lastEdited;
-    } 
+    }
 }

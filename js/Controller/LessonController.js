@@ -13,27 +13,31 @@ export default class LessonController {
         return await Lesson.getRegularLessonsForCurrentWeek(monday, sunday);
     }
 
-    static getTimetableChanges(startDate, endDate) {
-        return Lesson.getTimetableChanges(startDate, endDate);
+    static async getAllTimetableChanges() {
+        return await Lesson.getAllTimetableChanges();
+    }
+
+    static async getTimetableChanges(startDate, endDate) {
+        return await Lesson.getTimetableChanges(startDate, endDate);
     }
 
     static getLessonObject(lessonData) {
         return this.#lessonDataToLessonObject(lessonData);
     }
 
-    static getLessonById(id) {
-        return Lesson.getLessonById(id);
+    static async getLessonById(id) {
+        return await Lesson.getLessonById(id);
     }
 
     static renderLesson(){
         View.renderLesson();
     }
 
-    static saveNewLesson(lessonData) {
+    static async saveNewLesson(lessonData) {
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        let oldTimetable = Lesson.getOldTimetableCopy();
-        let oldTimetableChanges = Lesson.getOldTimetableChanges();
+        let oldTimetable = await Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 
         if (lessonData.class == '' && lessonData.subject != 'Termin') {
             View.alertClassInput();
@@ -45,11 +49,10 @@ export default class LessonController {
             return false;
         }
 
-        lesson.save();
-        View.renderLesson()
+        await lesson.save();
 
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
-
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        this.renderLesson();
     }
 
     static deleteLessonById(id) {
@@ -58,7 +61,7 @@ export default class LessonController {
         lesson.delete();
     }
 
-    static updateLesson(lessonData, oldLessonData) {
+    static async updateLesson(lessonData, oldLessonData) {
 
         if (lessonData.class == '' && lessonData.subject != 'Termin') {
             View.alertClassInput();
@@ -73,47 +76,49 @@ export default class LessonController {
         this.setLessonCanceled(oldLessonData);
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        let oldTimetable = Lesson.getOldTimetableCopy();
-        let oldTimetableChanges = Lesson.getOldTimetableChanges();
-        lesson.update();
+        let oldTimetable = await Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = await Lesson.getOldTimetableChanges();
+        
+        await lesson.update();
 
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
-        View.renderLesson();
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        this.renderLesson();
     }
 
-    static setLessonCanceled(lessonData) {
+    static async setLessonCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        let oldTimetable = Lesson.getOldTimetableCopy();
-        let oldTimetableChanges = Lesson.getOldTimetableChanges();
+        let oldTimetable = await Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 
-        lesson.cancel();
+        await lesson.cancel();
 
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
-
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        this.renderLesson();
 
         return lesson.id;
     }
 
-    static setLessonNotCanceled(lessonData) {
+    static async setLessonNotCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        let oldTimetable = Lesson.getOldTimetableCopy();
-        let oldTimetableChanges = Lesson.getOldTimetableChanges();
+        let oldTimetable = await Lesson.getOldTimetableCopy();
+        let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 
-        lesson.uncancel();
+        await lesson.uncancel();
 
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        this.renderLesson();
     }
 
     static createNewTask(event) {
         TaskController.createNewTask(event);
     }
 
-    static getOldTimetableCopy() {
-        return Lesson.getOldTimetableCopy();
+    static async getOldTimetableCopy() {
+        return await Lesson.getOldTimetableCopy();
     };
 
-    static getOldTimetableChanges() {
-        return Lesson.getOldTimetableChanges();
+    static async getOldTimetableChanges() {
+        return await Lesson.getOldTimetableChanges();
     };
 
     static async getAllSubjects() {
