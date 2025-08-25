@@ -18,7 +18,7 @@ export default class Settings extends AbstractModel {
         let result = await this.makeAjaxQuery('settings', 'saveSubject', subject);
 
         if (result.status == 'failed') {
-            this.writeToLocalDB('unsyncedSubjects', subject);
+            this.updateOnLocalDB('unsyncedSubjects', subject);
         }
     }
 
@@ -31,7 +31,7 @@ export default class Settings extends AbstractModel {
 
         if (result.status == 'failed') {
             deletedSubject.lastEdited = this.formatDateTime(new Date());
-            this.writeToLocalDB('unsyncedDeletedSubjects', deletedSubject);
+            this.updateOnLocalDB('unsyncedDeletedSubjects', deletedSubject);
         }
 
         return;
@@ -53,7 +53,7 @@ export default class Settings extends AbstractModel {
 
         if (result.status == 'failed') {
             lessons.forEach(entry => {
-                this.writeToLocalDB('unsyncedTimetables', entry);
+                this.updateOnLocalDB('unsyncedTimetables', entry);
             });
         }
     }
@@ -97,7 +97,7 @@ export default class Settings extends AbstractModel {
                 this.updateOnLocalDB('unsyncedTimetables', entry);
             });
             deletedLessons.forEach(entry => {
-                this.writeToLocalDB('unsyncedDeletedTimetableLessons', entry.serialize());
+                this.updateOnLocalDB('unsyncedDeletedTimetableLessons', entry.serialize());
             })
         }
     }

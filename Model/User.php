@@ -29,10 +29,10 @@ class User extends AbstractModel
     public function login($loginData)
     {
         $user = $this->getUserByEmail($loginData['userEmail']);
-
-        if (empty($user)) {
+        
+        if (is_array($user) && isset($user['status']) && $user['status'] == 'failed') {
             return [
-                'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
+                'message' => $user['message'],
                 'status' => 'failed'
             ];
             exit();
@@ -276,6 +276,7 @@ class User extends AbstractModel
         $query = "SELECT * FROM $this->tableName WHERE userEmail = :email";
         $result = $this->read($query, ['email' => $email]);
 
+        if (isset($result['status']) && $result['status'] == 'failed') return $result;
 
         if (!empty($result)) {
             $user = new User($result[0]['id']);

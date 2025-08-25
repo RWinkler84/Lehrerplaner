@@ -5,7 +5,6 @@ namespace Model;
 use PDO;
 use DateTime;
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 
@@ -33,7 +32,8 @@ class AbstractModel
         }
 
         return [
-            'status' => 'failed'
+            'status' => 'failed',
+            'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte versuche es später noch einmal.'
         ];
     }
 

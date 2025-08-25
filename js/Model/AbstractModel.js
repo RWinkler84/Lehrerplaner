@@ -82,7 +82,7 @@ export default class AbstractModel {
         let transaction = db.transaction(store, 'readwrite').objectStore(store).add(dataToStore,);
 
         transaction.onsuccess = () => {
-            this.markLocalDBUpdated()
+            this.markLocalDBUpdated();
         }
         transaction.onerror = () => {
             console.error('storing failed', transaction.error)

@@ -30,6 +30,8 @@ async function loadData() {
 async function startApp() {
     await loadData();
 
+    document.querySelector('#dispatcher').addEventListener('dataChanged', () => { alert('Geändert!') });
+
     //checking for unsynced changes
     // setInterval(abstCtrl.checkDataState.bind(abstCtrl), ONEMIN);
 
