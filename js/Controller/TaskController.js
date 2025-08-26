@@ -44,7 +44,7 @@ export default class TaskController {
         View.createTaskForm(event);
     }
 
-    static saveNewTask(taskData, event) {
+    static saveTask(taskData, event) {
         let task = new Task();
 
         task.id = taskData.id;
@@ -103,7 +103,7 @@ export default class TaskController {
 
         this.renderTaskChanges();
         View.removeEditability(event);
-        View.createSetDoneOrInProgressButtons(event);
+        View.showSetDoneOrInProgressButtons(event);
 
         return true;
     }
@@ -113,7 +113,7 @@ export default class TaskController {
 
         task.setInProgress();
         this.renderTaskChanges();
-        View.createSetDoneOrInProgressButtons(event);
+        View.showSetDoneOrInProgressButtons(event);
     }
 
     static async setTaskDone(id, event) {
@@ -122,7 +122,7 @@ export default class TaskController {
         task.setDone();
         this.renderTaskChanges();
 
-        if (task.reoccuring == 1) View.createSetDoneOrInProgressButtons(event);
+        if (task.reoccuring == 1) View.showSetDoneOrInProgressButtons(event);
         LessonController.renderLesson();
     }
 
@@ -150,9 +150,8 @@ export default class TaskController {
 
         if (event.target.classList.contains('setTaskDoneButton')) View.setTaskDone(event);
         if (event.target.classList.contains('setTaskInProgressButton')) View.setTaskInProgress(event);
-        if (event.target.classList.contains('saveNewTaskButton')) View.saveNewTask(event);
+        if (event.target.classList.contains('saveTaskButton')) View.saveTask(event);
         if (event.target.classList.contains('discardUpdateTaskButton')) View.revertChanges(event);
-        if (event.target.classList.contains('updateTaskButton')) View.updateTask(event);
         if (event.target.classList.contains('discardNewTaskButton')) View.removeTaskForm(event);
     }
 }

@@ -437,11 +437,11 @@ dialog .errorMessageDisplay {
     text-overflow: ellipsis;
 }
 
-.taskDone {
+.taskDone div{
     display: flex;
     min-width: 125px;
     gap: 0.5rem;
-    justify-content: center;
+    justify-content: end;
     vertical-align: center;
 }
 
@@ -675,7 +675,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 
-.saveNewTaskButton,
+.saveTaskButton,
 .updateTaskButton,
 .setTaskDoneButton,
 .saveNewLessonButton {
@@ -689,7 +689,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--lightMatteRed) !important;
 }
 
-.saveNewTaskButton:hover,
+.saveTaskButton:hover,
 .updateTaskButton:hover,
 .setTaskDoneButton:hover,
 .saveNewLessonButton:hover {

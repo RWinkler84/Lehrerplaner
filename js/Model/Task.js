@@ -105,7 +105,7 @@ export default class Task extends AbstractModel {
             if (task.status == 'open') openTasks.push(task);
         })
 
-        openTasks.sort(Fn.sortByDate);
+        openTasks = Fn.sortByDateAndTimeslot(openTasks);
 
         return openTasks;
     }
@@ -118,7 +118,7 @@ export default class Task extends AbstractModel {
             if (task.status == 'inProgress') inProgressTasks.push(task);
         })
 
-        inProgressTasks.sort(Fn.sortByDate);
+        inProgressTasks = Fn.sortByDateAndTimeslot(inProgressTasks);
 
         return inProgressTasks;
     }
@@ -155,6 +155,8 @@ export default class Task extends AbstractModel {
         let allTasks = [];
 
         allTasksArray.forEach((element) => {
+            if (element.status == 'done') return;
+
             let task = new Task();
             task.id = element.id;
             task.class = element.class;
