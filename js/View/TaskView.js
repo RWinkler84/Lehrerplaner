@@ -568,21 +568,20 @@ export default class TaskView extends AbstractView {
             buttonWrapper = this.#getButtonWrapperSibling(buttonWrapper);
         }
 
-        let taskId = buttonWrapper.closest('tr').dataset.taskid;
+        let taskTr = event.target.closest('td').classList.contains('responsive')
+            ? event.target.closest('tr').previousElementSibling.previousElementSibling
+            : event.target.closest('tr');
 
-        if (taskId) {
+        if (!taskTr.hasAttribute('data-new')) {
             this.revertChanges(event);
             return;
         }
 
         let tableBody = event.target.closest('tbody');
-        let firstFormTr = event.target.classList.contains('responsive')
-            ? event.target.closest('tr').previousElementSibling.previousElementSibling
-            : event.target.closest('tr');
 
-        firstFormTr.nextElementSibling.nextElementSibling.remove();
-        firstFormTr.nextElementSibling.remove();
-        firstFormTr.remove();
+        taskTr.nextElementSibling.nextElementSibling.remove();
+        taskTr.nextElementSibling.remove();
+        taskTr.remove();
 
         if (tableBody.querySelectorAll('td').length == 0) {
             tableBody.previousElementSibling.style.display = 'none';
