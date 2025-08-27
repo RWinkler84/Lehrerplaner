@@ -296,6 +296,8 @@ export default class TaskView extends AbstractView {
         let formTr = document.createElement('tr');
 
         checkBoxTR.setAttribute('data-new', '');
+        checkBoxTR.removeAttribute('style');
+
         responsiveButtonTR.setAttribute('data-new', '');
 
         formTr.setAttribute('data-new', '');

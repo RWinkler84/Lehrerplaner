@@ -457,6 +457,10 @@ tr[data-new] td {
     border-color: var(--contentContainerBackground) !important;
 }
 
+tr[data-new] td.taskAdditionalInfo {
+    border-color: var(--lightergrey) !important;
+}
+
 tr[data-new]:has(td[data-taskDescription]) td {
     border-top: solid 1px var(--contentContainerBackground);
 }
