@@ -199,7 +199,15 @@ export default class TaskView extends AbstractView {
             openTaskTableBody.insertBefore(taskElement, openTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
             openTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
             openTaskTableBody.insertBefore(responsiveButtonElement, taskElement.nextElementSibling.nextElementSibling);
-        })
+        });
+
+        //rerender previously unsaved task forms
+        if (allInProgressTaskIds.length < allRenderedTaskTrs.length) {
+            allRenderedTaskTrs.forEach(tr => {
+                if (openTaskTableBody.contains(tr)) return;
+                openTaskTable.append(tr);
+            });
+        }
 
         allInProgressTaskIds.forEach(taskId => {
             if (taskId == 0) return;
@@ -298,13 +306,13 @@ export default class TaskView extends AbstractView {
         formTr.innerHTML = this.getTaskTrHTML(task);
         formTr.querySelector('.taskDescription').contentEditable = true;
         formTr.querySelectorAll('.taskDone>div').forEach(div => {
-            if (div.classList.contains('editableTask')){
+            if (div.classList.contains('editableTask')) {
                 div.style.display = 'flex';
             } else {
                 div.style.display = 'none';
             }
         })
-        
+
         taskTable.append(formTr);
         taskTable.append(checkBoxTR);
         taskTable.append(responsiveButtonTR);
@@ -609,7 +617,7 @@ export default class TaskView extends AbstractView {
         taskTr.querySelector('td[data-taskDescription]').innerHTML = task.description;
 
         selectTr.querySelector('input[name="fixedDate"]').checked = task.fixedTime == 1 ? true : false;
-        selectTr.querySelector('input[name="fixedDate"]').disabled = task.reoccuring == 1 ? true: false;
+        selectTr.querySelector('input[name="fixedDate"]').disabled = task.reoccuring == 1 ? true : false;
         selectTr.querySelector('input[name="reoccuringTask"]').checked = task.reoccuring == 1 ? true : false;
         selectTr.querySelector('select[name="reoccuringIntervalSelect"]').disabled = task.reoccuring == 1 ? false : true;
         selectTr.querySelectorAll('option').forEach(option => {
