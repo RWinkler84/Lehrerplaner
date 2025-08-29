@@ -181,6 +181,44 @@ class AbstractModel
         return $this->escapeDbData($dataFromDb);
     }
 
+    public function getDbUpdateTimestamps()
+    {
+        global $user;
+
+        $userId = $user->getId();
+        $tableName = TABLEPREFIX . 'updateTimestamps';
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
+
+        $result = $this->read($query, []);
+        $result = $this->preprocessReadData($result);
+
+        if (empty($result)) return ['status' => 'failed'];
+
+        return $result;
+    }
+
+    public function setDbUpdateTimestamp($updatedTableName, $dateTime)
+    {
+        global $user;
+        $tableName = TABLEPREFIX . 'updateTimestamps';
+        $timestamp = $dateTime->format('Y-m-d H:i:s');
+
+        $query = "
+            INSERT INTO $tableName (userId, $updatedTableName) 
+            VALUES (:userId, :timestamp)
+            ON DUPLICATE KEY UPDATE
+                $updatedTableName = :timestamp
+        ";
+
+        $params = [
+            'userId' => $user->getId(),
+            'timestamp' => $timestamp
+        ];
+
+        $this->write($query, $params);
+    }
+
     //escape
     private function escapeDbData($data)
     {
@@ -201,7 +239,7 @@ class AbstractModel
     {
         if (!isset($dataArray['status']) || $dataArray['status'] != 'failed') {
             $dataArray = array_map(function ($data) {
-                $data['id'] = $data['itemId'];
+                if (isset($data['itemId'])) $data['id'] = $data['itemId'];
                 unset($data['userId']);
                 unset($data['itemId']);
 

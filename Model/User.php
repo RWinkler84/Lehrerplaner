@@ -2,6 +2,8 @@
 
 namespace Model;
 
+use Controller\AbstractController;
+use Controller\UserController;
 use DateInterval;
 use DateTime;
 use Error;
@@ -29,7 +31,7 @@ class User extends AbstractModel
     public function login($loginData)
     {
         $user = $this->getUserByEmail($loginData['userEmail']);
-        
+
         if (is_array($user) && isset($user['status']) && $user['status'] == 'failed') {
             return [
                 'message' => $user['message'],
@@ -52,7 +54,7 @@ class User extends AbstractModel
         if (password_verify($loginData['password'], $user->getPassword())) {
             $_SESSION['isLoggedIn'] = true;
             $_SESSION['userId'] = $user->getId();
-            
+
             $user->setRememberMeCookie();
 
             //if the user has requested a password reset, but still logs in with the old data the token needs to be wiped
@@ -62,7 +64,7 @@ class User extends AbstractModel
             return [
                 'status' => 'success',
                 'message' => 'Successfully logged in'
-                ];
+            ];
         } else {
             return [
                 'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
@@ -71,7 +73,7 @@ class User extends AbstractModel
         }
     }
 
-    public function isRemembered($rememberMeToken) :void
+    public function isRemembered($rememberMeToken): void
     {
         $user = $this->getUserByRememberMeToken($rememberMeToken);
 
@@ -79,7 +81,7 @@ class User extends AbstractModel
             $today = (new DateTime())->getTimestamp();
             $rememberMeUntil = strtotime($user->rememberMeUntil);
 
-            if ($today <= $rememberMeUntil){
+            if ($today <= $rememberMeUntil) {
                 $_SESSION['userId'] = $user->getId();
                 $_SESSION['isLoggedIn'] = true;
             }
@@ -103,8 +105,9 @@ class User extends AbstractModel
 
         $result = $this->write($query, $accountData);
 
-        if ($result['message'] == 'Data saved sucessfully') {
+        if ($result['status'] == 'success') {
             $user = $this->getUserByEmail($accountData['userEmail']);
+            $this->setInitalUpdateTimestamps($user);
 
             $mailSend = $user->sendEmailAuthenticationMail();
         }
@@ -116,7 +119,8 @@ class User extends AbstractModel
         return ['message' => 'Etwas ist schief gelaufen...'];
     }
 
-    public function deleteAccount() {
+    public function deleteAccount()
+    {
         global $user;
 
         $query = "DELETE FROM $this->tableName WHERE id = :id";
@@ -225,6 +229,26 @@ class User extends AbstractModel
         return ['message' => 'Der von dir verwendete Link scheint abgelaufen zu sein. Fordere einen neuen an.'];
     }
 
+    private function setInitalUpdateTimestamps($user)
+    {
+        $tableName = TABLEPREFIX . 'updateTimestamps';
+        $timestamp = (new DateTime())->format('Y-m-d H:i:s');
+
+        $query = "
+            INSERT INTO $tableName (userId, subjects, tasks, timetable, timetableChanges)
+            VALUES (:userId, :subjects, :tasks, :timetable, :timetableChanges)";
+
+        $params = [
+            'userId' => $user->getId(),
+            'subjects' => $timestamp,
+            'tasks' => $timestamp,
+            'timetable' => $timestamp,
+            'timetableChanges' => $timestamp,
+        ];
+
+        $this->write($query, $params);
+    }
+
     public function getId()
     {
         return $this->userId;
@@ -318,12 +342,13 @@ class User extends AbstractModel
         return $result;
     }
 
-    private function setRememberMeCookie(){
+    private function setRememberMeCookie()
+    {
         $rememberMeToken = bin2hex(random_bytes(20));
-        $rememberMeUntil = (new DateTime())->setTime(3,0)->modify('+1 day')->format('Y-m-d H:i:s'); 
+        $rememberMeUntil = (new DateTime())->setTime(3, 0)->modify('+1 day')->format('Y-m-d H:i:s');
         $rememberMeUntilTimestamp = strtotime($rememberMeUntil);
-        
-        
+
+
         $query = "UPDATE $this->tableName SET rememberMeToken = :rememberMeToken, rememberMeUntil = :rememberMeUntil WHERE id = :id";
         $params = [
             'rememberMeToken' => $rememberMeToken,
@@ -333,8 +358,8 @@ class User extends AbstractModel
 
         $result = $this->write($query, $params);
 
-        if ($result['status'] == 'success'){
-            setcookie('lprm', $rememberMeToken, $rememberMeUntilTimestamp,"", "", true);
+        if ($result['status'] == 'success') {
+            setcookie('lprm', $rememberMeToken, $rememberMeUntilTimestamp, "", "", true);
         }
     }
 

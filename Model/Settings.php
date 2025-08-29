@@ -4,6 +4,7 @@ namespace Model;
 
 use Model\AbstractModel;
 use Exception;
+use DateTime;
 
 class Settings extends AbstractModel
 {
@@ -14,7 +15,12 @@ class Settings extends AbstractModel
 
         $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :lastEdited)";
 
-        return $this->write($query, $subject);
+        $result = $this->write($query, $subject);
+
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subject['lastEdited']));
+
+        return $result;
+
     }
 
     public function deleteSubjects($ids)
@@ -35,6 +41,8 @@ class Settings extends AbstractModel
 
             if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         };
+
+        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime());
 
         return $finalResult;
     }
@@ -59,6 +67,8 @@ class Settings extends AbstractModel
 
             if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         }
+
+        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($timetableData[0]['lastEdited']));
 
         return $finalResult;
     }
@@ -96,6 +106,8 @@ class Settings extends AbstractModel
 
             if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         }
+
+        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($timetableData[0]['lastEdited']));
 
         return $finalResult;
     }
@@ -147,35 +159,8 @@ class Settings extends AbstractModel
             if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         }
 
+        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subjectsData[0]['lastEdited']));
+
         return $finalResult;
     }
-
-    // public function syncTimetable($timetableData)
-    // {
-    //     $timetableData = $this->preprocessDataToWrite($timetableData);
-    //     $results = [];
-    //     $tableName = TABLEPREFIX . 'timetable';
-
-    //     $query = "
-    //         INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekday, timeslot, lastEdited)
-    //         VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekday, :timeslot, :lastEdited)
-    //         ON DUPLICATE KEY UPDATE
-    //             validFrom = IF (VALUES(lastEdited) > lastEdited, VALUES(validFrom), validFrom),
-    //             validUntil = IF (VALUES(lastEdited) > lastEdited, VALUES(validUntil), validUntil),
-    //             class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
-    //             subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
-    //             weekday = IF (VALUES(lastEdited) > lastEdited, VALUES(weekday), weekday),
-    //             timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
-    //             lastEdited =  IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
-    //         ";
-
-    //     foreach ($timetableData as $lesson) {
-    //         if (!isset($lesson['validUntil']) || empty($lesson['validUntil'])) $lesson['validUntil'] = null;
-
-    //         $result = $this->write($query, $lesson);
-    //         $result['lesson'] = $lesson;
-    //         array_push($results, $result);
-    //     }
-    //     return $results;
-    // }
 }

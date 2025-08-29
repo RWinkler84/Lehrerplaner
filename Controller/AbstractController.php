@@ -39,6 +39,16 @@ class AbstractController {
         echo json_encode($result);
     }
 
+    public function setDbUpdateTimestamp($updatedTableName, $dateTime) {
+        $this->db->setDbUpdateTimestamp($updatedTableName, $dateTime);
+    }
+
+    public function getDbUpdateTimestamps() {
+        $result = $this->db->getDbUpdateTimestamps();
+
+        echo json_encode($result);
+    }
+
     public function syncDatabase(){
         $dataToSync = json_decode(file_get_contents('php://input'), true);
 

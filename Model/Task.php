@@ -2,6 +2,7 @@
 
 namespace Model;
 
+use DateTime;
 use Model\AbstractModel;
 
 class Task extends AbstractModel
@@ -13,9 +14,13 @@ class Task extends AbstractModel
         $taskData = $this->preprocessDataToWrite($taskData);
 
         $query = "INSERT INTO $this->tableName 
-            (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval) 
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval)";
-        return $this->write($query, $taskData);
+            (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, lastEdited) 
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :lastEdited)";
+        $result = $this->write($query, $taskData);
+        
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
+
+        return $result;
     }
 
     public function update($taskData)
@@ -23,34 +28,47 @@ class Task extends AbstractModel
         $taskData = $this->preprocessDataToWrite($taskData);
 
         $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval, lastEdited=:lastEdited WHERE userId = :userId AND itemId=:itemId";
+        $result = $this->write($query, $taskData);
 
-        return $this->write($query, $taskData);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
+
+        return $result;
     }
 
     public function deleteTaskById($taskId) {
         global $user;
 
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
+        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $taskId]);
 
-        return $this->delete($query, ['userId' => $user->getId(), 'itemId' => $taskId]);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime());
+
+        return $result;
     }
 
-    public function setInProgress($taskId)
+    public function setInProgress($taskData)
     {
-        $taskId = $this->preprocessDataToWrite($taskId);
+        $taskId = $this->preprocessDataToWrite($taskData);
 
-        $query = "UPDATE $this->tableName SET status='inProgress' WHERE userId=:userId AND itemId = :itemId";
+        $query = "UPDATE $this->tableName SET status='inProgress', lastEdited=:lastEdited WHERE userId=:userId AND itemId = :itemId";
+        $result = $this->write($query, $taskId);
 
-        return $this->write($query, $taskId);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
+
+        return $result;
     }
 
-    public function setDone($taskId)
+    public function setDone($taskData)
     {
-        $taskId = $this->preprocessDataToWrite($taskId);
+        $taskId = $this->preprocessDataToWrite($taskData);
 
-        $query = "UPDATE $this->tableName SET status='done' WHERE userId=:userId AND itemId = :itemId";
+        $query = "UPDATE $this->tableName SET status='done', lastEdited=:lastEdited WHERE userId=:userId AND itemId = :itemId";
 
-        return $this->write($query, $taskId);
+        $result = $this->write($query, $taskId);
+
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
+
+        return $result;
     }
 
     public function syncTasks($tasks)

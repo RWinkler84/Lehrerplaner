@@ -67,7 +67,6 @@ class LessonController extends AbstractController
         $lessonData = json_decode(file_get_contents('php://input'), true);
         $results = [];
 
-
         foreach ($lessonData as $lesson) {
             $result = $this->model->deleteLessonById($lesson['id']);
             

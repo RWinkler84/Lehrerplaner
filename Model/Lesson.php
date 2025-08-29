@@ -12,25 +12,37 @@ class Lesson extends AbstractModel
     public function save($lessonData)
     {
         $lessonData = $this->preprocessDataToWrite($lessonData);
-        $query = "INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, type, canceled, lastEdited) VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :type, :canceled, :lastEdited)";
 
-        return $this->write($query, $lessonData);
+        error_log(print_r($lessonData, true));
+        $query = "INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, type, canceled, lastEdited) VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :type, :canceled, :lastEdited)";
+
+        $result = $this->write($query, $lessonData);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
+        
+        return $result;
     }
 
     public function cancel($lessonData)
     {
-        $lessonData = $this->preprocessDataToWrite($lessonData);
-        $query = "UPDATE $this->tableName SET canceled = 'true' WHERE userId=:userId AND itemId = :itemId";
 
-        return $this->write($query, $lessonData);
+        $lessonData = $this->preprocessDataToWrite($lessonData);
+        $query = "UPDATE $this->tableName SET canceled = 'true', lastEdited = :lastEdited WHERE userId=:userId AND itemId = :itemId";
+
+        $result = $this->write($query, $lessonData);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
+        
+        return $result;
     }
 
     public function uncancel($lessonData)
     {
         $lessonData = $this->preprocessDataToWrite($lessonData);
-        $query = "UPDATE $this->tableName SET canceled = 'false' WHERE userId=:userId AND itemId = :itemId";
+        $query = "UPDATE $this->tableName SET canceled = 'false', lastEdited = :lastEdited WHERE userId=:userId AND itemId = :itemId";
 
-        return $this->write($query, $lessonData);
+        $result = $this->write($query, $lessonData);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
+        
+        return $result;
     }
 
     public function deleteLessonById($lessonId)
@@ -39,13 +51,16 @@ class Lesson extends AbstractModel
 
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
 
-        return $this->delete($query, ['userId' => $user->getId(), 'itemId' => $lessonId]);
+        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $lessonId]);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime());
+        
+        return $result;
     }
 
     public function syncTimetableChanges($timetableChanges)
     {
         $timetableChanges = $this->preprocessDataToWrite($timetableChanges);
-        $results = [];
+        $finalResult = ['status' => 'success'];
 
         $query = "
             INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, type, canceled, lastEdited)
@@ -62,10 +77,12 @@ class Lesson extends AbstractModel
 
         foreach ($timetableChanges as $lesson) {
             $result = $this->write($query, $lesson);
-            $result['id'] = $lesson['itemId'];
-            array_push($results, $result);
+
+            if ($result['status'] == 'failed') $finalResult = ['status' => 'failed'];
         }
 
-        return $results;
+        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($timetableChanges[0]['lastEdited']));
+
+        return $finalResult;
     }
 }

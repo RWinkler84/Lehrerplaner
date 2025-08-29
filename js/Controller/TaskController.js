@@ -123,6 +123,7 @@ export default class TaskController {
         this.renderTaskChanges();
 
         if (task.reoccuring == 1) View.showSetDoneOrInProgressButtons(event);
+        if (task.reoccuring == 0) View.removeTask(event);
         LessonController.renderLesson();
     }
 

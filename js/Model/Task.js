@@ -55,7 +55,7 @@ export default class Task extends AbstractModel {
 
         await this.updateOnLocalDB('tasks', this.serialize());
 
-        let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id });
+        let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id, 'lastEdited': this.lastEdited });
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTasks', this.serialize());
 
     }
@@ -71,7 +71,7 @@ export default class Task extends AbstractModel {
 
         await this.updateOnLocalDB('tasks', this.serialize());
 
-        let result = await this.makeAjaxQuery('task', 'setDone', { 'id': this.id });
+        let result = await this.makeAjaxQuery('task', 'setDone', { 'id': this.id, 'lastEdited': this.lastEdited });
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTasks', this.serialize());
     }
 
@@ -301,7 +301,7 @@ export default class Task extends AbstractModel {
             class: this.class,
             subject: this.subject,
             status: this.status,
-            date: this.date,
+            date: this.formatDate(this.date),
             timeslot: this.timeslot,
             description: this.description,
             fixedTime: this.fixedTime,

@@ -209,7 +209,7 @@ export default class Lesson extends AbstractModel {
         if (this.id != undefined) {
 
             this.updateOnLocalDB('timetableChanges', this.serialize());
-            let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id });
+            let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id, 'lastEdited': this.lastEdited });
 
             if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
 
@@ -231,7 +231,7 @@ export default class Lesson extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         this.updateOnLocalDB('timetableChanges', this.serialize())
-        let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id })
+        let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id, 'lastEdited': this.lastEdited })
 
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
     }
@@ -245,7 +245,7 @@ export default class Lesson extends AbstractModel {
         }
 
         if (this.weekday) serialized.weekday = this.weekday;
-        if (this.date) serialized.date = this.formatDateTime(this.date);
+        if (this.date) serialized.date = this.formatDate(this.date);
         if (this.type) serialized.type = this.type;
         if (this.canceled) serialized.canceled = this.canceled;
         if (this.validFrom) serialized.validFrom = this.validFrom;

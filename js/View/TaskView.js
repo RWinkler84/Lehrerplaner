@@ -656,6 +656,13 @@ export default class TaskView extends AbstractView {
         Controller.setTaskDone(taskId, event);
     }
 
+    static removeTask(event) {
+        let taskTr = event.target.closest('tr');
+        taskTr.nextElementSibling.nextElementSibling.remove() //responsive Buttons tr
+        taskTr.nextElementSibling.remove() //checkbox tr
+        taskTr.remove();
+    }
+
     static #backupTaskData(event) {
 
         let parentTr = event.target.closest('tr');
