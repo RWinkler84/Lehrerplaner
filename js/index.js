@@ -17,14 +17,10 @@ export let unsyncedDeletedTimetableChanges = [];
 
 let abstCtrl = new AbstractController();
 
-// export let allSubjects = [];
-// export let standardTimetable = [];
-// export let allTasksArray = [];
-// export let timetableChanges = [];
 export let taskBackupArray = [];
 
 async function loadData() {
-    await abstCtrl.syncDataOnStart();
+    await abstCtrl.syncData();
 }
 
 async function startApp() {

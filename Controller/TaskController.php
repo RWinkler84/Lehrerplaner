@@ -37,16 +37,14 @@ class TaskController extends AbstractController
     public function delete()
     {
         $taskData = json_decode(file_get_contents('php://input'), true);
-        $results = [];
+        $finalResult = ['status' => 'success'];
 
         foreach ($taskData as $task) {
-            $result = $this->model->deleteTaskById($task['id']);
-
-            $result['id'] = $task['id'];
-            array_push($results, $result);
+            $result = $this->model->deleteTask($task);
+            if ($result['status' == 'failed']) $finalResult = ['status' => 'failed'];
         }
 
-        echo json_encode($results);
+        echo json_encode($finalResult);
     }
 
     public function setInProgress()

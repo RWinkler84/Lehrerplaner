@@ -23,7 +23,7 @@ class Settings extends AbstractModel
 
     }
 
-    public function deleteSubjects($ids)
+    public function deleteSubjects($subjects)
     {
         global $user;
 
@@ -31,10 +31,9 @@ class Settings extends AbstractModel
         $tableName = TABLEPREFIX . 'subjects';
         $finalResult['status'] = 'success';
 
-
         $query = "DELETE FROM $tableName WHERE userId = $userId AND itemId=:id";
 
-        foreach ($ids as $entry) {
+        foreach ($subjects as $entry) {
             $item['id'] = $entry['id'];
 
             $result = $this->delete($query, $item);
@@ -42,7 +41,7 @@ class Settings extends AbstractModel
             if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         };
 
-        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime());
+        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subjects[0]['lastEdited']));
 
         return $finalResult;
     }

@@ -68,7 +68,7 @@ class LessonController extends AbstractController
         $results = [];
 
         foreach ($lessonData as $lesson) {
-            $result = $this->model->deleteLessonById($lesson['id']);
+            $result = $this->model->deleteLesson($lesson);
             
             $result['id'] = $lesson['id'];
             array_push($results, $result);

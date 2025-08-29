@@ -35,13 +35,13 @@ class Task extends AbstractModel
         return $result;
     }
 
-    public function deleteTaskById($taskId) {
+    public function deleteTask($taskData) {
         global $user;
 
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
-        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $taskId]);
+        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $taskData['id']]);
 
-        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime());
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
 
         return $result;
     }

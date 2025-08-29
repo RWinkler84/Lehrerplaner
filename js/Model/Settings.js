@@ -62,13 +62,12 @@ export default class Settings extends AbstractModel {
         let standardTimetable = await SettingsController.getAllRegularLessons();
         let timetableHasValidUntil = false;
         let validUntilDate;
-        let deletedLessons = [];
 
         //remove the old timetable
         for (let i = standardTimetable.length - 1; i >= 0; i--) {
             if (standardTimetable[i].validFrom == validFrom) {
                 await this.deleteFromLocalDB('timetable', standardTimetable[i].id)
-                deletedLessons.push((standardTimetable.splice(i, 1))[0]);
+                standardTimetable.splice(i, 1);
             }
         }
 
@@ -96,9 +95,6 @@ export default class Settings extends AbstractModel {
             lessons.forEach(entry => {
                 this.updateOnLocalDB('unsyncedTimetables', entry);
             });
-            deletedLessons.forEach(entry => {
-                this.updateOnLocalDB('unsyncedDeletedTimetableLessons', entry.serialize());
-            })
         }
     }
 

@@ -45,14 +45,14 @@ class Lesson extends AbstractModel
         return $result;
     }
 
-    public function deleteLessonById($lessonId)
+    public function deleteLesson($lesson)
     {
         global $user;
 
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
 
-        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $lessonId]);
-        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime());
+        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $lesson['id']]);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lesson['lastEdited']));
         
         return $result;
     }
