@@ -185,7 +185,7 @@ export default class Lesson extends AbstractModel {
 
         let result = await this.makeAjaxQuery('lesson', 'delete', [{ 'id': this.id }]);
 
-        if (result.status == 'failed' || result[0].status == 'failed') this.writeToLocalDB('unsyncedTimetableChanges', deletedItem);
+        if (result.status == 'failed' || result[0].status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', deletedItem);
     }
 
     async update() {

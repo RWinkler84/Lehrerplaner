@@ -128,7 +128,7 @@ export default class TaskController {
     }
 
     static renderTaskChanges() {
-        View.rerenderTasks();
+        View.renderTasks();
     }
 
     static async reorderTasks(oldTimetable, oldTimetableChanges) {

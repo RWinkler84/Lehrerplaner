@@ -65,16 +65,14 @@ class LessonController extends AbstractController
     public function delete()
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
-        $results = [];
+        $finalResult = ['status' => 'success'];
 
         foreach ($lessonData as $lesson) {
             $result = $this->model->deleteLesson($lesson);
-            
-            $result['id'] = $lesson['id'];
-            array_push($results, $result);
+            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
             }
 
-        echo json_encode($results);
+        echo json_encode($finalResult);
     }
 
     public static function syncTimetableChanges($timetableChanges)

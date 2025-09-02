@@ -17,7 +17,7 @@ class Task extends AbstractModel
             (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, lastEdited) 
             VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :lastEdited)";
         $result = $this->write($query, $taskData);
-        
+
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
 
         return $result;
@@ -35,7 +35,8 @@ class Task extends AbstractModel
         return $result;
     }
 
-    public function deleteTask($taskData) {
+    public function deleteTask($taskData)
+    {
         global $user;
 
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
@@ -73,7 +74,7 @@ class Task extends AbstractModel
 
     public function syncTasks($tasks)
     {
-        $results = [];
+        $finalResult = ['status' => 'success'];
         $tasks = $this->preprocessDataToWrite($tasks);
 
         $query = "
@@ -99,10 +100,10 @@ class Task extends AbstractModel
             }
 
             $result = $this->write($query, $task);
-            $result['id'] = $task['itemId'];
-            array_push($results, $result);
+            if ($result['status'] == 'failed') $finalResult['status'] == 'failed';
+            if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($task['lastEdited']));
         }
 
-        return $results;
+        return $finalResult;
     }
 }

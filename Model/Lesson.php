@@ -63,12 +63,13 @@ class Lesson extends AbstractModel
         $finalResult = ['status' => 'success'];
 
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, type, canceled, lastEdited)
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :type, :canceled, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, weekday, subject, type, canceled, lastEdited)
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :weekday, :subject, :type, :canceled, :lastEdited)
             ON DUPLICATE KEY UPDATE
                 date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
                 timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
                 class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
+                weekday = IF (VALUES(lastEdited) > lastEdited, VALUES(weekday), weekday),
                 subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
                 type = IF (VALUES(lastEdited) > lastEdited, VALUES(type), type),
                 canceled = IF (VALUES(lastEdited) > lastEdited, VALUES(canceled), canceled),
@@ -79,9 +80,8 @@ class Lesson extends AbstractModel
             $result = $this->write($query, $lesson);
 
             if ($result['status'] == 'failed') $finalResult = ['status' => 'failed'];
+            if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lesson['lastEdited']));
         }
-
-        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($timetableChanges[0]['lastEdited']));
 
         return $finalResult;
     }

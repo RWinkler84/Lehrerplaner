@@ -79,6 +79,5 @@ class TaskController extends AbstractController
     {
         $tasks = json_decode(file_get_contents('php://input'));
 
-        error_log(print_r($tasks, true));
     }
 }

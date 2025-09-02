@@ -98,7 +98,8 @@ export default class AbstractController {
         await this.#db.syncData();
     }
 
-    checkDataState() {
-        this.#db.checkDataState();
+    static renderDataChanges() {
+        TaskController.renderTaskChanges();
+        LessonController.renderLesson();
     }
 }

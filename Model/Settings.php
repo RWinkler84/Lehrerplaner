@@ -20,7 +20,6 @@ class Settings extends AbstractModel
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subject['lastEdited']));
 
         return $result;
-
     }
 
     public function deleteSubjects($subjects)
@@ -144,6 +143,8 @@ class Settings extends AbstractModel
         $subjectsData = $this->preprocessDataToWrite($subjectsData);
         $finalResult['status'] = 'success';
 
+        error_log(print_r($subjectsData, true));
+
         foreach ($subjectsData as $subject) {
             $query = "
                 INSERT INTO $tableName (userId, itemId, subject, colorCssClass, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :lastEdited)
@@ -156,9 +157,8 @@ class Settings extends AbstractModel
             $result = $this->write($query, $subject);
 
             if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
+            if ($result['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subject['lastEdited']));
         }
-
-        if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subjectsData[0]['lastEdited']));
 
         return $finalResult;
     }

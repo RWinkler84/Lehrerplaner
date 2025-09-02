@@ -164,6 +164,7 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         break;
                 }
             }
@@ -317,15 +318,15 @@ export default class AbstractModel {
     formatDate(date) {
         let dateObject = new Date(date);
         let dateString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
-        console.log(dateString);
+
         return dateString;
     }
 
     formatDateTime(date) {
         let dateObject = new Date(date);
         let dateString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
-        let timeString = dateObject.getHours() + ':' + dateObject.getMinutes().toString().padStart(2, '0') + ':' + dateObject.getSeconds().toString().padStart(2, '0');
-
+        let timeString = dateObject.getHours().toString().padStart(2, '0') + ':' + dateObject.getMinutes().toString().padStart(2, '0') + ':' + dateObject.getSeconds().toString().padStart(2, '0');
+        console.log(timeString);
         return `${dateString} ${timeString}`;
     }
 
@@ -390,7 +391,7 @@ export default class AbstractModel {
         })
 
         if (!lastLocalUpdateTimestamp) {
-            this.updateLocalWithRemoteData()
+            await this.updateLocalWithRemoteData()
         }
 
         if (lastLocalUpdateTimestamp) {
@@ -414,6 +415,7 @@ export default class AbstractModel {
                 await this.updateRemoteWithLocalData();
             }
         }
+        console.log('durch')
     }
 
     async updateLocalWithRemoteData() {
@@ -448,7 +450,6 @@ export default class AbstractModel {
             let timetable = await this.makeAjaxQuery('abstract', 'getTimetable')
             await this.writeRemoteToLocalDB('timetable', timetable, newestRemoteTimestamp);
             this.clearObjectStore('unsyncedTimetables');
-            this.clearObjectStore('unsyncedDeletedTimetableLessons');
         }
 
         if (new Date(updateTimestamps[0].timetableChanges).getTime() > lastLocalUpdateTimestamp) {
@@ -456,6 +457,7 @@ export default class AbstractModel {
             await this.writeRemoteToLocalDB('timetableChanges', timetableChanges, newestRemoteTimestamp);
             this.writeRemoteToLocalDB('timetableChanges', timetableChanges);
             this.clearObjectStore('unsyncedTimetableChanges');
+            this.clearObjectStore('unsyncedDeletedTimetableChanges');
         }
 
         if (new Date(updateTimestamps[0].tasks).getTime() > lastLocalUpdateTimestamp) {
@@ -464,6 +466,8 @@ export default class AbstractModel {
             this.clearObjectStore('unsyncedTasks');
             this.clearObjectStore('unsyncedDeletedTasks');
         }
+
+        AbstractController.renderDataChanges();
     }
 
     async updateRemoteWithLocalData() {
@@ -473,7 +477,7 @@ export default class AbstractModel {
         let unsyncedTasks = await this.readAllFromLocalDB('unsyncedTasks');
 
         let unsyncedDeletedSubjects = await this.readAllFromLocalDB('unsyncedDeletedSubjects');
-        let unsyncedDeletedTimetableLessons = await this.readAllFromLocalDB('unsyncedDeletedTimetableLessons');
+        let unsyncedDeletedTimetableChanges = await this.readAllFromLocalDB('unsyncedDeletedTimetableChanges');
         let unsyncedDeletedTasks = await this.readAllFromLocalDB('unsyncedDeletedTasks');
 
         let dataToSync = {
@@ -483,85 +487,58 @@ export default class AbstractModel {
             'tasks': []
         };
 
+        unsyncedSubjects.forEach(subject => { dataToSync.subjects.push(subject) });
+        unsyncedTimetables.forEach(lesson => { dataToSync.timetable.push(lesson) });
+        unsyncedTimetableChanges.forEach(lesson => { dataToSync.timetableChanges.push(lesson) });
+        unsyncedTasks.forEach(task => { dataToSync.tasks.push(task) });
+
         let result;
 
         // first delete, what needs to be deleted 
         if (unsyncedDeletedSubjects.length > 0) {
             result = await this.makeAjaxQuery('settings', 'deleteSubjects', unsyncedDeletedSubjects);
             if (result.status == 'success') this.clearObjectStore('unsyncedDeletedSubjects');
+            if (result.status == 'failed') return;
         }
 
         if (unsyncedDeletedTasks.length > 0) {
             result = await this.makeAjaxQuery('task', 'delete', unsyncedDeletedTasks);
             if (result.status == 'success') this.clearObjectStore('unsyncedDeletedTasks');
+            if (result.status == 'failed') return;
         }
 
         if (unsyncedDeletedTimetableChanges.length > 0) {
             result = await this.makeAjaxQuery('lesson', 'delete', unsyncedDeletedTimetableChanges);
-
-            // if the server can not be contacted, the result will just be an object, else it will be an array of objects
-            if (result.status !== 'failed') {
-                result.forEach(entry => {
-                    if (entry.status == 'success') {
-                        for (let i = unsyncedDeletedTimetableChanges.length - 1; i >= 0; i--) {
-                            if (entry.id == unsyncedDeletedTimetableChanges[i].id) unsyncedDeletedTimetableChanges.splice(unsyncedDeletedTimetableChanges[i], 1);
-                        }
-                    }
-                });
-            }
+            if (result.status == 'success') this.clearObjectStore('unsyncedDeletedTimetableChanges');
+            if (result.status == 'failed') return;
         }
 
-        // //if the deletion worked, go on to sync the rest
-        // if (
-        //     unsyncedDeletedSubjects.length == 0 &&
-        //     unsyncedDeletedTasks.length == 0 &&
-        //     unsyncedDeletedTimetableChanges.length == 0
-        // ) {
-        //     result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
+        result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
-        //     if (result.status && result.status == 'failed') { //will be the case, if the server is not responding
-        //         result = {
-        //             'subjects': { 'status': 'failed' },
-        //             'timetable': { 'status': 'failed' },
-        //             'timetableChanges': [{ 'status': 'failed' }],
-        //             'tasks': [{ 'status': 'failed' }],
-        //         }
-        //     }
+        if (result.status && result.status == 'failed') return; //will be the case, if the server is not responding
 
-        //     // then set previously unsynced items to synced on the global data
-        //     //subjects
-        //     if (result.subjects.status == 'success') {
-        //         allSubjects.forEach(entry => {
-        //             if (!entry.synced) entry.synced = true;
-        //         })
-        //     }
+        // clear the stores, if the operation was successfull
+        //subjects
+        if (result.subjects.status == 'success') {
+            await this.clearObjectStore('unsyncedSubjects');
+        }
 
-        //     //timetable
-        //     if (result.timetable.status == 'success') {
-        //         standardTimetable.forEach(entry => {
-        //             if (!entry.synced) entry.synced = true;
-        //         })
-        //     }
+        //timetable
+        if (result.timetable.status == 'success') {
+            await this.clearObjectStore('unsyncedTimetables');
+        }
 
-        //     //lessonChanges
-        //     result.timetableChanges.forEach(entry => {
-        //         if (entry.status == 'success') {
-        //             timetableChanges.forEach(lesson => {
-        //                 if (lesson.id == entry.id) lesson.synced = true;
-        //             });
-        //         }
-        //     });
+        //lessonChanges
+        if (result.timetableChanges.status == 'success') {
+            await this.clearObjectStore('unsyncedTimetableChanges');
+        }
 
-        //     //tasks
-        //     result.tasks.forEach(entry => {
-        //         if (entry.status == 'success') {
-        //             allTasksArray.forEach(task => {
-        //                 if (task.id == entry.id) task.synced = true;
-        //             });
-        //         }
-        //     });
-        // }
+        //tasks
+        if (result.tasks.status == 'success') {
+            await this.clearObjectStore('unsyncedTasks');
+        }
     }
+
 
     async writeRemoteToLocalDB(objectStore, dataToStore, newLocalTimestamp) {
         let result = await this.clearObjectStore(objectStore);
@@ -570,127 +547,5 @@ export default class AbstractModel {
             await this.updateOnLocalDB(objectStore, dataToStore);
             this.markLocalDBUpdated(newLocalTimestamp);
         }
-    }
-
-    async checkDataState() {
-
-        let localSettings = await this.readAllFromLocalDB('settings');
-
-        // check whether there is unsynced local data
-        // true
-        // fetch data from the server db
-        // check, if the remote data is newer than the local data
-        // false -> send the remote data to server and store it
-        // true -> get all remote datasets that are younger than local data
-        // if id doesn't exist -> write to local database
-        // if id does exist, ask the user, which version to keep (old, new, both)
-        //if both, give new ids to the local datasets and update the data under the original id
-
-
-        // let dataToSync = {
-        //     'subjects': [],
-        //     'timetable': [],
-        //     'timetableChanges': [],
-        //     'tasks': []
-        // };
-
-        // let result;
-
-        // // first delete, what needs to be deleted 
-        // if (unsyncedDeletedSubjects.length > 0) {
-        //     result = await this.makeAjaxQuery('settings', 'deleteSubjects', unsyncedDeletedSubjects);
-
-        //     // if the server can not be contacted, the result will just be an object, else it will be an array of objects
-        //     if (result.status !== 'failed') {
-        //         result.forEach(entry => {
-        //             if (entry.status == 'success') {
-        //                 for (let i = unsyncedDeletedSubjects.length - 1; i >= 0; i--) {
-        //                     if (entry.id == unsyncedDeletedSubjects[i].id) unsyncedDeletedSubjects.splice(unsyncedDeletedSubjects[i], 1);
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
-
-        // if (unsyncedDeletedTasks.length > 0) {
-        //     result = await this.makeAjaxQuery('task', 'delete', unsyncedDeletedTasks);
-
-        //     // if the server can not be contacted, the result will just be an object, else it will be an array of objects
-        //     if (result.status !== 'failed') {
-        //         result.forEach(entry => {
-        //             if (entry.status == 'success') {
-        //                 for (let i = unsyncedDeletedTasks.length - 1; i >= 0; i--) {
-        //                     if (entry.id == unsyncedDeletedTasks[i].id) unsyncedDeletedTasks.splice(unsyncedDeletedTasks[i], 1);
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
-
-        // if (unsyncedDeletedTimetableChanges.length > 0) {
-        //     result = await this.makeAjaxQuery('lesson', 'delete', unsyncedDeletedTimetableChanges);
-
-        //     // if the server can not be contacted, the result will just be an object, else it will be an array of objects
-        //     if (result.status !== 'failed') {
-        //         result.forEach(entry => {
-        //             if (entry.status == 'success') {
-        //                 for (let i = unsyncedDeletedTimetableChanges.length - 1; i >= 0; i--) {
-        //                     if (entry.id == unsyncedDeletedTimetableChanges[i].id) unsyncedDeletedTimetableChanges.splice(unsyncedDeletedTimetableChanges[i], 1);
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
-
-        // //if the deletion worked, go on to sync the rest
-        // if (
-        //     unsyncedDeletedSubjects.length == 0 &&
-        //     unsyncedDeletedTasks.length == 0 &&
-        //     unsyncedDeletedTimetableChanges.length == 0
-        // ) {
-        //     result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
-
-        //     if (result.status && result.status == 'failed') { //will be the case, if the server is not responding
-        //         result = {
-        //             'subjects': { 'status': 'failed' },
-        //             'timetable': { 'status': 'failed' },
-        //             'timetableChanges': [{ 'status': 'failed' }],
-        //             'tasks': [{ 'status': 'failed' }],
-        //         }
-        //     }
-
-        //     // then set previously unsynced items to synced on the global data
-        //     //subjects
-        //     if (result.subjects.status == 'success') {
-        //         allSubjects.forEach(entry => {
-        //             if (!entry.synced) entry.synced = true;
-        //         })
-        //     }
-
-        //     //timetable
-        //     if (result.timetable.status == 'success') {
-        //         standardTimetable.forEach(entry => {
-        //             if (!entry.synced) entry.synced = true;
-        //         })
-        //     }
-
-        //     //lessonChanges
-        //     result.timetableChanges.forEach(entry => {
-        //         if (entry.status == 'success') {
-        //             timetableChanges.forEach(lesson => {
-        //                 if (lesson.id == entry.id) lesson.synced = true;
-        //             });
-        //         }
-        //     });
-
-        //     //tasks
-        //     result.tasks.forEach(entry => {
-        //         if (entry.status == 'success') {
-        //             allTasksArray.forEach(task => {
-        //                 if (task.id == entry.id) task.synced = true;
-        //             });
-        //         }
-        //     });
-        // }
     }
 }

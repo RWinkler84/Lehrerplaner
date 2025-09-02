@@ -8,120 +8,10 @@ export default class TaskView extends AbstractView {
         super()
     }
 
-    static async renderUpcomingTasks() {
-        let allUpcomingTasks = await Controller.getAllOpenTasks();
-        let upcomingTasksTableBody = document.querySelector('#upcomingTasksTable tbody');
+    //renders and reorders open and inProgress tasks on app start and whenever something changes
+    //to optimize performance, it uses already rendered html elements and updates them, if there are any 
+    static async renderTasks() {
 
-        if (allUpcomingTasks.length == 0) {
-            document.querySelector('#upcomingTasksTable thead').style.display = 'none';
-            document.querySelector('#upcomingTasksTable tbody').innerHTML = '';
-            document.querySelector('#upcomingTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
-            return;
-        }
-
-        let tableBodyFragment = document.createDocumentFragment();
-        let responsiveButtonTR = this.getResponsiveButtonTR('openTask');
-        let checkBoxTR = this.getCheckboxTR();
-
-        allUpcomingTasks = Fn.sortByDateAndTimeslot(allUpcomingTasks);
-
-        allUpcomingTasks.forEach((task) => {
-            let taskTr = document.createElement('tr');
-            let checkBoxTrClone = checkBoxTR.cloneNode(true);
-            let responsiveButtonTRClone = responsiveButtonTR.cloneNode(true);
-
-            if (task.fixedTime == '1') checkBoxTrClone.querySelector('input[name="fixedDate"]').checked = true;
-            if (task.reoccuring == '1') {
-                checkBoxTrClone.querySelector('input[name="reoccuringTask"]').checked = true;
-                checkBoxTrClone.querySelector('select').disabled = false;
-                checkBoxTrClone.querySelectorAll('option').forEach(option => {
-                    option.selected = false;
-                    if (option.value == task.reoccuringInterval) option.selected = true;
-                });
-            }
-
-            taskTr.innerHTML = this.getTaskTrHTML(task);
-            taskTr.setAttribute('data-taskId', task.id);
-            taskTr.setAttribute('data-date', task.date);
-            taskTr.setAttribute('data-timeslot', task.timeslot);
-
-            if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
-
-            tableBodyFragment.append(taskTr);
-            tableBodyFragment.append(checkBoxTrClone);
-            tableBodyFragment.append(responsiveButtonTRClone);
-        });
-
-        upcomingTasksTableBody.append(tableBodyFragment);
-
-        //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
-        document.querySelectorAll('tr[data-checkboxtr]').forEach(tr => {
-            tr.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
-            tr.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
-        });
-    }
-
-    static async renderInProgressTasks() {
-        let allInProgressTasks = await Controller.getAllInProgressTasks();
-        let inProgressTasksTableBody = document.querySelector('#inProgressTasksTable tbody');
-
-        if (allInProgressTasks.length == 0) {
-            document.querySelector('#inProgressTasksTable thead').style.display = 'none';
-            document.querySelector('#inProgressTasksTable tbody').innerHTML = '';
-            document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'table-cell';
-            return;
-        }
-
-        if (document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'table-cell') {
-            document.querySelector('#inProgressTasksTable thead').style.display = 'table-row-group  ';
-            document.querySelector('#inProgressTasksTable td[data-noEntriesFound]').style.display = 'none';
-        }
-
-        let tableBodyFragment = document.createDocumentFragment();
-        let responsiveButtonTR = this.getResponsiveButtonTR('inProgressTask');
-        let checkBoxTR = this.getCheckboxTR();
-
-        allInProgressTasks = Fn.sortByDateAndTimeslot(allInProgressTasks);
-
-        allInProgressTasks.forEach((task) => {
-            let taskTr = document.createElement('tr');
-            let checkBoxTrClone = checkBoxTR.cloneNode(true);
-            let responsiveButtonTRClone = responsiveButtonTR.cloneNode(true);
-
-            if (task.fixedTime == '1') checkBoxTrClone.querySelector('input[name="fixedDate"]').checked = true;
-            if (task.reoccuring == '1') {
-                checkBoxTrClone.querySelector('input[name="reoccuringTask"]').checked = true;
-                checkBoxTrClone.querySelector('select').disabled = false;
-                checkBoxTrClone.querySelectorAll('option').forEach(option => {
-                    option.selected = false;
-                    if (option.value == task.reoccuringInterval) option.selected = true;
-                });
-            }
-
-            taskTr.innerHTML = this.getTaskTrHTML(task);
-            taskTr.setAttribute('data-taskId', task.id);
-            taskTr.setAttribute('data-date', task.date);
-            taskTr.setAttribute('data-timeslot', task.timeslot);
-
-            taskTr.querySelector('.setTaskInProgressButton').remove();
-
-            if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
-
-            tableBodyFragment.append(taskTr);
-            tableBodyFragment.append(checkBoxTrClone);
-            tableBodyFragment.append(responsiveButtonTRClone);
-        });
-
-        inProgressTasksTableBody.append(tableBodyFragment);
-
-        //highlighting off both TRs when the checkbox TR is hovered, because selecting backwards is impossible in CSS :$
-        document.querySelectorAll('tr[data-checkboxtr]').forEach(tr => {
-            tr.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
-            tr.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
-        });
-    }
-
-    static async rerenderTasks() {
         const openTaskTable = document.querySelector('#upcomingTasksTable');
         const inProgressTaskTable = document.querySelector('#inProgressTasksTable');
         const openTaskTableBody = openTaskTable.querySelector('tbody');
@@ -196,16 +86,24 @@ export default class TaskView extends AbstractView {
                 }
             });
 
+            //no element was found, because the task wasn't rendered yet (added by a syncing data from another device)                
+            if (!taskElement) {
+                let task = allOpenTasks.find(task => task.id == taskId);
+                taskElement = this.getTaskTrHTML(task);
+                checkBoxElement = this.getCheckboxTR(task);
+                responsiveButtonElement = this.getResponsiveButtonTR();
+            }
+
             openTaskTableBody.insertBefore(taskElement, openTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
             openTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
             openTaskTableBody.insertBefore(responsiveButtonElement, taskElement.nextElementSibling.nextElementSibling);
         });
 
-        //rerender previously unsaved task forms
+        //reappend previously unsaved task forms
         if (allInProgressTaskIds.length < allRenderedTaskTrs.length) {
             allRenderedTaskTrs.forEach(tr => {
                 if (openTaskTableBody.contains(tr)) return;
-                openTaskTable.append(tr);
+                if (tr.hasAttribute('data-new')) openTaskTableBody.append(tr);
             });
         }
 
@@ -232,6 +130,14 @@ export default class TaskView extends AbstractView {
                 }
             });
 
+            //no element was found, because the task wasn't rendered yet (added by a syncing data from another device)
+            if (!taskElement) {
+                let task = allInProgressTasks.find(task => task.id == taskId);
+                taskElement = this.getTaskTrHTML(task);
+                checkBoxElement = this.getCheckboxTR(task);
+                responsiveButtonElement = this.getResponsiveButtonTR();
+            }
+
             inProgressTaskTableBody.insertBefore(taskElement, inProgressTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
             inProgressTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
             inProgressTaskTableBody.insertBefore(responsiveButtonElement, taskElement.nextElementSibling.nextElementSibling);
@@ -243,6 +149,7 @@ export default class TaskView extends AbstractView {
         taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
         taskElement.dataset.date = task.date;
         taskElement.dataset.timeslot = task.timeslot;
+        taskElement.querySelector('.taskDescription').textContent = task.description;
 
         taskElement.querySelector('.taskAdditionalInfo').innerHTML = this.getAdditionalInfoHTML(task);
 
@@ -291,9 +198,9 @@ export default class TaskView extends AbstractView {
             description: ''
         }
 
+        let formTr = this.getTaskTrHTML(task);;
         let checkBoxTR = this.getCheckboxTR();
         let responsiveButtonTR = this.getResponsiveButtonTR('editableTask');
-        let formTr = document.createElement('tr');
 
         checkBoxTR.setAttribute('data-new', '');
         checkBoxTR.removeAttribute('style');
@@ -305,7 +212,6 @@ export default class TaskView extends AbstractView {
         formTr.setAttribute('data-date', task.date);
         formTr.setAttribute('data-timeslot', task.timeslot);
 
-        formTr.innerHTML = this.getTaskTrHTML(task);
         formTr.querySelector('.taskDescription').contentEditable = true;
         formTr.querySelectorAll('.taskDone>div').forEach(div => {
             if (div.classList.contains('editableTask')) {
@@ -330,10 +236,15 @@ export default class TaskView extends AbstractView {
     }
 
     static getTaskTrHTML(task) {
+        let taskTr = document.createElement('tr');
         let subjectDate = Fn.formatDate(task.date);
         let additionalInfo = this.getAdditionalInfoHTML(task);
 
-        return `
+        taskTr.setAttribute('data-taskId', task.id);
+        taskTr.setAttribute('data-date', task.date);
+        taskTr.setAttribute('data-timeslot', task.timeslot);
+
+        taskTr.innerHTML = `
             <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                 <td class="taskAdditionalInfo">${additionalInfo}</td>
                 <td class="taskClassName" data-class="${task.class}">${task.class}</td>
@@ -357,9 +268,13 @@ export default class TaskView extends AbstractView {
                 </td>
             </tr>
             `;
+
+        if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
+        return taskTr;
+
     }
 
-    static getCheckboxTR() {
+    static getCheckboxTR(task = null) {
         let checkboxTr = document.createElement('tr');
 
         checkboxTr.style.display = 'none';
@@ -384,6 +299,20 @@ export default class TaskView extends AbstractView {
                 </div>
             </td>
         `;
+
+        if (task) {
+            if (task.fixedTime == '1') checkboxTr.querySelector('input[name="fixedDate"]').checked = true;
+            if (task.reoccuring == '1') {
+                checkboxTr.querySelector('input[name="reoccuringTask"]').checked = true;
+                checkboxTr.querySelector('select').disabled = false;
+                checkboxTr.querySelectorAll('option').forEach(option => {
+                    option.selected = false;
+                    if (option.value == task.reoccuringInterval) option.selected = true;
+                });
+            }
+
+            return checkboxTr;
+        }
 
         return checkboxTr;
     }
