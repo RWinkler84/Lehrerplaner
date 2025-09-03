@@ -46,7 +46,7 @@ export default class Lesson extends AbstractModel {
             regularLessons.push(lesson);
         });
 
-        standardTimetable.sort((a, b) => {
+        regularLessons.sort((a, b) => {
             return new Date(a.validFrom).setHours(12, 0, 0, 0) - new Date(b.validFrom).setHours(12, 0, 0, 0);
         });
 

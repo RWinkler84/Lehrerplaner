@@ -41,7 +41,7 @@ class TaskController extends AbstractController
 
         foreach ($taskData as $task) {
             $result = $this->model->deleteTask($task);
-            if ($result['status' == 'failed']) $finalResult = ['status' => 'failed'];
+            if ($result['status'] == 'failed') $finalResult = ['status' => 'failed'];
         }
 
         echo json_encode($finalResult);

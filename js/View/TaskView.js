@@ -79,7 +79,8 @@ export default class TaskView extends AbstractView {
                     //task dates and timeslots and additional infos may change and need to be updated
                     allOpenTasks.forEach(task => {
                         if (task.id == taskId) {
-                            this.updateTaskElementOnRerender(taskElement, task);
+                            this.updateTaskElement(taskElement, task);
+                            this.updateCheckBoxElement(checkBoxElement, task);
                             this.updateResponsiveButtonElement(responsiveButtonElement, task);
                         }
                     });
@@ -91,7 +92,7 @@ export default class TaskView extends AbstractView {
                 let task = allOpenTasks.find(task => task.id == taskId);
                 taskElement = this.getTaskTrHTML(task);
                 checkBoxElement = this.getCheckboxTR(task);
-                responsiveButtonElement = this.getResponsiveButtonTR();
+                responsiveButtonElement = this.getResponsiveButtonTR('openTask');
             }
 
             openTaskTableBody.insertBefore(taskElement, openTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
@@ -123,7 +124,8 @@ export default class TaskView extends AbstractView {
                     //task dates my change and need to be updated while reordering
                     allInProgressTasks.forEach(task => {
                         if (task.id == taskId) {
-                            this.updateTaskElementOnRerender(taskElement, task);
+                            this.updateTaskElement(taskElement, task);
+                            this.updateCheckBoxElement(checkBoxElement, task);
                             this.updateResponsiveButtonElement(responsiveButtonElement, task);
                         }
                     });
@@ -135,7 +137,7 @@ export default class TaskView extends AbstractView {
                 let task = allInProgressTasks.find(task => task.id == taskId);
                 taskElement = this.getTaskTrHTML(task);
                 checkBoxElement = this.getCheckboxTR(task);
-                responsiveButtonElement = this.getResponsiveButtonTR();
+                responsiveButtonElement = this.getResponsiveButtonTR('inProgressTask');
             }
 
             inProgressTaskTableBody.insertBefore(taskElement, inProgressTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
@@ -144,7 +146,7 @@ export default class TaskView extends AbstractView {
         })
     }
 
-    static updateTaskElementOnRerender(taskElement, task) {
+    static updateTaskElement(taskElement, task) {
         let buttonTd = taskElement.querySelector('.taskDone');
         taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
         taskElement.dataset.date = task.date;
@@ -172,6 +174,22 @@ export default class TaskView extends AbstractView {
         }
     }
 
+    static updateCheckBoxElement(checkBoxElement, task) {
+        if (task.fixedTime == '1') checkBoxElement.querySelector('input[name="fixedDate"]').checked = true;
+        if (task.reoccuring == '1') {
+            checkBoxElement.querySelector('input[name="reoccuringTask"]').checked = true;
+            checkBoxElement.querySelector('select').disabled = false;
+            checkBoxElement.querySelector('input[name="fixedDate"]').disabled = true;
+            checkBoxElement.querySelectorAll('option').forEach(option => {
+                option.selected = false;
+                if (option.value == task.reoccuringInterval) option.selected = true;
+            });
+        }
+
+        return checkBoxElement;
+    }
+
+
     static updateResponsiveButtonElement(buttonElement, task) {
         if (buttonElement.querySelector('.editableTask').style.display == 'flex') return;
         if (task.status == 'open') {
@@ -185,12 +203,10 @@ export default class TaskView extends AbstractView {
     }
 
     static async createTaskForm(event) {
-        let allTasksArray = await Controller.getAllTasks();
         let lessonElement = event.target.closest('.lesson');
         let taskTable = document.querySelector('#upcomingTasksTable tbody');
 
         let task = {
-            id: Fn.generateId(allTasksArray),
             class: lessonElement.dataset.class,
             subject: lessonElement.dataset.subject,
             date: lessonElement.closest('.weekday').dataset.date,
@@ -270,8 +286,19 @@ export default class TaskView extends AbstractView {
             `;
 
         if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
-        return taskTr;
+        
+        let buttonTd = taskTr.querySelector('.taskDone');
+        
+        if (task.status == 'open') {
+            buttonTd.querySelector('.openTask').style.display = 'flex';
+            buttonTd.querySelector('.inProgressTask').style.display = 'none';
+        }
+        if (task.status == 'inProgress') {
+            buttonTd.querySelector('.openTask').style.display = 'none';
+            buttonTd.querySelector('.inProgressTask').style.display = 'flex';
+        }
 
+        return taskTr;
     }
 
     static getCheckboxTR(task = null) {
@@ -305,6 +332,7 @@ export default class TaskView extends AbstractView {
             if (task.reoccuring == '1') {
                 checkboxTr.querySelector('input[name="reoccuringTask"]').checked = true;
                 checkboxTr.querySelector('select').disabled = false;
+                checkboxTr.querySelector('input[name="fixedDate"]').disabled = true;
                 checkboxTr.querySelectorAll('option').forEach(option => {
                     option.selected = false;
                     if (option.value == task.reoccuringInterval) option.selected = true;
@@ -317,6 +345,7 @@ export default class TaskView extends AbstractView {
         return checkboxTr;
     }
 
+    /**  @param type 'openTask', 'inProgressTask', 'editableTask' */
     static getResponsiveButtonTR(type) {
         let buttonTR = document.createElement('tr');
         let openActive = 'none';
@@ -390,7 +419,7 @@ export default class TaskView extends AbstractView {
         }
     }
 
-    static saveTask(event) {
+    static async saveTask(event) {
         let taskElement = event.target.closest('tr');
 
         if (!taskElement.hasAttribute('data-new')) {
@@ -405,7 +434,6 @@ export default class TaskView extends AbstractView {
         let checkBoxElement = taskElement.nextElementSibling;
 
         let taskData = {
-            'id': taskElement.dataset.taskid,
             'class': taskElement.querySelector('td[data-class]').dataset.class,
             'subject': taskElement.querySelector('td[data-subject]').dataset.subject,
             'date': taskElement.dataset.date,
@@ -416,7 +444,7 @@ export default class TaskView extends AbstractView {
             'reoccuringInterval': checkBoxElement.querySelector('select').value
         }
 
-        if (Controller.saveTask(taskData, event)) {
+        if (await Controller.saveTask(taskData, event)) {
 
             TaskView.removeNewDataset(event);
             TaskView.removeEditability(event);

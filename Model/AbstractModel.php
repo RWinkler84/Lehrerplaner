@@ -193,7 +193,7 @@ class AbstractModel
         $result = $this->read($query, []);
         $result = $this->preprocessReadData($result);
 
-        if (empty($result)) return ['status' => 'failed'];
+        if (empty($result)) return ['status' => 'success', 'message' => 'No entries found'];
 
         return $result;
     }
@@ -248,6 +248,8 @@ class AbstractModel
 
             return $dataArray;
         }
+
+        return $dataArray;
     }
 
     protected function preprocessDataToWrite($dataArray)

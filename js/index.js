@@ -28,10 +28,8 @@ async function startApp() {
 
     document.addEventListener('visibilitychange', abstCtrl.syncData.bind(abstCtrl))
 
-    document.querySelector('#syncButton').addEventListener('click', abstCtrl.syncData.bind(abstCtrl) );
-
     //checking for unsynced changes
-    // setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN);
+    setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN);
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
@@ -79,8 +77,6 @@ async function startApp() {
     setWeekStartAndEndDate();
     LessonView.renderLesson();
 
-    // TaskView.renderUpcomingTasks();
-    // TaskView.renderInProgressTasks();
     TaskView.renderTasks();
 
     LessonView.showLessonHasTaskIndicator() // <- this has to run, after Tasks are rendered to work

@@ -44,10 +44,9 @@ export default class TaskController {
         View.createTaskForm(event);
     }
 
-    static saveTask(taskData, event) {
+    static async saveTask(taskData, event) {
         let task = new Task();
 
-        task.id = taskData.id;
         task.class = taskData.class;
         task.subject = taskData.subject;
         task.date = taskData.date;
@@ -66,7 +65,7 @@ export default class TaskController {
 
         if (!task.reoccuring && task.reoccuringInterval != '') task.reoccuringInterval = null;
 
-        task.save();
+        await task.save();
         LessonController.renderLesson();
 
         return true;

@@ -33,7 +33,11 @@ export default class Task extends AbstractModel {
     }
 
     async save() {
+        let allTasks = await Task.getAllTasks();
+
+        this.id = Fn.generateId(allTasks);
         this.lastEdited = this.formatDateTime(new Date());
+
         await this.writeToLocalDB('tasks', this.serialize());
 
         let result = await this.makeAjaxQuery('task', 'save', this.serialize());
@@ -42,9 +46,10 @@ export default class Task extends AbstractModel {
     }
 
     async delete() {
+        this.lastEdited = this.formatDateTime(new Date);
         await this.deleteFromLocalDB('tasks', this.id);
 
-        let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id }]);
+        let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id, 'lastEdited': this.lastEdited }]);
 
         if (result.status == 'failed' || result[0].status == 'failed') this.writeToLocalDB('unsyncedDeletedTasks', this.serialize());
     }
@@ -65,14 +70,7 @@ export default class Task extends AbstractModel {
             this.resetDateAccordingToInterval();
             return;
         }
-
-        this.status = 'done';
-        this.lastEdited = this.formatDateTime(new Date);
-
-        await this.updateOnLocalDB('tasks', this.serialize());
-
-        let result = await this.makeAjaxQuery('task', 'setDone', { 'id': this.id, 'lastEdited': this.lastEdited });
-        if (result.status == 'failed') this.updateOnLocalDB('unsyncedTasks', this.serialize());
+        this.delete();
     }
 
     async resetDateAccordingToInterval() {

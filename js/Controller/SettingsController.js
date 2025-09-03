@@ -85,6 +85,14 @@ export default class SettingsController {
 
         await model.saveTimetableUpdates(validFrom, lessons);
 
+        // check, whether lesson Changes exist after the validFrom date of the new timetable
+        let validUntil = lessons[0].validUntil ? lessons[0].validUntil : (new Date().setHours(12) + ONEDAY * 365);
+
+        let affectedLessonChanges = LessonController.getTimetableChanges(validFrom, validUntil);
+        let affectedTasks = TaskController.getAllTasksInTimespan(validFrom, validUntil);
+
+        if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
+
         LessonController.renderLesson();
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
 

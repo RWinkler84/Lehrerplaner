@@ -93,7 +93,7 @@ export default class AbstractModel {
         let promises;
         let db = await this.openIndexedDB();
 
-        if (dataToStore.length > 1) {
+        if (Array.isArray(dataToStore)) {
             promises = dataToStore.map((entry) => {
                 entry.id = Number(entry.id);
 

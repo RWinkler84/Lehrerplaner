@@ -92,7 +92,11 @@ class User extends AbstractModel
     {
         $mailSend = false;
 
-        if ($this->userExists($accountData)) {
+        $userExists = $this->userExists($accountData);
+
+        if (isset($userExists['status']) && $userExists['status'] == 'failed') {
+            return $userExists;
+        } else if ($this->userExists($accountData)) {
             return ['message' => 'Die angegebene E-Mail-Adresse wird bereits verwendet.'];
         }
 
@@ -232,7 +236,7 @@ class User extends AbstractModel
     private function setInitalUpdateTimestamps($user)
     {
         $tableName = TABLEPREFIX . 'updateTimestamps';
-        $timestamp = (new DateTime())->format('Y-m-d H:i:s');
+        $timestamp = '1970-01-01';
 
         $query = "
             INSERT INTO $tableName (userId, subjects, tasks, timetable, timetableChanges)
@@ -366,6 +370,8 @@ class User extends AbstractModel
     private function userExists($newUserData)
     {
         $allUsers = $this->getAllUsers();
+        
+        if (isset($allUsers['status']) && $allUsers['status'] == 'failed') return $allUsers;
 
         foreach ($allUsers as $existingUser) {
             if ($existingUser['userEmail'] == $newUserData['userEmail']) {
