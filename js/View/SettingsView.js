@@ -389,6 +389,8 @@ export default class SettingsView {
         dialog.querySelector('#descriptionPara').innerText = descriptionText;
 
         affectedLessonChanges.forEach(entry => {
+            if (new Date(entry.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
+
             let type = entry.type == 'sub' ? 'Vertretung' : 'Termin';
             let subject = entry.subject == 'Termin' ? ' - ' : entry.subject;
             let date = Fn.formatDate(entry.date)
@@ -407,6 +409,8 @@ export default class SettingsView {
         })
 
         affectedTasks.forEach(entry => {
+            if (new Date(entry.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
+
             let date = Fn.formatDate(entry.date)
 
             let html = `
