@@ -19,12 +19,8 @@ let abstCtrl = new AbstractController();
 
 export let taskBackupArray = [];
 
-async function loadData() {
-    await abstCtrl.syncData();
-}
-
 async function startApp() {
-    await loadData();
+    await abstCtrl.syncData();
 
     document.addEventListener('visibilitychange', abstCtrl.syncData.bind(abstCtrl))
 
@@ -67,6 +63,10 @@ async function startApp() {
     //on site login
     document.querySelector('#loginForm').addEventListener('submit', AbstractView.attemptLogin);
     document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', abstCtrl.sendResetPasswordMail.bind(abstCtrl));
+
+    //on site account create
+    document.querySelector('#createAccount').addEventListener('click', abstCtrl.openAccountCreationDialog);
+    document.querySelector('#continueAsGuest').addEventListener('click', abstCtrl.createGuestAccount.bind(abstCtrl));
 
     //logout
     document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);

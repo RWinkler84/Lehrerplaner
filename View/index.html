@@ -14,7 +14,8 @@
             <div>
                 <h1>Eduplanio</h1>
             </div>
-            <div class="flex gap">
+            <div id="topMenuButtonContainer" class="flex gap">
+                <div id="syncIndicator" class="unsynced"></div>
                 <div><button id="openSettingsButton">&#x2630;</button></div>
                 <div><button id="logoutButton">&#x279C;</button></div>
             </div>
@@ -440,9 +441,10 @@
                 </div>
             </div>
             <div id="loginErrorMessageDisplay" class="errorMessageDisplay alertRing">
-                Du wurdest wegen Inaktivität ausgeloggt. Melde dich erneut an, um Datenverlust zu vermeiden.
+                Du bist aktuell nicht eingeloggt. Melde dich an, um Datenverlust zu vermeiden.
             </div>
-            <div class="flex justifyEnd alignEnd marginTop">
+            <div class="flex spaceBetween alignEnd marginTop">
+            <span><a href id="createAccount">Registrieren</a> oder <a href id="continueAsGuest">als Gast nutzen</a></span>
                 <button type="submit" id="loginButton" class="confirmationButton"
                     style="margin-right: 3px">Login</button>
             </div>

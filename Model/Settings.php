@@ -26,6 +26,11 @@ class Settings extends AbstractModel
     {
         global $user;
 
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            exit;
+        }
+
         $userId = $user->getId();
         $tableName = TABLEPREFIX . 'subjects';
         $finalResult['status'] = 'success';
@@ -77,6 +82,11 @@ class Settings extends AbstractModel
     {
         global $user;
 
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            exit;
+        }
+
         $userId = $user->getId();
         $tableName = TABLEPREFIX . 'timetable';
 
@@ -125,6 +135,11 @@ class Settings extends AbstractModel
     public function updateValidUntil($dates)
     {
         global $user;
+
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            exit;
+        }
 
         $userId = $user->getId();
         $tableName = TABLEPREFIX . 'timetable';

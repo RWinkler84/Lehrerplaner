@@ -39,7 +39,10 @@ class Task extends AbstractModel
     {
         global $user;
 
-        error_log(print_r($taskData, true));
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            exit;
+        }
 
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
         $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $taskData['id']]);

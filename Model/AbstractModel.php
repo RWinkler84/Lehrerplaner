@@ -167,6 +167,7 @@ class AbstractModel
     public function getAllTasks()
     {
         global $user;
+
         $userId = $user->getId();
         $tableName = TABLEPREFIX . 'tasks';
 
@@ -184,6 +185,11 @@ class AbstractModel
     public function getDbUpdateTimestamps()
     {
         global $user;
+        
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            exit;
+        }
 
         $userId = $user->getId();
         $tableName = TABLEPREFIX . 'updateTimestamps';

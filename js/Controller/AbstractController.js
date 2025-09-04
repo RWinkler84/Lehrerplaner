@@ -28,8 +28,12 @@ export default class AbstractController {
         return await LessonController.getAllTimetableChanges();
     }
 
-    static openLoginDialog(event) {
+    static async openLoginDialog(event) {
         if (event != undefined) event.preventDefault();
+        let db = new Model;
+        let accountInfo = await db.getAccountInfo();
+
+        if (accountInfo.status == 'success' && accountInfo.accountType == 'guestUser') return;
         AbstractView.openLoginDialog();
     }
 
@@ -91,8 +95,33 @@ export default class AbstractController {
             setTimeout(() => { sendResetPasswordButton.style.display = 'inline-block' }, ONEMIN * 5); //after 5 minutes you can resend the Authmail again, prevents spam
             return;
         }
-
     }
+
+    async createGuestAccount(event){
+        event.preventDefault();
+        await this.#db.createGuestAccount();
+        AbstractController.closeLoginDialog();
+    }
+
+    /** @param status 'synced', 'unsynced' 'loggedOut' */
+    static setSyncIndicatorStatus(status) {
+        let syncIndicator = document.querySelector('#syncIndicator');
+
+        syncIndicator.removeAttribute('class');
+
+        switch (status) {
+            case 'synced':
+                syncIndicator.classList.add('synced');
+                break;
+            case 'unsynced':
+                syncIndicator.classList.add('unsynced');
+                break;
+            case 'loggedOut':
+                syncIndicator.classList.add('loggedOut');
+                break;
+        }
+    }
+
 
     async syncData() {
         await this.#db.syncData();

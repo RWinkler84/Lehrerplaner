@@ -18,7 +18,7 @@ class Lesson extends AbstractModel
 
         $result = $this->write($query, $lessonData);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
-        
+
         return $result;
     }
 
@@ -30,7 +30,7 @@ class Lesson extends AbstractModel
 
         $result = $this->write($query, $lessonData);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
-        
+
         return $result;
     }
 
@@ -41,7 +41,7 @@ class Lesson extends AbstractModel
 
         $result = $this->write($query, $lessonData);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
-        
+
         return $result;
     }
 
@@ -49,11 +49,16 @@ class Lesson extends AbstractModel
     {
         global $user;
 
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            exit;
+        }
+
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
 
         $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $lesson['id']]);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lesson['lastEdited']));
-        
+
         return $result;
     }
 

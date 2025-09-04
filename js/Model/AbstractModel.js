@@ -16,12 +16,20 @@ export default class AbstractModel {
                 })
         }
         catch (error) {
+            AbstractController.setSyncIndicatorStatus('unsynced');
             return { 'status': 'failed' };
         }
 
         let result = await response.json();
 
-        if (result.status == 'failed' && result.message == 'User not logged in!') AbstractController.openLoginDialog();
+        if (result.status == 'failed' && !result.message) {
+            AbstractController.setSyncIndicatorStatus('unsynced');
+        } else if (result.status == 'failed' && result.message == 'User not logged in!') {
+            AbstractController.openLoginDialog();
+            AbstractController.setSyncIndicatorStatus('loggedOut');
+        } else {
+            AbstractController.setSyncIndicatorStatus('synced');
+        }
 
         return result;
     }
@@ -169,6 +177,15 @@ export default class AbstractModel {
                 }
             }
 
+            request.onversionchange = () => {
+                db.close();
+                alert('Eine neue Version von Eduplanio ist verfügbar. Bitte lade die Seite neu.');
+            }
+
+            request.onblocked = () => {
+                alert('Eduplanio konnte ein notwendiges Update nicht durchführen. Schließe bitte alle anderen Browser-Tabs, in denen Eduplanio geöffnet ist, und lade anschließend die Seite neu.')
+            }
+
             request.onerror = () => {
                 reject('Database could not be opened' + request.error);
             }
@@ -183,6 +200,27 @@ export default class AbstractModel {
         if (date == null) date = new Date();
         let db = await this.openIndexedDB();
         db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 0, lastUpdated: this.formatDateTime(date) })
+    }
+
+    //handle account related actions
+    async createGuestAccount() {
+        let data = {
+            id: 1,
+            accountType: 'guestUser'
+        }
+
+        this.writeToLocalDB('settings', data);
+    }
+
+    async getAccountInfo() {
+        let accountInfo = await this.readFromLocalDB('settings', 1);
+
+        if (!accountInfo) return {status: 'failed'};
+        
+        return {
+            status: 'success',
+            ...accountInfo
+        }
     }
 
     static async calculateAllLessonDates(className, subject, endDate, timetable, lessonChanges) {
@@ -415,7 +453,6 @@ export default class AbstractModel {
                 await this.updateRemoteWithLocalData();
             }
         }
-        console.log('durch')
     }
 
     async updateLocalWithRemoteData() {

@@ -22,17 +22,11 @@
     --smallRadius: 3px;
 }
 
-html {
-    /* width: 100vw; */
-}
-
 body {
     background-color: var(--bodyBackground);
     display: flex;
     flex-direction: column;
 }
-
-main {}
 
 input,
 select {
@@ -49,6 +43,10 @@ input[type="checkbox"] {
     vertical-align: middle;
 }
 
+a {
+    text-decoration: none;
+}
+
 /* Top Menu */
 
 #topMenuContainer,
@@ -57,7 +55,28 @@ input[type="checkbox"] {
     color: var(--lighterText);
     padding: 1rem 2rem;
     margin-bottom: 1rem;
-    flex: 1 0 100%
+    flex: 1 0 100%;
+}
+#topMenuButtonContainer {
+    align-items: center;
+}
+
+#syncIndicator {
+    height: 0.7rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+}
+
+#syncIndicator.synced {
+    background-color: springgreen;
+}
+
+#syncIndicator.unsynced {
+    background-color: red;
+}
+
+#syncIndicator.loggedOut {
+    background-color: orange;
 }
 
 /* Content Containers */
@@ -360,7 +379,6 @@ dialog .errorMessageDisplay {
 }
 
 /* Task Container and Settings tables*/
-
 #upcomingTasksContainer,
 #inProgressTasksContainer {
     flex: 1 1 50%;

@@ -127,6 +127,11 @@ class User extends AbstractModel
     {
         global $user;
 
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            exit;
+        }
+
         $query = "DELETE FROM $this->tableName WHERE id = :id";
 
         return $this->delete($query, ['id' => $user->getId()]);
@@ -370,7 +375,7 @@ class User extends AbstractModel
     private function userExists($newUserData)
     {
         $allUsers = $this->getAllUsers();
-        
+
         if (isset($allUsers['status']) && $allUsers['status'] == 'failed') return $allUsers;
 
         foreach ($allUsers as $existingUser) {
