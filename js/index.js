@@ -1,10 +1,11 @@
+import LoginController from './Controller/LoginController.js';
 import AbstractController from './Controller/AbstractController.js';
-import SettingsView from './View/SettingsView.js';
-import TaskView from './View/TaskView.js';
-import LessonView from './View/LessonView.js';
-import AbstractView from './View/AbstractView.js';
 import TaskController from './Controller/TaskController.js';
 import SettingsController from './Controller/SettingsController.js';
+import AbstractView from './View/AbstractView.js';
+import LessonView from './View/LessonView.js';
+import TaskView from './View/TaskView.js';
+import SettingsView from './View/SettingsView.js';
 import Fn from './inc/utils.js';
 
 //config
@@ -14,6 +15,11 @@ export const ONEMIN = 60000;
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
 export let unsyncedDeletedTimetableChanges = [];
+
+export let mailStatus = {
+    authMailAlreadySend: false,
+    resetMailAlreadySend: false
+};
 
 let abstCtrl = new AbstractController();
 
@@ -58,15 +64,23 @@ async function startApp() {
     document.querySelector('#openSettingsButton').addEventListener('click', AbstractView.openSettings);
     document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
 
-    document.querySelector('#validFromPicker').addEventListener('change', SettingsView.isDateTaken);
+    document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
 
     //on site login
-    document.querySelector('#loginForm').addEventListener('submit', AbstractView.attemptLogin);
-    document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', abstCtrl.sendResetPasswordMail.bind(abstCtrl));
+    document.querySelector('#loginForm').addEventListener('submit', LoginController.attemptLogin);
+    document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', LoginController.sendResetPasswordMail);
+    document.querySelector('#loginForm').addEventListener('submit', LoginController.attemptLogin);
+    document.querySelector('#createAccountForm').addEventListener('submit', LoginController.attemptAccountCreation);
+    document.querySelector('#resetPasswordForm').addEventListener('submit', LoginController.attemptPasswordReset);
+    document.querySelectorAll('.backToLoginLink').forEach(link => { link.addEventListener('click', LoginController.openLoginDialog); });
+
+    window.addEventListener('DOMContentLoaded', LoginController.isAuth);
+    window.addEventListener('DOMContentLoaded', LoginController.isReset);
+    window.addEventListener('DOMContentLoaded', LoginController.isRegister);
 
     //on site account create
-    document.querySelector('#createAccount').addEventListener('click', abstCtrl.openAccountCreationDialog);
-    document.querySelector('#continueAsGuest').addEventListener('click', abstCtrl.createGuestAccount.bind(abstCtrl));
+    document.querySelector('#createAccount').addEventListener('click', LoginController.openCreateAccountDialog);
+    document.querySelector('#continueAsGuest').addEventListener('click', LoginController.createGuestAccount);
 
     //logout
     document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);

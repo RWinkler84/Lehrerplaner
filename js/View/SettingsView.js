@@ -1,9 +1,6 @@
 import Controller from "../Controller/SettingsController.js";
 import AbstractView from "./AbstractView.js";
 import Fn from "../inc/utils.js";
-import SettingsController from "../Controller/SettingsController.js";
-import LessonController from "../Controller/LessonController.js";
-import TaskController from "../Controller/TaskController.js";
 
 export default class SettingsView {
 
@@ -124,7 +121,7 @@ export default class SettingsView {
         let validFromElement = document.querySelector('#validFrom');
         let timetableValidDates = [];
         let dateOfTimetableToDisplay = new Date(validFromElement.dataset.date).setHours(12, 0, 0, 0);
-        let allSubjects = await SettingsController.getAllSubjects();
+        let allSubjects = await Controller.getAllSubjects();
 
         //get the all validity dates
         regularLessons.forEach(lesson => {
@@ -439,8 +436,8 @@ export default class SettingsView {
 
     static closeLessonChangesAndTasksToKeepDialog() {
         document.querySelector('#LessonChangesAndTasksToKeepDialog').removeAttribute('open');
-        LessonController.renderLesson();
-        TaskController.renderTaskChanges();
+        Controller.renderLesson();
+        Controller.renderTaskChanges();
     }
 
     static deleteLessonChangeOrTaskConflict(event) {
@@ -448,8 +445,8 @@ export default class SettingsView {
         let itemType = itemTr.dataset.type;
         let itemId = itemTr.dataset.id;
 
-        if (itemType == 'task') SettingsController.deleteTaskById(itemId);
-        if (itemType == 'lessonChange') SettingsController.deleteLessonChangeById(itemId);
+        if (itemType == 'task') Controller.deleteTaskById(itemId);
+        if (itemType == 'lessonChange') Controller.deleteLessonChangeById(itemId);
 
         itemTr.remove();
 

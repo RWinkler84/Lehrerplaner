@@ -117,10 +117,16 @@ class User extends AbstractModel
         }
 
         if ($mailSend) {
-            return ['message' => 'Confirmation email send'];
+            return [
+                'status' => 'success',
+                'message' => 'Confirmation email send'
+            ];
         }
 
-        return ['message' => 'Etwas ist schief gelaufen...'];
+        return [
+            'status' => 'failed',
+            'message' => 'Etwas ist schief gelaufen...'
+        ];
     }
 
     public function deleteAccount()
@@ -174,7 +180,7 @@ class User extends AbstractModel
     {
         $user = $this->getUserByEmail($data['userEmail']);
 
-        if (!is_null($user)) {
+        if (!is_null($user) && !is_array($user)) {
             $passwordResetLink = $user->generatePasswordResetLink();
             $mailSubject = 'Passwort zurücksetzen';
             $mailMessage = <<<MAIL

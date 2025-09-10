@@ -125,7 +125,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed'];
+        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -142,7 +142,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed'];
+        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -159,7 +159,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed'];
+        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -177,7 +177,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed'];
+        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
 
         return $this->escapeDbData($dataFromDb);
     }

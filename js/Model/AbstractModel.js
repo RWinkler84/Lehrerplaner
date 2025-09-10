@@ -1,4 +1,4 @@
-import { ONEDAY, unsyncedDeletedSubjects, unsyncedDeletedTasks, unsyncedDeletedTimetableChanges } from "../index.js";
+import { ONEDAY } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -14,13 +14,27 @@ export default class AbstractModel {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(content)
                 })
+
+    console.log(response);
+            if (!response.ok) {
+                AbstractController.setSyncIndicatorStatus('unsynced');
+                return {status: 'failed', message: response.statusText};
+            }
         }
         catch (error) {
             AbstractController.setSyncIndicatorStatus('unsynced');
-            return { 'status': 'failed' };
+            return { 'status': 'failed', message: 'Scheinbar gibt es gerade ein technisches Problem. Versuche es bitte später noch einmal.' };
         }
 
-        let result = await response.json();
+        let result;
+        
+        try { 
+            result = await response.json();
+            }
+        catch (error) {
+            AbstractController.setSyncIndicatorStatus('unsynced');
+            return {status: 'failed', message: error};
+        }
 
         if (result.status == 'failed' && !result.message) {
             AbstractController.setSyncIndicatorStatus('unsynced');
@@ -200,27 +214,6 @@ export default class AbstractModel {
         if (date == null) date = new Date();
         let db = await this.openIndexedDB();
         db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 0, lastUpdated: this.formatDateTime(date) })
-    }
-
-    //handle account related actions
-    async createGuestAccount() {
-        let data = {
-            id: 1,
-            accountType: 'guestUser'
-        }
-
-        this.writeToLocalDB('settings', data);
-    }
-
-    async getAccountInfo() {
-        let accountInfo = await this.readFromLocalDB('settings', 1);
-
-        if (!accountInfo) return {status: 'failed'};
-        
-        return {
-            status: 'success',
-            ...accountInfo
-        }
     }
 
     static async calculateAllLessonDates(className, subject, endDate, timetable, lessonChanges) {
@@ -419,7 +412,7 @@ export default class AbstractModel {
         let localSettings = await this.readAllFromLocalDB('settings');
         let updateTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
         let lastLocalUpdateTimestamp;
-
+        
         if (updateTimestamps.status == 'failed') return;
 
         //get local and newest remote timestamp
@@ -580,7 +573,7 @@ export default class AbstractModel {
     async writeRemoteToLocalDB(objectStore, dataToStore, newLocalTimestamp) {
         let result = await this.clearObjectStore(objectStore);
 
-        if (result.status == 'success') {
+        if (result.status == 'success' && !dataToStore.status) {
             await this.updateOnLocalDB(objectStore, dataToStore);
             this.markLocalDBUpdated(newLocalTimestamp);
         }

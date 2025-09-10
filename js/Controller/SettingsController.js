@@ -73,6 +73,10 @@ export default class SettingsController {
         View.discardNewTimetable();
     }
 
+    static async isDateTaken() {
+        return await View.isDateTaken();
+    }
+
     static async saveTimetableUpdates(validFrom, lessons) {
         let model = new Settings;
         let oldTimetable = await LessonController.getOldTimetableCopy();
@@ -129,6 +133,14 @@ export default class SettingsController {
 
     static async getLessonObject(lessonData) {
         return LessonController.getLessonObject(lessonData);
+    }
+
+    static renderLesson() {
+        LessonController.renderLesson();
+    }
+
+    static renderTaskChanges() {
+        TaskController.renderTaskChanges();
     }
 
     static async getAllSubjects() {
