@@ -1,4 +1,5 @@
 import Model from "../Model/AbstractModel.js";
+import View from "../View/AbstractView.js";
 import SettingsController from "./SettingsController.js";
 import LessonController from "./LessonController.js";
 import TaskController from "./TaskController.js";
@@ -32,25 +33,14 @@ export default class AbstractController {
         LoginController.openLoginDialog();
     }
 
-    /** @param status 'synced', 'unsynced' 'loggedOut' */
+    /** @param status 'synced', 'unsynced' */
     static setSyncIndicatorStatus(status) {
-        let syncIndicator = document.querySelector('#syncIndicator');
-
-        syncIndicator.removeAttribute('class');
-
-        switch (status) {
-            case 'synced':
-                syncIndicator.classList.add('synced');
-                break;
-            case 'unsynced':
-                syncIndicator.classList.add('unsynced');
-                break;
-            case 'loggedOut':
-                syncIndicator.classList.add('loggedOut');
-                break;
-        }
+        View.setSyncIndicatorStatus(status);
     }
 
+    static async toggleTemperaryOfflineUsage(offlineStatus) {
+        await LoginController.toggleTemperaryOfflineUsage(offlineStatus);
+    }
 
     async syncData() {
         await this.#db.syncData();

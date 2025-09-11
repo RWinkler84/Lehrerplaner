@@ -3,6 +3,7 @@
 namespace Model;
 
 use PDO;
+use PDOException;
 use DateTime;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -13,6 +14,8 @@ class AbstractModel
     protected function read($query, $params)
     {
         global $db;
+
+        error_log(print_r($db, true));
 
         if (!is_null($db)) {
 
@@ -31,10 +34,14 @@ class AbstractModel
             return $result;
         }
 
-        return [
-            'status' => 'failed',
-            'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte versuche es später noch einmal.'
-        ];
+        echo json_encode(
+            [
+                'status' => 'failed',
+                'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte versuche es später noch einmal.',
+                'error' => 'database unreachable'
+            ]
+        );
+        exit;
     }
 
     protected function write($query, $params)
@@ -62,12 +69,12 @@ class AbstractModel
                 }
 
                 $stmt->execute();
-            } catch (Exception $e) {
+            } catch (PDOException $e) {
                 error_log('Fehler beim Speichern der Daten: ' . $e);
-                http_response_code(500);
                 return [
-                    'message' => $e,
-                    'status' => 'failed'
+                    'status' => 'failed',
+                    'message' => 'Beim Speichern der Daten ist ein Fehler aufgetreten.',
+                    'error' => $e->getCode()
                 ];
             }
 
@@ -77,9 +84,14 @@ class AbstractModel
             ];
         }
 
-        return [
-            'status' => 'failed'
-        ];
+        echo json_encode(
+            [
+                'status' => 'failed',
+                'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte versuche es später noch einmal.',
+                'error' => 'database unreachable'
+            ]
+        );
+        exit;
     }
 
     protected function delete($query, $params)
@@ -99,18 +111,26 @@ class AbstractModel
                 error_log('Fehler beim Löschen der Daten: ' . $e);
                 http_response_code(500);
                 return [
-                    'message' => $e,
-                    'status' => 'failed'
+                    'message' => 'Die Daten konnten nicht gelöscht werden.',
+                    'status' => 'failed',
+                    'error' => $e
                 ];
             }
 
             return [
-                'message' => 'Data deleted sucessfully',
+                'message' => 'Die Daten wurden erfolgreich gelöscht.',
                 'status' => 'success'
             ];
         }
 
-        return ['status' => 'failed'];
+        echo json_encode(
+            [
+                'status' => 'failed',
+                'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte versuche es später noch einmal.',
+                'error' => 'database unreachable'
+            ]
+        );
+        exit;
     }
 
     public function getSubjects()
@@ -125,7 +145,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -142,7 +162,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -159,7 +179,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -177,7 +197,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'failed', 'message' => 'No entries found!'];
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -185,9 +205,13 @@ class AbstractModel
     public function getDbUpdateTimestamps()
     {
         global $user;
-        
+
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            echo json_encode([
+                'status' => 'failed',
+                'error' => 'User not logged in',
+                'message' => 'Der Nutzer ist nicht angemeldet.'
+            ]);
             exit;
         }
 
@@ -265,7 +289,7 @@ class AbstractModel
         if (!isset($user)) {
             echo json_encode([
                 'status' => 'failed',
-                'message' => 'User not logged in!'
+                'error' => 'User not logged in'
             ]);
             exit();
         }

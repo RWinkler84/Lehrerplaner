@@ -74,10 +74,6 @@ async function startApp() {
     document.querySelector('#resetPasswordForm').addEventListener('submit', LoginController.attemptPasswordReset);
     document.querySelectorAll('.backToLoginLink').forEach(link => { link.addEventListener('click', LoginController.openLoginDialog); });
 
-    window.addEventListener('DOMContentLoaded', LoginController.isAuth);
-    window.addEventListener('DOMContentLoaded', LoginController.isReset);
-    window.addEventListener('DOMContentLoaded', LoginController.isRegister);
-
     //on site account create
     document.querySelector('#createAccount').addEventListener('click', LoginController.openCreateAccountDialog);
     document.querySelector('#continueAsGuest').addEventListener('click', LoginController.createGuestAccount);
@@ -89,16 +85,20 @@ async function startApp() {
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
-    LessonView.renderLesson();
+    await LessonView.renderLesson();
 
-    TaskView.renderTasks();
+    await TaskView.renderTasks();
 
-    LessonView.showLessonHasTaskIndicator() // <- this has to run, after Tasks are rendered to work
+    await LessonView.showLessonHasTaskIndicator() // <- this has to run, after Tasks are rendered to work
 
-    SettingsView.renderSelectableLessonColors();
-    SettingsView.renderExistingSubjects();
-    SettingsView.setDateOfTimetableToDisplay();
-    SettingsView.renderLessons();
+    await SettingsView.renderSelectableLessonColors();
+    await SettingsView.renderExistingSubjects();
+    await SettingsView.setDateOfTimetableToDisplay();
+    await SettingsView.renderLessons();
+
+    LoginController.isAuth();
+    LoginController.isRegister();
+    LoginController.isReset();
 
     // FIDDLING WITH DATE
 

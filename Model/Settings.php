@@ -27,7 +27,7 @@ class Settings extends AbstractModel
         global $user;
 
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
             exit;
         }
 
@@ -68,7 +68,11 @@ class Settings extends AbstractModel
 
             $result = $this->write($query, $lesson);
 
-            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
+            if ($result['status'] == 'failed') {
+                $finalResult['status'] = 'failed';
+                $finalResult['error'] = $result['error'];
+                $finalResult['message'] = $result['message'];
+            }
         }
 
         if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($timetableData[0]['lastEdited']));
@@ -83,7 +87,7 @@ class Settings extends AbstractModel
         global $user;
 
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
             exit;
         }
 
@@ -112,7 +116,11 @@ class Settings extends AbstractModel
         if ($deleted['status'] == 'success') {
             $result = $this->saveTimetable($timetableData);
 
-            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
+            if ($result['status'] == 'failed') {
+                $finalResult['status'] = 'failed';
+                $finalResult['error'] = $result['error'];
+                $finalResult['message'] = $result['message'];
+            }
         }
 
         if ($finalResult['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($timetableData[0]['lastEdited']));
@@ -137,7 +145,7 @@ class Settings extends AbstractModel
         global $user;
 
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
             exit;
         }
 
@@ -171,7 +179,11 @@ class Settings extends AbstractModel
 
             $result = $this->write($query, $subject);
 
-            if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
+            if ($result['status'] == 'failed') {
+                $finalResult['status'] = 'failed';
+                $finalResult['error'] = $result['error'];
+            }
+
             if ($result['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subject['lastEdited']));
         }
 

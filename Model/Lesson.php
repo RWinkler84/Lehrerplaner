@@ -13,7 +13,6 @@ class Lesson extends AbstractModel
     {
         $lessonData = $this->preprocessDataToWrite($lessonData);
 
-        error_log(print_r($lessonData, true));
         $query = "INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, type, canceled, lastEdited) VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :type, :canceled, :lastEdited)";
 
         $result = $this->write($query, $lessonData);
@@ -50,7 +49,7 @@ class Lesson extends AbstractModel
         global $user;
 
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
             exit;
         }
 
@@ -84,7 +83,11 @@ class Lesson extends AbstractModel
         foreach ($timetableChanges as $lesson) {
             $result = $this->write($query, $lesson);
 
-            if ($result['status'] == 'failed') $finalResult = ['status' => 'failed'];
+            if ($result['status'] == 'failed') {
+                $finalResult['status'] = 'failed';
+                $finalResult['error'] = $result['error'];
+            }
+
             if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lesson['lastEdited']));
         }
 

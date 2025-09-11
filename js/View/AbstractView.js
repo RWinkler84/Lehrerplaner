@@ -125,4 +125,19 @@ export default class AbstractView {
         document.querySelector('nav').style.removeProperty('filter');
 
     }
+
+    static setSyncIndicatorStatus(status) {
+        let syncIndicator = document.querySelector('#syncIndicator');
+
+        syncIndicator.removeAttribute('class');
+
+        switch (status) {
+            case 'synced':
+                syncIndicator.classList.add('synced');
+                break;
+            case 'unsynced':
+                syncIndicator.classList.add('unsynced');
+                break;
+        }
+    }
 }

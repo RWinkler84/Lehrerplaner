@@ -40,7 +40,7 @@ class Task extends AbstractModel
         global $user;
 
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
             exit;
         }
 
@@ -105,7 +105,11 @@ class Task extends AbstractModel
             }
 
             $result = $this->write($query, $task);
-            if ($result['status'] == 'failed') $finalResult['status'] == 'failed';
+            if ($result['status'] == 'failed') {
+                $finalResult['status'] = 'failed';
+                $finalResult['error'] = $result['error'];
+            }
+
             if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($task['lastEdited']));
         }
 

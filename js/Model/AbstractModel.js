@@ -15,32 +15,37 @@ export default class AbstractModel {
                     body: JSON.stringify(content)
                 })
 
-    console.log(response);
             if (!response.ok) {
                 AbstractController.setSyncIndicatorStatus('unsynced');
-                return {status: 'failed', message: response.statusText};
+                return { status: 'failed', message: response.statusText };
             }
         }
         catch (error) {
             AbstractController.setSyncIndicatorStatus('unsynced');
-            return { 'status': 'failed', message: 'Scheinbar gibt es gerade ein technisches Problem. Versuche es bitte später noch einmal.' };
+            return {
+                status: 'failed',
+                error: 'no server response',
+                message: 'Scheinbar gibt es gerade ein technisches Problem. Versuche es bitte später noch einmal.'
+            };
         }
 
         let result;
-        
-        try { 
+
+        try {
             result = await response.json();
-            }
+        }
         catch (error) {
             AbstractController.setSyncIndicatorStatus('unsynced');
-            return {status: 'failed', message: error};
+            return { status: 'failed', message: error.message };
         }
 
-        if (result.status == 'failed' && !result.message) {
-            AbstractController.setSyncIndicatorStatus('unsynced');
-        } else if (result.status == 'failed' && result.message == 'User not logged in!') {
+        console.log(result);
+        if (result.status == 'failed' && result.error == 'User not logged in') {
+            await AbstractController.toggleTemperaryOfflineUsage(false);
             AbstractController.openLoginDialog();
-            AbstractController.setSyncIndicatorStatus('loggedOut');
+            AbstractController.setSyncIndicatorStatus('unsynced');
+        } else if (result.status == 'failed') {
+            AbstractController.setSyncIndicatorStatus('unsynced');
         } else {
             AbstractController.setSyncIndicatorStatus('synced');
         }
@@ -412,7 +417,7 @@ export default class AbstractModel {
         let localSettings = await this.readAllFromLocalDB('settings');
         let updateTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
         let lastLocalUpdateTimestamp;
-        
+
         if (updateTimestamps.status == 'failed') return;
 
         //get local and newest remote timestamp
@@ -477,7 +482,7 @@ export default class AbstractModel {
         }
 
         if (new Date(updateTimestamps[0].timetable).getTime() > lastLocalUpdateTimestamp) {
-            let timetable = await this.makeAjaxQuery('abstract', 'getTimetable')
+            let timetable = await this.makeAjaxQuery('abstract', 'getTimetable');
             await this.writeRemoteToLocalDB('timetable', timetable, newestRemoteTimestamp);
             this.clearObjectStore('unsyncedTimetables');
         }
@@ -567,8 +572,28 @@ export default class AbstractModel {
         if (result.tasks.status == 'success') {
             await this.clearObjectStore('unsyncedTasks');
         }
-    }
 
+        //Syncing failed (duplicate IDs most likely cause)
+        //subjects
+        if (result.subjects.status == 'failed' && result.subjects.error == '23000') {
+            await this.resolveDuplicateIds('subjects', unsyncedSubjects);
+        }
+
+        //timetable
+        if (result.timetable.status == 'failed' && result.timetable.error == '23000') {
+            await this.resolveDuplicateIds('timetables', unsyncedTimetables);
+        }
+
+        //lessonChanges
+        if (result.timetableChanges.status == 'failed' && result.timetableChanges.error == '23000') {
+            await this.resolveDuplicateIds('timetableChanges', unsyncedTimetableChanges);
+        }
+
+        //tasks
+        if (result.tasks.status == 'failed' && result.tasks.error == '23000') {
+            await this.resolveDuplicateIds('tasks', unsyncedTasks);
+        }
+    }
 
     async writeRemoteToLocalDB(objectStore, dataToStore, newLocalTimestamp) {
         let result = await this.clearObjectStore(objectStore);
@@ -577,5 +602,27 @@ export default class AbstractModel {
             await this.updateOnLocalDB(objectStore, dataToStore);
             this.markLocalDBUpdated(newLocalTimestamp);
         }
+    }
+
+    async resolveDuplicateIds(localDatasetName, localDataset) {
+        let remoteDataset;
+
+        switch (localDatasetName) {
+            case 'subjects':
+                remoteDataset = await this.makeAjaxQuery('abstract', 'getSubjects');
+                break;
+            case 'timetables':
+                remoteDataset = await await this.makeAjaxQuery('abstract', 'getTimetable');
+                break;
+            case 'timetableChanges':
+                remoteDataset = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
+                break;
+            case 'tasks':
+                remoteDataset = await this.makeAjaxQuery('abstract', 'getAllTasks');
+                break;
+        }
+
+        console.log('local', localDataset);
+        console.log('remote', remoteDataset);
     }
 }

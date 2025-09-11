@@ -35,7 +35,8 @@ class User extends AbstractModel
         if (is_array($user) && isset($user['status']) && $user['status'] == 'failed') {
             return [
                 'message' => $user['message'],
-                'status' => 'failed'
+                'status' => 'failed',
+                'error' => $user['error']
             ];
             exit();
         }
@@ -43,7 +44,8 @@ class User extends AbstractModel
         if ($user->emailConfirmed == 0) {
             return [
                 'message' => 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte öffne den Link in der Mail, die du nach der Anmeldung erhalten hast.',
-                'status' => 'mail auth missing'
+                'status' => 'failed',
+                'error' => 'mail auth missing' 
             ];
         }
 
@@ -68,7 +70,8 @@ class User extends AbstractModel
         } else {
             return [
                 'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
-                'status' => 'failed'
+                'status' => 'failed',
+                'error' => 'wrong login credentials'
             ];
         }
     }
@@ -134,7 +137,7 @@ class User extends AbstractModel
         global $user;
 
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'message' => 'User not logged in!']);
+            echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
             exit;
         }
 
