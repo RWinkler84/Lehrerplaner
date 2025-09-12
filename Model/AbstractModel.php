@@ -15,8 +15,6 @@ class AbstractModel
     {
         global $db;
 
-        error_log(print_r($db, true));
-
         if (!is_null($db)) {
 
             $stmt = $db->prepare($query);
@@ -47,6 +45,8 @@ class AbstractModel
     protected function write($query, $params)
     {
         global $db;
+        error_log(__FILE__ . print_r($params, true));
+        error_log(__FILE__ . $query);
 
         if (!is_null($db)) {
             try {

@@ -14,8 +14,8 @@ class Task extends AbstractModel
         $taskData = $this->preprocessDataToWrite($taskData);
 
         $query = "INSERT INTO $this->tableName 
-            (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, lastEdited) 
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :lastEdited)";
+            (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, created, lastEdited) 
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :created, :lastEdited)";
         $result = $this->write($query, $taskData);
 
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
@@ -27,7 +27,7 @@ class Task extends AbstractModel
     {
         $taskData = $this->preprocessDataToWrite($taskData);
 
-        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval, lastEdited=:lastEdited WHERE userId = :userId AND itemId=:itemId";
+        $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval, created=:created, lastEdited=:lastEdited WHERE userId = :userId AND itemId = :itemId AND created = :created";
         $result = $this->write($query, $taskData);
 
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
@@ -38,39 +38,20 @@ class Task extends AbstractModel
     public function deleteTask($taskData)
     {
         global $user;
+        $taskData = $this->preprocessDataToWrite($taskData);
 
         if (is_null($user)) {
             echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
             exit;
         }
 
-        $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
-        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $taskData['id']]);
-
-        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
-
-        return $result;
-    }
-
-    public function setInProgress($taskData)
-    {
-        $taskId = $this->preprocessDataToWrite($taskData);
-
-        $query = "UPDATE $this->tableName SET status='inProgress', lastEdited=:lastEdited WHERE userId=:userId AND itemId = :itemId";
-        $result = $this->write($query, $taskId);
-
-        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
-
-        return $result;
-    }
-
-    public function setDone($taskData)
-    {
-        $taskId = $this->preprocessDataToWrite($taskData);
-
-        $query = "UPDATE $this->tableName SET status='done', lastEdited=:lastEdited WHERE userId=:userId AND itemId = :itemId";
-
-        $result = $this->write($query, $taskId);
+        $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId AND created = :created";
+        $queryData = [
+            'userId' => $taskData['userId'],
+            'itemId' => $taskData['itemId'],
+            'created' => $taskData['created']
+        ];
+        $result = $this->delete($query, $queryData);
 
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskData['lastEdited']));
 
@@ -83,8 +64,8 @@ class Task extends AbstractModel
         $tasks = $this->preprocessDataToWrite($tasks);
 
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, lastEdited) 
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, created, lastEdited) 
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :created, :lastEdited)
             ON DUPLICATE KEY UPDATE
                 date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
                 timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),

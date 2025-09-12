@@ -142,7 +142,7 @@ export default class SettingsView {
             lesson.cssColorClass = Fn.getCssColorClass(lesson, allSubjects);
 
             timeslot.innerHTML = `
-                <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-id="${lesson.id}" data-validuntil="${lesson.validUntil}">
+                <div class="settingsLesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-id="${lesson.id}" data-validuntil="${lesson.validUntil}" data-created="${lesson.created}">
                      <div class="flex spaceBetween" style="width: 100%;">
                         <div style="width: 1.5rem;"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
@@ -358,7 +358,8 @@ export default class SettingsView {
                 'class': timeslot.firstElementChild.dataset.class,
                 'subject': timeslot.firstElementChild.dataset.subject,
                 'weekday': timeslot.closest('.settingsWeekday').dataset.weekday_number,
-                'timeslot': timeslot.dataset.timeslot
+                'timeslot': timeslot.dataset.timeslot,
+                'created':timeslot.firstElementChild.dataset.created
             }
 
             lessons.push(lessonData);

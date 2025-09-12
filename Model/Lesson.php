@@ -13,7 +13,7 @@ class Lesson extends AbstractModel
     {
         $lessonData = $this->preprocessDataToWrite($lessonData);
 
-        $query = "INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, type, canceled, lastEdited) VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :type, :canceled, :lastEdited)";
+        $query = "INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, type, canceled, created, lastEdited) VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :type, :canceled, :created, :lastEdited)";
 
         $result = $this->write($query, $lessonData);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
@@ -23,11 +23,16 @@ class Lesson extends AbstractModel
 
     public function cancel($lessonData)
     {
-
         $lessonData = $this->preprocessDataToWrite($lessonData);
-        $query = "UPDATE $this->tableName SET canceled = 'true', lastEdited = :lastEdited WHERE userId=:userId AND itemId = :itemId";
+        $query = "UPDATE $this->tableName SET canceled = 'true', lastEdited = :lastEdited WHERE userId = :userId AND itemId = :itemId AND created = :created";
+        $queryData = [
+            'userId' => $lessonData['userId'],
+            'itemId' => $lessonData['itemId'],
+            'created' => $lessonData['created'],
+            'lastEdited' => $lessonData['lastEdited']
+        ];
 
-        $result = $this->write($query, $lessonData);
+        $result = $this->write($query, $queryData);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
 
         return $result;
@@ -36,9 +41,15 @@ class Lesson extends AbstractModel
     public function uncancel($lessonData)
     {
         $lessonData = $this->preprocessDataToWrite($lessonData);
-        $query = "UPDATE $this->tableName SET canceled = 'false', lastEdited = :lastEdited WHERE userId=:userId AND itemId = :itemId";
+        $query = "UPDATE $this->tableName SET canceled = 'false', lastEdited = :lastEdited WHERE userId = :userId AND itemId = :itemId AND created = :created";
+        $queryData = [
+            'userId' => $lessonData['userId'],
+            'itemId' => $lessonData['itemId'],
+            'created' => $lessonData['created'],
+            'lastEdited' => $lessonData['lastEdited']
+        ];
 
-        $result = $this->write($query, $lessonData);
+        $result = $this->write($query, $queryData);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
 
         return $result;
@@ -46,16 +57,17 @@ class Lesson extends AbstractModel
 
     public function deleteLesson($lesson)
     {
-        global $user;
 
-        if (is_null($user)) {
-            echo json_encode(['status' => 'failed', 'error' => 'User not logged in']);
-            exit;
-        }
+        $lesson = $this->preprocessDataToWrite($lesson);
 
-        $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId";
+        $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId AND created = :created";
+        $queryData = [
+            'userId' => $lesson['userId'],
+            'itemId' => $lesson['itemId'],
+            'created' => $lesson['created'],
+        ];
 
-        $result = $this->delete($query, ['userId' => $user->getId(), 'itemId' => $lesson['id']]);
+        $result = $this->delete($query, $queryData);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lesson['lastEdited']));
 
         return $result;
@@ -67,8 +79,8 @@ class Lesson extends AbstractModel
         $finalResult = ['status' => 'success'];
 
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, weekday, subject, type, canceled, lastEdited)
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :weekday, :subject, :type, :canceled, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, weekday, subject, type, canceled, created, lastEdited)
+            VALUES (:userId, :itemId, :date, :timeslot, :class, :weekday, :subject, :type, :canceled, :created, :lastEdited)
             ON DUPLICATE KEY UPDATE
                 date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
                 timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),

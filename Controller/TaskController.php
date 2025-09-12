@@ -27,6 +27,7 @@ class TaskController extends AbstractController
 
     public function update()
     {
+        error_log('ich update jetzt');
         $taskData = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->update($taskData);
@@ -45,24 +46,6 @@ class TaskController extends AbstractController
         }
 
         echo json_encode($finalResult);
-    }
-
-    public function setInProgress()
-    {
-        $taskId = json_decode(file_get_contents('php://input'), true);
-
-        $result = $this->model->setInProgress($taskId);
-
-        echo json_encode($result);
-    }
-
-    public function setDone()
-    {
-        $taskId = json_decode(file_get_contents('php://input'), true);
-
-        $result = $this->model->setDone($taskId);
-
-        echo json_encode($result);
     }
 
     public static function syncTasks($tasks)

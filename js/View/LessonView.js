@@ -39,7 +39,7 @@ export default class LessonView {
             if (lesson.subject == 'Termin') lesson.cssColorClass = 'appointement';
 
             timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}">
+                <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}" data-created="${lesson.created}">
                     <div class="lessonContentContainer" style="width: 100%;">
                         <div class="lessonHasTaskIndicator"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
@@ -90,7 +90,7 @@ export default class LessonView {
             if (lesson.subject == 'Termin') lesson.cssColorClass = 'appointement';
 
             timeslot.innerHTML = `
-                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}">
+                <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}" data-created="${lesson.created}">
                     <div class="lessonContentContainer" style="width: 100%;">
                         <div class="lessonHasTaskIndicator"></div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
@@ -249,11 +249,13 @@ export default class LessonView {
         oldLessonData = {
             'id': lessonElement.dataset.id,
             'date': lessonElement.dataset.date,
+            'weekday': lessonElement.closest('.weekday').dataset.weekday_number,
             'timeslot': lessonElement.dataset.timeslot,
             'class': lessonElement.dataset.class,
             'subject': lessonElement.dataset.subject,
-            'type': 'sub',
-            'canceled': 'true'
+            'type': lessonElement.dataset.id == undefined ? 'normal' : 'sub',
+            'canceled': 'true',
+            'created': lessonElement.dataset.created
         }
 
         if (oldLessonData.subject == 'Termin') oldLessonData.type = 'appointement';
@@ -420,7 +422,8 @@ export default class LessonView {
             'date': lessonElement.closest('.weekday').dataset.date,
             'weekday': lessonElement.closest('.weekday').dataset.weekday_number,
             'timeslot': lessonElement.closest('.timeslot').dataset.timeslot,
-            'type': isSubstitute
+            'type': isSubstitute,
+            'created': lessonElement.dataset.created
         }
     }
 

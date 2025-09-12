@@ -17,6 +17,7 @@ export default class Lesson extends AbstractModel {
     #validFrom; //date a regular lesson was added to the scheduled timetable
     #validUntil;
     #cssColorClass
+    #created;
     #lastEdited;
 
     constructor(className, subject) {
@@ -41,6 +42,7 @@ export default class Lesson extends AbstractModel {
             lesson.type = 'normal';
             lesson.validFrom = entry.validFrom;
             lesson.validUntil = entry.validUntil;
+            lesson.created = entry.created;
             lesson.lastEdited = entry.lastEdited;
 
             regularLessons.push(lesson);
@@ -105,6 +107,7 @@ export default class Lesson extends AbstractModel {
             lesson.canceled = entry.canceled;
             lesson.validFrom = entry.validFrom;
             lesson.validUntil = entry.validUntil;
+            lesson.created = entry.created;
             lesson.lastEdited = entry.lastEdited;
 
             changes.push(lesson);
@@ -126,6 +129,8 @@ export default class Lesson extends AbstractModel {
             lesson.canceled = entry.canceled;
             lesson.type = entry.type;
             lesson.timeslot = entry.timeslot;
+            lesson.created = entry.created;
+            lesson.lastEdited = entry.lastEdited;
 
             if (Fn.isDateInTimespan(lesson.date, startDate, endDate)) changes.push(lesson);
         });
@@ -150,6 +155,7 @@ export default class Lesson extends AbstractModel {
         lesson.timeslot = lessonData.timeslot;
         lesson.canceled = lessonData.canceled;
         lesson.type = lessonData.type;
+        lesson.created = lessonData.created;
         lesson.lastEdited = lessonData.lastEdited;
 
         return lesson;
@@ -172,6 +178,7 @@ export default class Lesson extends AbstractModel {
 
         this.id = Fn.generateId(timetableChanges);
         this.lastEdited = this.formatDateTime(new Date());
+        this.created = this.lastEdited;
 
         await this.writeToLocalDB('timetableChanges', this.serialize());
         let result = await this.makeAjaxQuery('lesson', 'save', this.serialize());
@@ -183,9 +190,9 @@ export default class Lesson extends AbstractModel {
         let deletedItem = await this.readFromLocalDB('timetableChanges', this.id);
         this.deleteFromLocalDB('timetableChanges', this.id);
 
-        let result = await this.makeAjaxQuery('lesson', 'delete', [{ 'id': this.id }]);
+        let result = await this.makeAjaxQuery('lesson', 'delete', [this.serialize()]);
 
-        if (result.status == 'failed' || result[0].status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', deletedItem);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', deletedItem);
     }
 
     async update() {
@@ -193,6 +200,7 @@ export default class Lesson extends AbstractModel {
 
         if (this.subject == 'Termin') this.type = 'appointement';
         this.lastEdited = this.formatDateTime(new Date());
+        this.created = this.lastEdited;
         this.id = Fn.generateId(timetableChanges);
 
         this.writeToLocalDB('timetableChanges', this.serialize());
@@ -209,7 +217,7 @@ export default class Lesson extends AbstractModel {
         if (this.id != undefined) {
 
             this.updateOnLocalDB('timetableChanges', this.serialize());
-            let result = await this.makeAjaxQuery('lesson', 'cancel', { 'id': this.id, 'lastEdited': this.lastEdited });
+            let result = await this.makeAjaxQuery('lesson', 'cancel', this.serialize());
 
             if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
 
@@ -231,7 +239,7 @@ export default class Lesson extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         this.updateOnLocalDB('timetableChanges', this.serialize())
-        let result = await this.makeAjaxQuery('lesson', 'uncancel', { 'id': this.id, 'lastEdited': this.lastEdited })
+        let result = await this.makeAjaxQuery('lesson', 'uncancel', this.serialize())
 
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
     }
@@ -250,6 +258,7 @@ export default class Lesson extends AbstractModel {
         if (this.canceled) serialized.canceled = this.canceled;
         if (this.validFrom) serialized.validFrom = this.validFrom;
         if (this.validUntil) serialized.validUntil = this.validUntil;
+        if (this.created) serialized.created = this.created;
         if (this.lastEdited) serialized.lastEdited = this.lastEdited;
 
         return serialized;
@@ -300,6 +309,10 @@ export default class Lesson extends AbstractModel {
         return this.#cssColorClass;
     }
 
+    get created() {
+        return this.#created;
+    } 
+
     get lastEdited() {
         return this.#lastEdited;
     }
@@ -347,6 +360,10 @@ export default class Lesson extends AbstractModel {
 
     set cssColorClass(cssClass) {
         this.#cssColorClass = cssClass;
+    }
+
+    set created(created) {
+        this.#created = created;
     }
 
     set lastEdited(lastEdited) {

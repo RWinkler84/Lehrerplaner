@@ -13,7 +13,7 @@ class Settings extends AbstractModel
         $tableName = TABLEPREFIX . 'subjects';
         $subject = $this->preprocessDataToWrite($subject);
 
-        $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :lastEdited)";
+        $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass, created, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :created, :lastEdited)";
 
         $result = $this->write($query, $subject);
 
@@ -31,16 +31,19 @@ class Settings extends AbstractModel
             exit;
         }
 
-        $userId = $user->getId();
         $tableName = TABLEPREFIX . 'subjects';
         $finalResult['status'] = 'success';
 
-        $query = "DELETE FROM $tableName WHERE userId = $userId AND itemId=:id";
+        $query = "DELETE FROM $tableName WHERE userId = :userId AND itemId = :itemId AND created = :created";
 
         foreach ($subjects as $entry) {
-            $item['id'] = $entry['id'];
+            $queryData = [
+                'userId' => $user->getId(),
+                'itemId' => $entry['id'],
+                'created' => $entry['created']
+            ];
 
-            $result = $this->delete($query, $item);
+            $result = $this->delete($query, $queryData);
 
             if ($result['status'] == 'failed') $finalResult['status'] = 'failed';
         };
@@ -57,8 +60,8 @@ class Settings extends AbstractModel
         $finalResult['status'] = 'success';
 
         $query = "
-            INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekday, timeslot, lastEdited) 
-            VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekday, :timeslot, :lastEdited)
+            INSERT INTO $tableName (userId, itemId, validFrom, validUntil, class, subject, weekday, timeslot, created, lastEdited) 
+            VALUES (:userId, :itemId, :validFrom, :validUntil, :class, :subject, :weekday, :timeslot, :created, :lastEdited)
             ";
 
         foreach ($timetableData as $lesson) {
@@ -160,22 +163,42 @@ class Settings extends AbstractModel
         return $this->write($query, []);
     }
 
-    public function syncSubjects($subjectsData)
+    public function syncSubjects($subjectsToSync)
     {
+        global $user;
+
         $tableName = TABLEPREFIX . 'subjects';
-        $subjectsData = $this->preprocessDataToWrite($subjectsData);
+        $subjectsToSync = $this->preprocessDataToWrite($subjectsToSync);
         $finalResult['status'] = 'success';
 
-        error_log(print_r($subjectsData, true));
+        $storedSubjects = $this->read("SELECT * FROM $tableName WHERE userId = :userId", ['userId' => $user->getId()]);
+        error_log(print_r($storedSubjects, true));
 
-        foreach ($subjectsData as $subject) {
-            $query = "
-                INSERT INTO $tableName (userId, itemId, subject, colorCssClass, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :lastEdited)
-                ON DUPLICATE KEY UPDATE
-                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
-                colorCssClass = IF (VALUES(lastEdited) > lastEdited, VALUES(colorCssClass), colorCssClass),
-                lastEdited =  IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
-            ";
+        $lookup = [];
+
+        foreach ($storedSubjects as $storedSubject) {
+            $lookup[$storedSubject['itemId']] = $storedSubject;
+        }
+
+        foreach ($subjectsToSync as $subject) {
+            $matchingStoredEntry = $lookup[$subject['itemId']] ?? null;
+
+            //no duplicate id found
+            if (is_null($matchingStoredEntry)) {
+                $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass, created, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :created, :lastEdited)";
+            }
+
+            //duplicate id, same creation datetime -> update
+            if (!is_null($matchingStoredEntry)) {
+                if ($subject['created'] == $matchingStoredEntry['created']) {
+                    $query = "UPDATE $tableName SET userId = :userId, itemId = :itemId, subject = :subject, colorCssClass = :colorCssClass, created = :created, lastEdited = :lastEdited WHERE userId = :userId AND itemId = :itemId And created = :created";
+                } else {
+                    return [
+                        'status' => 'failed',
+                        'error' => 'id collision'
+                    ];
+                }
+            }
 
             $result = $this->write($query, $subject);
 

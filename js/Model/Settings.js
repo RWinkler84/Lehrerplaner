@@ -12,6 +12,7 @@ export default class Settings extends AbstractModel {
         let allSubjects = await this.getAllSubjects();
         subject.id = Fn.generateId(allSubjects);
         subject.lastEdited = this.formatDateTime(new Date());
+        subject.created = subject.lastEdited;
 
         this.writeToLocalDB('subjects', subject);
 
@@ -27,7 +28,7 @@ export default class Settings extends AbstractModel {
 
         this.deleteFromLocalDB('subjects', id);
 
-        let result = await this.makeAjaxQuery('settings', 'deleteSubjects', [{ 'id': id }]);
+        let result = await this.makeAjaxQuery('settings', 'deleteSubjects', [{ 'id': id, 'created': deletedSubject.created, 'lastEdited': deletedSubject.lastEdited }]);
 
         if (result.status == 'failed') {
             deletedSubject.lastEdited = this.formatDateTime(new Date());
@@ -44,6 +45,8 @@ export default class Settings extends AbstractModel {
         lessons.forEach(entry => {
             entry.id = Fn.generateId(standardTimetable);
             entry.lastEdited = this.formatDateTime(new Date());
+            entry.created = entry.lastEdited;
+
             standardTimetable.push(entry);
 
             this.writeToLocalDB('timetable', entry);
@@ -62,6 +65,7 @@ export default class Settings extends AbstractModel {
         let standardTimetable = await SettingsController.getAllRegularLessons();
         let timetableHasValidUntil = false;
         let validUntilDate;
+        let timetableCreationDate;
 
         //remove the old timetable
         for (let i = standardTimetable.length - 1; i >= 0; i--) {
@@ -73,6 +77,7 @@ export default class Settings extends AbstractModel {
 
         lessons.forEach(lesson => {
             if (lesson.validUntil === 'null' || lesson.validUntil === 'undefined') lesson.validUntil = null;
+            if (lesson.created) timetableCreationDate = lesson.created;
 
             if (lesson.validUntil) {
                 timetableHasValidUntil = true;
@@ -81,11 +86,17 @@ export default class Settings extends AbstractModel {
 
             if (!lesson.id) lesson.id = Fn.generateId(standardTimetable);
 
-            // if a lesson is added to a timetable with a validUntil date, this date is missing on the new lesson and needs to be added
-            if (timetableHasValidUntil) lesson.validUntil = validUntilDate;
             lesson.lastEdited = this.formatDateTime(new Date());
 
             standardTimetable.push(lesson);
+        })
+
+        //some lessons may not have a validUntil or creation date, which needs to match the other lessons of the timetable
+        lessons.forEach(lesson => {
+            // if a lesson is added to a timetable with a validUntil date, this date is missing on the new lesson and needs to be added
+            if (timetableHasValidUntil) lesson.validUntil = validUntilDate;
+            if (!lesson.created) lesson.created = timetableCreationDate;
+
             this.writeToLocalDB('timetable', lesson);
         })
 

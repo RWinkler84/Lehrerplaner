@@ -31,8 +31,8 @@ export default class LessonController {
         this.renderLesson();
     }
 
-    static deleteLessonById(id) {
-        let lesson = Lesson.getLessonById(id);
+    static async deleteLessonById(id) {
+        let lesson = await Lesson.getLessonById(id);
 
         lesson.delete();
     }
@@ -49,7 +49,7 @@ export default class LessonController {
             return false;
         }
 
-        this.setLessonCanceled(oldLessonData);
+        await this.setLessonCanceled(oldLessonData);
 
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
         let oldTimetable = await Lesson.getOldTimetableCopy();
@@ -63,6 +63,7 @@ export default class LessonController {
 
     static async setLessonCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
+        console.log(lessonData);
         let oldTimetable = await Lesson.getOldTimetableCopy();
         let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 
@@ -137,6 +138,7 @@ export default class LessonController {
         lesson.timeslot = lessonData.timeslot;
         lesson.canceled = lessonData.canceled = undefined ? 'false' : lessonData.canceled;
         lesson.type = lessonData.type = undefined ? 'normal' : lessonData.type;
+        lesson.created = lessonData.created;
 
         return lesson;
     }

@@ -16,6 +16,7 @@ export default class Task extends AbstractModel {
     #fixedTime = false;
     #reoccuring = false;
     #reoccuringInterval;
+    #created;
     #lastEdited;
 
     constructor(id = undefined) {
@@ -37,6 +38,7 @@ export default class Task extends AbstractModel {
 
         this.id = Fn.generateId(allTasks);
         this.lastEdited = this.formatDateTime(new Date());
+        this.created = this.lastEdited;
 
         await this.writeToLocalDB('tasks', this.serialize());
 
@@ -49,7 +51,7 @@ export default class Task extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date);
         await this.deleteFromLocalDB('tasks', this.id);
 
-        let result = await this.makeAjaxQuery('task', 'delete', [{ 'id': this.id, 'lastEdited': this.lastEdited }]);
+        let result = await this.makeAjaxQuery('task', 'delete', [this.serialize()]);
 
         if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTasks', this.serialize());
     }
@@ -58,11 +60,7 @@ export default class Task extends AbstractModel {
         this.status = 'inProgress';
         this.lastEdited = this.formatDateTime(new Date());
 
-        await this.updateOnLocalDB('tasks', this.serialize());
-
-        let result = await this.makeAjaxQuery('task', 'setInProgress', { 'id': this.id, 'lastEdited': this.lastEdited });
-        if (result.status == 'failed') this.updateOnLocalDB('unsyncedTasks', this.serialize());
-
+        this.update();
     }
 
     async setDone() {
@@ -142,6 +140,7 @@ export default class Task extends AbstractModel {
         task.fixedTime = taskData.fixedTime;
         task.reoccuring = taskData.reoccuring;
         task.reoccuringInterval = taskData.reoccuringInterval;
+        task.created = taskData.created
         task.lastEdited = taskData.lastEdited
 
         return task;
@@ -166,6 +165,7 @@ export default class Task extends AbstractModel {
             task.fixedTime = element.fixedTime;
             task.reoccuring = element.reoccuring;
             task.reoccuringInterval = element.reoccuringInterval;
+            task.created = element.created;
             task.lastEdited = element.lastEdited;
 
             allTasks.push(task)
@@ -285,6 +285,7 @@ export default class Task extends AbstractModel {
             'fixedTime': this.#fixedTime,
             'reoccuring': this.#reoccuring,
             'reoccuringInterval': this.#reoccuringInterval,
+            'created': this.#created,
             'lastEdited': this.#lastEdited
         }
     }
@@ -305,6 +306,7 @@ export default class Task extends AbstractModel {
             fixedTime: this.fixedTime,
             reoccuring: this.reoccuring,
             reoccuringInterval: this.reoccuringInterval,
+            created: this.created,
             lastEdited: this.lastEdited
         }
     }
@@ -349,6 +351,10 @@ export default class Task extends AbstractModel {
         return this.#reoccuringInterval;
     }
 
+    get created() {
+        return this.#created;
+    } 
+    
     get lastEdited() {
         return this.#lastEdited;
     }
@@ -393,6 +399,10 @@ export default class Task extends AbstractModel {
 
     set reoccuringInterval(reoccuringInterval) {
         this.#reoccuringInterval = reoccuringInterval;
+    }
+    
+    set created(created) {
+        this.#created = created;
     }
 
     set lastEdited(lastEdited) {
