@@ -45,8 +45,6 @@ class AbstractModel
     protected function write($query, $params)
     {
         global $db;
-        error_log(__FILE__ . print_r($params, true));
-        error_log(__FILE__ . $query);
 
         if (!is_null($db)) {
             try {
@@ -295,7 +293,7 @@ class AbstractModel
         }
 
         //sometimes dataArray will be a set of associative arrays, sometimes it will just be a single associative array
-        if (isset($dataArray[0])) {
+        if (is_array($dataArray)) {
 
             $dataArray = array_map(function ($data) {
                 global $user;

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Controller;
 
@@ -7,64 +7,78 @@ use Controller\LessonController;
 use Controller\SettingsController;
 use Controller\TaskController;
 
-class AbstractController {
+class AbstractController
+{
 
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = new AbstractModel();
     }
 
-    public function getSubjects() {
+    public function getSubjects()
+    {
         $result = $this->db->getSubjects();
 
         echo json_encode($result);
     }
 
-    public function getTimetable() {
+    public function getTimetable()
+    {
         $result = $this->db->getTimetable();
 
         echo json_encode($result);
     }
 
-    public function getTimetableChanges() {
+    public function getTimetableChanges()
+    {
         $result = $this->db->getTimetableChanges();
 
         echo json_encode($result);
     }
 
-    public function getAllTasks() {
+    public function getAllTasks()
+    {
         $result = $this->db->getAllTasks();
 
         echo json_encode($result);
     }
 
-    public function setDbUpdateTimestamp($updatedTableName, $dateTime) {
+    public function setDbUpdateTimestamp($updatedTableName, $dateTime)
+    {
         $this->db->setDbUpdateTimestamp($updatedTableName, $dateTime);
     }
 
-    public function getDbUpdateTimestamps() {
+    public function getDbUpdateTimestamps()
+    {
         $result = $this->db->getDbUpdateTimestamps();
 
         echo json_encode($result);
     }
 
-    public function syncDatabase(){
+    public function syncDatabase()
+    {
         $dataToSync = json_decode(file_get_contents('php://input'), true);
 
+        // error_log(print_r($dataToSync, true));
+        if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
+            $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
+        }
 
-        $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects']);
-        $timetableResults = SettingsController::syncTimetable($dataToSync['timetable']);
-        $timetableChangesResults = LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
-        $taskResults = TaskController::syncTasks($dataToSync['tasks']);
+        if (!empty($dataToSync['timetable'])){
+            $timetableResults = SettingsController::syncTimetable($dataToSync['timetable']);
+        }
+        // $timetableChangesResults = LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
+        // $taskResults = TaskController::syncTasks($dataToSync['tasks']);
 
-        $result = [
-            'subjects' => $subjectsResults,
-            'timetable' => $timetableResults,
-            'timetableChanges' => $timetableChangesResults,
-            'tasks' => $taskResults,
-            ];
+        // $result = [
+        //     'subjects' => $subjectsResults,
+        //     'timetable' => $timetableResults,
+        //     'timetableChanges' => $timetableChangesResults,
+        //     'tasks' => $taskResults,
+        //     ];
 
-        echo json_encode($result);
+        // echo json_encode($result);
     }
 }

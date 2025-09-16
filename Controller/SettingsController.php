@@ -60,13 +60,13 @@ class SettingsController extends AbstractController
         echo json_encode($result);
     }
 
-    public static function syncSubjects($subjectsData)
+    public static function syncSubjects($subjects, $deletedSubjects)
     {
         $subjectsResult = [];
 
         $model = new Settings;
 
-        if (!empty($subjectsData)) $subjectsResult = $model->syncSubjects($subjectsData);
+        $subjectsResult = $model->syncSubjects($subjects, $deletedSubjects);
 
         return $subjectsResult;
     }
@@ -77,7 +77,7 @@ class SettingsController extends AbstractController
 
         $model = new Settings;
 
-        if (!empty($timetableData)) $timetableResult = $model->saveTimetableUpdates($timetableData);
+        $timetableResult = $model->syncTimetable($timetableData);
 
         return $timetableResult;
     }
