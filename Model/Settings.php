@@ -293,7 +293,6 @@ class Settings extends AbstractModel
                     }));
 
                     break;
-
                 } else if ((isset($validFromSyncLookup[$storedLesson['validFrom']]) && $validFromSyncLookup[$storedLesson['validFrom']]['lastEdited'] <= $storedLesson['lastEdited'])) {
                     $isMatch = true;
 
@@ -309,7 +308,6 @@ class Settings extends AbstractModel
                 $storedTimetables = array_filter($storedTimetables, function ($lesson) use ($storedLesson) {
                     return $storedLesson['validFrom'] != $lesson['validFrom'];
                 });
-
             }
 
             if (!empty($timetableToUpdate)) $result = $this->saveTimetableUpdates($timetableToUpdate);
@@ -333,9 +331,6 @@ class Settings extends AbstractModel
                 $storedItemIdLookup[$storedLesson['itemId']] = true;
             }
 
-            error_log('lookup' . print_r($storedItemIdLookup, true));
-            
-
             foreach ($timetablesToSync as &$lessonToSync) {
                 if (isset($storedItemIdLookup[$lessonToSync['itemId']])) {
                     $lessonToSync['itemId'] = max(array_column($storedTimetables, 'itemId')) + 1;
@@ -343,8 +338,6 @@ class Settings extends AbstractModel
                     $storedItemIdLookup[$lessonToSync['itemId']] = true;
                 }
             }
-
-            error_log('to save' . print_r($timetablesToSync, true));
 
             $result = $this->saveTimetable($timetablesToSync);
 
@@ -356,7 +349,7 @@ class Settings extends AbstractModel
             }
         }
 
-        // $this->setValidUntilDatesAfterTimetableSync();
+        $this->setValidUntilDatesAfterTimetableSync();
 
         return $finalResult;
     }
@@ -374,6 +367,27 @@ class Settings extends AbstractModel
             return $aDate - $bDate;
         });
 
-        error_log('sorted' . print_r($storedTimetables, true));
+        $timetablesGrouped = [];
+        $lessonsToUpdate = [];
+
+        foreach ($storedTimetables as $lesson) {
+            $timetablesGrouped[$lesson['validFrom']][] = $lesson;
+        }
+
+        $allValidFromDates = array_keys($timetablesGrouped);
+
+        for ($i = 0; $i < count($allValidFromDates) - 1; $i++) {
+
+            $validUntilDate = (new DateTime($allValidFromDates[$i + 1]))->modify('-1 day')->format('Y-m-d');
+
+            foreach ($timetablesGrouped[$allValidFromDates[$i]] as $lesson) {
+                if (empty($lesson['validUntil'])) {
+                    $lesson['validUntil'] = $validUntilDate;
+                    $lessonsToUpdate[] = $lesson;
+                }
+            }
+        }
+
+        if (!empty($lessonsToUpdate)) $this->saveTimetableUpdates($lessonsToUpdate);
     }
 }
