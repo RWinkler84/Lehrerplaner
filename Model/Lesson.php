@@ -121,7 +121,7 @@ class Lesson extends AbstractModel
             if (!is_null($matchingElement)) {
                 if ($lessonToSync['created'] == $matchingElement['created'] && $lessonToSync['lastEdited'] > $matchingElement['lastEdited']) {
                     $query = "UPDATE $this->tableName SET 
-                    userId=userId:,itemId=itemId:,date=date:,weekday=weekday:,timeslot=timeslot:,class=class:,subject=subject:,canceled=canceled:,type=type:,created=created:,lastEdited=lastEdited: 
+                    userId=:userId,itemId=:itemId,date=:date,weekday=:weekday,timeslot=:timeslot,class=:class,subject=:subject,canceled=:canceled,type=:type,created=:created,lastEdited=:lastEdited 
                     WHERE userId = :userId AND itemId = :itemId And created = :created";
                 }
 

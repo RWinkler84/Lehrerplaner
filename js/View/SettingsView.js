@@ -63,9 +63,6 @@ export default class SettingsView {
         }
 
         subjectsContainer.innerHTML = subjectsHTML;
-
-        // subjectsContainer.querySelectorAll('.deleteItemButton').forEach(element => element.addEventListener('click', SettingsView.deleteSubject));
-
     }
 
     static deleteSubject(event) {
@@ -339,7 +336,6 @@ export default class SettingsView {
         document.querySelector('#validFromPickerWrapper').value = '';
         document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
         document.querySelector('#timetableForwardButton').style.visibility = 'visible';
-        SettingsView.setDateOfTimetableToDisplay();
         SettingsView.setDateOfTimetableToDisplay();
         SettingsView.renderLessons();
     }

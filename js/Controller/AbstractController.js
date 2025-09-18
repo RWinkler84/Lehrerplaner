@@ -46,7 +46,15 @@ export default class AbstractController {
         await this.#db.syncData();
     }
 
-    static renderDataChanges() {
+    static async renderDataChanges(updatedElements = null) {
+        if (updatedElements) {
+            console.log('updatedElements ', updatedElements);
+            if (updatedElements.subjects) await SettingsController.renderSubjectChanges();
+            if (updatedElements.timetable) await SettingsController.renderSettingsLessonChanges();
+            if (updatedElements.timetableChanges) await LessonController.renderLesson();
+            if (updatedElements.tasks) await TaskController.renderTaskChanges();
+        }
+
         TaskController.renderTaskChanges();
         LessonController.renderLesson();
     }

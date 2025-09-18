@@ -126,7 +126,7 @@ export default class TaskController {
         LessonController.renderLesson();
     }
 
-    static renderTaskChanges() {
+    static async renderTaskChanges() {
         View.renderTasks();
     }
 

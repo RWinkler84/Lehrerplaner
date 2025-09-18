@@ -127,7 +127,6 @@ export default class AbstractModel {
                 return new Promise(resolve => {
                     let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
                     transaction.onsuccess = () => {
-                        console.log('stored', entry);
                         this.markLocalDBUpdated();
                         resolve();
                     }
@@ -256,7 +255,6 @@ export default class AbstractModel {
                 dataToStore.lastUpdated.tasks = this.formatDateTime(date);
                 break;
         }
-        console.log(dataToStore);
 
         db.transaction('settings', 'readwrite').objectStore('settings').put(dataToStore)
     }
@@ -453,7 +451,7 @@ export default class AbstractModel {
     }
 
     async syncData() {
-
+        await this.checkForNulledCreatedField();
         let localSettings = await this.readFromLocalDB('settings', 0);
         let localTimestamps = localSettings == undefined ? false : localSettings.lastUpdated;
         let remoteTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
@@ -543,7 +541,7 @@ export default class AbstractModel {
             await this.writeRemoteToLocalDB('tasks', tasks, remoteTimestamps[0].tasks);
         }
 
-        AbstractController.renderDataChanges();
+        AbstractController.renderDataChanges(tablesToUpdate);
     }
 
     async writeRemoteToLocalDB(objectStore, dataToStore, newLocalTimestamp) {
@@ -553,5 +551,38 @@ export default class AbstractModel {
             await this.updateOnLocalDB(objectStore, dataToStore);
             this.markLocalDBUpdated(objectStore, newLocalTimestamp);
         }
+    }
+
+    async checkForNulledCreatedField() {
+        let subjects = await this.readAllFromLocalDB('subjects');
+        let timetable = await this.readAllFromLocalDB('timetable');
+        let timetableChanges = await this.readAllFromLocalDB('timetableChanges');
+        let tasks = await this.readAllFromLocalDB('tasks');
+
+        subjects.forEach(entry => {
+            if (!entry.created) {
+                entry.created = '1970-01-01 00-00-00';
+            }
+        });
+        timetable.forEach(entry => {
+            if (!entry.created) {
+                entry.created = '1970-01-01 00-00-00';
+            }
+        });
+        timetableChanges.forEach(entry => {
+            if (!entry.created) {
+                entry.created = '1970-01-01 00-00-00';
+            }
+        });
+        tasks.forEach(entry => {
+            if (!entry.created) {
+                entry.created = '1970-01-01 00-00-00';
+            }
+        });
+
+        this.updateOnLocalDB('subjects', subjects);
+        this.updateOnLocalDB('timetable', timetable);
+        this.updateOnLocalDB('timetableChanges', timetableChanges);
+        this.updateOnLocalDB('tasks', tasks);
     }
 }

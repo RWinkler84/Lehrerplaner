@@ -31,7 +31,7 @@ async function startApp() {
     document.addEventListener('visibilitychange', abstCtrl.syncData.bind(abstCtrl))
 
     //checking for unsynced changes
-    // setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
+    setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {

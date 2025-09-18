@@ -137,6 +137,19 @@ export default class SettingsController {
         return LessonController.getLessonObject(lessonData);
     }
 
+    static async renderSettingsLessonChanges(){
+        await View.setDateOfTimetableToDisplay();
+        await View.renderLessons();
+    }
+
+    static async renderSubjectChanges() {
+        await View.renderExistingSubjects();
+    }
+
+    static async renderSelectableLessonColorsChanges() {
+        await View.renderSelectableLessonColors();
+    }
+
     static renderLesson() {
         LessonController.renderLesson();
     }

@@ -5,7 +5,7 @@ import TaskController from './TaskController.js';
 
 export default class LessonController {
 
-    static renderLesson() {
+    static async renderLesson() {
         View.renderLesson();
     }
 
