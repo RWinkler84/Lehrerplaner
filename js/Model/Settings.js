@@ -27,6 +27,7 @@ export default class Settings extends AbstractModel {
         let deletedSubject = await this.readFromLocalDB('subjects', id);
 
         this.deleteFromLocalDB('subjects', id);
+        this.deleteFromLocalDB('unsyncedSubjects', id);
 
         let result = await this.makeAjaxQuery('settings', 'deleteSubjects', [{ 'id': id, 'created': deletedSubject.created, 'lastEdited': deletedSubject.lastEdited }]);
 
@@ -103,6 +104,31 @@ export default class Settings extends AbstractModel {
         let result = await this.makeAjaxQuery('settings', 'saveTimetableUpdates', lessons);
 
         if (result.status == 'failed') {
+            //check, if the timetable was already stored in unsyncedTimetables, if so, remove it
+            let unsyncedTimetables = await this.readAllFromLocalDB('unsyncedTimetables');
+            let unsyncedTimetablesGrouped = [];
+            let lessonsValidFrom = [];
+
+            if (unsyncedTimetables.length > 0) {
+                unsyncedTimetables.forEach(unsyncedLesson => {
+                    if (!unsyncedTimetablesGrouped[unsyncedLesson.validFrom]) {
+                        unsyncedTimetablesGrouped[unsyncedLesson.validFrom] = []
+                    }
+
+                    unsyncedTimetablesGrouped[unsyncedLesson.validFrom].push(unsyncedLesson);
+                });
+
+                lessons.forEach(lesson => {
+                    if (!lessonsValidFrom.includes(lesson.validFrom)) lessonsValidFrom.push(lesson.validFrom);
+                });
+
+                lessonsValidFrom.forEach(entry => {
+                    if (unsyncedTimetablesGrouped[entry]) {
+                        unsyncedTimetablesGrouped[entry].forEach(lesson => this.deleteFromLocalDB('unsyncedTimetables', lesson.id));
+                    }
+                });
+            }
+            //and now save each lesson as unsynced
             lessons.forEach(entry => {
                 this.updateOnLocalDB('unsyncedTimetables', entry);
             });

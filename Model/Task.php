@@ -58,40 +58,82 @@ class Task extends AbstractModel
         return $result;
     }
 
-    public function syncTasks($tasks)
+    public function syncTasks($tasksToSync, $tasksToDelete)
     {
+        global $user;
         $finalResult = ['status' => 'success'];
-        $tasks = $this->preprocessDataToWrite($tasks);
 
-        $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, created, lastEdited) 
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :created, :lastEdited)
-            ON DUPLICATE KEY UPDATE
-                date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
-                timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
-                class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
-                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
-                description = IF (VALUES(lastEdited) > lastEdited, VALUES(description), description),
-                status = IF (VALUES(lastEdited) > lastEdited, VALUES(status), status),
-                fixedTime = IF (VALUES(lastEdited) > lastEdited, VALUES(fixedTime), fixedTime),
-                reoccuring = IF (VALUES(lastEdited) > lastEdited, VALUES(reoccuring), reoccuring),
-                reoccuringInterval = IF (VALUES(lastEdited) > lastEdited, VALUES(reoccuringInterval), reoccuringInterval),
-                lastEdited = IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
-        ";
+        //delete unsynced deleted tasks
+        if (!empty($tasksToDelete)) {
+            foreach ($tasksToDelete as $task) {
+                $result = $this->deleteTask($task);
 
-        foreach ($tasks as $task) {
+                if ($result['status'] == 'failed') {
+                    return [
+                        'status' => 'failed',
+                        'error' => $result['error']
+                    ];
+                }
+            }
+        }
 
-            if ($task['fixedTime'] == '') {
-                $task['fixedTime'] = 0;
+        //store and update new data
+        if (!empty($tasksToSync)) {
+            $storedTasks = $this->read("SELECT * FROM $this->tableName WHERE userId = :userId", ['userId' => $user->getId()]);
+            $tasksToSync = $this->preprocessDataToWrite($tasksToSync);
+
+            $storedTasksLookup = [];
+
+            foreach ($storedTasks as $task) {
+                $storedTasksLookup[$task['itemId']] = $task;
+            }
+        }
+
+        foreach ($tasksToSync as $taskToSync) {
+            $query = '';
+            $matchingElement = $storedTasksLookup[$taskToSync['itemId']] ?? null;
+
+            //no id matches -> insert task into db
+            if (is_null($matchingElement)) {
+                $result = $this->save($taskToSync);
+
+                if ($result['status'] == 'failed') {
+                    return [
+                        'status' => 'failed',
+                        'error' => $result['error']
+                    ];
+                }
             }
 
-            $result = $this->write($query, $task);
-            if ($result['status'] == 'failed') {
-                $finalResult['status'] = 'failed';
-                $finalResult['error'] = $result['error'];
+            if (!is_null($matchingElement)) {
+                if ($taskToSync['created'] == $matchingElement['created'] && $taskToSync['lastEdited'] > $matchingElement['lastEdited']) {
+                    $query = "UPDATE $this->tableName SET class=:class, subject=:subject, date=:date, timeslot=:timeslot, description=:description, status=:status, fixedTime=:fixedTime, reoccuring=:reoccuring, reoccuringInterval=:reoccuringInterval, created=:created, lastEdited=:lastEdited WHERE userId = :userId AND itemId = :itemId AND created = :created";
+                }
+
+                //duplicate Ids
+                if ($taskToSync['created'] != $matchingElement['created']) {
+                    $newId = max(array_column($storedTasks, 'itemId')) + 1;
+                    $taskToSync['itemId'] = $newId;
+                    $storedTasks[] = $taskToSync;
+
+                    $query = "INSERT INTO $this->tableName 
+                        (userId, itemId, date, timeslot, class, subject, description, status, fixedTime, reoccuring, reoccuringInterval, created, lastEdited) 
+                        VALUES (:userId, :itemId, :date, :timeslot, :class, :subject, :description, :status, :fixedTime, :reoccuring, :reoccuringInterval, :created, :lastEdited)";
+                }
             }
 
-            if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($task['lastEdited']));
+            if ($query != '') {
+                $result = $this->write($query, $taskToSync);
+
+                if ($result['status'] == 'failed') {
+                    return [
+                        'status' => 'failed',
+                        'error' => $result['error']
+                    ];
+                }
+                error_log('taskToSync' . print_r($taskToSync, true));
+                if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskToSync['lastEdited']));
+            }
         }
 
         return $finalResult;

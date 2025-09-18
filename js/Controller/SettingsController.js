@@ -82,6 +82,7 @@ export default class SettingsController {
         let oldTimetable = await LessonController.getOldTimetableCopy();
         let oldTimetableChanges = await LessonController.getOldTimetableChanges();
         let today = new Date();
+        let startDate = today.getTime() > new Date(validFrom).getTime() ? today : new Date(validFrom);
 
         if (lessons.length == 0) {
             View.alertTimetable();
@@ -93,8 +94,8 @@ export default class SettingsController {
         // check, whether future lesson changes and tasks exist that are affected by the timetable edit
         let validUntil = lessons[0].validUntil ? lessons[0].validUntil : (new Date().setHours(12) + ONEDAY * 365);
 
-        let affectedLessonChanges = await LessonController.getTimetableChanges(today, validUntil);
-        let affectedTasks = await TaskController.getAllTasksInTimespan(today, validUntil);
+        let affectedLessonChanges = await LessonController.getTimetableChanges(startDate, validUntil);
+        let affectedTasks = await TaskController.getAllTasksInTimespan(startDate, validUntil);
 
         if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
 

@@ -388,6 +388,7 @@ export default class SettingsView {
 
         affectedLessonChanges.forEach(entry => {
             if (new Date(entry.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
+            if (entry.canceled == 'true') return;
 
             let type = entry.type == 'sub' ? 'Vertretung' : 'Termin';
             let subject = entry.subject == 'Termin' ? ' - ' : entry.subject;

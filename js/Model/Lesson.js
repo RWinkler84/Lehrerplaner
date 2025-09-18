@@ -189,6 +189,7 @@ export default class Lesson extends AbstractModel {
     async delete() {
         let deletedItem = await this.readFromLocalDB('timetableChanges', this.id);
         this.deleteFromLocalDB('timetableChanges', this.id);
+        this.deleteFromLocalDB('unsyncedTimetableChanges', this.id);
 
         let result = await this.makeAjaxQuery('lesson', 'delete', [this.serialize()]);
 

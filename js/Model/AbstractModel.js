@@ -458,85 +458,89 @@ export default class AbstractModel {
         let localTimestamps = localSettings == undefined ? false : localSettings.lastUpdated;
         let remoteTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
         let dataToSync = {};
+        let tablesToUpdate = {
+            subjects: false,
+            timetable: false,
+            timetableChanges: false,
+            tasks: false
+        };
 
         if (remoteTimestamps.status == 'failed') return;
 
         if (!localTimestamps) {
-            await this.updateLocalWithRemoteData()
+            await this.updateLocalWithRemoteData({subjects: true, timetable: true, timetableChanges: true, tasks: true});
         }
 
+        //send date with differing timestamps
         if (remoteTimestamps[0].subjects != localTimestamps.subjects) {
             dataToSync['subjects'] = await this.readAllFromLocalDB('unsyncedSubjects');
             dataToSync['deletedSubjects'] = await this.readAllFromLocalDB('unsyncedDeletedSubjects');
+            tablesToUpdate.subjects = true;
         }
 
         if (remoteTimestamps[0].timetable != localTimestamps.timetable) {
-            console.log('hier')
-
-            dataToSync['timetable'] = await this.readAllFromLocalDB('timetable');
+            dataToSync['timetable'] = await this.readAllFromLocalDB('unsyncedTimetables');
+            tablesToUpdate.timetable = true;
         }
 
         if (remoteTimestamps[0].timetableChanges != localTimestamps.timetableChanges) {
-            dataToSync['timetableChanges'] = await this.readAllFromLocalDB('timetableChanges');
+            dataToSync['timetableChanges'] = await this.readAllFromLocalDB('unsyncedTimetableChanges');
             dataToSync['deletedTimetableChanges'] = await this.readAllFromLocalDB('unsyncedDeletedTimetableChanges');
+            tablesToUpdate.timetableChanges = true;
         }
 
         if (remoteTimestamps[0].tasks != localTimestamps.tasks) {
-            dataToSync['tasks'] = await this.readAllFromLocalDB('tasks');
+            dataToSync['tasks'] = await this.readAllFromLocalDB('unsyncedTasks');
             dataToSync['deletedTasks'] = await this.readAllFromLocalDB('unsyncedDeletedTasks');
+            tablesToUpdate.tasks = true;
         }
 
-        let dataToStore = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
+        let result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
-        console.log(dataToSync)
-    }
-
-    async updateLocalWithRemoteData() {
-        let localSettings = await this.readAllFromLocalDB('settings');
-        let updateTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
-        let lastLocalUpdateTimestamp = 0;
-        let newestRemoteTimestamp; //is used to set the lastUpdated timestamp on the local database to the timestamp of the last remote update
-
-        if (updateTimestamps.status == 'failed') return;
-
-        //get local and newest remote timestamp
-        localSettings.forEach(entry => {
-            if (!entry.lastUpdated) return;
-            lastLocalUpdateTimestamp = new Date(entry.lastUpdated).getTime();
-        })
-
-        newestRemoteTimestamp = new Date(updateTimestamps[0].subjects).getTime();
-        if (new Date(updateTimestamps[0].timetable).getTime() > newestRemoteTimestamp) newestRemoteTimestamp = new Date(updateTimestamps[0].timetable).getTime();
-        if (new Date(updateTimestamps[0].timetableChanges).getTime() > newestRemoteTimestamp) newestRemoteTimestamp = new Date(updateTimestamps[0].timetableChanges).getTime();
-        if (new Date(updateTimestamps[0].tasks).getTime() > newestRemoteTimestamp) newestRemoteTimestamp = new Date(updateTimestamps[0].tasks).getTime();
-
-        //sync the data, that is newer from the server to the indexedDb
-        if (new Date(updateTimestamps[0].subjects).getTime() > lastLocalUpdateTimestamp) {
-            let subjects = await this.makeAjaxQuery('abstract', 'getSubjects');
-            await this.writeRemoteToLocalDB('subjects', subjects, newestRemoteTimestamp);
+        //check the results and clear data that has been synced
+        if (result.subjects.status && result.subjects.status == 'success') {
             this.clearObjectStore('unsyncedSubjects');
             this.clearObjectStore('unsyncedDeletedSubjects');
         }
 
-        if (new Date(updateTimestamps[0].timetable).getTime() > lastLocalUpdateTimestamp) {
-            let timetable = await this.makeAjaxQuery('abstract', 'getTimetable');
-            await this.writeRemoteToLocalDB('timetable', timetable, newestRemoteTimestamp);
+        if (result.timetable.status && result.timetable.status == 'success') {
             this.clearObjectStore('unsyncedTimetables');
         }
 
-        if (new Date(updateTimestamps[0].timetableChanges).getTime() > lastLocalUpdateTimestamp) {
-            let timetableChanges = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
-            await this.writeRemoteToLocalDB('timetableChanges', timetableChanges, newestRemoteTimestamp);
-            this.writeRemoteToLocalDB('timetableChanges', timetableChanges);
+        if (result.timetableChanges.status && result.timetableChanges.status == 'success') {
             this.clearObjectStore('unsyncedTimetableChanges');
             this.clearObjectStore('unsyncedDeletedTimetableChanges');
         }
 
-        if (new Date(updateTimestamps[0].tasks).getTime() > lastLocalUpdateTimestamp) {
-            let tasks = await this.makeAjaxQuery('abstract', 'getAllTasks');
-            await this.writeRemoteToLocalDB('tasks', tasks, newestRemoteTimestamp);
+        if (result.tasks.status && result.tasks.status == 'success') {
             this.clearObjectStore('unsyncedTasks');
             this.clearObjectStore('unsyncedDeletedTasks');
+        }
+
+        this.updateLocalWithRemoteData(tablesToUpdate);
+    }
+
+    async updateLocalWithRemoteData(tablesToUpdate) {
+        let remoteTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
+        
+        if (tablesToUpdate.subjects) {
+            let subjects = await this.makeAjaxQuery('abstract', 'getSubjects');
+            await this.writeRemoteToLocalDB('subjects', subjects, remoteTimestamps[0].subjects);
+        }
+
+        if (tablesToUpdate.timetable) {
+            let timetable = await this.makeAjaxQuery('abstract', 'getTimetable');
+            await this.writeRemoteToLocalDB('timetable', timetable, remoteTimestamps[0].timetable);
+        }
+
+        if (tablesToUpdate.timetableChanges) {
+            let timetableChanges = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
+            await this.writeRemoteToLocalDB('timetableChanges', timetableChanges, remoteTimestamps[0].timetableChanges);
+        }
+
+        if (tablesToUpdate.tasks) {
+            let tasks = await this.makeAjaxQuery('abstract', 'getAllTasks');
+            await this.writeRemoteToLocalDB('tasks', tasks, remoteTimestamps[0].tasks);
         }
 
         AbstractController.renderDataChanges();
@@ -550,34 +554,4 @@ export default class AbstractModel {
             this.markLocalDBUpdated(objectStore, newLocalTimestamp);
         }
     }
-
-    //function syncheDaten()
-        //hole Zeitstempel vom Server
-            //prüfe, wo Zeitstempel unterschiedlich sind
-                //wenn Zeitstempel für Tabelle unterschiedlich
-                    //hole Tabellendaten vom Server
-                       //function bereinigeTabellenDaten(serverDaten)
-                        //hole Tabellendaten vom Browser
-                        //suche nach doppelten Ids
-                            //Treffer: prüfe ob created-Datum identisch ist
-                                //ja
-                                    //ist lokal neuer, update
-                                    //ist remote neuer, tue nichts
-                                //nein
-                                    //löse ID-Konflikt auf
-                                    //localId wird durch höchste Id im remote Datensatz + 1 ersetzt
-                                    //lokaler Datensatz zu remote hinzugefügt
-                //Zeitstempel identisch
-                    //tu nichts
-
-    //schicke aktualisierte lokale Daten zum Speichern an den Server
-
-    //function bereinigeTabellenDaten(serverDaten)
-    //hole unsyncedDeleted-Tabellendaten
-    //prüfe auf ID-Duplicate
-    //Treffer: prüfe ob created-Datum identisch ist
-    //ja
-    //lösche Datensatz aus den remote Daten
-    //nein
-    //tu nichts
 }

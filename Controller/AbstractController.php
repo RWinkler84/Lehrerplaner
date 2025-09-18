@@ -60,25 +60,35 @@ class AbstractController
     public function syncDatabase()
     {
         $dataToSync = json_decode(file_get_contents('php://input'), true);
+        $subjectsResults = [];
+        $timetableResults = [];
+        $timetableChangesResults = [];
+        $taskResults = [];
 
         // error_log(print_r($dataToSync, true));
         if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
             $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
         }
 
-        if (!empty($dataToSync['timetable'])){
+        if (!empty($dataToSync['timetable'])) {
             $timetableResults = SettingsController::syncTimetable($dataToSync['timetable']);
         }
-        // $timetableChangesResults = LessonController::syncTimetableChanges($dataToSync['timetableChanges']);
-        // $taskResults = TaskController::syncTasks($dataToSync['tasks']);
 
-        // $result = [
-        //     'subjects' => $subjectsResults,
-        //     'timetable' => $timetableResults,
-        //     'timetableChanges' => $timetableChangesResults,
-        //     'tasks' => $taskResults,
-        //     ];
+        if (!empty($dataToSync['timetableChanges']) || !empty($dataToSync['deletedTimetableChanges'])) {
+            $timetableChangesResults = LessonController::syncTimetableChanges($dataToSync['timetableChanges'], $dataToSync['deletedTimetableChanges']);
+        }
 
-        // echo json_encode($result);
+        if (!empty($dataToSync['tasks']) || !empty($dataToSync['deletedTasks'])) {
+            $taskResults = TaskController::syncTasks($dataToSync['tasks'], $dataToSync['deletedTasks']);
+        }
+
+        $result = [
+            'subjects' => $subjectsResults,
+            'timetable' => $timetableResults,
+            'timetableChanges' => $timetableChangesResults,
+            'tasks' => $taskResults,
+            ];
+
+        echo json_encode($result);
     }
 }

@@ -73,34 +73,80 @@ class Lesson extends AbstractModel
         return $result;
     }
 
-    public function syncTimetableChanges($timetableChanges)
+    public function syncTimetableChanges($changesToSync, $changesToDelete)
     {
-        $timetableChanges = $this->preprocessDataToWrite($timetableChanges);
+        global $user;
         $finalResult = ['status' => 'success'];
 
-        $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, timeslot, class, weekday, subject, type, canceled, created, lastEdited)
-            VALUES (:userId, :itemId, :date, :timeslot, :class, :weekday, :subject, :type, :canceled, :created, :lastEdited)
-            ON DUPLICATE KEY UPDATE
-                date = IF (VALUES(lastEdited) > lastEdited, VALUES(date), date),
-                timeslot = IF (VALUES(lastEdited) > lastEdited, VALUES(timeslot), timeslot),
-                class = IF (VALUES(lastEdited) > lastEdited, VALUES(class), class),
-                weekday = IF (VALUES(lastEdited) > lastEdited, VALUES(weekday), weekday),
-                subject = IF (VALUES(lastEdited) > lastEdited, VALUES(subject), subject),
-                type = IF (VALUES(lastEdited) > lastEdited, VALUES(type), type),
-                canceled = IF (VALUES(lastEdited) > lastEdited, VALUES(canceled), canceled),
-                lastEdited = IF (VALUES(lastEdited) > lastEdited, VALUES(lastEdited), lastEdited)
-            ";
+        //remove deleted lessonChanges, preprocessing an picking of the right db entries is handeled by deleteLesson()
+        if (!empty($changesToDelete)) {
+            foreach ($changesToDelete as $lesson) {
+                $result = $this->deleteLesson($lesson);
 
-        foreach ($timetableChanges as $lesson) {
-            $result = $this->write($query, $lesson);
+                if ($result['status'] == 'failed') {
+                    return [
+                        'status' => 'failed',
+                        'error' => $result['error']
+                    ];
+                }
+            }
+        }
 
-            if ($result['status'] == 'failed') {
-                $finalResult['status'] = 'failed';
-                $finalResult['error'] = $result['error'];
+        //insert or update lessonChanges
+        if (!empty($changesToSync)) $changesToSync = $this->preprocessDataToWrite($changesToSync);
+
+        $storedChanges = $this->read("SELECT * FROM $this->tableName WHERE userId = :userId", ['userId' => $user->getId()]);
+        $storedLessonsLookup = [];
+
+        foreach ($storedChanges as $lesson) {
+            $storedLessonsLookup[$lesson['itemId']] = $lesson;
+        }
+
+        foreach ($changesToSync as $lessonToSync) {
+            $query = '';
+            $matchingElement = $storedLessonsLookup[$lessonToSync['itemId']] ?? null;
+
+            //no id matches -> insert lesson to db
+            if (is_null($matchingElement)) {
+                $result = $this->save($lessonToSync);
+
+                if ($result['status'] == 'failed') {
+                    return [
+                        'status' => 'failed',
+                        'error' => $result['error']
+                    ];
+                }
             }
 
-            if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lesson['lastEdited']));
+            if (!is_null($matchingElement)) {
+                if ($lessonToSync['created'] == $matchingElement['created'] && $lessonToSync['lastEdited'] > $matchingElement['lastEdited']) {
+                    $query = "UPDATE $this->tableName SET 
+                    userId=userId:,itemId=itemId:,date=date:,weekday=weekday:,timeslot=timeslot:,class=class:,subject=subject:,canceled=canceled:,type=type:,created=created:,lastEdited=lastEdited: 
+                    WHERE userId = :userId AND itemId = :itemId And created = :created";
+                }
+
+                //duplicate Ids
+                if ($lessonToSync['created'] != $matchingElement['created']) {
+                    $newId = max(array_column($storedChanges, 'itemId')) + 1;
+                    $lessonToSync['itemId'] = $newId;
+                    $storedChanges[] = $lessonToSync;
+
+                    $query = "INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, type, canceled, created, lastEdited) VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :type, :canceled, :created, :lastEdited)";
+                }
+            }
+
+            if ($query != '') {
+                $result = $this->write($query, $lessonToSync);
+
+                if ($result['status'] == 'failed') {
+                    return [
+                        'status' => 'failed',
+                        'error' => $result['error']
+                    ];
+                }
+
+                if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonToSync['lastEdited']));
+            }
         }
 
         return $finalResult;

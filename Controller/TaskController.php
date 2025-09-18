@@ -48,12 +48,12 @@ class TaskController extends AbstractController
         echo json_encode($finalResult);
     }
 
-    public static function syncTasks($tasks)
+    public static function syncTasks($tasksToSync, $tasksToDelete)
     {
         $result = [];
         $model = new Task;
 
-        if (!empty($tasks)) $result = $model->syncTasks($tasks);
+        $result = $model->syncTasks($tasksToSync, $tasksToDelete);
 
         return $result;
     }

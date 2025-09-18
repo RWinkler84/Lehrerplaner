@@ -293,7 +293,7 @@ class AbstractModel
         }
 
         //sometimes dataArray will be a set of associative arrays, sometimes it will just be a single associative array
-        if (is_array($dataArray)) {
+        if (isset($dataArray[0])) {
 
             $dataArray = array_map(function ($data) {
                 global $user;

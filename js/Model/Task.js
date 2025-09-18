@@ -50,6 +50,7 @@ export default class Task extends AbstractModel {
     async delete() {
         this.lastEdited = this.formatDateTime(new Date);
         await this.deleteFromLocalDB('tasks', this.id);
+        await this.deleteFromLocalDB('unsyncedTasks', this.id);
 
         let result = await this.makeAjaxQuery('task', 'delete', [this.serialize()]);
 

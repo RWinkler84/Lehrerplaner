@@ -56,7 +56,6 @@ class Settings extends AbstractModel
 
     public function saveTimetable($timetableData)
     {
-        error_log('to save after' . print_r($timetableData, true));
         $tableName = TABLEPREFIX . 'timetable';
         $timetableData = $this->preprocessDataToWrite($timetableData);
 
@@ -194,7 +193,7 @@ class Settings extends AbstractModel
 
             foreach ($subjectsToSync as $subject) {
                 $result = ['status' => 'success'];
-                $query = "";
+                $query = '';
                 $matchingStoredEntry = $lookup[$subject['itemId']] ?? null;
 
                 //no duplicate id found
@@ -212,21 +211,23 @@ class Settings extends AbstractModel
                         $newId = max(array_column($storedSubjects, 'itemId')) + 1;
                         $subject['itemId'] = $newId;
                         $storedSubjects[] = $subject;
+
                         $query = "INSERT INTO $tableName (userId, itemId, subject, colorCssClass, created, lastEdited) VALUES (:userId, :itemId, :subject, :colorCssClass, :created, :lastEdited)";
                     }
                 }
-                // error_log('Subject: ' . print_r($subject, true));
-                // error_log('Stored entry' . print_r($matchingStoredEntry, true));
-                // error_log("Query: {$query}");
 
-                if ($query != '') $result = $this->write($query, $subject);
+                if ($query != '') {
+                    $result = $this->write($query, $subject);
 
-                if ($result['status'] == 'failed') {
-                    $finalResult['status'] = 'failed';
-                    $finalResult['error'] = $result['error'];
+                    if ($result['status'] == 'failed') {
+                        return [
+                            'status' => 'failed',
+                            'error' => $result['error']
+                        ];
+                    }
+
+                    if ($result['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subject['lastEdited']));
                 }
-
-                if ($result['status'] == 'success') $this->setDbUpdateTimestamp($tableName, new DateTime($subject['lastEdited']));
             }
         }
 
@@ -339,14 +340,18 @@ class Settings extends AbstractModel
                 }
             }
 
-            $result = $this->saveTimetable($timetablesToSync);
+            $result = $this->saveTimetable(array_values($timetablesToSync));
 
             if ($result['status'] == 'failed') {
-                $finalResult = [
+                return [
                     'status' => 'failed',
                     'error' => 'Saving timetables failed'
                 ];
             }
+
+            error_log('timetable to sync ' . print_r($timetablesToSync, true));
+            error_log($timetablesToSync[count($timetablesToSync) - 1]['lastEdited']);
+            $this->setDbUpdateTimestamp($tableName, new DateTime($timetablesToSync[count($timetablesToSync) - 1]['lastEdited']));
         }
 
         $this->setValidUntilDatesAfterTimetableSync();
@@ -360,6 +365,8 @@ class Settings extends AbstractModel
         $tableName = TABLEPREFIX . 'timetable';
 
         $storedTimetables = $this->read("SELECT * FROM $tableName WHERE userId = :userId", ['userId' => $user->getId()]);
+        $allTs = $this->read("SELECT * FROM updateTimestamps WHERE userId = :userId", ['userId' => $user->getId()]);
+        $timetableTimestamp = $allTs[0]['timetable'];
 
         usort($storedTimetables, function ($a, $b) {
             $aDate = (new DateTime($a['validFrom']))->getTimestamp();
@@ -383,6 +390,9 @@ class Settings extends AbstractModel
             foreach ($timetablesGrouped[$allValidFromDates[$i]] as $lesson) {
                 if (empty($lesson['validUntil'])) {
                     $lesson['validUntil'] = $validUntilDate;
+                    $lesson['lastEdited'] = (new DateTime($timetableTimestamp))->modify('+1 minute')->format('Y-m-d H:i:s');
+                    unset($lesson['id']);
+
                     $lessonsToUpdate[] = $lesson;
                 }
             }

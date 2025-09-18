@@ -75,12 +75,12 @@ class LessonController extends AbstractController
         echo json_encode($finalResult);
     }
 
-    public static function syncTimetableChanges($timetableChanges)
+    public static function syncTimetableChanges($timetableChanges, $deletedTimetableChanges)
     {
         $result = [];
         $model = new Lesson;
 
-        if (!empty($timetableChanges)) $result = $model->syncTimetableChanges($timetableChanges);
+        $result = $model->syncTimetableChanges($timetableChanges, $deletedTimetableChanges);
 
         return $result;
     }
