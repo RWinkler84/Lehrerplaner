@@ -84,7 +84,7 @@ export default class AbstractController {
                 break;
  
             case 'openMenuButton':
-                View.openTopMenu(event);
+                View.toggleTopMenu(event);
                 break;
 
             case 'createAccountButton':

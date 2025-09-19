@@ -145,11 +145,16 @@ export default class AbstractView {
         }
     }
 
-    static openTopMenu(event) {
+    static toggleTopMenu(event) {
         event.stopPropagation();
+        let topMenuElement = document.querySelector('#topMenu');
 
-        document.querySelector('#topMenu').style.display = 'flex';
+        if (topMenuElement.style.display == 'flex') {
+            this.closeTopMenu(event);
+            return;
+        }
 
+        topMenuElement.style.display = 'flex';
         document.addEventListener('click', AbstractView.closeTopMenu);
     }
 
