@@ -234,24 +234,20 @@ export default class AbstractModel {
         let dataToStore = {
             id: 0,
             lastUpdated: {
+                subjects: null,
+                timetable : null,
+                timetableChanges: null,
+                tasks: null
             }
         }
 
         let timestamps = await this.readFromLocalDB('settings', 0);
 
         if (timestamps) {
-            timestamps.lastUpdated.subjects ?
-                dataToStore.lastUpdated.subjects = timestamps.lastUpdated.subjects :
-                dataToStore.lastUpdated.subjects = timestamps.lastUpdated.subjects = 0;
-            timestamps.lastUpdated.timetable ?
-                dataToStore.lastUpdated.timetable = timestamps.lastUpdated.timetable :
-                dataToStore.lastUpdated.timetable = timestamps.lastUpdated.timetable = 0;
-            timestamps.lastUpdated.timetableChanges ?
-                dataToStore.lastUpdated.timetableChanges = timestamps.lastUpdated.timetableChanges :
-                dataToStore.lastUpdated.timetableChanges = timestamps.lastUpdated.timetableChanges = 0;
-            timestamps.lastUpdated.tasks ?
-                dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks :
-                dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks = 0;
+            dataToStore.lastUpdated.subjects = timestamps.lastUpdated.subjects ? timestamps.lastUpdated.subjects : 0;
+            dataToStore.lastUpdated.timetable = timestamps.lastUpdated.timetable ? timestamps.lastUpdated.timetable : 0;
+            dataToStore.lastUpdated.timetableChanges = timestamps.lastUpdated.timetableChanges ? timestamps.lastUpdated.timetableChanges : 0;
+            dataToStore.lastUpdated.tasks =  timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
         }
 
         switch (store) {
@@ -567,6 +563,7 @@ export default class AbstractModel {
     }
 
     async checkForNulledCreatedField() {
+        let timestamp = await this.readFromLocalDB('settings', 0);
         let subjects = await this.readAllFromLocalDB('subjects');
         let timetable = await this.readAllFromLocalDB('timetable');
         let timetableChanges = await this.readAllFromLocalDB('timetableChanges');
@@ -592,6 +589,18 @@ export default class AbstractModel {
                 entry.created = '1970-01-01 00-00-00';
             }
         });
+
+        if (typeof timestamp.lastUpdated == 'string') {
+            await this.updateOnLocalDB('settings', {
+                id: 0,
+                lastUpdated: {
+                    subjects: timestamp.lastUpdated,
+                    timetable: timestamp.lastUpdated,
+                    timetableChanges: timestamp.lastUpdated,
+                    tasks: timestamp.lastUpdated,
+                }
+            });
+        }
 
         this.updateOnLocalDB('subjects', subjects);
         this.updateOnLocalDB('timetable', timetable);
