@@ -1,4 +1,5 @@
 import AbstractModel from "./AbstractModel.js";
+import Controller from "../Controller/LoginController.js";
 import { mailStatus, ONEMIN } from "../index.js";
 
 export default class Login extends AbstractModel {
@@ -49,10 +50,12 @@ export default class Login extends AbstractModel {
         return result;
     }
     async toggleTemperaryOfflineUsage(offlineStatus) {
-        console.log('offlineStatus to set:', offlineStatus);
         let accountInfo = await this.getAccountInfo();
         
-        if (accountInfo.status == 'failed') return;
+        if (accountInfo.status == 'failed'){
+            await Controller.createGuestAccount();
+            accountInfo = await this.getAccountInfo();
+            }
 
         this.updateOnLocalDB('settings', {id: 1, accountType: accountInfo.accountType, temporarilyOffline: offlineStatus});
     }

@@ -7,7 +7,6 @@ export default class LoginController extends AbstractController {
     static async openLoginDialog(event, forceOpen = false) {
         event?.preventDefault();
 
-        console.log(event);
         let db = new Model;
         let accountInfo = await db.getAccountInfo();
 
@@ -137,6 +136,7 @@ export default class LoginController extends AbstractController {
     static async createGuestAccount() {
         let db = new Model;
         await db.createGuestAccount();
+        this.renderTopMenu();
     }
 
     static async sendResetPasswordMail(event) {

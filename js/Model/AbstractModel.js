@@ -6,6 +6,18 @@ export default class AbstractModel {
 
     async makeAjaxQuery(controller, action, content = '') {
         let response;
+        let isRegisteredUser = await this.isRegisteredUser();
+        let allowedActionsUnregisteredUser = [
+            'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
+            'sendPasswortResetMail'
+        ];
+
+        if (!allowedActionsUnregisteredUser.includes(action)) {
+            if (!isRegisteredUser) {
+                AbstractController.openLoginDialog();
+                return { status: 'failed', error: 'unregistered user' }
+            };
+        }
 
         try {
             response = await fetch(`index.php?c=${controller}&a=${action}`,
@@ -214,12 +226,20 @@ export default class AbstractModel {
         })
     }
 
+    async isRegisteredUser() {
+        let userInfo = await this.readFromLocalDB('settings', 1);
+
+        if (!userInfo || userInfo.accountType == 'guestUser') return false;
+
+        return true;
+    }
+
     async getUserInfo() {
         let userInfo = await this.readFromLocalDB('settings', 1);
         let loginStatus = await this.makeAjaxQuery('abstract', 'getUserLoginStatus');
 
         if (!userInfo) {
-            userInfo = {accountType: 'not set'};
+            userInfo = { accountType: 'not set' };
         }
 
         userInfo.loggedIn = loginStatus.status == 'true' ? true : false;
@@ -235,7 +255,7 @@ export default class AbstractModel {
             id: 0,
             lastUpdated: {
                 subjects: null,
-                timetable : null,
+                timetable: null,
                 timetableChanges: null,
                 tasks: null
             }
@@ -247,7 +267,7 @@ export default class AbstractModel {
             dataToStore.lastUpdated.subjects = timestamps.lastUpdated.subjects ? timestamps.lastUpdated.subjects : 0;
             dataToStore.lastUpdated.timetable = timestamps.lastUpdated.timetable ? timestamps.lastUpdated.timetable : 0;
             dataToStore.lastUpdated.timetableChanges = timestamps.lastUpdated.timetableChanges ? timestamps.lastUpdated.timetableChanges : 0;
-            dataToStore.lastUpdated.tasks =  timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
+            dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
         }
 
         switch (store) {
@@ -475,7 +495,7 @@ export default class AbstractModel {
         if (remoteTimestamps.status == 'failed') return;
 
         if (!localTimestamps) {
-            await this.updateLocalWithRemoteData({subjects: true, timetable: true, timetableChanges: true, tasks: true});
+            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true });
         }
 
         //send date with differing timestamps
@@ -529,7 +549,7 @@ export default class AbstractModel {
 
     async updateLocalWithRemoteData(tablesToUpdate) {
         let remoteTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
-        
+
         if (tablesToUpdate.subjects) {
             let subjects = await this.makeAjaxQuery('abstract', 'getSubjects');
             await this.writeRemoteToLocalDB('subjects', subjects, remoteTimestamps[0].subjects);
@@ -590,7 +610,7 @@ export default class AbstractModel {
             }
         });
 
-        if (typeof timestamp.lastUpdated == 'string') {
+        if (timestamp && typeof timestamp.lastUpdated == 'string') {
             await this.updateOnLocalDB('settings', {
                 id: 0,
                 lastUpdated: {
