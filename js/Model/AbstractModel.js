@@ -214,6 +214,19 @@ export default class AbstractModel {
         })
     }
 
+    async getUserInfo() {
+        let userInfo = await this.readFromLocalDB('settings', 1);
+        let loginStatus = await this.makeAjaxQuery('abstract', 'getUserLoginStatus');
+
+        if (!userInfo) {
+            userInfo = {accountType: 'not set'};
+        }
+
+        userInfo.loggedIn = loginStatus.status == 'true' ? true : false;
+
+        return userInfo;
+    }
+
     async markLocalDBUpdated(store, date = null) {
         if (date == null) date = new Date();
         let db = await this.openIndexedDB();

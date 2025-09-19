@@ -113,6 +113,53 @@ export default class AbstractView {
         document.querySelector('#isCurrentWeekDot').style.display = "none";
     }
 
+    static async renderTopMenu(userInfo) {
+        let loginButton = document.querySelector('#loginButton');
+        let logoutButton = document.querySelector('#logoutButton');
+        let createAccountButton = document.querySelector('#createAccountButton');
+        let openSettingsButton = document.querySelector('#openSettingsButton');
+
+        console.log(userInfo)
+
+        openSettingsButton.removeAttribute('style');
+        loginButton.style.display = 'none';
+        logoutButton.style.display = 'none';
+        createAccountButton.style.display = 'none';
+
+        if ((userInfo.accountType == 'registeredUser' && !userInfo.loggedIn) || userInfo.accountType == 'guestUser') {
+            createAccountButton.removeAttribute('style');
+            loginButton.removeAttribute('style');
+            return;
+        }
+
+        if (userInfo.accountType == 'registeredUser' && userInfo.loggedIn) {
+            logoutButton.removeAttribute('style');
+            return; 
+        }
+
+        if (userInfo.accountType == 'not set') {
+            openSettingsButton.style.display = 'none';
+            createAccountButton.removeAttribute('style');
+            loginButton.removeAttribute('style');
+            return;
+        }
+    }
+
+    static openTopMenu(event) {
+        event.stopPropagation();
+
+        document.querySelector('#topMenu').style.display = 'flex';
+
+        document.addEventListener('click', AbstractView.closeTopMenu);
+    }
+
+    static closeTopMenu(event) {
+        if (event.target.id != 'topMenu') {
+            document.querySelector('#topMenu').removeAttribute('style');
+            document.removeEventListener('click', AbstractView.closeTopMenu);
+        }
+    }
+
     static openSettings() {
         document.querySelector('#settingsContainer').style.display = 'block';
         document.querySelector('main').style.filter = 'blur(3px)';

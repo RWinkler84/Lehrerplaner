@@ -4,6 +4,7 @@ import SettingsController from "./SettingsController.js";
 import LessonController from "./LessonController.js";
 import TaskController from "./TaskController.js";
 import LoginController from "./LoginController.js";
+import AbstractModel from "../Model/AbstractModel.js";
 
 export default class AbstractController {
 
@@ -57,5 +58,38 @@ export default class AbstractController {
 
         TaskController.renderTaskChanges();
         LessonController.renderLesson();
+    }
+
+    static async renderTopMenu() {
+        let db = new AbstractModel;
+        let userInfo = await db.getUserInfo();
+
+        View.renderTopMenu(userInfo);
+    }
+
+    static topMenuClickEventHandler(event) {
+        let target = event.target.id;
+
+        switch (target) {
+            case 'logoutButton':
+                SettingsController.logout();
+                break;
+
+            case 'loginButton':
+                LoginController.openLoginDialog(null, true);
+                break;
+
+            case 'openSettingsButton':
+                View.openSettings();
+                break;
+ 
+            case 'openMenuButton':
+                View.openTopMenu(event);
+                break;
+
+            case 'createAccountButton':
+                LoginController.openCreateAccountDialog();
+                break;
+        }
     }
 }

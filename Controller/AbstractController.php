@@ -87,8 +87,20 @@ class AbstractController
             'timetable' => $timetableResults,
             'timetableChanges' => $timetableChangesResults,
             'tasks' => $taskResults,
-            ];
+        ];
 
         echo json_encode($result);
+    }
+
+    public function  getUserLoginStatus()
+    {
+        global $user;
+
+        if (is_null($user)) {
+            echo json_encode(['status' => 'failed']);
+            exit;
+        }
+
+        echo json_encode(['status' => 'true']);
     }
 }

@@ -4,13 +4,15 @@ import Model from "../Model/Login.js";
 
 export default class LoginController extends AbstractController {
 
-    static async openLoginDialog(event) {
-        if (event != undefined) event.preventDefault();
+    static async openLoginDialog(event, forceOpen = false) {
+        event?.preventDefault();
+        
+        console.log(event);
         let db = new Model;
         let accountInfo = await db.getAccountInfo();
 
         if (accountInfo.status == 'success' && accountInfo.temporarilyOffline == true) return;
-        if (accountInfo.status == 'success' && accountInfo.accountType == 'guestUser') return;
+        if (accountInfo.status == 'success' && accountInfo.accountType == 'guestUser' && !forceOpen) return;
 
         View.openLoginDialog();
         View.closeSendResetPasswordMailDialog();
@@ -19,14 +21,14 @@ export default class LoginController extends AbstractController {
     }
 
     static openCreateAccountDialog(event) {
-        event.preventDefault();
+        event?.preventDefault();
 
         View.openCreateAccountDialog();
         View.closeLoginDialog();
     }
 
     static openSendResetPasswordMailDialog(event) {
-        event.preventDefault();
+        event?.preventDefault();
 
         View.openSendResetPasswordMailDialog();
         View.closeLoginDialog();
@@ -62,13 +64,13 @@ export default class LoginController extends AbstractController {
             let abstCtrl = new AbstractController;
 
             View.closeLoginDialog();
+            AbstractController.renderTopMenu();
             abstCtrl.syncData();
             window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
         } else {
             if (result.error == 'mail auth missing' && result.status == 'failed') View.showLoginErrorMessage('mail auth missing', result.message);
             if (result.error == 'wrong login credentials' && result.status == 'failed') View.showLoginErrorMessage('wrong login credentials', result.message);
             if (result.error == 'no server response' && result.status == 'failed') View.showLoginErrorMessage('no server response', result.message);
-
         }
     }
 
@@ -233,7 +235,6 @@ export default class LoginController extends AbstractController {
             View.closeLoginDialog();
         }
 
-        console.log(offlineStatus);
         let db = new Model;
         await db.toggleTemperaryOfflineUsage(offlineStatus);
     }

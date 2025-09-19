@@ -57,8 +57,10 @@ a {
     margin-bottom: 1rem;
     flex: 1 0 100%;
 }
+
 #topMenuButtonContainer {
     align-items: center;
+    position: relative;
 }
 
 #syncIndicator {
@@ -77,6 +79,16 @@ a {
 
 #syncIndicator.loggedOut {
     background-color: orange;
+}
+
+#topMenu {
+    display: none;
+    background-color: var(--lightMenuBackground);
+    position: absolute;
+    top: 2rem;
+    right: 0rem;
+    z-index: 1;
+    padding: 1rem 1rem;
 }
 
 /* Content Containers */
@@ -577,6 +589,14 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--matteRed);
 }
 
+.menuButton {
+    font-size: 1rem;
+    padding: 0.5rem 2rem;
+    color: var(--lighterText);
+    border: none;
+    background-color: transparent;
+}
+
 .taskDone button,
 .discardNewLessonButton,
 .saveNewLessonButton {
@@ -643,10 +663,9 @@ tr[data-new]:has(td[data-taskDescription]) td {
 .deleteItemButton,
 .deleteLessonButton,
 #closeSettingsButton,
-#openSettingsButton,
+#openMenuButton,
 #openTimetableSettingsButton,
-#openAccountSettingsButton,
-#logoutButton {
+#openAccountSettingsButton {
     color: var(--lightgrey);
     border: none;
     border-radius: var(--smallRadius);
@@ -660,7 +679,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #closeSettingsButton:hover,
 #timetableSettingsButton:hover,
 #accountSettingsButton:hover,
-#openSettingsButton:hover {
+#openMenuButton:hover,
+.menuButton:hover {
     background-color: rgba(256, 256, 256, 0.1);
 }
 
@@ -668,9 +688,8 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--matteRed);
 }
 
-#openSettingsButton,
-#closeSettingsButton,
-#logoutButton {
+#openMenuButton,
+#closeSettingsButton {
     width: 2rem;
     height: 2rem;
     font-size: 1.5rem;

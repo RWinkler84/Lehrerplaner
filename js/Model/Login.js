@@ -10,7 +10,7 @@ export default class Login extends AbstractModel {
 
         if (loginData) {
             result = await this.makeAjaxQuery('user', 'login', loginData);
-            if (result.status == 'success') this.updateAccountType();
+            if (result.status == 'success') await this.updateAccountType();
 
             return result;
         }

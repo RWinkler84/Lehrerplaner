@@ -51,6 +51,9 @@ async function startApp() {
         label.addEventListener('mouseenter', AbstractView.removeAddLessonButton);
     })
 
+    //top menu handlers
+    document.querySelector('#topMenuContainer').addEventListener('click', AbstractController.topMenuClickEventHandler)
+
     //handler for task tables
     document.querySelector('#upcomingTasksTable tbody').addEventListener('click', TaskController.tasksTableEventHandler);
     document.querySelector('#inProgressTasksTable tbody').addEventListener('click', TaskController.tasksTableEventHandler);
@@ -61,7 +64,6 @@ async function startApp() {
 
     //handlers for settings
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
-    document.querySelector('#openSettingsButton').addEventListener('click', AbstractView.openSettings);
     document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
 
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
@@ -78,10 +80,7 @@ async function startApp() {
     document.querySelector('#createAccount').addEventListener('click', LoginController.openCreateAccountDialog);
     document.querySelector('#continueAsGuest').addEventListener('click', LoginController.createGuestAccount);
 
-    //logout
-    document.querySelector('#logoutButton').addEventListener('click', SettingsController.logout);
-
-
+    AbstractController.renderTopMenu();
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
