@@ -20,7 +20,7 @@
                 <!-- <div><button id="logoutButton">&#x279C;</button></div> -->
                 <div id="topMenu" class="flex column justifyCenter ">
                     <button id="openSettingsButton" class="menuButton">Einstellungen</button>
-                    <button id="loginButton" class="menuButton">Login</button>
+                    <button id="openLoginButton" class="menuButton">Login</button>
                     <button id="createAccountButton" class="menuButton">Registrieren</button>
                     <button id="logoutButton" class="menuButton">Abmelden</button>
                 </div>
@@ -432,8 +432,9 @@
 
     <!-- dialogs -->
     <dialog id="loginDialog">
-        <div class="headline">
+        <div class="headline flex spaceBetween">
             <h3>Login</h3>
+            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
         </div>
         <form id="loginForm" method="post">
             <div class="flex column halfGap marginTop" class="formBody">
@@ -459,8 +460,9 @@
     </dialog>
 
     <dialog id="createAccountDialog">
-        <div class="headline">
+        <div class="headline flex spaceBetween">
             <h3>Konto anlegen</h3>
+            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
         </div>
         <form id="createAccountForm" method="post">
             <div class="flex column halfGap marginTop" class="formBody">
@@ -490,8 +492,9 @@
     </dialog>
 
     <dialog id="sendResetPasswordMailDialog">
-        <div class="headline">
+        <div class="headline flex spaceBetween">
             <h3>Passwort-Reset-Mail anfordern</h3>
+            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
         </div>
         <form id="sendResetPasswordMailForm" method="post">
             <div class="flex column halfGap marginTop" class="formBody">
@@ -508,8 +511,9 @@
     </dialog>
 
     <dialog id="resetPasswordDialog">
-        <div class="headline">
+        <div class="headline flex spaceBetween">
             <h3>Passwort zurücksetzen</h3>
+            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
         </div>
         <form id="resetPasswordForm" method="post">
             <div class="flex halfGap marginTop" class="formBody">

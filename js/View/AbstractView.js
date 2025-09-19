@@ -119,8 +119,6 @@ export default class AbstractView {
         let createAccountButton = document.querySelector('#createAccountButton');
         let openSettingsButton = document.querySelector('#openSettingsButton');
 
-        console.log(userInfo)
-
         openSettingsButton.removeAttribute('style');
         loginButton.style.display = 'none';
         logoutButton.style.display = 'none';

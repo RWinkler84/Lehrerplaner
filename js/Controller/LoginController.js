@@ -6,12 +6,12 @@ export default class LoginController extends AbstractController {
 
     static async openLoginDialog(event, forceOpen = false) {
         event?.preventDefault();
-        
+
         console.log(event);
         let db = new Model;
         let accountInfo = await db.getAccountInfo();
 
-        if (accountInfo.status == 'success' && accountInfo.temporarilyOffline == true) return;
+        if (accountInfo.status == 'success' && accountInfo.temporarilyOffline == true && !forceOpen) return;
         if (accountInfo.status == 'success' && accountInfo.accountType == 'guestUser' && !forceOpen) return;
 
         View.openLoginDialog();
@@ -68,9 +68,7 @@ export default class LoginController extends AbstractController {
             abstCtrl.syncData();
             window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
         } else {
-            if (result.error == 'mail auth missing' && result.status == 'failed') View.showLoginErrorMessage('mail auth missing', result.message);
-            if (result.error == 'wrong login credentials' && result.status == 'failed') View.showLoginErrorMessage('wrong login credentials', result.message);
-            if (result.error == 'no server response' && result.status == 'failed') View.showLoginErrorMessage('no server response', result.message);
+            View.showLoginErrorMessage(result.error, result.message);
         }
     }
 
@@ -223,7 +221,7 @@ export default class LoginController extends AbstractController {
             return;
         }
 
-        let result = await db.resendAuthMail(formData);            
+        let result = await db.resendAuthMail(formData);
         let status = result.status == 'success' ? 'success' : 'failed';
 
         View.showResendAuthMailResult(status, result.message);
@@ -233,6 +231,9 @@ export default class LoginController extends AbstractController {
         if (event) {
             event.preventDefault();
             View.closeLoginDialog();
+            View.closeCreateAccountDialog();
+            View.closeResetPasswordDialog();
+            View.closeSendResetPasswordMailDialog();
         }
 
         let db = new Model;
@@ -249,5 +250,52 @@ export default class LoginController extends AbstractController {
 
     static isRegister() {
         View.isRegister()
+    }
+
+    static dialogEventHandler(event) {
+
+        let elementId = event.target.id;
+        let elementClassList = event.target.classList;
+
+        //elements with ids
+        switch (elementId) {
+            //send forms buttons
+            case 'loginButton':
+                LoginController.attemptLogin(event);
+                break;
+            case 'submitNewAccountDataButton':
+                LoginController.attemptAccountCreation(event);
+                break;
+            case 'sendResetPasswordMailButton':
+                LoginController.sendResetPasswordMail(event);
+                break;
+            case 'resetPasswordButton':
+                LoginController.attemptPasswordReset(event);
+                break;
+
+            //links
+            case 'continueAsGuest':
+                LoginController.createGuestAccount();
+                break;
+            case 'createAccount':
+                LoginController.openCreateAccountDialog(event);
+                break;
+            case 'resendAuthMail':
+                LoginController.resendAuthMail(event);
+                break;
+            case 'sendResetPasswordMail':
+                LoginController.openSendResetPasswordMailDialog(event);
+                break;
+        }
+
+        switch (true) {
+            case elementClassList.contains('useTemporarilyOfflineButton'):
+                LoginController.toggleTemperaryOfflineUsage(true, event);
+                break;
+
+            case elementClassList.contains('backToLoginLink'):
+                LoginController.openLoginDialog(event, true);
+                break;
+        }
     }
 }

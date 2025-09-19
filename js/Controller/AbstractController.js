@@ -75,8 +75,8 @@ export default class AbstractController {
                 SettingsController.logout();
                 break;
 
-            case 'loginButton':
-                LoginController.openLoginDialog(null, true);
+            case 'openLoginButton':
+                LoginController.openLoginDialog(event, true);
                 break;
 
             case 'openSettingsButton':

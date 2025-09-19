@@ -69,16 +69,7 @@ async function startApp() {
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
 
     //on site login
-    document.querySelector('#loginForm').addEventListener('submit', LoginController.attemptLogin);
-    document.querySelector('#sendResetPasswordMailForm').addEventListener('submit', LoginController.sendResetPasswordMail);
-    document.querySelector('#loginForm').addEventListener('submit', LoginController.attemptLogin);
-    document.querySelector('#createAccountForm').addEventListener('submit', LoginController.attemptAccountCreation);
-    document.querySelector('#resetPasswordForm').addEventListener('submit', LoginController.attemptPasswordReset);
-    document.querySelectorAll('.backToLoginLink').forEach(link => { link.addEventListener('click', LoginController.openLoginDialog); });
-
-    //on site account create
-    document.querySelector('#createAccount').addEventListener('click', LoginController.openCreateAccountDialog);
-    document.querySelector('#continueAsGuest').addEventListener('click', LoginController.createGuestAccount);
+    document.addEventListener('click', LoginController.dialogEventHandler);
 
     AbstractController.renderTopMenu();
     setDateForWeekdays();

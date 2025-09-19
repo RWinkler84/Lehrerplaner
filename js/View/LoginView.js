@@ -81,8 +81,6 @@ export default class LoginView extends AbstractView {
         sendResetPasswordMailDialog.setAttribute('open', '');
         sendResetPasswordMailErrorMessageDisplay.style.color = 'var(--matteRed)';
         sendResetPasswordMailErrorMessageDisplay.innerText = '';
-
-        sendResetPasswordMailDialog.querySelector('.backToLoginLink').addEventListener('click', Controller.openLoginDialog);
     }
 
     static openLoginDialog() {
@@ -155,9 +153,8 @@ export default class LoginView extends AbstractView {
             loginErrorDisplay.querySelector('#sendResetPasswordMail').addEventListener('click', Controller.openSendResetPasswordMailDialog);
         }
 
-        if (error == 'no server response') {
-            loginErrorDisplay.innerHTML += '<p><a href="" id="useTemporarilyOffline" style="text-decoration: none;">Vorrübergehend offline nutzen</a></p>';
-            loginErrorDisplay.querySelector('#useTemporarilyOffline').addEventListener('click', (event) => {Controller.toggleTemperaryOfflineUsage(true, event)});
+        if (error == 'no server response' || error == 'database unreachable') {
+            loginErrorDisplay.innerHTML += '<p><a href="" class="useTemporarilyOfflineButton" style="text-decoration: none;">Vorrübergehend offline nutzen</a></p>';
         }
 
         this.alertLoginErrorMessageDisplay();
@@ -188,9 +185,7 @@ export default class LoginView extends AbstractView {
 
             errorMessageDisplay.style.color = 'var(--matteGreen)';
             errorMessageDisplay.innerText = message;
-            errorMessageDisplay.innerHTML += '<p><a href="" id="backToLogin" style="text-decoration: none">Zurück zum Login</a></p>';
-
-            errorMessageDisplay.querySelector('#backToLogin').addEventListener('click', Controller.openLoginDialog);
+            errorMessageDisplay.innerHTML += '<p><a href="" class="backToLoginLink" style="text-decoration: none">Zurück zum Login</a></p>';
 
             navigation.style.display = 'none';
             window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
