@@ -41,11 +41,19 @@ class User extends AbstractModel
             exit();
         }
 
+        if (is_null($user)) {
+            return [
+                'message' => 'Login fehlgeschlagen. E-Mail oder Password ist falsch.',
+                'status' => 'failed',
+                'error' => 'wrong login credentials'
+            ];
+        }
+
         if ($user->emailConfirmed == 0) {
             return [
                 'message' => 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte öffne den Link in der Mail, die du nach der Anmeldung erhalten hast.',
                 'status' => 'failed',
-                'error' => 'mail auth missing' 
+                'error' => 'mail auth missing'
             ];
         }
 
