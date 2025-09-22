@@ -114,7 +114,7 @@ export default class AbstractView {
     }
 
     static async renderTopMenu(userInfo) {
-        let loginButton = document.querySelector('#loginButton');
+        let loginButton = document.querySelector('#openLoginButton');
         let logoutButton = document.querySelector('#logoutButton');
         let createAccountButton = document.querySelector('#createAccountButton');
         let openSettingsButton = document.querySelector('#openSettingsButton');

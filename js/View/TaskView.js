@@ -148,9 +148,12 @@ export default class TaskView extends AbstractView {
 
     static updateTaskElement(taskElement, task) {
         let buttonTd = taskElement.querySelector('.taskDone');
-        taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
         taskElement.dataset.date = task.date;
         taskElement.dataset.timeslot = task.timeslot;
+
+        taskElement.querySelector('.taskClassName').textContent = task.class;
+        taskElement.querySelector('.taskSubject').textContent = task.subject;
+        taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
         taskElement.querySelector('.taskDescription').textContent = task.description;
 
         taskElement.querySelector('.taskAdditionalInfo').innerHTML = this.getAdditionalInfoHTML(task);
