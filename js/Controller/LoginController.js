@@ -75,7 +75,6 @@ export default class LoginController extends AbstractController {
         event.preventDefault();
 
         let accountData = View.getAccountDataFromForm();
-        console.log(accountData);
 
         const mailRegEx = /^[^@]+@[^@]+\.[^@]+$/;
         const passwordRegEx = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;

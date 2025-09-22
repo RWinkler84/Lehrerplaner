@@ -457,7 +457,6 @@ export default class TaskView extends AbstractView {
     }
 
     static updateTask(event) {
-        console.log('hier');
         let taskTr = event.target.closest('tr');
         if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
 

@@ -68,7 +68,7 @@ class AbstractModel
 
                 $stmt->execute();
             } catch (PDOException $e) {
-                error_log('Fehler beim Speichern der Daten: ' . $e);
+                error_log(__FILE__ . __LINE__ . 'Fehler beim Speichern der Daten: ' . $e);
                 return [
                     'status' => 'failed',
                     'message' => 'Beim Speichern der Daten ist ein Fehler aufgetreten.',
@@ -106,7 +106,7 @@ class AbstractModel
 
                 $stmt->execute();
             } catch (Exception $e) {
-                error_log('Fehler beim Löschen der Daten: ' . $e);
+                error_log(__FILE__ . __LINE__ . 'Fehler beim Löschen der Daten: ' . $e);
                 http_response_code(500);
                 return [
                     'message' => 'Die Daten konnten nicht gelöscht werden.',
@@ -354,7 +354,7 @@ class AbstractModel
 
             return true;
         } catch (Exception $e) {
-            error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+            error_log(__FILE__ . __LINE__ . "Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
 
             return false;
         }

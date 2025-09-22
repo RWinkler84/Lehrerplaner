@@ -349,8 +349,6 @@ class Settings extends AbstractModel
                 ];
             }
 
-            error_log('timetable to sync ' . print_r($timetablesToSync, true));
-            error_log($timetablesToSync[count($timetablesToSync) - 1]['lastEdited']);
             $this->setDbUpdateTimestamp($tableName, new DateTime($timetablesToSync[count($timetablesToSync) - 1]['lastEdited']));
         }
 

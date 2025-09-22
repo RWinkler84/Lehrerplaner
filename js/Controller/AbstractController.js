@@ -49,7 +49,6 @@ export default class AbstractController {
 
     static async renderDataChanges(updatedElements = null) {
         if (updatedElements) {
-            console.log('updatedElements ', updatedElements);
             if (updatedElements.subjects) await SettingsController.renderSubjectChanges();
             if (updatedElements.timetable) await SettingsController.renderSettingsLessonChanges();
             if (updatedElements.timetableChanges) await LessonController.renderLesson();

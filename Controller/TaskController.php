@@ -27,7 +27,6 @@ class TaskController extends AbstractController
 
     public function update()
     {
-        error_log('ich update jetzt');
         $taskData = json_decode(file_get_contents('php://input'), true);
 
         $result = $this->model->update($taskData);

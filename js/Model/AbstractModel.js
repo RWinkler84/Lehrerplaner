@@ -51,7 +51,6 @@ export default class AbstractModel {
             return { status: 'failed', message: error.message };
         }
 
-        console.log(result);
         if (result.status == 'failed' && result.error == 'User not logged in') {
             await AbstractController.toggleTemperaryOfflineUsage(false);
             AbstractController.openLoginDialog();
@@ -109,7 +108,6 @@ export default class AbstractModel {
                 entry.id = Number(entry.id);
                 let transaction = db.transaction(store, 'readwrite').objectStore(store).add();
                 transaction.onsuccess = () => {
-                    console.log('stored', entry)
                     this.markLocalDBUpdated()
                 }
             });
@@ -153,7 +151,6 @@ export default class AbstractModel {
 
         return new Promise(resolve => {
             transaction.onsuccess = () => {
-                console.log('updated', dataToStore)
                 this.markLocalDBUpdated(store)
                 resolve();
             }
@@ -167,7 +164,6 @@ export default class AbstractModel {
         let transaction = db.transaction(store, 'readwrite').objectStore(store).delete(id);
 
         transaction.onsuccess = () => {
-            console.log('deleted')
             this.markLocalDBUpdated(store)
         };
     }
@@ -429,7 +425,6 @@ export default class AbstractModel {
         let dateObject = new Date(date);
         let dateString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
         let timeString = dateObject.getHours().toString().padStart(2, '0') + ':' + dateObject.getMinutes().toString().padStart(2, '0') + ':' + dateObject.getSeconds().toString().padStart(2, '0');
-        console.log(timeString);
         return `${dateString} ${timeString}`;
     }
 

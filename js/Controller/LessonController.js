@@ -63,7 +63,6 @@ export default class LessonController {
 
     static async setLessonCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
-        console.log(lessonData);
         let oldTimetable = await Lesson.getOldTimetableCopy();
         let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 

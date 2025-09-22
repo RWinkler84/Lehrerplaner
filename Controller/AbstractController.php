@@ -65,7 +65,6 @@ class AbstractController
         $timetableChangesResults = [];
         $taskResults = [];
 
-        // error_log(print_r($dataToSync, true));
         if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
             $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
         }

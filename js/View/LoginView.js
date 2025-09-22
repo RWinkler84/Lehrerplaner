@@ -56,8 +56,6 @@ export default class LoginView extends AbstractView {
         let password = createAccountDialog.querySelector('#newPassword').value;
         let passwordRepeat = createAccountDialog.querySelector('#newPasswordRepeat').value;
 
-        console.log(createAccountDialog)
-
         return {
             'userEmail': email,
             'password': password,

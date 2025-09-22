@@ -131,7 +131,7 @@ class Task extends AbstractModel
                         'error' => $result['error']
                     ];
                 }
-                error_log('taskToSync' . print_r($taskToSync, true));
+                
                 if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($taskToSync['lastEdited']));
             }
         }
