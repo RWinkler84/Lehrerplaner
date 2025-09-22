@@ -178,15 +178,18 @@ export default class AbstractView {
 
     static setSyncIndicatorStatus(status) {
         let syncIndicator = document.querySelector('#syncIndicator');
+        let tooltipText = syncIndicator.querySelector('span');
 
         syncIndicator.removeAttribute('class');
 
         switch (status) {
             case 'synced':
                 syncIndicator.classList.add('synced');
+                tooltipText.textContent = 'Die Verbindung zum Server ist her-gestellt. Deine Daten werden gesichert.'
                 break;
             case 'unsynced':
                 syncIndicator.classList.add('unsynced');
+                tooltipText.textContent = 'Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.'
                 break;
         }
     }

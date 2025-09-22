@@ -67,6 +67,11 @@ a {
     height: 0.7rem;
     aspect-ratio: 1/1;
     border-radius: 50%;
+    position: relative;
+    margin-left: 0.5rem;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
 }
 
 #syncIndicator.synced {
@@ -79,6 +84,10 @@ a {
 
 #syncIndicator.loggedOut {
     background-color: orange;
+}
+
+#syncIndicator:hover span {
+    visibility: visible;
 }
 
 #topMenu {
@@ -467,7 +476,7 @@ dialog .errorMessageDisplay {
     text-overflow: ellipsis;
 }
 
-.taskDone div{
+.taskDone div {
     display: flex;
     min-width: 125px;
     gap: 0.5rem;
@@ -795,6 +804,10 @@ h3 {
     left: calc(100% + 15px);
 }
 
+#syncIndicator span {
+    top: -10px;
+}
+
 .tooltip:hover {
     background-color: var(--lightgrey);
 }
@@ -825,6 +838,17 @@ h3 {
     border-width: 10px;
     border-style: solid;
     border-color: transparent var(--lightergrey) transparent transparent;
+}
+
+#syncIndicator span::after {
+    content: " ";
+    position: absolute;
+    top: 15px;
+    left: 100%;
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--lightergrey);
 }
 
 .tooltip.error {
