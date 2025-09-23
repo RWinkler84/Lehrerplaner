@@ -39,6 +39,12 @@ export default class AbstractController {
         View.setSyncIndicatorStatus(status);
     }
 
+    static setVersion(version) {
+        let db = new Model;
+        db.setVersion(version);
+        SettingsController.setVersion(version);
+    }
+
     static async toggleTemperaryOfflineUsage(offlineStatus) {
         await LoginController.toggleTemperaryOfflineUsage(offlineStatus);
     }

@@ -450,7 +450,13 @@ export default class SettingsView {
 
     }
 
-    static makeTimetableEditable() {
+    static async makeTimetableEditable() {
+
+        if (await SettingsView.isAllSubjectsEmpty()) {
+            SettingsView.alertTimetable(true);
+
+            return;
+        }
 
         document.querySelectorAll('.settingsTimeslot').forEach((element) => {
             element.innerHTML = '';
@@ -466,18 +472,6 @@ export default class SettingsView {
         document.querySelector('#createChangeTimetableButtonContainer').style.display = 'none';
         document.querySelector('#saveDiscardTimetableButtonContainer').style.display = 'flex';
 
-        if (SettingsView.isAllSubjectsEmpty()) {
-            SettingsView.alertTimetable(true);
-
-            document.querySelector('#saveNewTimetableButton').style.display = 'none';
-
-            document.querySelectorAll('.settingsTimeslot').forEach((element) => {
-                element.innerHTML = '';
-                element.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
-                element.removeEventListener('click', SettingsView.createLessonForm);
-            });
-            return;
-        }
     }
 
     static makeLessonsEditable() {
@@ -516,8 +510,8 @@ export default class SettingsView {
         return false;
     }
 
-    static isAllSubjectsEmpty() {
-        let allSubjects = Controller.getAllSubjects();
+    static async isAllSubjectsEmpty() {
+        let allSubjects = await Controller.getAllSubjects();
 
         document.querySelector('#noSubjectsAlertTooltip').style.display = 'none';
 
@@ -593,6 +587,10 @@ export default class SettingsView {
             document.querySelector('#deletionErrorDisplay').style.display = 'block';
             document.querySelector('#approveAccountDeletionContainer').style.display = 'none';
         }
+    }
+
+    static setVersionDisplay(version) {
+        document.querySelector('#versionDisplay').textContent = version;
     }
 
     //validation functions

@@ -142,6 +142,10 @@ a {
     background-color: var(--matteGreen);
 }
 
+#accountSettingsContainer {
+    position: relative;
+}
+
 /* dialogs */
 dialog {
     top: 25%;
@@ -573,6 +577,13 @@ tr[data-new]:has(td[data-taskDescription]) td {
 #deletionErrorDisplay {
     display: none;
     color: var(--matteRed);
+}
+
+#versionDisplay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: var(--lightgrey);
 }
 
 /* Buttons */

@@ -163,6 +163,10 @@ export default class SettingsController {
         return await model.getAllSubjects();
     }
 
+    static setVersion(version) {
+        View.setVersionDisplay(version);
+    }
+
         static settingsClickEventHandler(event) {
         let target = event.target.id;
 

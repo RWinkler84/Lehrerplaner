@@ -72,6 +72,8 @@ async function startApp() {
     document.addEventListener('click', LoginController.dialogEventHandler);
 
     AbstractController.renderTopMenu();
+    AbstractController.setVersion('0.9.0');
+
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();

@@ -68,7 +68,7 @@ export default class AbstractModel {
         id = Number(id);
 
         let db = await this.openIndexedDB();
-        let transaction = db.transaction(store, 'readwrite');
+        let transaction = db.transaction(store, 'readonly');
         let objectStore = transaction.objectStore(store);
         let request = objectStore.get(id);
 
@@ -85,7 +85,7 @@ export default class AbstractModel {
 
     async readAllFromLocalDB(store) {
         let db = await this.openIndexedDB();
-        let transaction = db.transaction(store, 'readwrite');
+        let transaction = db.transaction(store, 'readonly');
         let objectStore = transaction.objectStore(store);
         let request = objectStore.getAll();
 
@@ -241,6 +241,10 @@ export default class AbstractModel {
         userInfo.loggedIn = loginStatus.status == 'true' ? true : false;
 
         return userInfo;
+    }
+
+    async setVersion(version) {
+        await this.updateOnLocalDB('settings', {id:2, version: version});
     }
 
     async markLocalDBUpdated(store, date = null) {
