@@ -25,8 +25,8 @@ export default class LoginView extends AbstractView {
         let token = params.get('reset');
 
         if (token) {
-            document.querySelector('#resetPasswordDialog').setAttribute('open', '');
-            document.querySelector('#loginDialog').removeAttribute('open');
+            document.querySelector('#resetPasswordDialog').showModal();
+            document.querySelector('#loginDialog').close();
         }
     }
 
@@ -35,8 +35,8 @@ export default class LoginView extends AbstractView {
         let token = params.get('register');
 
         if (token != null) {
-            document.querySelector('#createAccountDialog').setAttribute('open', '');
-            document.querySelector('#loginDialog').removeAttribute('open');
+            document.querySelector('#createAccountDialog').showModal();
+            document.querySelector('#loginDialog').close();
         }
     }
 
@@ -74,9 +74,9 @@ export default class LoginView extends AbstractView {
 
         let sendResetPasswordMailDialog = document.querySelector('#sendResetPasswordMailDialog');
 
-        document.querySelector('#loginDialog').removeAttribute('open');
+        document.querySelector('#loginDialog').close();
 
-        sendResetPasswordMailDialog.setAttribute('open', '');
+        sendResetPasswordMailDialog.showModal();
         sendResetPasswordMailErrorMessageDisplay.style.color = 'var(--matteRed)';
         sendResetPasswordMailErrorMessageDisplay.innerText = '';
     }
@@ -84,18 +84,18 @@ export default class LoginView extends AbstractView {
     static openLoginDialog() {
         let loginDialog = document.querySelector('#loginDialog');
 
-        loginDialog.setAttribute('open', '');
+        loginDialog.showModal();
     }
 
     static openCreateAccountDialog() {
         let createAccountDialog = document.querySelector('#createAccountDialog');
-        createAccountDialog.setAttribute('open', '');
+        createAccountDialog.showModal();
     }
 
     static closeLoginDialog() {
         let loginDialog = document.querySelector('#loginDialog');
 
-        loginDialog.removeAttribute('open');
+        loginDialog.close();
         loginDialog.querySelector('#userEmail').value = '';
         loginDialog.querySelector('#password').value = '';
         loginDialog.querySelector('#loginErrorMessageDisplay').innerText = 'Du bist aktuell nicht eingeloggt. Melde dich an, um Datenverlust zu vermeiden.';
@@ -105,19 +105,19 @@ export default class LoginView extends AbstractView {
         let dialog = document.querySelector('#sendResetPasswordMailDialog');
 
         dialog.querySelector('#resetPasswordMail').value = '';
-        dialog.removeAttribute('open');
+        dialog.close();
     }
 
     static closeCreateAccountDialog() {
         let dialog = document.querySelector('#createAccountDialog');
 
-        dialog.removeAttribute('open');
+        dialog.close();
     }
 
     static closeResetPasswordDialog() {
         let dialog = document.querySelector('#resetPasswordDialog');
 
-        dialog.removeAttribute('open');
+        dialog.close();
         dialog.querySelector('#resetPassword').value = '';
         dialog.querySelector('#resetPasswordRepeat').value = '';
     }
@@ -187,7 +187,7 @@ export default class LoginView extends AbstractView {
 
             navigation.style.display = 'none';
             window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
-            
+
             return;
         }
 

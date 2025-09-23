@@ -148,10 +148,13 @@ a {
 
 /* dialogs */
 dialog {
-    top: 25%;
     background-color: var(--contentContainerBackground);
     min-width: 460px;
     max-width: 460px;
+}
+
+dialog::backdrop {
+    backdrop-filter: blur(3px);
 }
 
 dialog .alertRing {
@@ -178,6 +181,7 @@ dialog .errorMessageDisplay {
 
 /* tasks and timetable changes conflicts dialog */
 #LessonChangesAndTasksToKeepDialog {
+    top: 25%;
     width: fit-content;
     min-width: 700px;
 }

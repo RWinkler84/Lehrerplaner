@@ -70,6 +70,7 @@ async function startApp() {
 
     //on site login
     document.addEventListener('click', LoginController.dialogEventHandler);
+    document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
 
     AbstractController.renderTopMenu();
     AbstractController.setVersion('0.9.0');

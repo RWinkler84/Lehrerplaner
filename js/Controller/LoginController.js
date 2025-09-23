@@ -13,17 +13,17 @@ export default class LoginController extends AbstractController {
         if (accountInfo.status == 'success' && accountInfo.temporarilyOffline == true && !forceOpen) return;
         if (accountInfo.status == 'success' && accountInfo.accountType == 'guestUser' && !forceOpen) return;
 
-        View.openLoginDialog();
         View.closeSendResetPasswordMailDialog();
         View.closeCreateAccountDialog();
         View.closeResetPasswordDialog();
+        View.openLoginDialog();
     }
 
     static openCreateAccountDialog(event) {
         event?.preventDefault();
 
-        View.openCreateAccountDialog();
         View.closeLoginDialog();
+        View.openCreateAccountDialog();
     }
 
     static openSendResetPasswordMailDialog(event) {
@@ -227,6 +227,7 @@ export default class LoginController extends AbstractController {
     }
     /** @param offlineStatus boolean: Should the app work temporarily offline or not? */
     static async toggleTemperaryOfflineUsage(offlineStatus, event = null) {
+        console.log('aktiv', event)
         if (event) {
             event.preventDefault();
             View.closeLoginDialog();
@@ -252,7 +253,6 @@ export default class LoginController extends AbstractController {
     }
 
     static dialogEventHandler(event) {
-
         let elementId = event.target.id;
         let elementClassList = event.target.classList;
 
@@ -295,6 +295,18 @@ export default class LoginController extends AbstractController {
             case elementClassList.contains('backToLoginLink'):
                 LoginController.openLoginDialog(event, true);
                 break;
+        }
+
+        //dialog cancel event
+        if (event.type == "cancel") {
+            switch (elementId) {
+                case 'loginDialog':
+                case 'createAccountDialog': 
+                case 'sendResetPasswordMailDialog': 
+                case 'resetPasswordDialog':
+                    LoginController.toggleTemperaryOfflineUsage(true, event)
+                    break;
+            }
         }
     }
 }
