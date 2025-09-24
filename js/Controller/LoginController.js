@@ -91,7 +91,7 @@ export default class LoginController extends AbstractController {
         }
 
         if (accountData.passwordRepeat == '') {
-            alertAccountCreationNewPasswordRepeat();
+            View.alertAccountCreationNewPasswordRepeat();
             return false;
         }
 
