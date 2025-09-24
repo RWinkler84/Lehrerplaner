@@ -39,13 +39,13 @@
 
     <main>
         <div id="timetableContainer">
-            <div class="flex doubleGap spaceBetween" style="margin-bottom: 1rem;">
+            <div class="flex gap spaceBetween" style="margin-bottom: 1rem;">
                 <div id="calendarWeek" class="flex alignCenter">
                     <h2><span id="wochenplanText">Wochenplan</span> KW <span id="calendarWeekCounter"
                             data-split_first_week="false">-</span></h2>
                     <div id="isCurrentWeekDot"></div>
                 </div>
-                <div class="flex gap">
+                <div class="flex gap" id="weekSwitcher">
                     <button id="weekBackwardButton">&#9664</button>
                     <div id="dateSpan" class="flex alignEnd"><span id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span
                             id="weekEndDate">Sonntag</span></div>
@@ -460,7 +460,7 @@
             <div id="loginErrorMessageDisplay" class="errorMessageDisplay alertRing">
                 Du bist aktuell nicht eingeloggt. Melde dich an, um Datenverlust zu vermeiden.
             </div>
-            <div class="flex spaceBetween alignEnd marginTop">
+            <div class="flex wrap gap spaceBetween alignEnd marginTop">
                 <span><a href id="createAccount">Registrieren</a> oder <a href id="continueAsGuest">als Gast
                         nutzen</a></span>
                 <button type="submit" id="loginButton" class="confirmationButton"
@@ -480,15 +480,13 @@
                     <label for="newUserEmail" style="display: block">E-Mail</label>
                     <div class="alertRing"><input type="mail" name="newUserEmail" id="newUserEmail" autofocus></div>
                 </div>
-                <div class="flex spaceBetween">
-                    <div>
-                        <label for="newPassword" style="display: block">Passwort wählen</label>
-                        <div class="alertRing"><input type="password" name="newPassword" id="newPassword"></div>
-                    </div>
-                    <div>
-                        <label for="newPasswordRepeat" style="display: block">Passwort wiederholen</label>
-                        <div class="alertRing"><input type="password" name="newPasswordRepeat" id="newPasswordRepeat">
-                        </div>
+                <div>
+                    <label for="newPassword" style="display: block">Passwort wählen</label>
+                    <div class="alertRing"><input type="password" name="newPassword" id="newPassword"></div>
+                </div>
+                <div>
+                    <label for="newPasswordRepeat" style="display: block">Passwort wiederholen</label>
+                    <div class="alertRing"><input type="password" name="newPasswordRepeat" id="newPasswordRepeat">
                     </div>
                 </div>
             </div>
