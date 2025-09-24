@@ -48,12 +48,19 @@ a {
 }
 
 /* Top Menu */
+nav {
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
 
 #topMenuContainer,
 #settingsTitleBar {
     background-color: var(--topMenuBackgound);
     color: var(--lighterText);
-    padding: 1rem 2rem;
+    padding: 0.5rem 2rem;
     margin-bottom: 1rem;
     flex: 1 0 100%;
 }
@@ -101,6 +108,9 @@ a {
 }
 
 /* Content Containers */
+main {
+    margin-top: 50px;
+}
 
 #settingsSubjectsContainer,
 #settingsTimetableContainer,
@@ -110,12 +120,13 @@ a {
     position: relative;
     background-color: var(--contentContainerBackground);
     padding: 2rem 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 #settingsContainer {
     display: none;
     position: absolute;
+    z-index: 2;
     background-color: var(--bodyBackground);
     padding: 0.5rem;
     top: 2rem;

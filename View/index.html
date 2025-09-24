@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/index.css">
+    <link rel="icon" type="image/png" href="../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="shortcut icon" href="../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Eduplanio" />
+    <link rel="manifest" href="../site.webmanifest" />
     <title>Eduplanio - dein Schulorganizer</title>
 </head>
 
@@ -16,7 +22,8 @@
             </div>
             <div id="topMenuButtonContainer" class="flex gap">
                 <div id="syncIndicator" class="unsynced">
-                    <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.</span>
+                    <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem
+                        Internet und melde dich an, um Datenverlust zu vermeiden.</span>
                 </div>
                 <div><button id="openMenuButton">&#x2630;</button></div>
                 <!-- <div><button id="logoutButton">&#x279C;</button></div> -->
@@ -502,7 +509,8 @@
         <form id="sendResetPasswordMailForm" method="post">
             <div class="flex column halfGap marginTop" class="formBody">
                 <label for="resetPasswordMail" style="display: block">E-Mail-Adresse</label>
-                <div class="alertRing"><input type="mail" name="resetPasswordMail" id="resetPasswordMail" autofocus></div>
+                <div class="alertRing"><input type="mail" name="resetPasswordMail" id="resetPasswordMail" autofocus>
+                </div>
             </div>
             <div id="sendResetPasswordMailErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
             <div class="flex spaceBetween alignEnd marginTop">
@@ -522,7 +530,8 @@
             <div class="flex halfGap marginTop" class="formBody">
                 <div>
                     <label for="resetPassword" style="display: block">Neues Passwort</label>
-                    <div class="alertRing"><input type="password" name="resetPassword" id="resetPassword" autofocus></div>
+                    <div class="alertRing"><input type="password" name="resetPassword" id="resetPassword" autofocus>
+                    </div>
                 </div>
                 <div>
                     <label for="resetPasswordRepeat" style="display: block">Passwort wiederholen</label>
