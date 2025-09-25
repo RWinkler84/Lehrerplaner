@@ -137,7 +137,7 @@ export default class SettingsController {
         return LessonController.getLessonObject(lessonData);
     }
 
-    static async renderSettingsLessonChanges(){
+    static async renderSettingsLessonChanges() {
         await View.setDateOfTimetableToDisplay();
         await View.renderLessons();
     }
@@ -167,17 +167,30 @@ export default class SettingsController {
         View.setVersionDisplay(version);
     }
 
-        static settingsClickEventHandler(event) {
+    static openSettings() {
+        View.openSettings();
+    }
+
+    static settingsClickEventHandler(event) {
         let target = event.target.id;
 
         switch (target) {
             //top menu
+            case 'openSettingsMenuButton':
+            View.toggleSettingsMenu(event);
+            break;
+
             case 'openTimetableSettingsButton':
                 View.openTimetableSettings();
                 break;
 
             case 'openAccountSettingsButton':
                 View.openAccountSettings();
+                break;
+
+            case 'closeSettingsButton': //fall through
+            case 'closeSettingsButtonResponsive':
+                View.closeSettings();
                 break;
 
             //timetable settings

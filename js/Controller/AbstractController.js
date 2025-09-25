@@ -85,7 +85,7 @@ export default class AbstractController {
                 break;
 
             case 'openSettingsButton':
-                View.openSettings();
+                SettingsController.openSettings();
                 break;
  
             case 'openMenuButton':

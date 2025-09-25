@@ -237,19 +237,13 @@
         <div id="settingsContainer">
             <div id="settingsTitleBar" class="flex spaceBetween alignCenter" style="height: 3rem;">
                 <h3>Einstellungen</h3>
-                <div class="flex halfGap">
-                    <button id="openTimetableSettingsButton" class="selected">Stundenplan</button>
-                    <button id="openAccountSettingsButton">Konto</button>
-                    <button id="closeSettingsButton">&#215;</button>
-                </div>
-                <div id="responsiveSettingsMenu">
-                <div><button id="openSettingsButton">&#x2630;</button></div>
-                <div id="settingsMenu" class="flex column justifyCenter ">
-                    <button id="openSettingsButton" class="menuButton">Einstellungen</button>
-                    <button id="openLoginButton" class="menuButton">Login</button>
-                    <button id="createAccountButton" class="menuButton">Registrieren</button>
-                    <button id="logoutButton" class="menuButton">Abmelden</button>
-                </div>
+                <div style="position: relative;"><button id="openSettingsMenuButton">&#x2630;</button>
+                    <div id="settingsMenu">
+                        <button id="openTimetableSettingsButton" class="selected">Stundenplan</button>
+                        <button id="openAccountSettingsButton">Konto</button>
+                        <button id="closeSettingsButton">&#215;</button>
+                        <button id="closeSettingsButtonResponsive">schließen</button>
+                    </div>
                 </div>
             </div>
 

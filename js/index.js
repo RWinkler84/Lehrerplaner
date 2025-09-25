@@ -64,7 +64,6 @@ async function startApp() {
 
     //handlers for settings
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
-    document.querySelector('#closeSettingsButton').addEventListener('click', AbstractView.closeSettings);
 
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
 

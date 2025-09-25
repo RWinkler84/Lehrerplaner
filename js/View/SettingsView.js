@@ -4,6 +4,39 @@ import Fn from "../inc/utils.js";
 
 export default class SettingsView {
 
+    static openSettings() {
+        document.querySelector('#settingsContainer').style.display = 'block';
+        document.querySelector('main').style.filter = 'blur(3px)';
+        document.querySelector('nav').style.filter = 'blur(3px)';
+    }
+
+    static closeSettings() {
+        document.querySelector('#settingsContainer').style.display = 'none';
+        document.querySelector('main').style.removeProperty('filter');
+        document.querySelector('nav').style.removeProperty('filter');
+
+    }
+
+    static toggleSettingsMenu(event) {
+        event.stopPropagation();
+        let settingsMenuElement = document.querySelector('#settingsMenu');
+
+        if (settingsMenuElement.style.display == 'flex') {
+            this.closeSettingsMenu(event);
+            return;
+        }
+
+        settingsMenuElement.style.display = 'flex';
+        document.addEventListener('click', SettingsView.closeSettingsMenu);
+    }
+
+    static closeSettingsMenu(event) {
+        if (event.target.id != 'settingsMenu') {
+            document.querySelector('#settingsMenu').removeAttribute('style');
+            document.removeEventListener('click', SettingsView.closeSettingsMenu);
+        }
+    }
+
     //timetable settings functions
     static async renderSelectableLessonColors() {
         let allSubjects = await Controller.getAllSubjects();
@@ -163,10 +196,14 @@ export default class SettingsView {
         let lessonFormHTML = `
                 <form id="lessonForm">
                     <div class="lessonForm">
-                        <div class="alertRing"><input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;"></div>
-                        <div class="alertRing">${subjectSelectHTML}</div>
-                        <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
-                        <button class="discardNewLessonButton">&#x2718;</button>
+                        <div class="flex">
+                            <div class="alertRing"><input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;"></div>
+                            <div class="alertRing">${subjectSelectHTML}</div>
+                        </div>
+                        <div class="flex alignCenter halfGap">
+                            <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
+                            <button class="discardNewLessonButton">&#x2718;</button>
+                        </div>
                     </div>
                 </form>
             `;
@@ -355,7 +392,7 @@ export default class SettingsView {
                 'subject': timeslot.firstElementChild.dataset.subject,
                 'weekday': timeslot.closest('.settingsWeekday').dataset.weekday_number,
                 'timeslot': timeslot.dataset.timeslot,
-                'created':timeslot.firstElementChild.dataset.created
+                'created': timeslot.firstElementChild.dataset.created
             }
 
             lessons.push(lessonData);
@@ -383,7 +420,7 @@ export default class SettingsView {
         dialog.querySelector('#descriptionPara').innerText = descriptionText;
 
         affectedLessonChanges.forEach(entry => {
-            if (new Date(entry.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
+            if (new Date(entry.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) return;
             if (entry.canceled == 'true') return;
 
             let type = entry.type == 'sub' ? 'Vertretung' : 'Termin';
@@ -404,7 +441,7 @@ export default class SettingsView {
         })
 
         affectedTasks.forEach(entry => {
-            if (new Date(entry.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
+            if (new Date(entry.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) return;
 
             let date = Fn.formatDate(entry.date)
 

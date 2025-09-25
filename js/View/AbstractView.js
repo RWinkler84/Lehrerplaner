@@ -160,19 +160,6 @@ export default class AbstractView {
         }
     }
 
-    static openSettings() {
-        document.querySelector('#settingsContainer').style.display = 'block';
-        document.querySelector('main').style.filter = 'blur(3px)';
-        document.querySelector('nav').style.filter = 'blur(3px)';
-    }
-
-    static closeSettings() {
-        document.querySelector('#settingsContainer').style.display = 'none';
-        document.querySelector('main').style.removeProperty('filter');
-        document.querySelector('nav').style.removeProperty('filter');
-
-    }
-
     static setSyncIndicatorStatus(status) {
         let syncIndicator = document.querySelector('#syncIndicator');
         let tooltipText = syncIndicator.querySelector('span');
