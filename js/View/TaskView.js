@@ -266,12 +266,12 @@ export default class TaskView extends AbstractView {
         taskTr.innerHTML = `
             <tr data-taskid="${task.id}" data-date="${task.date}" data-timeslot="${task.timeslot}">
                 <td class="taskAdditionalInfo">${additionalInfo}</td>
-                <td class="taskClassName" data-class="${task.class}">${task.class}</td>
-                <td class="taskSubjectContainer" data-subject="${task.subject}">
+                <td class="taskClassName" data-class="${task.class}" data-heading="Klasse:">${task.class}</td>
+                <td class="taskSubjectContainer" data-subject="${task.subject}" data-heading="Fach:">
                     <div class="taskSubject">${task.subject}</div>
                     <div class="smallDate">${subjectDate}</div>
                 </td>
-                <td class="taskDescription" data-taskDescription="">${task.description}</td>
+                <td class="taskDescription" data-taskDescription="" data-heading="Beschreibung:">${task.description}</td>
                 <td class="taskDone">
                     <div class="openTask">
                         <button class="setTaskDoneButton">&#x2714;</button>
@@ -354,6 +354,8 @@ export default class TaskView extends AbstractView {
         let openActive = 'none';
         let editableActive = 'none';
         let inProgressActive = 'none';
+
+        buttonTR.classList.add('responsiveButtonsTr')
 
         switch (type) {
             case 'openTask':
