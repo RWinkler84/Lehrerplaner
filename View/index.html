@@ -26,7 +26,6 @@
                         Internet und melde dich an, um Datenverlust zu vermeiden.</span>
                 </div>
                 <div><button id="openMenuButton">&#x2630;</button></div>
-                <!-- <div><button id="logoutButton">&#x279C;</button></div> -->
                 <div id="topMenu" class="flex column justifyCenter ">
                     <button id="openSettingsButton" class="menuButton">Einstellungen</button>
                     <button id="openLoginButton" class="menuButton">Login</button>
@@ -39,7 +38,7 @@
 
     <main>
         <div id="timetableContainer">
-            <div class="flex gap spaceBetween" style="margin-bottom: 1rem;">
+            <div id="calendarWeekContainer" class="flex gap spaceBetween" style="margin-bottom: 1rem;">
                 <div id="calendarWeek" class="flex alignCenter">
                     <h2><span id="wochenplanText">Wochenplan</span> KW <span id="calendarWeekCounter"
                             data-split_first_week="false">-</span></h2>
@@ -243,27 +242,41 @@
                     <button id="openAccountSettingsButton">Konto</button>
                     <button id="closeSettingsButton">&#215;</button>
                 </div>
+                <div id="responsiveSettingsMenu">
+                <div><button id="openSettingsButton">&#x2630;</button></div>
+                <div id="settingsMenu" class="flex column justifyCenter ">
+                    <button id="openSettingsButton" class="menuButton">Einstellungen</button>
+                    <button id="openLoginButton" class="menuButton">Login</button>
+                    <button id="createAccountButton" class="menuButton">Registrieren</button>
+                    <button id="logoutButton" class="menuButton">Abmelden</button>
+                </div>
+                </div>
             </div>
 
             <div id="timetableSettingsContainer">
                 <div id="settingsSubjectsContainer" class="flex doubleGap">
+                    <div id="subjectsInfoTooltip" class="tooltip">?
+                        <span class="tooltipTextLeft">Hier kannst du die von dir unterrichteten Fächer anlegen
+                            und
+                            ihnen
+                            eine Farbe zuweisen. Gib einfach ein Fachkürzel deiner Wahl ein und wähle eine Farbe
+                            aus.</span>
+                    </div>
                     <!-- create subjects and select their colors -->
-                    <div id="createSubjectContainer">
-                        <div class="flex gap">
-                            <div class="flex gap column">
-                                <div>
-                                    <label for="subjectName">Fächer anlegen:</label>
-                                    <div class="alertRing"><input type="text" name="subjectName" id="subjectName"
-                                            placeholder="Fachkürzel"></div>
-                                </div>
-                                <div>
-                                    <label>Farbe wählen:</label>
-                                    <div id="colourSelection" class="flex halfGap"></div>
-                                </div>
+                    <div id="createSubjectContainer" class="flex gap">
+                        <div class="flex gap column">
+                            <div>
+                                <label for="subjectName">Fächer anlegen:</label>
+                                <div class="alertRing"><input type="text" name="subjectName" id="subjectName"
+                                        placeholder="Fachkürzel"></div>
                             </div>
-                            <div class="flex alignEnd">
-                                <div><button id="createSubjectButton">Anlegen</button></div>
+                            <div>
+                                <label>Farbe wählen:</label>
+                                <div id="colourSelection" class="flex halfGap"></div>
                             </div>
+                        </div>
+                        <div class="flex alignEnd justifyEnd">
+                            <div><button id="createSubjectButton">Anlegen</button></div>
                         </div>
                     </div>
 
@@ -271,42 +284,40 @@
                     <div id="existingSubjectsContainer" class="flex gap column">
                         <div class="flex spaceBetween">
                             <label>Fachübersicht:</label>
-                            <div id="subjectsInfoTooltip" class="tooltip">?
-                                <span class="tooltipTextLeft">Hier kannst du die von dir unterrichteten Fächer anlegen
-                                    und
-                                    ihnen
-                                    eine Farbe zuweisen. Gib einfach ein Fachkürzel deiner Wahl ein und wähle eine Farbe
-                                    aus.</span>
-                            </div>
                         </div>
                         <div id="subjectsListContainer" class="flex gap"></div>
                     </div>
                 </div>
 
                 <div id="settingsTimetableContainer">
-                    <div class="flex spaceBetween alignEnd marginBottom">
-                        <div class="flex alignEnd">
-                            <label>Stundenpläne anlegen:</label>
+                    <div id="timetableDatePickerContainer" class="flex spaceBetween alignEnd marginBottom gap">
+                        <div class="flex">
+                            <div><label>Stundenpläne anlegen:</label></div>
                             <div id="noSubjectsAlertTooltip" class="tooltip error">!
                                 <span class="tooltipTextRight">Es wurden keine Fächer gefunden! Bevor du einen
                                     Stundenplan anlegen kannst, musst du oben deine Fächer eintragen.</span>
                             </div>
                         </div>
-                        <div class="flex gap alignEnd" style="height: 1.5rem;">
+                        <div id="validFromPickerContainer" class="gap">
                             <label>gültig ab: </label>
-                            <button id="timetableBackwardButton">&#9664</button>
-                            <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span></div>
-                            <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
-                                <div class="alertRing"><input type="date" name="validFromPicker" id="validFromPicker">
+                            <div class="flex gap">
+                                <button id="timetableBackwardButton">&#9664</button>
+                                <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span>
                                 </div>
-                                <div id="validFromPickerAlertTooltip" class="tooltip error">!
-                                    <span class="tooltipTextLeft">Für dieses Datum existiert bereits ein Stundenplan. Um
-                                        diesen
-                                        zu ändern, wähle ihn aus und bearbeite ihn direkt.</span>
+                                <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
+                                    <div class="alertRing"><input type="date" name="validFromPicker"
+                                            id="validFromPicker">
+                                    </div>
+                                    <div id="validFromPickerAlertTooltip" class="tooltip error">!
+                                        <span class="tooltipTextLeft">Für dieses Datum existiert bereits ein
+                                            Stundenplan. Um
+                                            diesen
+                                            zu ändern, wähle ihn aus und bearbeite ihn direkt.</span>
+                                    </div>
                                 </div>
+                                <button id="timetableForwardButton">&#9654</button>
                             </div>
-                            <button id="timetableForwardButton">&#9654</button>
-                            <div id="subjectsInfoTooltip" class="tooltip">?
+                            <div id="timetableInfoTooltip" class="tooltip">?
                                 <span class="tooltipTextLeft">Hier kannst du deine festen Stundenpläne speichern und
                                     bearbeiten.
                                     Lege die Stunden im jeweilgen Zeitslot mit Klasse und Fach an. Wähle außerdem aus,
@@ -396,20 +407,22 @@
                             </div>
                         </div>
                     </div>
-                    <div id="createChangeTimetableButtonContainer" class="flex justifyEnd halfGap">
-                        <div><button id="editTimetableButton">Bearbeiten</button></div>
-                        <div><button id="createNewTimetableButton">Plan anlegen</button></div>
-                    </div>
-                    <div id="saveDiscardTimetableButtonContainer" class="flex justifyEnd">
-                        <div class="flex halfGap">
-                            <div><button id="saveNewTimetableButton">Speichern</button></div>
-                            <div><button id="discardNewTimetableButton">Abbrechen</button></div>
+                    <div class="marginTop">
+                        <div id="createChangeTimetableButtonContainer" class="flex justifyEnd halfGap">
+                            <div><button id="editTimetableButton">Bearbeiten</button></div>
+                            <div><button id="createNewTimetableButton">Plan anlegen</button></div>
                         </div>
-                    </div>
-                    <div id="saveDiscardTimetableChangesButtonContainer" class="flex justifyEnd">
-                        <div class="flex halfGap">
-                            <div><button id="saveTimetableUpdatesButton">Speichern</button></div>
-                            <div><button id="discardTimetableChangesButton">Abbrechen</button></div>
+                        <div id="saveDiscardTimetableButtonContainer" class="flex justifyEnd">
+                            <div class="flex halfGap">
+                                <div><button id="saveNewTimetableButton">Speichern</button></div>
+                                <div><button id="discardNewTimetableButton">Abbrechen</button></div>
+                            </div>
+                        </div>
+                        <div id="saveDiscardTimetableChangesButtonContainer" class="flex justifyEnd">
+                            <div class="flex halfGap">
+                                <div><button id="saveTimetableUpdatesButton">Speichern</button></div>
+                                <div><button id="discardTimetableChangesButton">Abbrechen</button></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -460,11 +473,12 @@
             <div id="loginErrorMessageDisplay" class="errorMessageDisplay alertRing">
                 Du bist aktuell nicht eingeloggt. Melde dich an, um Datenverlust zu vermeiden.
             </div>
-            <div class="flex wrap gap spaceBetween alignEnd marginTop">
-                <span><a href id="createAccount">Registrieren</a> oder <a href id="continueAsGuest">als Gast
-                        nutzen</a></span>
+            <div class="marginTop" style="text-align: center;"> <a href id="createAccount">Registrieren</a> oder <a href
+                    id="continueAsGuest">als Gast
+                    nutzen</a></div>
+            <div class="flex justifyEnd marginTop">
                 <button type="submit" id="loginButton" class="confirmationButton"
-                    style="margin-right: 3px; margin-left: 2rem;">Login</button>
+                    style="margin-right: 3px;">Login</button>
             </div>
         </form>
     </dialog>

@@ -63,7 +63,6 @@ export default class AbstractView {
 
             taskRow.style.backgroundColor = 'var(--lightergrey)';
             taskRow.nextElementSibling.style.backgroundColor = 'var(--lightergrey)';
-            taskRow.nextElementSibling.nextElementSibling.style.backgroundColor = 'var(--lightergrey)';
         });
 
         AbstractView.removeAddLessonButton();
@@ -82,8 +81,6 @@ export default class AbstractView {
 
             if (taskRow.nextElementSibling.hasAttribute('data-new')) return;
             taskRow.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
-            taskRow.nextElementSibling.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
-
         });
     }
     static greyOutPassedDays() {

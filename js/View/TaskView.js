@@ -45,14 +45,12 @@ export default class TaskView extends AbstractView {
 
         allOpenTasks.forEach(task => {
             allOpenTaskIds.push(task.id);
-            allOpenTaskIds.push(0)
-            allOpenTaskIds.push(0) //the two zeros represent the checkbox and the responsive Button trs
+            allOpenTaskIds.push(0) //the zero represent the checkbox tr
         });
 
         allInProgressTasks.forEach(task => {
             allInProgressTaskIds.push(task.id);
-            allInProgressTaskIds.push(0)
-            allInProgressTaskIds.push(0) //the two zeros represent the checkbox and the responsive Button trs
+            allOpenTaskIds.push(0) //the zero represent the checkbox tr
         });
 
         document.querySelectorAll('.taskList')
@@ -68,20 +66,17 @@ export default class TaskView extends AbstractView {
 
             let taskElement;
             let checkBoxElement;
-            let responsiveButtonElement;
 
             allRenderedTaskTrs.forEach((element, index) => {
                 if (element.dataset.taskid == taskId) {
                     taskElement = element;
                     checkBoxElement = allRenderedTaskTrs[index + 1];
-                    responsiveButtonElement = allRenderedTaskTrs[index + 2];
 
                     //task dates and timeslots and additional infos may change and need to be updated
                     allOpenTasks.forEach(task => {
                         if (task.id == taskId) {
                             this.updateTaskElement(taskElement, task);
                             this.updateCheckBoxElement(checkBoxElement, task);
-                            this.updateResponsiveButtonElement(responsiveButtonElement, task);
                         }
                     });
                 }
@@ -92,12 +87,10 @@ export default class TaskView extends AbstractView {
                 let task = allOpenTasks.find(task => task.id == taskId);
                 taskElement = this.getTaskTrHTML(task);
                 checkBoxElement = this.getCheckboxTR(task);
-                responsiveButtonElement = this.getResponsiveButtonTR('openTask');
             }
 
             openTaskTableBody.insertBefore(taskElement, openTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
             openTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
-            openTaskTableBody.insertBefore(responsiveButtonElement, taskElement.nextElementSibling.nextElementSibling);
         });
 
         //reappend previously unsaved task forms
@@ -113,20 +106,17 @@ export default class TaskView extends AbstractView {
 
             let taskElement;
             let checkBoxElement;
-            let responsiveButtonElement;
 
             allRenderedTaskTrs.forEach((element, index) => {
                 if (element.dataset.taskid == taskId) {
                     taskElement = element;
                     checkBoxElement = allRenderedTaskTrs[index + 1];
-                    responsiveButtonElement = allRenderedTaskTrs[index + 2];
 
                     //task dates my change and need to be updated while reordering
                     allInProgressTasks.forEach(task => {
                         if (task.id == taskId) {
                             this.updateTaskElement(taskElement, task);
                             this.updateCheckBoxElement(checkBoxElement, task);
-                            this.updateResponsiveButtonElement(responsiveButtonElement, task);
                         }
                     });
                 }
@@ -137,12 +127,10 @@ export default class TaskView extends AbstractView {
                 let task = allInProgressTasks.find(task => task.id == taskId);
                 taskElement = this.getTaskTrHTML(task);
                 checkBoxElement = this.getCheckboxTR(task);
-                responsiveButtonElement = this.getResponsiveButtonTR('inProgressTask');
             }
 
             inProgressTaskTableBody.insertBefore(taskElement, inProgressTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
             inProgressTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
-            inProgressTaskTableBody.insertBefore(responsiveButtonElement, taskElement.nextElementSibling.nextElementSibling);
         })
     }
 
@@ -192,19 +180,6 @@ export default class TaskView extends AbstractView {
         return checkBoxElement;
     }
 
-
-    static updateResponsiveButtonElement(buttonElement, task) {
-        if (buttonElement.querySelector('.editableTask').style.display == 'flex') return;
-        if (task.status == 'open') {
-            buttonElement.querySelector('.openTask').style.display = 'flex';
-            buttonElement.querySelector('.inProgressTask').style.display = 'none';
-        }
-        if (task.status == 'inProgress') {
-            buttonElement.querySelector('.openTask').style.display = 'none';
-            buttonElement.querySelector('.inProgressTask').style.display = 'flex';
-        }
-    }
-
     static async createTaskForm(event) {
         let lessonElement = event.target.closest('.lesson');
         let taskTable = document.querySelector('#upcomingTasksTable tbody');
@@ -219,12 +194,9 @@ export default class TaskView extends AbstractView {
 
         let formTr = this.getTaskTrHTML(task);;
         let checkBoxTR = this.getCheckboxTR();
-        let responsiveButtonTR = this.getResponsiveButtonTR('editableTask');
 
         checkBoxTR.setAttribute('data-new', '');
         checkBoxTR.removeAttribute('style');
-
-        responsiveButtonTR.setAttribute('data-new', '');
 
         formTr.setAttribute('data-new', '');
         formTr.setAttribute('data-taskId', task.id);
@@ -242,7 +214,6 @@ export default class TaskView extends AbstractView {
 
         taskTable.append(formTr);
         taskTable.append(checkBoxTR);
-        taskTable.append(responsiveButtonTR);
 
         if (taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
             taskTable.parentElement.querySelector('thead').removeAttribute('style');
@@ -289,9 +260,9 @@ export default class TaskView extends AbstractView {
             `;
 
         if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
-        
+
         let buttonTd = taskTr.querySelector('.taskDone');
-        
+
         if (task.status == 'open') {
             buttonTd.querySelector('.openTask').style.display = 'flex';
             buttonTd.querySelector('.inProgressTask').style.display = 'none';
@@ -348,48 +319,6 @@ export default class TaskView extends AbstractView {
         return checkboxTr;
     }
 
-    /**  @param type 'openTask', 'inProgressTask', 'editableTask' */
-    static getResponsiveButtonTR(type) {
-        let buttonTR = document.createElement('tr');
-        let openActive = 'none';
-        let editableActive = 'none';
-        let inProgressActive = 'none';
-
-        buttonTR.classList.add('responsiveButtonsTr')
-
-        switch (type) {
-            case 'openTask':
-                openActive = 'flex';
-                break;
-            case 'inProgressTask':
-                inProgressActive = 'flex';
-                break;
-            case 'editableTask':
-                editableActive = 'flex';
-                break;
-        }
-
-        let htmlContent = `
-            <td class="taskDone responsive" colspan="4">
-                <div class="openTask" style="display: ${openActive}">
-                    <button class="setTaskDoneButton">&#x2714;</button>
-                    <button class="setTaskInProgressButton">&#x279C;</button>
-                </div>
-                <div class="editableTask" style="display: ${editableActive}">
-                    <button class="saveTaskButton">&#x2714;</button>
-                    <button class="discardNewTaskButton">&#x2718;</button>
-                </div>
-                <div class="inProgressTask" style="display: ${inProgressActive}">
-                    <button class="setTaskDoneButton">&#x2714;</button>
-                </div>
-            </td>
-            `;
-
-        buttonTR.innerHTML = htmlContent;
-
-        return buttonTR;
-    }
-
     static getAdditionalInfoHTML(task) {
         let additionalInfoHTML = '';
 
@@ -432,10 +361,6 @@ export default class TaskView extends AbstractView {
             return;
         }
 
-        if (taskElement.firstElementChild.classList.contains('responsive')) {
-            taskElement = this.#getButtonWrapperSibling(taskElement.firstElementChild).closest('tr');
-        }
-
         let checkBoxElement = taskElement.nextElementSibling;
 
         let taskData = {
@@ -460,7 +385,6 @@ export default class TaskView extends AbstractView {
 
     static updateTask(event) {
         let taskTr = event.target.closest('tr');
-        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
 
         let classTd = taskTr.querySelector('td[data-class]');
         let subjectTd = taskTr.querySelector('td[data-subject]');
@@ -506,7 +430,6 @@ export default class TaskView extends AbstractView {
     static removeEditability(event) {
 
         let taskTr = event.target.closest('tr');
-        if (event.target.closest('td').classList.contains('responsive')) taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
 
         taskTr.querySelector('td[data-taskdescription]').removeAttribute('contenteditable');
         taskTr.nextElementSibling.style.display = "none";
@@ -516,32 +439,17 @@ export default class TaskView extends AbstractView {
         //removes 'new' dataset of the given task form, after it was saved
 
         let buttonWrapper = event.target.closest('td');
-        let buttonWrapperSibling = TaskView.#getButtonWrapperSibling(buttonWrapper);
-        let fixedDateTr = () => {
-            if (buttonWrapper.classList.contains('responsive')) {
-                return buttonWrapper.closest('tr').previousElementSibling;
-            } else {
-                return buttonWrapper.closest('tr').nextElementSibling;
-            }
-        };
+        let fixedDateTr = buttonWrapper.closest('tr').nextElementSibling;
+
 
         buttonWrapper.closest('tr').removeAttribute('data-new');
-        buttonWrapperSibling.closest('tr').removeAttribute('data-new');
-        fixedDateTr().removeAttribute('data-new');
-        fixedDateTr().style.display = 'none';
+        fixedDateTr.removeAttribute('data-new');
+        fixedDateTr.style.display = 'none';
     }
 
     static removeTaskForm(event) {
 
-        let buttonWrapper = event.target.closest('td');
-
-        if (buttonWrapper.classList.contains('responsive')) {
-            buttonWrapper = this.#getButtonWrapperSibling(buttonWrapper);
-        }
-
-        let taskTr = event.target.closest('td').classList.contains('responsive')
-            ? event.target.closest('tr').previousElementSibling.previousElementSibling
-            : event.target.closest('tr');
+        let taskTr = event.target.closest('tr');
 
         if (!taskTr.hasAttribute('data-new')) {
             this.revertChanges(event);
@@ -550,7 +458,6 @@ export default class TaskView extends AbstractView {
 
         let tableBody = event.target.closest('tbody');
 
-        taskTr.nextElementSibling.nextElementSibling.remove();
         taskTr.nextElementSibling.remove();
         taskTr.remove();
 
@@ -565,12 +472,6 @@ export default class TaskView extends AbstractView {
 
         let taskTr = event.target.closest('tr');
         let selectTr = event.target.closest('tr').nextElementSibling;
-
-        if (event.target.closest('td').classList.contains('responsive')) {
-            taskTr = event.target.closest('tr').previousElementSibling.previousElementSibling
-            selectTr = event.target.closest('tr').previousElementSibling;
-        }
-
         let taskId = taskTr.dataset.taskid;
         let task = await Controller.getTaskBackupData(taskId);
         let taskDate = Fn.formatDate(task.date);
@@ -594,11 +495,6 @@ export default class TaskView extends AbstractView {
 
     static setTaskInProgress(event) {
         let buttonWrapper = event.target.closest('td');
-
-        if (event.target.closest('td').classList.contains('responsive')) {
-            buttonWrapper = this.#getButtonWrapperSibling(buttonWrapper).closest('tr');
-        }
-
         let taskId = buttonWrapper.closest('tr').dataset.taskid;
 
         Controller.setTaskInProgress(taskId, event);
@@ -607,11 +503,6 @@ export default class TaskView extends AbstractView {
 
     static setTaskDone(event) {
         let buttonWrapper = event.target.closest('td');
-
-        if (event.target.closest('td').classList.contains('responsive')) {
-            buttonWrapper = this.#getButtonWrapperSibling(buttonWrapper).closest('tr');
-        }
-
         let taskId = buttonWrapper.closest('tr').dataset.taskid;
 
         Controller.setTaskDone(taskId, event);
@@ -619,7 +510,6 @@ export default class TaskView extends AbstractView {
 
     static removeTask(event) {
         let taskTr = event.target.closest('tr');
-        taskTr.nextElementSibling.nextElementSibling.remove() //responsive Buttons tr
         taskTr.nextElementSibling.remove() //checkbox tr
         taskTr.remove();
     }
@@ -633,19 +523,10 @@ export default class TaskView extends AbstractView {
     }
 
 
-    // every Task has two sets of buttons for responsiveness, so both need to be changed
     static showSaveOrDiscardChangesButtons(event) {
         let buttonWrapper = event.target.closest('tr').querySelector('.taskDone');
-        let buttonWrapperSibling = TaskView.#getButtonWrapperSibling(buttonWrapper);
 
         buttonWrapper.querySelectorAll('div').forEach(div => {
-            if (div.classList.contains('editableTask')) {
-                div.style.display = 'flex';
-            } else {
-                div.style.display = 'none';
-            }
-        });
-        buttonWrapperSibling.querySelectorAll('div').forEach(div => {
             if (div.classList.contains('editableTask')) {
                 div.style.display = 'flex';
             } else {
@@ -656,18 +537,9 @@ export default class TaskView extends AbstractView {
 
     static showSetDoneOrInProgressButtons(event) {
         let buttonWrapper = event.target.closest('tr').lastElementChild;
-        let buttonWrapperSibling = TaskView.#getButtonWrapperSibling(buttonWrapper);
 
         if (event.target.closest('table').id == 'upcomingTasksTable') {
             buttonWrapper.querySelectorAll('div').forEach(div => {
-                if (div.classList.contains('openTask')) {
-                    div.style.display = 'flex';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-
-            buttonWrapperSibling.querySelectorAll('div').forEach(div => {
                 if (div.classList.contains('openTask')) {
                     div.style.display = 'flex';
                 } else {
@@ -684,38 +556,13 @@ export default class TaskView extends AbstractView {
                     div.style.display = 'none';
                 }
             });
-
-            buttonWrapperSibling.querySelectorAll('div').forEach(div => {
-                if (div.classList.contains('inProgressTask')) {
-                    div.style.display = 'flex';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-        }
-    }
-
-    static #getButtonWrapperSibling(buttonWrapper) {
-
-        if (buttonWrapper.classList.contains('responsive')) {
-            return buttonWrapper.closest('tr').previousElementSibling.previousElementSibling.querySelector('.taskDone');
-        } else {
-            return buttonWrapper.closest('tr').nextElementSibling.nextElementSibling.querySelector('.taskDone');
         }
     }
 
     //validation errors
     static alertReoccuringIntervalSelect(event) {
-        let selectTr;
-        let alertRing;
-
-        if (event.target.closest('td').classList.contains('responsive')) {
-            selectTr = event.target.closest('tr').previousElementSibling;
-        } else {
-            selectTr = event.target.closest('tr').nextElementSibling;
-        }
-
-        alertRing = selectTr.querySelector('select').parentElement;
+        let selectTr = event.target.closest('tr').nextElementSibling;;
+        let alertRing = selectTr.querySelector('select').parentElement;
 
         alertRing.classList.add('validationError');
         setTimeout(() => {

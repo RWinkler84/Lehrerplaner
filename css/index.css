@@ -61,7 +61,7 @@ nav {
     background-color: var(--topMenuBackgound);
     color: var(--lighterText);
     padding: 0.5rem 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     flex: 1 0 100%;
 }
 
@@ -78,7 +78,6 @@ nav {
     margin-left: 0.5rem;
     display: flex;
     justify-content: center;
-    /* align-items: center; */
 }
 
 #syncIndicator.synced {
@@ -128,11 +127,11 @@ main {
     position: absolute;
     z-index: 2;
     background-color: var(--bodyBackground);
-    padding: 0.5rem;
-    top: 2rem;
+    top: 1rem;
     left: 2rem;
     right: 2rem;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    border: solid 0.5rem var(--bodyBackground);
 }
 
 #settingsTimetableContainer {
@@ -547,6 +546,14 @@ tr[data-new]:has(td[data-taskDescription]) td {
     flex-wrap: wrap;
 }
 
+#validFromPickerContainer {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    height: 1.5rem;
+    margin-right: 2rem;
+}
+
 .colorSelectionBox {
     box-sizing: content-box;
     width: 1.5rem;
@@ -886,8 +893,11 @@ h3 {
     background-color: var(--matteRed);
 }
 
-#subjectsInfoTooltip {
-    margin-right: 0.5rem;
+#subjectsInfoTooltip,
+#timetableInfoTooltip {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
 }
 
 #validFromPickerAlertTooltip {
@@ -916,6 +926,10 @@ h3 {
 
 .spaceBetween {
     justify-content: space-between;
+}
+
+.justifyStart {
+    justify-content: start;
 }
 
 .justifyCenter {
@@ -1107,29 +1121,39 @@ h3 {
     }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 850px) {
+    #settingsContainer {
+        left: 0;
+        right: 0;
 
-    body {
-        /* font-size: 14px; */
+    }
+}
+
+@media screen and (max-width: 620px) {
+
+    #topMenuContainer {
+        padding: 0.5rem 0.5rem;
     }
 
-    html {
-        /* min-width: 500px; */
-    }
-
-    #topMenuContainer,
     #timetableContainer,
-    #taskContainer {
-        padding: 1rem 0.5rem;
-
+    #taskContainer,
+    #settingsSubjectsContainer,
+    #settingsTimetableContainer {
+        padding: 1.5rem 0.5rem;
     }
 
-    #wochenplanText {
-        display: none;
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    #calendarWeekContainer {
+        flex-direction: column;
+        justify-content: end;
     }
 
     #weekSwitcher {
         min-width: 220px;
+        justify-content: space-between;
     }
 
     .timeslot,
@@ -1155,9 +1179,17 @@ h3 {
         margin: 0;
     }
 
-
-    /* make the table wrap */
+    /* make the task tables wrap */
     table {
+        display: block;
+        width: 100%;
+    }
+
+    table>* {
+        display: block;
+    }
+
+    tbody {
         display: block;
     }
 
@@ -1167,6 +1199,7 @@ h3 {
 
     tr {
         position: relative;
+        display: block;
     }
 
     td {
@@ -1177,12 +1210,12 @@ h3 {
         padding: 0.5rem 1rem !important;
     }
 
-    #upcomingTasksTable td, #inProgressTasksTable td {
+    #upcomingTasksTable td,
+    #inProgressTasksTable td {
         border: none;
     }
 
     .taskDescription {
-        display: block;
         min-width: 100%;
         max-width: 100%;
         padding-bottom: 1rem;
@@ -1199,13 +1232,12 @@ h3 {
         color: var(--lightgrey);
     }
 
-    .taskAdditionalInfo.overdue ~ td:not(:last-child) {
+    .taskAdditionalInfo.overdue~td:not(:last-child) {
         border-left: solid 3px var(--matteRed) !important;
         padding-left: 1rem !important;
     }
 
     .taskDone {
-        display: block;
         position: absolute;
         border-left: none !important;
         border-right: none !important;
@@ -1217,11 +1249,40 @@ h3 {
         display: none;
     }
 
+    /* responsive settings */
+    #settingsSubjectsContainer {
+        flex-direction: column-reverse;
+    }
+
+    #createSubjectContainer {
+        justify-content: space-between;
+    }
+
+    #timetableDatePickerContainer {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    #subjectsInfoTooltip,
+    #timetableInfoTooltip {
+        position: absolute;
+        top: 1rem;
+        right: 0.5rem;
+    }
+
+    #validFromPickerContainer {
+        width: 100%;
+    }
+
     /* generic classes */
     .wrap {
         justify-content: end;
     }
 }
 
+/* @media screen and (max-width: 500px) {
 
-
+    #createSubjectContainer {
+        flex-direction: column;
+    }
+} */
