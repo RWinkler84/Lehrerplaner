@@ -150,15 +150,19 @@ export default class LessonView {
         let subjectSelectHTML = await AbstractView.getSubjectSelectHTML()
 
         let lessonFormHTML = `
-            <form id="lessonForm">
-                <div class="lessonForm">
-                    <div class="alertRing"><input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;"></div>
-                    <div class="alertRing">${subjectSelectHTML}</div>
-                    <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
-                    <button class="discardNewLessonButton">&#x2718;</button>
-                </div>
-            </form>
-        `;
+                <form id="lessonForm">
+                    <div class="lessonForm">
+                        <div class="flex">
+                            <div class="alertRing"><input type="text" name="class" id="class" placeholder="Klasse" style="width: 4rem;"></div>
+                            <div class="alertRing">${subjectSelectHTML}</div>
+                        </div>
+                        <div class="flex alignCenter halfGap">
+                            <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
+                            <button class="discardNewLessonButton">&#x2718;</button>
+                        </div>
+                    </div>
+                </form>
+            `;
 
         timeslotElement.innerHTML = lessonFormHTML;
         let lessonForm = timeslotElement.querySelector('.lessonForm');

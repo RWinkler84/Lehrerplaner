@@ -26,6 +26,7 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
+    AbstractController.setVersion('0.9.1');
     await abstCtrl.syncData();
 
     document.addEventListener('visibilitychange', abstCtrl.syncData.bind(abstCtrl))
@@ -72,7 +73,6 @@ async function startApp() {
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
 
     AbstractController.renderTopMenu();
-    AbstractController.setVersion('0.9.0');
 
     setDateForWeekdays();
     setCalendarWeek();
