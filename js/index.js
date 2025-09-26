@@ -11,6 +11,7 @@ import Fn from './inc/utils.js';
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
+export const TODAY = '2025-06-24';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];

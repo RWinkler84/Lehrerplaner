@@ -1,3 +1,4 @@
+import { TODAY } from '../index.js';
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -98,7 +99,7 @@ export default class AbstractView {
     }
 
     static toogleIsCurrentWeekDot() {
-        let today = new Date();
+        let today = new Date(TODAY);
         let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"').dataset.date;
         let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"').dataset.date;
 

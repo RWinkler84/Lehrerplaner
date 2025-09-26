@@ -1,4 +1,4 @@
-import { ONEDAY } from "../index.js";
+import { ONEDAY,TODAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import LessonController from "./LessonController.js";
@@ -59,7 +59,7 @@ export default class SettingsController {
         await model.saveNewTimetable(lessons);
 
         // check, whether lesson Changes exist after the validFrom date of the new timetable
-        let validUntil = lessons[0].validUntil ? lessons[0].validUntil : (new Date().setHours(12) + ONEDAY * 365);
+        let validUntil = lessons[0].validUntil ? lessons[0].validUntil : (new Date(TODAY).setHours(12) + ONEDAY * 365);
 
         let affectedLessonChanges = await LessonController.getTimetableChanges(validFrom, validUntil);
         let affectedTasks = await TaskController.getAllTasksInTimespan(validFrom, validUntil);

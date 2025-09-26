@@ -1,3 +1,4 @@
+import { TODAY } from '../index.js';
 import AbstractView from './AbstractView.js';
 import Controller from '../Controller/TaskController.js';
 import Fn from '../inc/utils.js';
@@ -146,7 +147,7 @@ export default class TaskView extends AbstractView {
 
         taskElement.querySelector('.taskAdditionalInfo').innerHTML = this.getAdditionalInfoHTML(task);
 
-        if (new Date(task.date) < new Date()) {
+        if (new Date(task.date) < new Date(TODAY)) {
             taskElement.querySelector('.taskAdditionalInfo').classList.add('overdue');
         } else {
             taskElement.querySelector('.taskAdditionalInfo').classList.remove('overdue');
@@ -259,7 +260,7 @@ export default class TaskView extends AbstractView {
             </tr>
             `;
 
-        if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
+        if (new Date(task.date) < new Date(TODAY)) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
 
         let buttonTd = taskTr.querySelector('.taskDone');
 

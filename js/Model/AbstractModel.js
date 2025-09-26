@@ -1,4 +1,4 @@
-import { ONEDAY } from "../index.js";
+import { ONEDAY, TODAY } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -290,7 +290,7 @@ export default class AbstractModel {
 
     static async calculateAllLessonDates(className, subject, endDate, timetable, lessonChanges) {
 
-        let dateIterator = new Date().setHours(12, 0, 0, 0);
+        let dateIterator = new Date('2025-06-24').setHours(12, 0, 0, 0);
         let validTimetableDates = await AbstractModel.getCurrentlyAndFutureValidTimetableDates();
         let teachingWeekdays = [];
         let allLessonDates = [];
@@ -332,7 +332,7 @@ export default class AbstractModel {
         }
 
         //merging with the timetable changes
-        let today = new Date().setHours(12, 0, 0, 0);
+        let today = new Date('2025-06-24').setHours(12, 0, 0, 0);
 
         lessonChanges.forEach(entry => {
             if (entry.class != className) return;
@@ -464,7 +464,7 @@ export default class AbstractModel {
     static async getCurrentlyAndFutureValidTimetableDates() {
         let allValidDates = await AbstractModel.getAllValidDates();
         let validDates = [];
-        let today = new Date().setHours(12, 0, 0, 0);
+        let today = new Date(TODAY).setHours(12, 0, 0, 0);
 
         let i = allValidDates.length;
 

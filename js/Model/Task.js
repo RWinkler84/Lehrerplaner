@@ -265,7 +265,7 @@ export default class Task extends AbstractModel {
 
         allTasksArray.forEach(task => {
 
-            if (task.date.setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) return;
+            if (task.date.setHours(12, 0, 0, 0) < new Date('2025-06-24').setHours(12, 0, 0, 0)) return;
             if (task.fixedTime == true) return;
 
             affectedTasks.push(task);
