@@ -26,6 +26,7 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
+    LoginController.createGuestAccount();
     AbstractController.setVersion('0.9.1');
     await abstCtrl.syncData();
 
@@ -97,8 +98,8 @@ async function startApp() {
     function setCalendarWeek() {
         let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
         let weekCounter = 1;
-        let currentYear = new Date().getFullYear();
-        let referenceDate = new Date().setHours(12, 0, 0, 0);
+        let currentYear = 2025;
+        let referenceDate = new Date('2025-06-24').setHours(12, 0, 0, 0);
         let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
         let monday = firstThursday - ONEDAY * 3
         let sunday = firstThursday + ONEDAY * 3;
@@ -115,7 +116,7 @@ async function startApp() {
     }
 
     function setDateForWeekdays() {
-        let todayUnix = new Date().setHours(12, 0, 0, 0);
+        let todayUnix = new Date('2025-06-24').setHours(12, 0, 0, 0);
 
         //go back to monday of given week
         while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;

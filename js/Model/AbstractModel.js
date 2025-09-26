@@ -106,7 +106,7 @@ export default class AbstractModel {
         if (dataToStore.length > 1) {
             dataToStore.forEach((entry) => {
                 entry.id = Number(entry.id);
-                let transaction = db.transaction(store, 'readwrite').objectStore(store).add();
+                let transaction = db.transaction(store, 'readwrite').objectStore(store).add(entry);
                 transaction.onsuccess = () => {
                     this.markLocalDBUpdated()
                 }

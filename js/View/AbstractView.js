@@ -86,7 +86,7 @@ export default class AbstractView {
     static greyOutPassedDays() {
         document.querySelectorAll('.weekday').forEach(weekday => {
             weekday.classList.remove('passed');
-            if (new Date(weekday.dataset.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) weekday.classList.add('passed');
+            if (new Date(weekday.dataset.date).setHours(12, 0, 0, 0) < new Date('2025-06-24').setHours(12, 0, 0, 0)) weekday.classList.add('passed');
         })
     }
 
@@ -120,24 +120,6 @@ export default class AbstractView {
         loginButton.style.display = 'none';
         logoutButton.style.display = 'none';
         createAccountButton.style.display = 'none';
-
-        if ((userInfo.accountType == 'registeredUser' && !userInfo.loggedIn) || userInfo.accountType == 'guestUser') {
-            createAccountButton.removeAttribute('style');
-            loginButton.removeAttribute('style');
-            return;
-        }
-
-        if (userInfo.accountType == 'registeredUser' && userInfo.loggedIn) {
-            logoutButton.removeAttribute('style');
-            return; 
-        }
-
-        if (userInfo.accountType == 'not set') {
-            openSettingsButton.style.display = 'none';
-            createAccountButton.removeAttribute('style');
-            loginButton.removeAttribute('style');
-            return;
-        }
     }
 
     static toggleTopMenu(event) {
