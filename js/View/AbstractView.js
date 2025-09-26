@@ -119,7 +119,7 @@ export default class AbstractView {
 
         openSettingsButton.removeAttribute('style');
         loginButton.style.display = 'none';
-        logoutButton.style.display = 'none';
+        logoutButton.removeAttribute('style');
         createAccountButton.style.display = 'none';
     }
 

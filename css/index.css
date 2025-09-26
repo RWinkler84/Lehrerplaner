@@ -1343,3 +1343,201 @@ h3 {
         flex-direction: column;
     }
 } */
+
+/* demo tour */
+html {
+    scroll-behavior: smooth;
+}
+.introWindow {
+    display: none;
+    position: absolute;
+    z-index: 3;
+    width: 500px;
+    min-height: 200px;
+    background-color: var(--contentContainerBackground);
+    border: solid 1px var(--bodyBackground);
+    padding: 1rem 2rem;
+}
+
+.introWindow p>button.confirmationButton,
+.introWindow p>button.cancelButton {
+    padding: 0 1rem;
+}
+
+#window6,
+#window7,
+#window8 {
+    transform: translate(-50%);
+}
+
+#window1,
+#window4,
+#window5,
+#window9,
+#window10,
+#window12,
+#window13,
+#window14 {
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.introWindow .buttons {
+    flex-grow: 1;
+    margin-top: 2rem;
+}
+
+.introTextItem {
+    background-color: var(--lightergrey);
+    border-radius: 3px;
+    padding: 0 0.5rem;
+}
+
+p {
+    margin: 0.5rem;
+}
+
+.highlighted {
+    border: solid 3px transparent;
+    animation-name: blinking;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes blinking {
+    0% {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: var(--matteRed);
+    }
+
+    100% {
+        border-color: transparent
+    }
+}
+
+/* responsiveness */
+
+.responsive {
+    display: none;
+}
+
+@media screen and (max-width: 1350px) {
+    .lessonOption.lessonPastMessage {
+        display: none;
+    }
+
+    .lessonOption.lessonPastMessage.responsive {
+        display: block;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+
+    .lessonHasTaskIndicator {
+        margin-right: 0.25rem;
+    }
+
+    .spacerBlock {
+        display: none;
+    }
+
+    .lessonOptionsWrapper {
+        padding: 1rem 0.5rem;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+
+    #taskContainer {
+        flex-direction: column;
+    }
+
+    #upcomingTasksContainer,
+    #inProgressTasksContainer {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+    body {
+        font-size: 14px;
+    }
+
+    /* html {
+        min-width: 500px;
+    } */
+
+    #topMenuContainer,
+    #timetableContainer,
+    #taskContainer {
+        padding: 1rem 0.5rem;
+
+    }
+
+    #wochenplanText {
+        display: none;
+    }
+
+    .timeslot,
+    .settingsTimeslot,
+    .timeslotLabel {
+        min-width: 0;
+        display: flex;
+        border-top: solid 1px var(--lightgrey);
+        height: 2.4rem;
+        padding: 0.2rem;
+
+    }
+    .lesson {
+        padding: 0.35rem;
+    }
+
+    .lessonContentContainer {
+        height: 1rem;
+    }
+
+    .taskDone {
+        display: none;
+    }
+
+    .taskDone.responsive {
+        display: table-cell;
+    }
+
+    .taskDone.responsive button {
+        width: 49%;
+        margin: 0;
+    }
+
+    .introWindow {
+        width: 100%;
+    }
+    
+    .introWindow .buttons {
+    flex-grow: 1;
+    margin-top: 2rem;
+    flex-direction: column;
+}
+
+    #window1,
+    #window4,
+    #window5,
+    #window6,
+    #window7,
+    #window8,
+    #window9,
+    #window10,
+    #window12,
+    #window13,
+    #window14 {
+        position: fixed;
+        transform: translate(0,0);
+        bottom: 0px;
+        left: 0px;
+    }
+}

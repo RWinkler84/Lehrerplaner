@@ -31,9 +31,15 @@ async function startApp() {
     AbstractController.setVersion('0.9.1');
     await abstCtrl.syncData();
 
+    //live demo stuff
     window.addEventListener("beforeunload", async () => {
-        await window.indexedDB.deleteDatabase('eduplanio');
+        window.indexedDB.deleteDatabase('eduplanio');
     });
+
+    document.addEventListener('click', runTour);
+    document.querySelector('#logoutButton').addEventListener('click', async () => { 
+        window.indexedDB.deleteDatabase('eduplanio');
+        window.location = '../' });
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
@@ -268,6 +274,377 @@ async function startApp() {
             document.querySelector('#weekOverviewContainer').style.left = 'auto';
         }
     }
+
+    function runTour(event) {
+        if (event.preventDefault && document.querySelector('#window6').style.display == 'block') event.preventDefault();
+
+        const window1 = document.querySelector('#window1');
+        const window2 = document.querySelector('#window2');
+        const window3 = document.querySelector('#window3');
+        const window4 = document.querySelector('#window4');
+        const window5 = document.querySelector('#window5');
+        const window6 = document.querySelector('#window6');
+        const window7 = document.querySelector('#window7');
+        const window8 = document.querySelector('#window8');
+        const window9 = document.querySelector('#window9');
+        const window10 = document.querySelector('#window10');
+        const window11 = document.querySelector('#window11');
+        const window12 = document.querySelector('#window12');
+        const window13 = document.querySelector('#window13');
+        const window14 = document.querySelector('#window14');
+
+        let translateLeft;
+
+        if (event.target.classList && event.target.classList.contains('cancelTour')) {
+            event.target.closest('.introWindow').style.display = 'none';
+        }
+
+        switch (event.target.id) {
+
+            case 'window1Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+
+                window2.style.display = 'block';
+                window2.style.top = getElementProperty(document.querySelector('#topMenuContainer'), 'bottom') + window.scrollY + 'px';
+                window2.style.left = getElementProperty(document.querySelector('#topMenuButtonContainer'), 'right') - getElementProperty(window2, 'width') + 'px';
+
+                checkPosition(window2);
+                window.scroll(0, 0);
+
+                document.querySelector('#topMenuButtonContainer').classList.add('highlighted');
+                break;
+
+            case 'window2Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#topMenuButtonContainer').classList.remove('highlighted');
+
+                window3.style.display = 'block';
+                window3.style.top = getElementProperty(document.querySelector('#weekSwitcher'), 'bottom') + window.scrollY + 'px';
+                window3.style.left = getElementProperty(document.querySelector('#topMenuButtonContainer'), 'right') - getElementProperty(window3, 'width') + 'px';
+
+                checkPosition(window3);
+
+                document.querySelector('#weekSwitcher').classList.add('highlighted');
+                break;
+
+            case 'window3Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#weekSwitcher').classList.remove('highlighted');
+
+                window4.style.display = 'block';
+                window4.style.top = getElementProperty(document.querySelector('#weekOverviewContainer'), 'bottom') - 50 + window.scrollY + 'px';
+
+                checkPosition(window4);
+                scrollToPosition(event.target.id);
+
+                document.querySelector('#weekOverviewContainer').classList.add('highlighted');
+                break;
+
+            case 'window4Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+
+                window5.style.display = 'block';
+                window5.style.top = getElementProperty(document.querySelector('#weekOverviewContainer'), 'bottom') - 50 + window.scrollY + 'px';
+
+                checkPosition(window5);
+
+                break;
+
+            case 'window5Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.addEventListener('formOpened',() => runTour({ target: { id: 'lessonFormOpened' } }));
+                break;
+
+            case 'lessonFormOpened':
+                translateLeft = getElementProperty(document.querySelector('.lessonForm'), 'left') + getElementProperty(document.querySelector('.lessonForm'), 'width') / 2;
+
+                document.querySelector('#weekOverviewContainer').classList.remove('highlighted');
+                document.removeEventListener('click', () => runTour({ target: { id: 'lessonFormOpened' } }));
+
+                window6.style.display = 'block';
+                window6.style.top = getElementProperty(document.querySelector('.lessonForm'), 'bottom') + window.scrollY + 10 + 'px';
+                window6.style.left = translateLeft + 'px';
+
+                checkPosition(window6);
+                scrollToPosition('lessonFormOpened');
+
+                document.querySelector('.lessonForm').classList.add('highlighted');
+                document.querySelector('#lessonForm').removeEventListener('submit', LessonView.saveNewLesson);
+                document.querySelector('.discardNewLessonButton').removeEventListener('click', LessonView.removeLessonForm);
+
+                break;
+
+            case 'window6Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+
+                translateLeft = getElementProperty(document.querySelector('.lessonForm'), 'left') + getElementProperty(document.querySelector('.lessonForm'), 'width') / 2;
+
+                window7.style.display = 'block';
+                window7.style.top = getElementProperty(document.querySelector('.lessonForm'), 'bottom') + window.scrollY + 10 + 'px';
+                window7.style.left = translateLeft + 'px';
+
+                checkPosition(window7);
+
+                document.querySelector('.lessonForm').classList.add('highlighted');
+                document.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
+                document.querySelector('.discardNewLessonButton').addEventListener('click', LessonView.removeLessonForm);
+                break;
+
+            case 'window7Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                if (document.querySelector('.lessonForm')) document.querySelector('.lessonForm').classList.remove('highlighted');
+
+                translateLeft = getElementProperty(document.querySelector('#markedSlot>.lesson'), 'left') + getElementProperty(document.querySelector('#markedSlot>.lesson'), 'width') / 2;
+
+                window8.style.display = 'block';
+                window8.style.top = getElementProperty(document.querySelector('#markedSlot>.lesson'), 'bottom') + window.scrollY + 10 + 'px';
+                window8.style.left = translateLeft + 'px';
+
+                checkPosition(window8);
+                scrollToPosition(event.target.id);
+
+                document.querySelectorAll('.lessonForm').forEach(lessonForm => lessonForm.remove());
+                document.querySelector('#markedSlot>.lesson').classList.add('highlighted');
+                break;
+
+            case 'window8Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('#markedSlot>.lesson').classList.remove('highlighted');
+
+                window9.style.display = 'block';
+                window9.style.top = getElementProperty(document.querySelector('#taskContainer'), 'bottom') + window.scrollY + 3 + 'px';
+
+                checkPosition(window9);
+                scrollToPosition(event.target.id);
+
+                document.querySelector('#taskContainer').classList.add('highlighted');
+                break;
+
+            case 'window9Confirm':
+                event.target.closest('.introWindow').style.visibility = 'hidden';
+                document.querySelector('#taskContainer').classList.remove('highlighted');
+
+                document.querySelectorAll('tr[data-taskid="3"]>td').forEach(td => {
+                    td.classList.add('highlighted');
+
+                    if (td.classList.contains('taskSubjectContainer')) {
+                        td.style.borderLeft = 'none';
+                        td.style.borderRight = 'none';
+                    }
+
+                    if (td.classList.contains('taskDescription')) {
+                        td.style.borderLeft = 'none';
+                        td.style.borderRight = 'none';
+                    }
+
+                    if (td.classList.contains('taskDone')) {
+                        td.style.borderLeft = 'none';
+                        td.style.borderRight = 'solid 3px';
+                        td.style.height = '55px';
+                    }
+                });
+
+                document.querySelectorAll('tr[data-taskid="3"]>td.taskDone button').forEach(button => button.style.height = '1.25rem')
+
+                window10.style.display = 'block';
+                window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="3"]'), 'bottom') + window.scrollY + 3 + 'px';
+
+                checkPosition(window10);
+                scrollToPosition(event.target.id);
+                break;
+
+            case 'window10Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelectorAll('.highlighted').forEach(td => {
+                    td.classList.remove('highlighted');
+                    td.removeAttribute('style');
+                })
+
+                document.querySelector('#taskContainer').addEventListener('dblclick', continueTourAfterMakingTaskEditable);
+                break;
+
+            case 'taskEdited':
+                document.querySelector('#taskContainer').removeEventListener('dblclick', continueTourAfterMakingTaskEditable);
+
+                window11.style.display = 'block';
+                translateLeft = getElementProperty(document.querySelector('.discardNewTaskButton'), 'right') - getElementProperty(window11, 'width');
+                window11.style.top = getElementProperty(document.querySelector('.discardNewTaskButton'), 'bottom') + window.scrollY + 15 + 'px';
+                window11.style.left = translateLeft + 'px';
+
+                checkPosition(window11);
+                scrollToPosition(event.target.id);
+
+                document.querySelector('td[contenteditable]').nextElementSibling.classList.add('highlighted');
+                document.querySelector('td[contenteditable]').nextElementSibling.style.borderRight = 'solid 3px';
+                break;
+
+            case 'window11Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('td[contenteditable]').nextElementSibling.classList.remove('highlighted');
+                document.querySelector('td[contenteditable]').nextElementSibling.style.borderRight = 'none';
+
+                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.classList.add('highlighted');
+                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.style.borderRight = 'solid 3px';
+
+                window12.style.display = 'block';
+                window12.style.top = getElementProperty(document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild, 'bottom') + window.scrollY + 10 + 'px';
+
+                checkPosition(window12);
+
+                break;
+
+            case 'window12Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+
+                window13.style.display = 'block';
+                window13.style.top = getElementProperty(document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild, 'bottom') + window.scrollY + 10 + 'px';
+
+                checkPosition(window13);
+                scrollToPosition(event.target.id);
+
+                break;
+
+            case 'window13Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.classList.remove('highlighted');
+                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.style.borderRight = 'none';
+
+                window14.style.display = 'block';
+                window14.style.top = getElementProperty(document.querySelector('tr[data-taskid="6"]'), 'bottom') + window.scrollY + 10 + 'px';
+                checkPosition(window14);
+                scrollToPosition(event.target.id);
+
+                break;
+
+            case 'window14Confirm':
+                event.target.closest('.introWindow').style.display = 'none';
+                window9.style.display = 'none';
+                scrollToPosition(event.target.id);
+        }
+    }
+
+    function continueTourAfterMakingTaskEditable(event) {
+        if (event.target.closest('tr')) {
+            runTour({ target: { id: 'taskEdited' } });
+        }
+    }
+
+    function getElementProperty(element, prop) {
+        let rect = element.getBoundingClientRect()
+        return rect[prop];
+    }
+
+    function checkPosition(windowElem) {
+        if (window.outerWidth <= 600) {
+            windowElem.style.position = 'fixed';
+            windowElem.style.top = '';
+
+            windowElem.style.left = '0px';
+            windowElem.style.bottom = '0px';
+            return;
+        }
+
+        let rect = windowElem.getBoundingClientRect();
+
+        if (rect.right > window.outerWidth) {
+            windowElem.style.left = '';
+            windowElem.style.right = '16px';
+            windowElem.style.transform = 'translate(0px)';
+        }
+
+        if (rect.left <= 0) {
+            windowElem.style.left = '16px';
+            windowElem.style.transform = 'translate(0px)';
+        }
+
+    }
+
+    function scrollToPosition(buttonClicked) {
+
+        const window6 = document.querySelector('#window6');
+        const window8 = document.querySelector('#window8');
+        const window9 = document.querySelector('#window9');
+        const window10 = document.querySelector('#window10');
+        const window11 = document.querySelector('#window11');
+        const window13 = document.querySelector('#window13');
+        const window14 = document.querySelector('#window14');
+
+        if (window.outerWidth <= 600) {
+            switch (buttonClicked) {
+                case 'window3Confirm':
+                    window.scroll(0, getElementProperty(document.querySelector('#timetableContainer'), 'top'));
+                    break;
+
+                case 'lessonFormOpened':
+                    document.querySelector('#lessonForm').scrollIntoView({ block: 'start' });
+                    break;
+
+                case 'window7Confirm':
+                    document.querySelector('#markedSlot>.lesson').scrollIntoView();
+                    break;
+
+                case 'window8Confirm':
+                    document.querySelector('#taskContainer').scrollIntoView();
+                    break;
+
+                case 'window9Confirm':
+                    document.querySelector('tr[data-taskid="3"]').scrollIntoView({ block: 'start' });
+                    break;
+
+                case 'taskEdited':
+                    window.requestAnimationFrame();
+                    document.querySelector('.discardUpdateTaskButton').scrollIntoView({ block: 'start' });
+                    break;
+
+                case 'window14Confirm':
+                    window.scroll(0, 0);
+                    break;
+            }
+
+            return;
+        }
+
+        switch (buttonClicked) {
+            case 'window3Confirm':
+                window.scroll(0, getElementProperty(document.querySelector('#timetableContainer'), 'top') + 100);
+                break;
+
+            case 'lessonFormOpened':
+                window.scroll(0, getElementProperty(window6, 'top'));
+                break;
+
+            case 'window7Confirm':
+                window.scroll(0, getElementProperty(window8, 'top') + getElementProperty(window8, 'height') / 2);
+                break;
+
+            case 'window8Confirm':
+                window.scroll(0, getElementProperty(window9, 'top') + getElementProperty(window9, 'height') / 2);
+                break;
+
+            case 'window9Confirm':
+                window.scroll(0, getElementProperty(window10, 'top') + getElementProperty(window10, 'height') / 2);
+                break;
+
+            case 'taskEdited':
+                window.scroll(0, getElementProperty(window11, 'top') + getElementProperty(window11, 'height') / 2);
+                break;
+
+            case 'window12Confirm':
+                window.scroll(0, getElementProperty(window13, 'top') + getElementProperty(window13, 'height') / 2);
+                break;
+
+            case 'window13Confirm':
+                window.scroll(0, getElementProperty(window14, 'top') + getElementProperty(window14, 'height') / 2);
+                break;
+
+            case 'window14Confirm':
+                window.scroll(0, 0);
+                break;
+        }
+    }
+
 }
+
+
 
 startApp();

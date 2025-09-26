@@ -183,6 +183,9 @@ export default class LessonView {
         //timeslot event handlers
         timeslotElement.removeEventListener('click', LessonView.createLessonForm);
         timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
+
+        let evt = new Event('formOpened');
+        document.dispatchEvent(evt);
     }
 
     static async createUpdateLessonForm(event, oldLessonData) {
