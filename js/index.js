@@ -31,7 +31,9 @@ async function startApp() {
     AbstractController.setVersion('0.9.1');
     await abstCtrl.syncData();
 
-    document.addEventListener('visibilitychange', abstCtrl.syncData.bind(abstCtrl))
+    window.addEventListener("beforeunload", async () => {
+        await window.indexedDB.deleteDatabase('eduplanio');
+    });
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
