@@ -424,9 +424,19 @@ async function startApp() {
                 event.target.closest('.introWindow').style.visibility = 'hidden';
                 document.querySelector('#taskContainer').classList.remove('highlighted');
 
-                document.querySelectorAll('tr[data-taskid="3"]>td').forEach(td => {
+                document.querySelectorAll('tr[data-taskid="6"]>td').forEach(td => {
                     td.classList.add('highlighted');
 
+                    if (td.classList.contains('taskAdditionalInfo')) {
+                        td.style.borderLeft = 'solid 3px var(--matteRed)';
+                        td.style.borderRight = 'none';
+                    }
+
+                    if (td.classList.contains('taskClassName')) {
+                        td.style.borderLeft = 'none';
+                        td.style.borderRight = 'none';
+                    }
+                    
                     if (td.classList.contains('taskSubjectContainer')) {
                         td.style.borderLeft = 'none';
                         td.style.borderRight = 'none';
@@ -444,10 +454,10 @@ async function startApp() {
                     }
                 });
 
-                document.querySelectorAll('tr[data-taskid="3"]>td.taskDone button').forEach(button => button.style.height = '1.25rem')
+                document.querySelectorAll('tr[data-taskid="6"]>td.taskDone button').forEach(button => button.style.height = '1.25rem')
 
                 window10.style.display = 'block';
-                window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="3"]'), 'bottom') + window.scrollY + 3 + 'px';
+                window10.style.top = getElementProperty(document.querySelector('tr[data-taskid="6"]'), 'bottom') + window.scrollY + 3 + 'px';
 
                 checkPosition(window10);
                 scrollToPosition(event.target.id);
