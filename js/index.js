@@ -37,9 +37,10 @@ async function startApp() {
     });
 
     document.addEventListener('click', runTour);
-    document.querySelector('#logoutButton').addEventListener('click', async () => { 
+    document.querySelector('#logoutButton').addEventListener('click', async () => {
         window.indexedDB.deleteDatabase('eduplanio');
-        window.location = '../' });
+        window.location = '../'
+    });
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
@@ -292,6 +293,7 @@ async function startApp() {
         const window12 = document.querySelector('#window12');
         const window13 = document.querySelector('#window13');
         const window14 = document.querySelector('#window14');
+        const nav = document.querySelector('nav');
 
         let translateLeft;
 
@@ -352,10 +354,12 @@ async function startApp() {
 
             case 'window5Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
-                document.addEventListener('formOpened',() => runTour({ target: { id: 'lessonFormOpened' } }));
+                document.addEventListener('formOpened', () => runTour({ target: { id: 'lessonFormOpened' } }));
                 break;
 
             case 'lessonFormOpened':
+                let navHeight = nav.getBoundingClientRect().height;
+                nav.style.transform = `translate(0, -${navHeight}px`;
                 translateLeft = getElementProperty(document.querySelector('.lessonForm'), 'left') + getElementProperty(document.querySelector('.lessonForm'), 'width') / 2;
 
                 document.querySelector('#weekOverviewContainer').classList.remove('highlighted');
@@ -436,7 +440,7 @@ async function startApp() {
                         td.style.borderLeft = 'none';
                         td.style.borderRight = 'none';
                     }
-                    
+
                     if (td.classList.contains('taskSubjectContainer')) {
                         td.style.borderLeft = 'none';
                         td.style.borderRight = 'none';
@@ -494,7 +498,7 @@ async function startApp() {
                 document.querySelector('td[contenteditable]').nextElementSibling.style.borderRight = 'none';
 
                 document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.classList.add('highlighted');
-                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.style.borderRight = 'solid 3px';
+                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.style.border = 'solid 3px';
 
                 window12.style.display = 'block';
                 window12.style.top = getElementProperty(document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild, 'bottom') + window.scrollY + 10 + 'px';
@@ -517,7 +521,7 @@ async function startApp() {
             case 'window13Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
                 document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.classList.remove('highlighted');
-                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.style.borderRight = 'none';
+                document.querySelector('td[contenteditable]').closest('tr').nextElementSibling.firstElementChild.style.border = 'none';
 
                 window14.style.display = 'block';
                 window14.style.top = getElementProperty(document.querySelector('tr[data-taskid="6"]'), 'bottom') + window.scrollY + 10 + 'px';
@@ -529,6 +533,7 @@ async function startApp() {
             case 'window14Confirm':
                 event.target.closest('.introWindow').style.display = 'none';
                 window9.style.display = 'none';
+                nav.removeAttribute('style');
                 scrollToPosition(event.target.id);
         }
     }
@@ -579,6 +584,8 @@ async function startApp() {
         const window13 = document.querySelector('#window13');
         const window14 = document.querySelector('#window14');
 
+        let y;
+
         if (window.outerWidth <= 600) {
             switch (buttonClicked) {
                 case 'window3Confirm':
@@ -586,11 +593,15 @@ async function startApp() {
                     break;
 
                 case 'lessonFormOpened':
-                    document.querySelector('#lessonForm').scrollIntoView({ block: 'start' });
+                    let form = document.querySelector('#lessonForm');
+                    y = form.getBoundingClientRect().y;
+                    window.scrollTo(0, y - 40);
                     break;
 
                 case 'window7Confirm':
-                    document.querySelector('#markedSlot>.lesson').scrollIntoView();
+                    let markedSlot = document.querySelector('#markedSlot');
+                    y = markedSlot.getBoundingClientRect().y - markedSlot.getBoundingClientRect().height;
+                    window.scrollTo(0, y + window.scrollY);
                     break;
 
                 case 'window8Confirm':
@@ -603,7 +614,9 @@ async function startApp() {
 
                 case 'taskEdited':
                     window.requestAnimationFrame();
-                    document.querySelector('.discardUpdateTaskButton').scrollIntoView({ block: 'start' });
+                    let td = document.querySelector('td[contendeditable]');
+                    y = td.getBoundingClientRect().y - td.getBoundingClientRect().height;
+                    window.scrollTo(0, y + window.scrollY);
                     break;
 
                 case 'window14Confirm':

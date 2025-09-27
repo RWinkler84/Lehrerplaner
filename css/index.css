@@ -1501,19 +1501,6 @@ p {
         height: 1rem;
     }
 
-    .taskDone {
-        display: none;
-    }
-
-    .taskDone.responsive {
-        display: table-cell;
-    }
-
-    .taskDone.responsive button {
-        width: 49%;
-        margin: 0;
-    }
-
     .introWindow {
         width: 100%;
     }
