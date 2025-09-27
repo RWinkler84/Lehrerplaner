@@ -6,7 +6,7 @@ export default class LessonView {
 
     static async renderLesson() {
         this.removeAllLessons()
-        
+
         let monday = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         let sunday = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
 
@@ -166,11 +166,19 @@ export default class LessonView {
 
         timeslotElement.innerHTML = lessonFormHTML;
         let lessonForm = timeslotElement.querySelector('.lessonForm');
-        let lessonFormProps = lessonForm.getBoundingClientRect()
+        let lessonFormProps = lessonForm.getBoundingClientRect();
+        let offset;
+        let saveMargin = 5;
 
+        //extends the right side
         if (lessonFormProps.right > timetableProps.right) {
-            let offset = lessonFormProps.width - timeslotProps.width;
+            offset = lessonFormProps.width - timeslotProps.width + saveMargin; 
             lessonForm.style.transform = `translateX(-${offset}px)`;
+        }
+        //extends the bottom
+        if (lessonFormProps.bottom > timetableProps.bottom) {
+            offset = lessonFormProps.bottom - timetableProps.bottom + saveMargin;
+            lessonForm.style.transform += `translateY(-${offset}px)`;
         }
 
         //form button event handlers
