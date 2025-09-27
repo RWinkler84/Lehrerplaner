@@ -29,7 +29,8 @@ async function startApp() {
     AbstractController.setVersion('0.9.1');
     await abstCtrl.syncData();
 
-    document.addEventListener('visibilitychange', abstCtrl.syncData.bind(abstCtrl))
+    document.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
+    document.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl))
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
