@@ -170,12 +170,28 @@ export default class LessonView {
         let offset;
         let saveMargin = 5;
 
-        //extends the right side
+        console.log(lessonFormProps)
+
+        //center the form on the timeslot 
+        offset = (lessonFormProps.width - timeslotProps.width) / 2;
+        lessonForm.style.transform = `translateX(-${offset}px)`;
+
+        //get new coordinates and check
+        lessonFormProps = lessonForm.getBoundingClientRect();
+
+        //if it extends the right side
         if (lessonFormProps.right > timetableProps.right) {
-            offset = lessonFormProps.width - timeslotProps.width + saveMargin; 
+            lessonForm.removeAttribute('style');
+            offset = lessonFormProps.width - timeslotProps.width;
             lessonForm.style.transform = `translateX(-${offset}px)`;
         }
-        //extends the bottom
+
+        //the left
+        if (lessonFormProps.left < timetableProps.left) {
+            lessonForm.removeAttribute('style');
+        }
+
+        //or it extends the bottom
         if (lessonFormProps.bottom > timetableProps.bottom) {
             offset = lessonFormProps.bottom - timetableProps.bottom + saveMargin;
             lessonForm.style.transform += `translateY(-${offset}px)`;
