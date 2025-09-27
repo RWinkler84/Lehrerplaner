@@ -494,10 +494,14 @@ dialog .errorMessageDisplay {
     text-overflow: ellipsis;
 }
 
+.taskDone {
+    padding-right: 0 !important;
+    padding-left: 0.5rem !important;
+}
+
 .taskDone div {
     display: flex;
-    min-width: 125px;
-    gap: 0.5rem;
+    gap: 1rem;
     justify-content: end;
     vertical-align: center;
 }
@@ -773,7 +777,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .saveTaskButton,
 .updateTaskButton,
-.setTaskDoneButton,
 .saveNewLessonButton {
     background-color: var(--lightMatteGreen);
     margin-right: 0.5rem;
@@ -1230,6 +1233,7 @@ h3 {
 
     td {
         display: block;
+        border-left: solid 1px var(--lightgrey) !important;
     }
 
     .taskClassName {
@@ -1267,12 +1271,10 @@ h3 {
         position: absolute;
         border-left: none !important;
         border-right: none !important;
+        padding-right: 0.5rem !important;
         right: 0;
         top: 0;
-    }
-
-    .taskDone.responsive {
-        display: none;
+        max-width: 125px;
     }
 
     /* responsive settings */
