@@ -139,8 +139,13 @@ export default class SettingsView {
 
         //hide timetable changing buttons, if necessary
         document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
-        if (allValidDates.length <= 1) document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
 
+        if (allValidDates.length <= 1) {
+            document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+        } else {
+            document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
+        }
+        
         //hide edit timetable button, if there is not yet a timetable
         if (date == undefined) document.querySelector('#editTimetableButton').style.display = 'none';
     }
