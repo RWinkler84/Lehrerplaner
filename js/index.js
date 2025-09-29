@@ -129,6 +129,7 @@ async function startApp() {
         })
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
+        AbstractView.setIsTodayDot();
     }
 
 
@@ -161,6 +162,7 @@ async function startApp() {
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
+        AbstractView.setIsTodayDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(false);
     }
@@ -181,6 +183,7 @@ async function startApp() {
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
+        AbstractView.setIsTodayDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(true);
     }

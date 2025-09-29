@@ -129,7 +129,7 @@ export default class AbstractView {
 
         if (userInfo.accountType == 'registeredUser' && userInfo.loggedIn) {
             logoutButton.removeAttribute('style');
-            return; 
+            return;
         }
 
         if (userInfo.accountType == 'not set') {
@@ -158,6 +158,23 @@ export default class AbstractView {
             document.querySelector('#topMenu').removeAttribute('style');
             document.removeEventListener('click', AbstractView.closeTopMenu);
         }
+    }
+
+    static setIsTodayDot() {
+        let weekdays = document.querySelectorAll('.weekday');
+        let today = new Date().setHours(12, 0, 0, 0);
+        console.log(today);
+
+        weekdays.forEach((weekday) => {
+            let weekdayDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            console.log(weekdayDate);
+            if (weekdayDate != today) {
+                weekday.querySelector('.isTodayDot').style.display = 'none';
+                return;
+            }
+
+            weekday.querySelector('.isTodayDot').style.display = 'inline-block';
+        });
     }
 
     static setSyncIndicatorStatus(status) {

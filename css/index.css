@@ -316,6 +316,15 @@ dialog .errorMessageDisplay {
     background-color: var(--lightergrey);
 }
 
+.isTodayDot {
+    display: none;
+    margin-left: 0.5rem;
+    height: 0.5rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background-color: var(--matteGreen);
+}
+
 .lesson,
 .settingsLesson {
     max-width: 100%;
