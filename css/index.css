@@ -131,7 +131,7 @@ main {
     left: 2rem;
     right: 2rem;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-    border: solid 0.5rem var(--bodyBackground);
+    border: solid 0.3rem var(--bodyBackground);
 }
 
 #settingsTimetableContainer {
@@ -336,10 +336,6 @@ dialog .errorMessageDisplay {
     color: var(--lighterText);
     text-align: center;
     transition: all 0.3s ease-out;
-}
-
-.lesson:hover {
-    transform: translate(-1px, -1px);
 }
 
 .lessonContentContainer {
