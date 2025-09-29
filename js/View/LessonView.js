@@ -182,7 +182,7 @@ export default class LessonView {
         //if it extends the right side
         if (lessonFormProps.right > timetableProps.right) {
             lessonForm.removeAttribute('style');
-            offset = lessonFormProps.width - timeslotProps.width;
+            offset = lessonFormProps.width - timeslotProps.width + saveMargin;
             lessonForm.style.transform = `translateX(-${offset}px)`;
         }
 

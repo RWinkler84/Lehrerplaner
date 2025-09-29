@@ -254,18 +254,22 @@ dialog .errorMessageDisplay {
 .settingsWeekOverview {
     width: 100%;
     display: grid;
-    grid-template-columns: 0.3fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 0.6fr 0.6fr;
+    grid-template-columns: 0.2fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 0.6fr 0.6fr;
     min-width: 900px;
 }
 
 .settingsWeekOverview {
-    grid-template-columns: 0.3fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: 0.2fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
 }
 
 #timeslots,
 #settingsTimeslots {
     display: grid;
     grid-template-rows: 3rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    position: sticky;
+    left: 0;
+    background-color: var(--contentContainerBackground);
+    border-right: solid 1px var(--lightgrey);
 }
 
 .timeslotLabel,
@@ -303,8 +307,22 @@ dialog .errorMessageDisplay {
     min-width: 0;
 }
 
+.weekday[data-weekday_number="1"],
+.settingsWeekday[data-weekday_number="1"] {
+    border-left: none;
+}
+ 
 .weekday.passed {
     background-color: var(--lightergrey);
+}
+
+.isTodayDot {
+    display: none;
+    margin-left: 0.5rem;
+    height: 0.5rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background-color: var(--matteGreen);
 }
 
 .lesson,
@@ -1302,11 +1320,11 @@ h3 {
     #openTimetableSettingsButton,
     #openAccountSettingsButton,
     #closeSettingsButtonResponsive {
-            font-size: 1rem;
-    padding: 0.5rem 2rem;
-    color: var(--lighterText);
-    border: none;
-    background-color: transparent;
+        font-size: 1rem;
+        padding: 0.5rem 2rem;
+        color: var(--lighterText);
+        border: none;
+        background-color: transparent;
     }
 
     #closeSettingsButton {
