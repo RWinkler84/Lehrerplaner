@@ -163,11 +163,9 @@ export default class AbstractView {
     static setIsTodayDot() {
         let weekdays = document.querySelectorAll('.weekday');
         let today = new Date().setHours(12, 0, 0, 0);
-        console.log(today);
 
         weekdays.forEach((weekday) => {
             let weekdayDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
-            console.log(weekdayDate);
             if (weekdayDate != today) {
                 weekday.querySelector('.isTodayDot').style.display = 'none';
                 return;
@@ -175,6 +173,49 @@ export default class AbstractView {
 
             weekday.querySelector('.isTodayDot').style.display = 'inline-block';
         });
+    }
+
+    static scrollToCurrentDay() {
+        if (window.innerWidth <= 620) {
+
+            const timetable = document.querySelector('#weekOverviewContainer');
+            const timeslotLabelWidth = document.querySelector('#timeslots').getBoundingClientRect().width;
+            const offset = '14'; //padding 16px - border width
+
+            let weekdays = document.querySelectorAll('.weekday');
+            let weekdayProps;
+            let today = new Date().setHours(12, 0, 0, 0);
+            let match = false //on week switches the timetable gets duplicated, to ensure the scrolling scrolls to the right element, it must only run once
+
+            //find today, if it lies in the currently displayed week
+            weekdays.forEach((weekday) => {
+                if (match) return;
+                let weekdayDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+                if (weekdayDate != today) return;
+
+                weekdayProps = weekday.getBoundingClientRect();
+                match = true;
+                timetable.scrollTo({
+                    top: weekdayProps.y,
+                    // left: weekdayProps.x - 64,
+                    left: weekdayProps.x - timeslotLabelWidth - offset,
+                    // behavior: 'smooth'
+                });
+                 console.log(timeslotLabelWidth)
+
+                return;
+            });
+
+            //today is not displayed? go for monday of the displayed week
+            if (!match) {
+                weekdayProps = weekdays[0].getBoundingClientRect();
+                timetable.scrollTo({
+                    top: weekdayProps.y,
+                    left: weekdayProps.x - timeslotLabelWidth - offset,
+                    // behavior: 'smooth'
+                });
+            }
+        }
     }
 
     static setSyncIndicatorStatus(status) {

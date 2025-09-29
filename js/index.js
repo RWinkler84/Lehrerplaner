@@ -125,11 +125,13 @@ async function startApp() {
 
             weekday.dataset.date = new Date(todayUnix).toString();
 
-            todayUnix += ONEDAY;    // ONEDAY = ms/day
+            todayUnix += ONEDAY;
         })
+
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
         AbstractView.setIsTodayDot();
+        AbstractView.scrollToCurrentDay();
     }
 
 
@@ -162,9 +164,10 @@ async function startApp() {
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
-        AbstractView.setIsTodayDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(false);
+        AbstractView.setIsTodayDot();
+        AbstractView.scrollToCurrentDay();
     }
 
     function switchToNextWeek() {
@@ -183,9 +186,10 @@ async function startApp() {
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
-        AbstractView.setIsTodayDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(true);
+        AbstractView.setIsTodayDot();
+        AbstractView.scrollToCurrentDay();
     }
 
     function calcCalendarWeek(countUp = true) {
