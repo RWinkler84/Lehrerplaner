@@ -324,6 +324,37 @@ class AbstractModel
         return $dataArray;
     }
 
+    public function sendSupportTicket($ticketData)
+    {
+        $userEmail = $ticketData['userEmail'];
+        $ticketTopic = $ticketData['ticketTopic'];
+        $sendAtTimestamp = $ticketData['sendAt'];
+        $ticketContent = $ticketData['ticketContent'];
+        $version = $ticketData['appVersion'];
+
+        $mailContent = "
+            <p><b>Nutzer-Mail: </b>$userEmail</p>
+            <p><b>Thema: </b>$ticketTopic</p>
+            <p><b>App-Version: </b>$version</p>
+            <p><b>gesendet am: </b>$sendAtTimestamp</p>
+            <p><b>Ticketinhalt: </b>$ticketContent</p>
+        ";
+
+        $mailSend = $this->sendMail('winkler.ralf84@hotmail.de', 'Neue Support-Anfrage', $mailContent);
+
+        if ($mailSend) {
+            return [
+                'status' => 'success',
+                'message' => 'Mail send successfully.'
+            ];
+        }
+
+        return [
+            'status' => 'failed',
+            'message' => 'Mail could not be send.'
+        ];
+    }
+
     protected function sendMail($recipient, $subject, $message): bool
     {
         $mail = new PHPMailer(true);
@@ -351,12 +382,12 @@ class AbstractModel
             // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
             $mail->send();
-
-            return true;
         } catch (Exception $e) {
             error_log(__FILE__ . __LINE__ . "Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
 
             return false;
         }
+
+        return true;
     }
 }

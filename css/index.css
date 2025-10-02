@@ -43,6 +43,11 @@ input[type="checkbox"] {
     vertical-align: middle;
 }
 
+textarea {
+    width: 100%;
+    height: 7rem;
+}
+
 a {
     text-decoration: none;
 }
@@ -311,7 +316,7 @@ dialog .errorMessageDisplay {
 .settingsWeekday[data-weekday_number="1"] {
     border-left: none;
 }
- 
+
 .weekday.passed {
     background-color: var(--lightergrey);
 }
@@ -515,7 +520,7 @@ dialog .errorMessageDisplay {
 
 .taskDone div {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     justify-content: end;
     vertical-align: center;
 }

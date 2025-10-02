@@ -102,4 +102,11 @@ class AbstractController
 
         echo json_encode(['status' => 'true']);
     }
+
+    public function sendSupportTicket() {
+        $ticketData = json_decode(file_get_contents('php://input'), true);
+        $result = $this->db->sendSupportTicket($ticketData);
+
+        echo json_encode($result);
+    }
 }

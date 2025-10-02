@@ -115,20 +115,30 @@ export default class AbstractView {
         let logoutButton = document.querySelector('#logoutButton');
         let createAccountButton = document.querySelector('#createAccountButton');
         let openSettingsButton = document.querySelector('#openSettingsButton');
+        let openSupportDialogButton = document.querySelector('#openSupportDialogButton');
 
         openSettingsButton.removeAttribute('style');
         loginButton.style.display = 'none';
         logoutButton.style.display = 'none';
         createAccountButton.style.display = 'none';
+        openSupportDialogButton.style.display = 'none';
 
-        if ((userInfo.accountType == 'registeredUser' && !userInfo.loggedIn) || userInfo.accountType == 'guestUser') {
+        if ((userInfo.accountType == 'registeredUser' && !userInfo.loggedIn)) {
+            loginButton.removeAttribute('style');
+            openSupportDialogButton.removeAttribute('style');
+            return;
+        }
+
+        if (userInfo.accountType == 'guestUser') {
             createAccountButton.removeAttribute('style');
             loginButton.removeAttribute('style');
+            openSupportDialogButton.removeAttribute('style');
             return;
         }
 
         if (userInfo.accountType == 'registeredUser' && userInfo.loggedIn) {
             logoutButton.removeAttribute('style');
+            openSupportDialogButton.removeAttribute('style');
             return;
         }
 
@@ -183,15 +193,15 @@ export default class AbstractView {
 
             let weekdays = document.querySelectorAll('.weekday');
             let weekdayProps;
-            let today = new Date(TODAY).setHours(12, 0, 0, 0);
+            let today = new Date().setHours(12, 0, 0, 0);
 
             //go for monday of the displayed week
-                weekdayProps = weekdays[0].getBoundingClientRect();
-                timetable.scrollTo({
-                    top: weekdayProps.y,
-                    left: weekdayProps.x - timeslotLabelWidth - offset,
-                    // behavior: 'smooth'
-                });
+            weekdayProps = weekdays[0].getBoundingClientRect();
+            timetable.scrollTo({
+                top: weekdayProps.y,
+                left: weekdayProps.x - timeslotLabelWidth - offset,
+                // behavior: 'smooth'
+            });
 
             //find today, if it lies in the currently displayed week, after the week switch animation is finished
             setTimeout(() => {
@@ -233,5 +243,119 @@ export default class AbstractView {
                 tooltipText.textContent = 'Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.'
                 break;
         }
+    }
+
+    static openSupportDialog() {
+        let dialog = document.querySelector('#supportDialog');
+        dialog.showModal();
+    }
+
+    static closeSupportDialog() {
+        let dialog = document.querySelector('#supportDialog');
+
+        dialog.querySelector('#supportTicketUserEmail').value = '';
+        dialog.querySelector('#supportTicketTopic').value = '';
+        dialog.querySelector('#supportTicketContent').value = '';
+        dialog.querySelector('#supportTicketAnswer').value = '';
+
+        this.toggleSupportDialogButtons('close');
+
+        dialog.close();
+    }
+
+    static getSupportTicketContentFromForm() {
+        let dialog = document.querySelector('#supportDialog');
+
+        return {
+            userEmail: dialog.querySelector('#supportTicketUserEmail').value,
+            ticketTopic: dialog.querySelector('#supportTicketTopic').value,
+            ticketContent: dialog.querySelector('#supportTicketContent').value,
+            captchaAnswer: dialog.querySelector('#supportTicketAnswer').value,
+            appVersion: document.querySelector('#versionDisplay').textContent
+        }
+    }
+
+    static toggleSupportDialogButtons(status) {
+        let submitButton = document.querySelector('#sendSupportTicketButton');
+        let closeButton = document.querySelector('#closeSupportDialogButton');
+
+        switch (status) {
+            case 'sending':
+                submitButton.style.display = 'none';
+                break;
+
+            case 'success':
+                closeButton.style.display = 'block'
+                break;
+
+            case 'failed':
+                submitButton.style.display = 'block';
+                break;
+
+            case 'close':
+                submitButton.style.display = 'block';
+                closeButton.style.display = 'none';
+                break;
+        }
+    }
+
+    static displayMessageOnSupportDialog(result) {
+        let errorMessageDisplay = document.querySelector('#supportTicketErrorMessageDisplay');
+
+        if (result.status == 'success') {
+            errorMessageDisplay.textContent = result.message;
+            errorMessageDisplay.style.color = 'var(--matteGreen)';
+        }
+
+        if (result.status == 'failed') {
+            errorMessageDisplay.textContent = result.message;
+            if (errorMessageDisplay.hasAttribute('style')) errorMessageDisplay.removeAttribute('style');
+        }
+    }
+
+    //support ticket alerts
+
+    static alertSupportTicketUserEmail(message = null) {
+        let alertRing = document.querySelector('#supportTicketUserEmail').parentElement;
+        let errorMessageDisplay = document.querySelector('#supportTicketErrorMessageDisplay');
+
+        if (message) {
+            errorMessageDisplay.textContent = message;
+            if (errorMessageDisplay.hasAttribute('style')) errorMessageDisplay.removeAttribute('style');
+        } else {
+            errorMessageDisplay.textContent = '';
+        }
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertSupportTicketTopic() {
+        let alertRing = document.querySelector('#supportTicketTopic').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertSupportTicketContent() {
+        let alertRing = document.querySelector('#supportTicketContent').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertSupportTicketCaptcha() {
+        let alertRing = document.querySelector('#supportTicketAnswer').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
     }
 }

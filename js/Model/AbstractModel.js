@@ -288,6 +288,11 @@ export default class AbstractModel {
         db.transaction('settings', 'readwrite').objectStore('settings').put(dataToStore)
     }
 
+    async sendSupportTicket(formData){
+        formData.sendAt = this.formatDateTime(new Date());
+        return await this.makeAjaxQuery('abstract', 'sendSupportTicket', formData);
+    }
+
     static async calculateAllLessonDates(className, subject, endDate, timetable, lessonChanges) {
 
         let dateIterator = new Date().setHours(12, 0, 0, 0);

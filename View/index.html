@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
@@ -28,6 +28,7 @@
                 <div><button id="openMenuButton">&#x2630;</button></div>
                 <div id="topMenu" class="flex column justifyCenter ">
                     <button id="openSettingsButton" class="menuButton">Einstellungen</button>
+                    <button id="openSupportDialogButton" class="menuButton">Support</button>
                     <button id="openLoginButton" class="menuButton">Login</button>
                     <button id="createAccountButton" class="menuButton">Registrieren</button>
                     <button id="logoutButton" class="menuButton">Abmelden</button>
@@ -67,7 +68,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="1" data-date="">
-                        <div class="weekdayLabel">Mo<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Mo<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -81,7 +83,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="2" data-date="">
-                        <div class="weekdayLabel">Di<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Di<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -95,7 +98,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="3" data-date="">
-                        <div class="weekdayLabel">Mi<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Mi<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
 
                         <div class="timeslot" data-timeslot="1"></div>
@@ -110,7 +114,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="4" data-date="">
-                        <div class="weekdayLabel">Do<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Do<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
 
                         <div class="timeslot" data-timeslot="1"></div>
@@ -125,7 +130,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="5" data-date="">
-                        <div class="weekdayLabel">Fr<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Fr<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -139,7 +145,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="6" data-date="">
-                        <div class="weekdayLabel">Sa<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Sa<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -153,7 +160,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="0" data-date="">
-                        <div class="weekdayLabel">So<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">So<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -599,6 +607,53 @@
                     <button id="closeLessonChangesAndTasksToKeepDialogButton"
                         class="confirmationButton">Erledigt</button>
                 </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="supportDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Support</h3><button class="deleteItemButton closeSupportDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="divider"></div>
+        <div class="dialogBody">
+            <p>
+                Du hast eine Frage zu einem Feature, hast ein Problem entdeckt oder einen Verbesserungsvorschlag? Dann
+                schick uns eine Nachricht!
+            </p>
+            <form id="supportFrom">
+                <div class="flex column halfGap marginTop" class="formBody">
+                    <div>
+                        <label for="supportTicketUserEmail" style="display: block">Deine E-Mail-Adresse</label>
+                        <div class="alertRing"><input type="email" name="supportTicketUserEmail"
+                                id="supportTicketUserEmail" autofocus>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="supportTicketTopic" style="display: block">Thema des Tickets</label>
+                        <div class="alertRing"><input type="text" name="supportTicketTopic" id="supportTicketTopic">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="supportTicketContent" style="display: block">Beschreibung</label>
+                        <div class="alertRing"><textarea name="supportTicketContent" id="supportTicketContent"
+                                placeholder="Bei technischen Problemen beschreibe bitte möglichst genau, was du getan hast, bevor das Problem aufgetreten ist, damit wir es leichter nachvollziehen können."></textarea>
+                        </div>
+                    </div>
+                    <div class="flex spaceBetween">
+                        <div id="supportTicketQuestionDisplay">Platzhalter</div>
+                        <div class="alertRing" style="width:fit-content"><input type="text" name="answer"
+                                id="supportTicketAnswer" style="width: 2rem;">
+                        </div>
+                    </div>
+                </div>
+                <div id="supportTicketErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
+            </form>
+            <div class="flex justifyEnd alignEnd marginTop navigation">
+                <button type="submit" id="sendSupportTicketButton" class="confirmationButton"
+                    style="margin-right: 3px">Senden</button>
+                <button class="confirmationButton closeSupportDialogButton" id="closeSupportDialogButton"
+                    style="margin-right: 3px; display: none">Schließen</button>
             </div>
         </div>
     </dialog>

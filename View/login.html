@@ -6,110 +6,310 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="./css/index.css">
-    <link rel="stylesheet" href="./css/login.css">
+    <link rel="stylesheet" href="../css/test.css">
 </head>
 
 <body>
-    <div id="dialogContainer">
-
-        <dialog id="loginDialog" open>
-            <div class="headline">
-                <h3>Login</h3>
-            </div>
-            <form id="loginForm" method="post">
-                <div class="flex column halfGap marginTop" class="formBody">
-                    <div>
-                        <label for="userEmail" style="display: block">E-Mail</label>
-                        <div class="alertRing"><input type="text" name="userEmail" id="userEmail"></div>
-                    </div>
-                    <div>
-                        <label for="password" style="display: block">Passwort</label>
-                        <div class="alertRing"><input type="password" name="password" id="password"></div>
-                    </div>
-                </div>
-                <div id="loginErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
-                <div class="flex spaceBetween alignEnd marginTop"><a href="" id="createAccount"
-                        style="margin-left: 3px; text-decoration: none;">Konto anlegen</a><button type="submit"
-                        id="loginButton" style="margin-right: 3px">Login</button>
-                </div>
-            </form>
-        </dialog>
-
-        <dialog id="createAccountDialog">
-            <div class="headline">
-                <h3>Konto anlegen</h3>
-            </div>
-            <form id="createAccountForm" method="post">
-                <div class="flex column halfGap marginTop" class="formBody">
-                    <div>
-                        <label for="newUserEmail" style="display: block">E-Mail</label>
-                        <div class="alertRing"><input type="mail" name="newUserEmail" id="newUserEmail"></div>
-                    </div>
-                    <div class="flex spaceBetween">
-                        <div>
-                            <label for="newPassword" style="display: block">Passwort wählen</label>
-                            <div class="alertRing"><input type="password" name="newPassword" id="newPassword"></div>
-                        </div>
-                        <div>
-                            <label for="newPasswordRepeat" style="display: block">Passwort wiederholen</label>
-                            <div class="alertRing"><input type="password" name="newPasswordRepeat"
-                                    id="newPasswordRepeat">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="accountCreationErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
-                <div class="flex spaceBetween alignEnd marginTop">
-                    <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
-                    <button type="submit" id="submitNewAccountDataButton" style="margin-right: 3px">Anlegen</button>
-                </div>
-            </form>
-        </dialog>
-
-        <dialog id="sendResetPasswordMailDialog">
-            <div class="headline">
-                <h3>Passwort-Reset-Mail anfordern</h3>
-            </div>
-            <form id="sendResetPasswordMailForm" method="post">
-                <div class="flex column halfGap marginTop" class="formBody">
-                    <label for="resetPasswordMail" style="display: block">E-Mail-Adresse</label>
-                    <div class="alertRing"><input type="mail" name="resetPasswordMail" id="resetPasswordMail"></div>
-                </div>
-                <div id="sendResetPasswordMailErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
-                <div class="flex spaceBetween alignEnd marginTop">
-                    <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
-                    <button type="submit" id="sendResetPasswordMailButton" style="margin-right: 3px">Anfordern</button>
-                </div>
-            </form>
-        </dialog>
-
-        <dialog id="resetPasswordDialog">
-            <div class="headline">
-                <h3>Passwort zurücksetzen</h3>
-            </div>
-            <form id="resetPasswordForm" method="post">
-                <div class="flex halfGap marginTop" class="formBody">
-                    <div>
-                        <label for="resetPassword" style="display: block">Neues Passwort</label>
-                        <div class="alertRing"><input type="password" name="resetPassword" id="resetPassword"></div>
-                    </div>
-                    <div>
-                        <label for="resetPasswordRepeat" style="display: block">Passwort wiederholen</label>
-                        <div class="alertRing"><input type="password" name="resetPasswordRepeat"
-                                id="resetPasswordRepeat"></div>
-                    </div>
-                </div>
-                <div id="resetPasswordErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
-                <div class="flex spaceBetween alignEnd marginTop navigation">
-                    <a href="" class="backToLoginLink" style="margin-left: 3px; text-decoration: none;">zurück</a>
-                    <button type="submit" id="resetPasswordButton" style="margin-right: 3px">Speichern</button>
-                </div>
-            </form>
-        </dialog>
-
+    <div id="yearContainer">
+    </div>
+    <div id="addTimespanForm">
+        <input type="text" name="topic" id="topicInput">
+        <div id="createSpanButtonContainer">
+            <button id="startSpanCreationButton" class="confirmationButton">Anlegen</button>
+        </div>
+        <div id="cancelSpanCreationButtonContainer">
+            <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
+            <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
+        </div>
     </div>
 
-    <script src="./js/login.js"></script>
+    <script>
+
+
+        function createContainer() {
+            const yearContainer = document.querySelector('#yearContainer');
+            const monthNames = {
+                0: 'Januar',
+                1: 'Februar',
+                2: 'März',
+                3: 'April',
+                4: 'Mai',
+                5: 'Juni',
+                6: 'Juli',
+                7: 'August',
+                8: 'September',
+                9: 'Oktober',
+                10: 'November',
+                11: 'Dezember'
+            };
+            const dayNames = {
+                0: 'So',
+                1: 'Mo',
+                2: 'Di',
+                3: 'Mi',
+                4: 'Do',
+                5: 'Fr',
+                6: 'Sa',
+            }
+
+            let today = new Date();
+            let dateIterator = new Date(`${today.getFullYear()}-01-01`).setHours(12, 0, 0, 0);
+            let oneday = 86400000;
+
+            let blankMonth = document.createElement('div');
+            let blankWeek = document.createElement('div');
+
+            blankMonth.classList.add('month');
+            blankMonth.innerHTML = `
+                <div class="monthName">Januar</div>
+            `;
+            blankWeek.classList.add('week');
+            blankWeek.innerHTML = `
+                <div class="day" data-weekdayNumber="1"></div>
+                <div class="day" data-weekdayNumber="2"></div>
+                <div class="day" data-weekdayNumber="3"></div>
+                <div class="day" data-weekdayNumber="4"></div>
+                <div class="day" data-weekdayNumber="5"></div>
+                <div class="day" data-weekdayNumber="6"></div>
+                <div class="day" data-weekdayNumber="0"></div>
+            `
+
+            let isYearCompleted = false;
+            let currentMonth = blankMonth.cloneNode(true);
+            let currentWeek = blankWeek.cloneNode(true);
+            let monthIterator = 0;
+
+            do {
+                let currentDay = new Date(dateIterator);
+
+                if (currentDay.getMonth() != monthIterator) {
+                    currentMonth.appendChild(currentWeek);
+                    currentWeek = blankWeek.cloneNode(true);
+
+                    yearContainer.appendChild(currentMonth);
+                    currentMonth = blankMonth.cloneNode(true);
+                    currentMonth.querySelector('.monthName').textContent = monthNames[currentDay.getMonth()];
+                    monthIterator++;
+                }
+                if (currentDay.getDay() == 1) {
+                    currentMonth.appendChild(currentWeek);
+                    currentWeek = blankWeek.cloneNode(true);
+                }
+
+                currentWeek.querySelectorAll('.day').forEach(day => {
+                    if (day.dataset.weekdaynumber != currentDay.getDay()) return;
+
+                    day.setAttribute('data-date', currentDay);
+                    day.innerHTML = `
+                        <div class="dayName">${dayNames[currentDay.getDay()]}</div>
+                        <div class="dayDate">${currentDay.getDate()}.${currentDay.getMonth() + 1}.</div>
+                    `;
+
+                });
+
+                if (currentDay.getDate() == 31 && currentDay.getMonth() == 11) {
+                    isYearCompleted = true;
+                    currentMonth.appendChild(currentWeek);
+                    yearContainer.appendChild(currentMonth);
+                }
+
+                dateIterator += oneday;
+            } while (!isYearCompleted);
+
+            yearContainer.querySelectorAll('.day').forEach(day => {
+                if (day.children.length == 0) day.style.visibility = 'hidden';
+            });
+        }
+
+        function startSpanCreation() {
+            document.querySelector('#yearContainer').addEventListener('click', createSpan);
+            document.querySelector('#createSpanButtonContainer').style.display = 'none';
+            document.querySelector('#cancelSpanCreationButtonContainer').style.display = 'block';
+        }
+
+        function saveNewSpan() {
+            let allSpanDays = document.querySelectorAll('div[new]');
+
+            allSpanDays.forEach(day => {
+                day.removeAttribute('new');
+            });
+
+            let firstDay = allSpanDays[0].dataset.date;
+            let lastDay = allSpanDays[allSpanDays.length - 1].dataset.date;
+
+            let topicInput = document.querySelector('#topicInput');
+            let topicDisplay = document.createElement('div');
+
+            topicDisplay.classList.add('topicDisplay');
+            topicDisplay.textContent = topicInput.value;
+
+            allSpanDays[0].appendChild(topicDisplay);
+
+            topicInput.value = ''
+            document.querySelector('#createSpanButtonContainer').style.display = 'block';
+            document.querySelector('#cancelSpanCreationButtonContainer').style.display = 'none';
+            document.querySelector('#yearContainer').removeEventListener('click', createSpan);
+
+            console.log(firstDay, lastDay);
+        }
+
+        function cancelSpanCreation() {
+            let allSpanDays = document.querySelectorAll('div[new]');
+
+            allSpanDays.forEach(day => {
+                day.classList.remove('active');
+                day.removeAttribute('new');
+                day.removeAttribute('data-span');
+            });
+
+            document.querySelector('#yearContainer').removeEventListener('click', createSpan);
+            document.querySelector('#createSpanButtonContainer').style.display = 'block';
+            document.querySelector('#cancelSpanCreationButtonContainer').style.display = 'none';
+        }
+
+        function createSpan(event) {
+            if (event.target.classList.contains('active')) return;
+
+            let target = event.target;
+            let alldays = document.querySelectorAll('.day');
+            let allSpanIds = [];
+            let spanId;
+            let isFirstSpanElement = true;
+
+            alldays.forEach(day => {
+                if (day.dataset.span != '' && !allSpanIds.includes(day.dataset.span)) allSpanIds.push(day.dataset.span);
+                if (day.hasAttribute('new')) {
+                    isFirstSpanElement = false;
+                    spanId = day.dataset.span;
+                }
+            });
+
+            if (isFirstSpanElement) {
+                target.setAttribute('data-span', Math.max(allSpanIds) + 1)
+                target.setAttribute('new', '');
+            }
+
+            if (!isFirstSpanElement) {
+                target.setAttribute('data-span', spanId)
+                target.setAttribute('new', '');
+            }
+
+            drawNewSpan();
+        }
+
+        function drawNewSpan() {
+            let alldays = document.querySelectorAll('.day');
+            let allNewSpanDays = document.querySelectorAll('div[new]');
+
+            alldays = Array.from(alldays);
+
+            if (allNewSpanDays.length == 1) {
+                allNewSpanDays[0].classList.add('active', 'solo');
+            } else {
+                let nextElement = allNewSpanDays[0];
+                let lastElement = allNewSpanDays[allNewSpanDays.length - 1];
+
+                nextElement.classList.remove('solo');
+                if (document.querySelector('.start[new]')) document.querySelector('.start[new]').classList.remove('start');
+                nextElement.classList.add('start');
+
+                do {
+                    nextElement.classList.add('active');
+                    nextElement.setAttribute('data-span', allNewSpanDays[0].dataset.span);
+                    nextElement.setAttribute('new', '');
+                    nextElement = alldays[alldays.indexOf(nextElement) + 1]
+                    //switch
+                } while (nextElement != lastElement);
+
+                nextElement.classList.remove('solo');
+                if (document.querySelector('.end[new]')) document.querySelector('.end[new]').classList.remove('end');
+                nextElement.classList.add('active');
+                nextElement.classList.add('end');
+            }
+        }
+
+        function drawSpan() {
+            let alldays = document.querySelectorAll('.day');
+            let spanElementsById = {};
+
+            alldays = Array.from(alldays);
+
+            alldays.forEach(day => {
+                if (day.hasAttribute('data-span')) {
+                    !spanElementsById[day.dataset.span] ? spanElementsById[day.dataset.span] = [day] : spanElementsById[day.dataset.span].push(day);
+                }
+            })
+
+            let spanIds = Object.keys(spanElementsById);
+
+            spanIds.forEach(id => {
+                if (spanElementsById[id].length == 1) {
+                    spanElementsById[id][0].classList.add('active', 'solo');
+                } else {
+                    let lastIndex = spanElementsById[id].length - 1
+                    let nextElement = spanElementsById[id][0];
+
+                    nextElement.classList.remove('solo');
+                    nextElement.classList.add('start');
+
+                    do {
+                        nextElement.classList.add('active');
+                        nextElement.setAttribute('data-span', id);
+                        nextElement = alldays[alldays.indexOf(nextElement) + 1]
+                        //switch
+                    } while (nextElement != spanElementsById[id][lastIndex])
+                    nextElement.classList.add('active');
+                    nextElement.classList.add('end');
+
+                }
+            });
+        }
+
+        function timespanFormHandler(event) {
+
+            switch (event.target.id) {
+                case 'startSpanCreationButton':
+                    startSpanCreation();
+                    break;
+
+                case 'saveSpanCreationButton':
+                    saveNewSpan();
+                    break;
+
+                case 'cancelSpanCreationButton':
+                    cancelSpanCreation();
+                    break;
+            }
+        }
+
+        document.querySelector('#addTimespanForm').addEventListener('click', timespanFormHandler);
+
+        createContainer();
+
+        // altlasten
+
+        function dragHandler(event) {
+            let element = event.target;
+
+            if (event.type == 'mousedown' && element.classList.contains('handle')) event.target.setAttribute('draggable', true);
+            if (event.type == 'mouseup' && element.classList.contains('handle')) event.target.removeAttribute('draggable');
+
+            if (event.type == 'dragenter' || event.type == 'dragleave') toggleCellActivation(element, event);
+            if (event.type == 'drop') reasignDragHandler(element);
+        }
+
+        function addHandleElement(element, startElement = true) {
+            let handle = document.createElement('div');
+
+            handle.classList.add('handle');
+            handle.setAttribute('data-spanid', element.dataset.spanid);
+            startElement ? handle.classList.add('start') : handle.classList.add('end');
+            handle.textContent = '|';
+
+            element.appendChild(handle);
+        }
+
+    </script>
 </body>
 
 </html>
