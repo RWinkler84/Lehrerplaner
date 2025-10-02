@@ -87,7 +87,7 @@ export default class AbstractController {
         if (formData.userEmail == '') { View.alertSupportTicketUserEmail(); return; }
         if (formData.ticketTopic == '') { View.alertSupportTicketTopic(); return; }
         if (formData.ticketContent == '') { View.alertSupportTicketContent(); return; }
-        if (formData.captchaAnswer == '') { View.alertSupportTicketCaptcha(); return; }
+        // if (formData.captchaAnswer == '') { View.alertSupportTicketCaptcha(); return; } //not yet implemented
 
         const mailRegEx = /^[^@]+@[^@]+\.[^@]+$/;
 
