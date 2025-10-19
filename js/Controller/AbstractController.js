@@ -107,7 +107,7 @@ export default class AbstractController {
             View.toggleSupportDialogButtons('success');
             View.displayMessageOnSupportDialog(result);
         } else {
-            result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später später noch einmal.'
+            result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später noch einmal.'
             View.toggleSupportDialogButtons('failed');
             View.displayMessageOnSupportDialog(result);
         }

@@ -367,12 +367,12 @@ class AbstractModel
             $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
             $mail->Username   = MAILUSERNAME;                           //SMTP username
             $mail->Password   = MAILPASSWORD;                           //SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
             $mail->Port       = MAILPORT;                               //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
             $mail->CharSet    = 'UTF-8';
 
             //Recipients
-            $mail->setFrom(MAILFROM, 'Lehrerplaner');
+            $mail->setFrom(MAILFROM, 'Eduplanio');
             $mail->addAddress($recipient);                        //Add a recipient
 
             //Content
