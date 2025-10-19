@@ -97,7 +97,10 @@ export default class SettingsController {
         let affectedLessonChanges = await LessonController.getTimetableChanges(startDate, validUntil);
         let affectedTasks = await TaskController.getAllTasksInTimespan(startDate, validUntil);
 
-        if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
+        if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) {
+            LessonController.removeOutdatedCanceledLessons(affectedLessonChanges);
+            View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
+        }
 
         LessonController.renderLesson();
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
@@ -177,8 +180,8 @@ export default class SettingsController {
         switch (target) {
             //top menu
             case 'openSettingsMenuButton':
-            View.toggleSettingsMenu(event);
-            break;
+                View.toggleSettingsMenu(event);
+                break;
 
             case 'openTimetableSettingsButton':
                 View.openTimetableSettings();

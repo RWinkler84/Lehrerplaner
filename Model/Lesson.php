@@ -60,6 +60,8 @@ class Lesson extends AbstractModel
 
         $lesson = $this->preprocessDataToWrite($lesson);
 
+        error_log(print_r($lesson, true));
+
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId AND created = :created";
         $queryData = [
             'userId' => $lesson['userId'],

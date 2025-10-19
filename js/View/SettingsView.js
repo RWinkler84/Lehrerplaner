@@ -469,13 +469,14 @@ export default class SettingsView {
         dialog.querySelectorAll('.deleteItemButton').forEach(button => {
             button.addEventListener('click', SettingsView.deleteLessonChangeOrTaskConflict)
         });
+        
         dialog.querySelector('#closeLessonChangesAndTasksToKeepDialogButton').addEventListener('click', SettingsView.closeLessonChangesAndTasksToKeepDialog);
-
-        dialog.setAttribute('open', '');
+            
+        if (lessonConflictsContainer.querySelector('table tbody').children.length > 0 || taskConflictsContainer.querySelector('table tbody').children.length > 0) dialog.showModal();
     }
 
     static closeLessonChangesAndTasksToKeepDialog() {
-        document.querySelector('#LessonChangesAndTasksToKeepDialog').removeAttribute('open');
+        document.querySelector('#LessonChangesAndTasksToKeepDialog').close();
         Controller.renderLesson();
         Controller.renderTaskChanges();
     }

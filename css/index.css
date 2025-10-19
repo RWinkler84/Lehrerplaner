@@ -196,7 +196,6 @@ dialog .errorMessageDisplay {
 
 /* tasks and timetable changes conflicts dialog */
 #LessonChangesAndTasksToKeepDialog {
-    top: 25%;
     width: fit-content;
     min-width: 700px;
 }

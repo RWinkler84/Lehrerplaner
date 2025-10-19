@@ -1,5 +1,5 @@
 import AbstractModel from "./AbstractModel.js";
-import { ONEDAY} from "../index.js";
+import { ONEDAY } from "../index.js";
 import Fn from '../inc/utils.js';
 import LessonController from "../Controller/LessonController.js";
 
@@ -170,10 +170,21 @@ export default class Lesson extends AbstractModel {
 
     };
 
+    async removeOutdatedCanceledLessons(affectedLessonChanges) {
+        for (let lesson of affectedLessonChanges) {
+            if (lesson.canceled != 'true') return;
+           
+            await this.deleteFromLocalDB('timetableChanges', lesson.id);
+            let result = await this.makeAjaxQuery('lesson', 'delete', [lesson.serialize()]);
+
+            if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', lesson.serialize());
+        }
+    }
+
     //public class methods
     async save() {
         let timetableChanges = await LessonController.getAllTimetableChanges();
-        
+
         if (this.subject == 'Termin') this.type = 'appointement';
 
         this.id = Fn.generateId(timetableChanges);
@@ -312,7 +323,7 @@ export default class Lesson extends AbstractModel {
 
     get created() {
         return this.#created;
-    } 
+    }
 
     get lastEdited() {
         return this.#lastEdited;

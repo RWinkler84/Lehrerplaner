@@ -85,6 +85,12 @@ export default class LessonController {
         this.renderLesson();
     }
 
+    static removeOutdatedCanceledLessons(affectedLessonChanges) {
+        let model = new Lesson;
+
+        model.removeOutdatedCanceledLessons(affectedLessonChanges);
+    }
+
     static createNewTask(event) {
         TaskController.createNewTask(event);
     }

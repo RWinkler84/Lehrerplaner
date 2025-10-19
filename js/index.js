@@ -26,11 +26,11 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
-    AbstractController.setVersion('0.9.2');
+    AbstractController.setVersion('0.9.3');
     await abstCtrl.syncData();
 
-    document.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
-    document.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl))
+    window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
+    window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl))
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
