@@ -21,6 +21,17 @@ class Lesson extends AbstractModel
         return $result;
     }
 
+    public function update($lessonData) {
+        $lessonData = $this->preprocessDataToWrite($lessonData);
+
+        $query = "UPDATE $this->tableName SET date = :date, weekday = :weekday, timeslot = :timeslot, class = :class, subject = :subject, type = :type, canceled = :canceled, lastEdited = :lastEdited WHERE userId = :userId AND itemId = :itemId AND created = :created";
+
+        $result = $this->write($query, $lessonData);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonData['lastEdited']));
+
+        return $result;
+    }
+
     public function cancel($lessonData)
     {
         $lessonData = $this->preprocessDataToWrite($lessonData);
@@ -57,10 +68,7 @@ class Lesson extends AbstractModel
 
     public function deleteLesson($lesson)
     {
-
         $lesson = $this->preprocessDataToWrite($lesson);
-
-        error_log(print_r($lesson, true));
 
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId AND created = :created";
         $queryData = [

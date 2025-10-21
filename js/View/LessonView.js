@@ -170,8 +170,6 @@ export default class LessonView {
         let offset;
         let saveMargin = 5;
 
-        console.log(lessonFormProps)
-
         //center the form on the timeslot 
         offset = (lessonFormProps.width - timeslotProps.width) / 2;
         lessonForm.style.transform = `translateX(-${offset}px)`;
@@ -243,10 +241,6 @@ export default class LessonView {
 
         timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => LessonView.removeLessonForm(event, true));
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
-
-        //timeslot event handlers
-        // timeslotElement.removeEventListener('click', LessonView.createLessonForm);
-        // timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
 
     static saveNewLesson(event) {

@@ -55,7 +55,7 @@ export default class LessonController {
         let oldTimetable = await Lesson.getOldTimetableCopy();
         let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 
-        await lesson.update();
+        await lesson.save();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         this.renderLesson();
@@ -84,11 +84,17 @@ export default class LessonController {
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         this.renderLesson();
     }
-
-    static removeOutdatedCanceledLessons(affectedLessonChanges) {
+    /** @param isNewTimetable bool, indicates, if the affected lessons fall into the validity timespan of a new or a an updated timetable, triggering different filter methods */
+    static async filterAffectedLessonChanges(affectedLessonChanges, timetable, isNewTimetable) {
         let model = new Lesson;
 
-        model.removeOutdatedCanceledLessons(affectedLessonChanges);
+        return await model.filterAffectedLessonChanges(affectedLessonChanges, timetable, isNewTimetable);
+    }
+
+    static async handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate) {
+        let model = new Lesson;
+
+        await model.handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate);
     }
 
     static createNewTask(event) {

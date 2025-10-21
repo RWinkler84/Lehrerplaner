@@ -484,7 +484,7 @@ export default class AbstractModel {
     }
 
     async syncData() {
-        await this.checkForNulledCreatedField();
+        // await this.checkForNulledCreatedField();
         let localSettings = await this.readFromLocalDB('settings', 0);
         let localTimestamps = localSettings == undefined ? false : localSettings.lastUpdated;
         let remoteTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');

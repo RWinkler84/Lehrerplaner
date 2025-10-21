@@ -123,16 +123,7 @@ export default class Lesson extends AbstractModel {
         let changes = [];
 
         timetableChanges.forEach((entry) => {
-            let lesson = new Lesson(entry.class, entry.subject);
-            lesson.date = entry.date;
-            lesson.id = entry.id;
-            lesson.canceled = entry.canceled;
-            lesson.type = entry.type;
-            lesson.timeslot = entry.timeslot;
-            lesson.created = entry.created;
-            lesson.lastEdited = entry.lastEdited;
-
-            if (Fn.isDateInTimespan(lesson.date, startDate, endDate)) changes.push(lesson);
+            if (Fn.isDateInTimespan(entry.date, startDate, endDate)) changes.push(entry);
         });
 
         if (changes.length > 1) changes.sort(Fn.sortByDate);
@@ -152,6 +143,7 @@ export default class Lesson extends AbstractModel {
         let lesson = new Lesson(lessonData.class, lessonData.subject);
         lesson.id = lessonData.id;
         lesson.date = lessonData.date;
+        lesson.weekday = lessonData.weekday;
         lesson.timeslot = lessonData.timeslot;
         lesson.canceled = lessonData.canceled;
         lesson.type = lessonData.type;
@@ -170,14 +162,98 @@ export default class Lesson extends AbstractModel {
 
     };
 
-    async removeOutdatedCanceledLessons(affectedLessonChanges) {
-        for (let lesson of affectedLessonChanges) {
-            if (lesson.canceled != 'true') return;
-           
-            await this.deleteFromLocalDB('timetableChanges', lesson.id);
-            let result = await this.makeAjaxQuery('lesson', 'delete', [lesson.serialize()]);
+    async filterAffectedLessonChanges(affectedLessonChanges, timetable, isNewTimetable) {
+        let filteredLessonChanges = [];
 
-            if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', lesson.serialize());
+        //a new timetable deletes all canceled lessons, but keeps substitute lessons and appointements after its valid date, 
+        //because they could potentially still be valid
+        if (isNewTimetable) {
+            for (let lesson of affectedLessonChanges) {
+                if (lesson.type == 'appointement' || lesson.type == 'sub') {
+                    filteredLessonChanges.push(lesson); continue;
+                }
+
+                await this.deleteFromLocalDB('timetableChanges', lesson.id);
+                let result = await this.makeAjaxQuery('lesson', 'delete', [lesson.serialize()]);
+
+                if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', lesson.serialize());
+            }
+        }
+
+        //an updated timetable deletes canceled lessons, if the canceled lessons don't exist anymore according to the new plan
+        //other canceled lessons, substitute lessons and appointements are kept for the user to review
+        if (!isNewTimetable) {
+            for (let lesson of affectedLessonChanges) {
+                if (lesson.type == 'appointement' || lesson.type == 'sub') {
+                    filteredLessonChanges.push(lesson);
+                    continue;
+                }
+
+                //does the canceled lesson still exist?
+                let match = false;
+
+                if (lesson.canceled == 'true') {
+                    timetable.forEach(entry => {
+                        if (
+                            lesson.class == entry.class &&
+                            lesson.subject == entry.subject &&
+                            lesson.weekday == entry.weekday &&
+                            lesson.timeslot == entry.timeslot
+                        ) {
+                            match = true;
+                        }
+                    });
+                }
+
+                if (match) {
+                    filteredLessonChanges.push(lesson);
+                } else {
+                    await this.deleteFromLocalDB('timetableChanges', lesson.id);
+                    let result = await this.makeAjaxQuery('lesson', 'delete', [lesson.serialize()]);
+
+                    if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', lesson.serialize());
+                }
+            }
+        }
+
+        return filteredLessonChanges;
+    }
+
+    //this function handles rare cases, where there is a new or updated timetable and the user chose to keep substitute lessons, that
+    //fall in the period of the new timetable. If those occupy a timeslot of a regular lesson of the new timetable, this regular lessons
+    //must be canceled automatically to ensure correct reordering of tasks later on
+    async handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate) {
+        let allTimetables = await Lesson.getAllRegularLessons();
+        let timetable = [];
+
+        allTimetables.forEach(lesson => { if (lesson.validFrom == timetableValidFromDate) timetable.push(lesson) });
+
+        for (let id of remainingLessonIds) {
+            let allTimetableChanges = await Lesson.getAllTimetableChanges()
+            let remainingLesson = await Lesson.getLessonById(id);
+
+            if (remainingLesson.canceled == 'true') continue;
+
+            timetable.forEach(regularLesson => {
+                if (regularLesson.weekday == remainingLesson.weekday && regularLesson.timeslot == remainingLesson.timeslot) {
+
+                    //if there is a match, the regular lesson and the remaining substitute lesson need to swap places in the database
+                    //in order to be rendered correctly (hence the id swap and update on the regular lesson)
+                    regularLesson.canceled = 'true';
+                    regularLesson.date = remainingLesson.date;
+                    regularLesson.created = remainingLesson.created;
+                    regularLesson.lastEdited = regularLesson.created;
+                    regularLesson.id = remainingLesson.id;
+                    regularLesson.validFrom = undefined;
+                    regularLesson.validUntil = undefined;
+
+                    remainingLesson.id = Fn.generateId(allTimetableChanges);
+
+                    regularLesson.update();
+                    remainingLesson.save();
+                }
+            });
+
         }
     }
 
@@ -208,15 +284,11 @@ export default class Lesson extends AbstractModel {
     }
 
     async update() {
-        let timetableChanges = await LessonController.getAllTimetableChanges();
-
         if (this.subject == 'Termin') this.type = 'appointement';
         this.lastEdited = this.formatDateTime(new Date());
-        this.created = this.lastEdited;
-        this.id = Fn.generateId(timetableChanges);
 
-        this.writeToLocalDB('timetableChanges', this.serialize());
-        let result = await this.makeAjaxQuery('lesson', 'save', this.serialize());
+        this.updateOnLocalDB('timetableChanges', this.serialize());
+        let result = await this.makeAjaxQuery('lesson', 'update', this.serialize());
 
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTimetableChanges', this.serialize());
     }

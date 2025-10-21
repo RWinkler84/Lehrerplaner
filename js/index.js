@@ -26,7 +26,7 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
-    AbstractController.setVersion('0.9.3');
+    AbstractController.setVersion('0.9.31');
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))

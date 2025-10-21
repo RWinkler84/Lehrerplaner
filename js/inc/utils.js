@@ -80,7 +80,7 @@ export default class Utils {
     }
 
     static getNumberOfWeeksPerYear(year) {
-        let nextNewYear = new Date((year + 1), 0 ,1).getTime();
+        let nextNewYear = new Date((year + 1), 0, 1).getTime();
         let firstThursday = Utils.getFirstThirsdayOfTheYear(year);
 
         let weeksPerYear = 0;
@@ -119,6 +119,25 @@ export default class Utils {
         return {
             'monday': new Date(monday),
             'sunday': new Date(sunday)
+        }
+    }
+
+    static getAbbreviatedDayName(weekdayNumber) {
+        switch (weekdayNumber) {
+            case '0':
+                return 'So';
+            case '1':
+                return 'Mo';
+            case '2':
+                return 'Di';
+            case '3':
+                return 'Mi';
+            case '4':
+                return 'Do';
+            case '5':
+                return 'Fr';
+            case '6':
+                return 'Sa';
         }
     }
 
@@ -170,12 +189,12 @@ export default class Utils {
     }
 
     static getCssColorClass(lesson, allSubjects) {
-            let match;
+        let match;
 
-            allSubjects.forEach((subject) => {
-                if (subject.subject == lesson.subject) match = subject.colorCssClass;
-            })
-    
-            return match;
-        }
+        allSubjects.forEach((subject) => {
+            if (subject.subject == lesson.subject) match = subject.colorCssClass;
+        })
+
+        return match;
+    }
 }

@@ -56,13 +56,14 @@ a {
 nav {
     position: fixed;
     width: 100%;
-    z-index: 1;
+    z-index: 4;
     top: 0;
     left: 0;
 }
 
 #topMenuContainer,
 #settingsTitleBar {
+    position: relative;
     background-color: var(--topMenuBackgound);
     color: var(--lighterText);
     padding: 0.5rem 2rem;
@@ -107,7 +108,6 @@ nav {
     position: absolute;
     top: 2rem;
     right: 0rem;
-    z-index: 1;
     padding: 1rem 1rem;
 }
 
@@ -130,7 +130,7 @@ main {
 #settingsContainer {
     display: none;
     position: absolute;
-    z-index: 2;
+    z-index: 4;
     background-color: var(--bodyBackground);
     top: 1rem;
     left: 2rem;
@@ -274,7 +274,7 @@ dialog .errorMessageDisplay {
     left: 0;
     background-color: var(--contentContainerBackground);
     border-right: solid 1px var(--lightgrey);
-    z-index: 1;
+    z-index: 3;
 }
 
 .timeslotLabel,
@@ -417,6 +417,7 @@ dialog .errorMessageDisplay {
     border-radius: var(--standardRadius);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     padding: 0.5rem 0.5rem;
+    z-index: 1;
 }
 
 .addLessonButtonWrapper {
@@ -863,7 +864,7 @@ h3 {
     visibility: hidden;
     position: absolute;
     right: calc(100% + 15px);
-    z-index: 4;
+    z-index: 5;
     min-width: 250px;
     padding: 1rem;
     border-radius: var(--standardRadius);
@@ -1003,6 +1004,10 @@ h3 {
 
 .marginTop {
     margin-top: 1rem;
+}
+
+.centeredText {
+    text-align: center;
 }
 
 .marginBottom {
@@ -1312,7 +1317,7 @@ h3 {
         position: absolute;
         top: 2rem;
         right: 0rem;
-        z-index: 2;
+        z-index: 4;
         flex-direction: column;
         gap: 0;
         background-color: var(--lightMenuBackground);

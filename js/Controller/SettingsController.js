@@ -59,12 +59,15 @@ export default class SettingsController {
         await model.saveNewTimetable(lessons);
 
         // check, whether lesson Changes exist after the validFrom date of the new timetable
-        let validUntil = lessons[0].validUntil ? lessons[0].validUntil : (new Date().setHours(12) + ONEDAY * 365);
+        let validUntil = lessons[0].validUntil == null || lessons[0].validUntil == 'null' ? (new Date().setHours(12) + ONEDAY * 365) : lessons[0].validUntil;
 
         let affectedLessonChanges = await LessonController.getTimetableChanges(validFrom, validUntil);
         let affectedTasks = await TaskController.getAllTasksInTimespan(validFrom, validUntil);
 
-        if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
+        if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) {
+            let filteredLessonChanges = await LessonController.filterAffectedLessonChanges(affectedLessonChanges, lessons, true);
+            View.renderLessonChangesAndTasksToKeepDialog(filteredLessonChanges, affectedTasks, validFrom);
+        }
 
         //triggers reordering of tasks for each lesson
         LessonController.renderLesson();
@@ -92,20 +95,26 @@ export default class SettingsController {
         await model.saveTimetableUpdates(validFrom, lessons);
 
         // check, whether future lesson changes and tasks exist that are affected by the timetable edit
-        let validUntil = lessons[0].validUntil ? lessons[0].validUntil : (new Date().setHours(12) + ONEDAY * 365);
+        let validUntil = lessons[0].validUntil == null || lessons[0].validUntil == 'null' ? (new Date().setHours(12) + ONEDAY * 365) : lessons[0].validUntil;
 
         let affectedLessonChanges = await LessonController.getTimetableChanges(startDate, validUntil);
         let affectedTasks = await TaskController.getAllTasksInTimespan(startDate, validUntil);
 
         if (affectedLessonChanges.length > 0 || affectedTasks.length > 0) {
-            LessonController.removeOutdatedCanceledLessons(affectedLessonChanges);
-            View.renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks);
+            let filteredLessonChanges = await LessonController.filterAffectedLessonChanges(affectedLessonChanges, lessons, false);
+            View.renderLessonChangesAndTasksToKeepDialog(filteredLessonChanges, affectedTasks, validFrom);
         }
 
         LessonController.renderLesson();
         TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
 
         View.discardNewTimetable();
+    }
+
+    static async handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate) {
+        await LessonController.handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate);
+        LessonController.renderLesson();
+        TaskController.renderTaskChanges();
     }
 
     static logout() {
