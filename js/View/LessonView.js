@@ -112,6 +112,9 @@ export default class LessonView {
             lesson.addEventListener('mouseenter', AbstractView.highlightTask);
             lesson.addEventListener('mouseleave', AbstractView.removeTaskHighlight);
 
+            // lesson.addEventListener('click', () => mockup.showModal())
+
+
             lesson.querySelector('.lessonOptionsButton').addEventListener('click', LessonView.showLessonOptions);
             lesson.addEventListener('mouseleave', LessonView.hideLessonsOptions);
 

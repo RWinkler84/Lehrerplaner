@@ -26,7 +26,7 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
-    AbstractController.setVersion('0.9.31');
+    AbstractController.setVersion('0.9.33');
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
@@ -272,6 +272,9 @@ async function startApp() {
             document.querySelector('#weekOverviewContainer').style.left = 'auto';
         }
     }
+
+
+    closeMockup.addEventListener('click', () => {document.querySelector('#mockup').close()});
 }
 
 startApp();

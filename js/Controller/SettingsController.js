@@ -23,6 +23,8 @@ export default class SettingsController {
 
         View.renderExistingSubjects();
         View.renderSelectableLessonColors();
+        LessonController.renderLesson();
+        View.renderLessons()
 
         return true;
     }
@@ -34,6 +36,8 @@ export default class SettingsController {
 
         View.renderExistingSubjects();
         View.renderSelectableLessonColors();
+        View.renderLessons()
+        LessonController.renderLesson();
     }
 
     static async saveNewTimetable(validFrom, lessons) {

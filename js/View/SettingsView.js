@@ -46,6 +46,11 @@ export default class SettingsView {
             'subjectColorThree',
             'subjectColorFour',
             'subjectColorFive',
+            'subjectColorSix',
+            'subjectColorSeven',
+            'subjectColorEight',
+            'subjectColorNine',
+            'subjectColorTen',
         ];
 
         let selectionContainer = document.querySelector('#colourSelection');

@@ -14,6 +14,17 @@
     --darkMint: #acef79;
     --lightMatteGreen: #17B2B5;
     --lightMatteRed: #F58F8F;
+    --robinBlue: #1ECBE1;
+    --darkRobinBlue: #1bb2c5;
+    --champagne: #FFEAD0;
+    --darkChampagne: #FFDAAD;
+    --rose: #F77896;
+    --darkRose: #F55178;
+    --purple: #6C56B3; 
+    --lightPurple: #8472C0;
+    --pumpkin: #FA7921;
+    --lightPumpkin: #FB924B;
+
     --lightgrey: rgb(184, 184, 184);
     --lightergrey: rgb(227, 227, 227);
     --labelgrey: rgb(106, 106, 106);
@@ -1034,8 +1045,54 @@ h3 {
     background-color: var(--mint);
     color: black;
 }
+.subjectColorSix {
+    background-color: var(--robinBlue);
+    color: black;
+}
+
+.subjectColorSeven {
+    background-color: var(--champagne);
+    color: black;
+}
+
+.subjectColorEight {
+    background-color: var(--rose);
+    /* color: black; */
+}
+
+.subjectColorNine {
+    background-color: var(--purple);
+}
+
+.subjectColorTen {
+    background-color: var(--pumpkin);
+    color: black;
+}
 
 .subjectColorFive.light.lessonOptionsWrapper .lessonOption button {
+    color: black;
+}
+
+.subjectColorSix button,
+.subjectColorSix.light.lessonOptionsWrapper .lessonOption button {
+    color: black;
+}
+
+.subjectColorSeven.light.lessonOptionsWrapper .lessonOption button {
+    color: black;
+}
+
+.subjectColorEight button {
+    color: var(--lighterText);
+}
+
+.subjectColorTen button,
+.subjectColorTen.light.lessonOptionsWrapper .lessonOption button {
+    color: black;
+}
+
+.undefined button,
+.undefined.light.lessonOptionsWrapper .lessonOption button {
     color: black;
 }
 
@@ -1069,6 +1126,26 @@ h3 {
 
 .subjectColorFive.light {
     background-color: var(--darkMint);
+}
+
+.subjectColorSix.light {
+    background-color: var(--darkRobinBlue);
+}
+
+.subjectColorSeven.light {
+    background-color: var(--darkChampagne);
+}
+
+.subjectColorEight.light {
+    background-color: var(--darkRose);
+}
+
+.subjectColorNine.light {
+    background-color: var(--lightPurple);
+}
+
+.subjectColorTen.light {
+    background-color: var(--lightPumpkin);
 }
 
 .blankWeekTable {
