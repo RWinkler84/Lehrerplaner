@@ -29,7 +29,6 @@ class LessonController extends AbstractController
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
 
-        error_log(print_r($lessonData, true));
         $result = $this->model->update($lessonData);
 
         echo json_encode($result);

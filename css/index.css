@@ -209,6 +209,8 @@ dialog .errorMessageDisplay {
 #LessonChangesAndTasksToKeepDialog {
     width: fit-content;
     min-width: 700px;
+    /* overflow-y: auto; */
+    scrollbar-color: inherit transparent;
 }
 
 .dialogBody {
@@ -1025,6 +1027,8 @@ h3 {
     margin-bottom: 1rem;
 }
 
+
+/* Lesson Colors */
 .subjectColorOne {
     background-color: var(--matteGreen);
 }
@@ -1066,7 +1070,7 @@ h3 {
 
 .subjectColorTen {
     background-color: var(--pumpkin);
-    color: black;
+    /* color: black; */
 }
 
 .subjectColorFive.light.lessonOptionsWrapper .lessonOption button {
@@ -1075,7 +1079,7 @@ h3 {
 
 .subjectColorSix button,
 .subjectColorSix.light.lessonOptionsWrapper .lessonOption button {
-    color: black;
+    color: --var(black);
 }
 
 .subjectColorSeven.light.lessonOptionsWrapper .lessonOption button {
@@ -1086,24 +1090,35 @@ h3 {
     color: var(--lighterText);
 }
 
-.subjectColorTen button,
-.subjectColorTen.light.lessonOptionsWrapper .lessonOption button {
+.subjectColorTen button {
+    /* color: black; */
+    color: var(--lighterText);
+
+}
+
+/* .undefined button, */
+.undefined.light.lessonOptionsWrapper .lessonOption button {
     color: black;
 }
 
-.undefined button,
-.undefined.light.lessonOptionsWrapper .lessonOption button {
-    color: black;
+.canceled button {
+    color: var(--lightgrey);
 }
 
 .subjectColorOne .lessonHasTaskIndicator,
 .subjectColorTwo .lessonHasTaskIndicator,
 .subjectColorThree .lessonHasTaskIndicator,
-.subjectColorFour .lessonHasTaskIndicator {
+.subjectColorFour .lessonHasTaskIndicator,
+.subjectColorNine .lessonHasTaskIndicator,
+.subjectColorTen .lessonHasTaskIndicator {
     background-color: var(--lightergrey);
 }
 
 .subjectColorFive .lessonHasTaskIndicator,
+.subjectColorSix .lessonHasTaskIndicator,
+.subjectColorSeven .lessonHasTaskIndicator,
+.subjectColorEight .lessonHasTaskIndicator,
+.undefined .lessonHasTaskIndicator,
 .appointement .lessonHasTaskIndicator {
     background-color: var(--labelgrey);
 }
