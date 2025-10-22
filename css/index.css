@@ -758,6 +758,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     border-radius: var(--smallRadius);
     padding: 0 0.2em;
     background-color: transparent;
+    font-size: 1rem;
 }
 
 .lessonOptionsButton:hover,
@@ -1079,7 +1080,7 @@ h3 {
 
 .subjectColorSix button,
 .subjectColorSix.light.lessonOptionsWrapper .lessonOption button {
-    color: --var(black);
+    color: black;
 }
 
 .subjectColorSeven.light.lessonOptionsWrapper .lessonOption button {
