@@ -1,3 +1,4 @@
+import { ONEDAY } from '../index.js';
 import Task from '../Model/Task.js';
 import View from '../View/TaskView.js';
 import LessonController from './LessonController.js';
@@ -136,8 +137,14 @@ export default class TaskController {
         this.renderTaskChanges();
     }
 
-    static tasksTableEventHandler(event) {
+    static async tasksTableEventHandler(event) {
         if (event.type == 'dblclick') {
+            let timetable = await LessonController.getAllRegularLessons();
+            let timetableChanges = await LessonController.getAllTimetableChanges();
+            let lessonDates = await Task.calculateAllLessonDates('7c', 'De', new Date().setHours(12) + ONEDAY * 30, timetable, timetableChanges);
+
+            console.log(lessonDates);
+
             View.makeEditable(event);
             return;
         }

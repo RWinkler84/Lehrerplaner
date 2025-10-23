@@ -472,8 +472,8 @@ dialog .errorMessageDisplay {
     background-color: var(--lightergrey);
 }
 
-#upcomingTasksTable tbody tr:hover+tr,
-#inProgressTasksTable tbody tr:hover+tr {
+#upcomingTasksTable tbody tr[data-taskid]:hover+tr,
+#inProgressTasksTable tbody tr[data-taskid]:hover+tr {
     background-color: var(--lightergrey);
 }
 
@@ -809,9 +809,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
     display: none;
 }
 
-
-.saveTaskButton,
-.updateTaskButton,
 .saveNewLessonButton {
     background-color: var(--lightMatteGreen);
     margin-right: 0.5rem;

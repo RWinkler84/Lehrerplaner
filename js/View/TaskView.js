@@ -411,12 +411,21 @@ export default class TaskView extends AbstractView {
         let parentTr = event.target.closest('tr');
 
         parentTr.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
-        parentTr.nextElementSibling.style.display = 'table-row';
         parentTr.querySelector('td[data-taskdescription]').focus();
+
+        if (window.innerWidth > 620) {
+            parentTr.nextElementSibling.style.display = 'table-row';
+        } else {
+            parentTr.nextElementSibling.style.display = 'block';
+            parentTr.nextElementSibling.style.marginTop = '-2rem';
+        }
 
         window.getSelection().removeAllRanges();
         TaskView.showSaveOrDiscardChangesButtons(event);
+
         parentTr.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        parentTr.nextElementSibling.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
+        parentTr.nextElementSibling.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
     }
 
     static highlightCheckboxTrPreviousSibling(event) {
