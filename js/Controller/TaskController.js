@@ -87,6 +87,8 @@ export default class TaskController {
 
         task.class = taskData.class;
         task.subject = taskData.subject;
+        task.date = taskData.date;
+        task.timeslot = taskData.timeslot;
         task.description = taskData.description;
         task.fixedTime = taskData.fixedTime;
         task.reoccuring = taskData.reoccuring;
@@ -131,6 +133,12 @@ export default class TaskController {
         View.renderTasks();
     }
 
+    static revertTaskChanges(event) {
+        View.removeEditability(event);
+        View.showSetDoneOrInProgressButtons(event);
+        View.renderTasks();
+    }
+
     static async reorderTasks(oldTimetable, oldTimetableChanges) {
 
         await Task.reorderTasks(oldTimetable, oldTimetableChanges);
@@ -139,13 +147,10 @@ export default class TaskController {
 
     static async tasksTableEventHandler(event) {
         if (event.type == 'dblclick') {
-            let timetable = await LessonController.getAllRegularLessons();
-            let timetableChanges = await LessonController.getAllTimetableChanges();
-            let lessonDates = await Task.calculateAllLessonDates('7c', 'De', new Date().setHours(12) + ONEDAY * 30, timetable, timetableChanges);
+            let taskData = View.getTaskDataFromTr(event);
+            let upcomingLessons = await Task.calculateAllLessonDates(taskData.class, taskData.subject, new Date().setHours(12) + ONEDAY * 30);
 
-            console.log(lessonDates);
-
-            View.makeEditable(event);
+            View.makeEditable(event, upcomingLessons);
             return;
         }
 
@@ -158,7 +163,7 @@ export default class TaskController {
         if (event.target.classList.contains('setTaskDoneButton')) View.setTaskDone(event);
         if (event.target.classList.contains('setTaskInProgressButton')) View.setTaskInProgress(event);
         if (event.target.classList.contains('saveTaskButton')) View.saveTask(event);
-        if (event.target.classList.contains('discardUpdateTaskButton')) View.revertChanges(event);
+        if (event.target.classList.contains('discardUpdateTaskButton')) this.revertTaskChanges(event);
         if (event.target.classList.contains('discardNewTaskButton')) View.removeTaskForm(event);
     }
 }

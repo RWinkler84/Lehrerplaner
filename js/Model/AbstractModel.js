@@ -293,12 +293,15 @@ export default class AbstractModel {
         return await this.makeAjaxQuery('abstract', 'sendSupportTicket', formData);
     }
 
-    static async calculateAllLessonDates(className, subject, endDate, timetable, lessonChanges) {
+    static async calculateAllLessonDates(className, subject, endDate, timetable = null, lessonChanges = null) {
 
         let dateIterator = new Date().setHours(12, 0, 0, 0);
         let validTimetableDates = await AbstractModel.getCurrentlyAndFutureValidTimetableDates();
         let teachingWeekdays = [];
         let allLessonDates = [];
+
+        if (!timetable) timetable = await AbstractController.getAllRegularLessons();
+        if (!lessonChanges) lessonChanges = await AbstractController.getAllTimetableChanges();
 
         //check on which weekdays a lesson is held
         timetable.forEach(entry => {

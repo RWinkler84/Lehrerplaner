@@ -521,6 +521,17 @@ dialog .errorMessageDisplay {
     text-overflow: ellipsis;
 }
 
+.taskDateSelectWrapper {
+    display: none;
+}
+
+.taskDateSelect {
+    font-size: 0.8rem;
+    padding: initial;
+    text-align: initial;
+    height: initial;
+}
+
 .taskDescription {
     width: 100%;
     max-width: 0px;

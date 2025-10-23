@@ -76,7 +76,7 @@ export default class TaskView extends AbstractView {
                     allOpenTasks.forEach(task => {
                         if (task.id == taskId) {
                             this.updateTaskElement(taskElement, task);
-                            this.updateCheckBoxElement(checkBoxElement, task);
+                            this.updateCheckBoxElement(checkBoxElement, taskElement, task);
                         }
                     });
                 }
@@ -116,7 +116,7 @@ export default class TaskView extends AbstractView {
                     allInProgressTasks.forEach(task => {
                         if (task.id == taskId) {
                             this.updateTaskElement(taskElement, task);
-                            this.updateCheckBoxElement(checkBoxElement, task);
+                            this.updateCheckBoxElement(checkBoxElement, taskElement, task);
                         }
                     });
                 }
@@ -136,12 +136,17 @@ export default class TaskView extends AbstractView {
 
     static updateTaskElement(taskElement, task) {
         let buttonTd = taskElement.querySelector('.taskDone');
+        if (buttonTd.querySelector('.editableTask').style.display == 'flex') return; //is the task tr editable, leave it as is
+
         taskElement.dataset.date = task.date;
         taskElement.dataset.timeslot = task.timeslot;
 
         taskElement.querySelector('.taskClassName').textContent = task.class;
         taskElement.querySelector('.taskSubject').textContent = task.subject;
         taskElement.querySelector('.smallDate').textContent = Fn.formatDate(task.date);
+        taskElement.querySelector('.smallDate').removeAttribute('style');
+        taskElement.querySelector('.taskDateSelectWrapper').innerHTML = '';
+        taskElement.querySelector('.taskDateSelectWrapper').removeAttribute('style');
         taskElement.querySelector('.taskDescription').textContent = task.description;
 
         taskElement.querySelector('.taskAdditionalInfo').innerHTML = this.getAdditionalInfoHTML(task);
@@ -154,7 +159,6 @@ export default class TaskView extends AbstractView {
 
         //button update
 
-        if (buttonTd.querySelector('.editableTask').style.display == 'flex') return;
         if (task.status == 'open') {
             buttonTd.querySelector('.openTask').style.display = 'flex';
             buttonTd.querySelector('.inProgressTask').style.display = 'none';
@@ -165,12 +169,28 @@ export default class TaskView extends AbstractView {
         }
     }
 
-    static updateCheckBoxElement(checkBoxElement, task) {
-        if (task.fixedTime == '1') checkBoxElement.querySelector('input[name="fixedDate"]').checked = true;
+    static updateCheckBoxElement(checkBoxElement, taskElement, task) {
+        let buttonTd = taskElement.querySelector('.taskDone');
+        if (buttonTd.querySelector('.editableTask').style.display == 'flex') return; //is the task tr editable, leave it as is
+
+        if (task.fixedTime == '1') {
+            checkBoxElement.querySelector('input[name="fixedDate"]').checked = true;
+        } else {
+            checkBoxElement.querySelector('input[name="fixedDate"]').checked = false;
+        }
+
         if (task.reoccuring == '1') {
             checkBoxElement.querySelector('input[name="reoccuringTask"]').checked = true;
             checkBoxElement.querySelector('select').disabled = false;
             checkBoxElement.querySelector('input[name="fixedDate"]').disabled = true;
+            checkBoxElement.querySelectorAll('option').forEach(option => {
+                option.selected = false;
+                if (option.value == task.reoccuringInterval) option.selected = true;
+            });
+        } else {
+            checkBoxElement.querySelector('input[name="reoccuringTask"]').checked = false;
+            checkBoxElement.querySelector('select').disabled = true;
+            checkBoxElement.querySelector('input[name="fixedDate"]').disabled = false;
             checkBoxElement.querySelectorAll('option').forEach(option => {
                 option.selected = false;
                 if (option.value == task.reoccuringInterval) option.selected = true;
@@ -241,6 +261,7 @@ export default class TaskView extends AbstractView {
                 <td class="taskSubjectContainer" data-subject="${task.subject}" data-heading="Fach:">
                     <div class="taskSubject">${task.subject}</div>
                     <div class="smallDate">${subjectDate}</div>
+                    <div class="taskDateSelectWrapper"></div>
                 </td>
                 <td class="taskDescription" data-taskDescription="" data-heading="Beschreibung:">${task.description}</td>
                 <td class="taskDone">
@@ -392,6 +413,7 @@ export default class TaskView extends AbstractView {
         let taskData = {
             'id': taskTr.dataset.taskid,
             'class': classTd.dataset.class,
+            'date': taskTr.querySelector('.taskDateSelect').value,
             'subject': subjectTd.dataset.subject,
             'description': taskTr.querySelector('td[data-taskdescription]').innerText,
             'fixedTime': taskTr.nextElementSibling.querySelector('input[type="checkbox"]').checked,
@@ -399,19 +421,21 @@ export default class TaskView extends AbstractView {
             'reoccuringInterval': taskTr.nextElementSibling.querySelector('select').value
         }
 
+        taskData.timeslot = taskTr.querySelector(`option[value="${taskData.date}"]`).dataset.timeslot;
+        console.log(taskData);
+
         Controller.updateTask(taskData, event);
     }
 
-    static makeEditable(event) {
+    static makeEditable(event, upcomingLessons) {
 
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
+        if (event.target.closest('tr').querySelector('td[data-taskdescription]').hasAttribute('contenteditable')) return;
 
         this.#backupTaskData(event);
 
         let parentTr = event.target.closest('tr');
-
-        parentTr.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
-        parentTr.querySelector('td[data-taskdescription]').focus();
+        let dateSelect = this.getDateSelectHTML(parentTr, upcomingLessons);
 
         if (window.innerWidth > 620) {
             parentTr.nextElementSibling.style.display = 'table-row';
@@ -420,12 +444,54 @@ export default class TaskView extends AbstractView {
             parentTr.nextElementSibling.style.marginTop = '-2rem';
         }
 
+        parentTr.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
+        parentTr.querySelector('td[data-taskdescription]').focus();
+
+        parentTr.querySelector('.taskDateSelectWrapper').append(dateSelect);
+        parentTr.querySelector('.taskDateSelectWrapper').style.display = "block";
+        parentTr.querySelector('.smallDate').style.display = 'none';
+
         window.getSelection().removeAllRanges();
         TaskView.showSaveOrDiscardChangesButtons(event);
 
         parentTr.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
         parentTr.nextElementSibling.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
         parentTr.nextElementSibling.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
+    }
+
+    static getDateSelectHTML(taskElement, upcomingLessons) {
+        let taskDate = new Date(taskElement.dataset.date);
+        let select = document.createElement('select');
+        let optionElement = document.createElement('option');
+        select.classList.add('taskDateSelect');
+        select.setAttribute('name', 'taskDateSelect');
+
+        upcomingLessons.forEach(lesson => {
+            let lessonDate = Fn.formatDate(lesson.date);
+            let lessonDateFullYear = lesson.date;
+            let option = optionElement.cloneNode();
+
+            option.setAttribute('value', lessonDateFullYear);
+            option.setAttribute('data-timeslot', lesson.timeslot);
+            option.textContent = lessonDate;
+            if (taskDate.setHours(12) == lesson.date.setHours(12)) option.setAttribute('selected', '');
+
+            select.append(option);
+        });
+
+        return select;
+    }
+
+    static getTaskDataFromTr(event) {
+        let taskElement = event.target.closest('tr');
+
+        return {
+            id: taskElement.dataset.taskid,
+            class: taskElement.querySelector('.taskClassName').dataset.class,
+            subject: taskElement.querySelector('.taskSubjectContainer').dataset.subject,
+            date: taskElement.dataset.date,
+            description: taskElement.querySelector('.taskDescription').innerText
+        };
     }
 
     static highlightCheckboxTrPreviousSibling(event) {
@@ -461,7 +527,7 @@ export default class TaskView extends AbstractView {
         let taskTr = event.target.closest('tr');
 
         if (!taskTr.hasAttribute('data-new')) {
-            this.revertChanges(event);
+            Controller.revertTaskChanges(event);
             return;
         }
 
@@ -475,31 +541,6 @@ export default class TaskView extends AbstractView {
             tableBody.nextElementSibling.querySelector('td[data-noentriesfound]').style.display = 'table-cell';
             return;
         }
-    }
-
-    static async revertChanges(event) {
-
-        let taskTr = event.target.closest('tr');
-        let selectTr = event.target.closest('tr').nextElementSibling;
-        let taskId = taskTr.dataset.taskid;
-        let task = await Controller.getTaskBackupData(taskId);
-        let taskDate = Fn.formatDate(task.date);
-
-        taskTr.querySelector('td[data-class]').innerText = task.class;
-        taskTr.querySelector('td[data-subject]').innerHTML = `<div class="taskSubject">${task.subject}</div><div class="smallDate">${taskDate}</div>`;
-        taskTr.querySelector('td[data-taskDescription]').innerHTML = task.description;
-
-        selectTr.querySelector('input[name="fixedDate"]').checked = task.fixedTime == 1 ? true : false;
-        selectTr.querySelector('input[name="fixedDate"]').disabled = task.reoccuring == 1 ? true : false;
-        selectTr.querySelector('input[name="reoccuringTask"]').checked = task.reoccuring == 1 ? true : false;
-        selectTr.querySelector('select[name="reoccuringIntervalSelect"]').disabled = task.reoccuring == 1 ? false : true;
-        selectTr.querySelectorAll('option').forEach(option => {
-            option.selected = false;
-            if (option.value == task.reoccuringInterval) option.selected = true;
-        });
-
-        TaskView.removeEditability(event);
-        TaskView.showSetDoneOrInProgressButtons(event);
     }
 
     static setTaskInProgress(event) {
