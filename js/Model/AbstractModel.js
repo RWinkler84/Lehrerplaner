@@ -180,7 +180,7 @@ export default class AbstractModel {
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio', 2);
+            let request = window.indexedDB.open('eduplanio', 3);
 
             request.onupgradeneeded = (event) => {
                 let db = request.result;
@@ -257,7 +257,8 @@ export default class AbstractModel {
                 subjects: null,
                 timetable: null,
                 timetableChanges: null,
-                tasks: null
+                tasks: null,
+                lessonNotes: null
             }
         }
 
@@ -268,6 +269,7 @@ export default class AbstractModel {
             dataToStore.lastUpdated.timetable = timestamps.lastUpdated.timetable ? timestamps.lastUpdated.timetable : 0;
             dataToStore.lastUpdated.timetableChanges = timestamps.lastUpdated.timetableChanges ? timestamps.lastUpdated.timetableChanges : 0;
             dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
+            dataToStore.lastUpdated.lessonNotes = timestamps.lastUpdated.lessonNotes ? timestamps.lastUpdated.lessonNotes : 0;
         }
 
         switch (store) {
@@ -282,6 +284,9 @@ export default class AbstractModel {
                 break;
             case 'tasks':
                 dataToStore.lastUpdated.tasks = this.formatDateTime(date);
+                break;
+            case 'lessonNotes':
+                dataToStore.lastUpdated.lessonNotes = this.formatDateTime(date);
                 break;
         }
 
