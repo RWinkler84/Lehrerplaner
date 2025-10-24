@@ -381,6 +381,7 @@ export default class LessonView {
             if (optionsWrapper.querySelector('button[data-add_new_task]')) optionsWrapper.querySelector('button[data-add_new_task]').addEventListener('click', Controller.createNewTask);
             if (optionsWrapper.querySelector('button[data-lesson_canceled]')) optionsWrapper.querySelector('button[data-lesson_canceled]').addEventListener('click', LessonView.setLessonCanceled);
             if (optionsWrapper.querySelector('button[data-lesson_uncanceled]')) optionsWrapper.querySelector('button[data-lesson_uncanceled]').addEventListener('click', LessonView.setLessonNotCanceled);
+            if (optionsWrapper.querySelector('button[data-add_note]')) optionsWrapper.querySelector('button[data-add_note]').addEventListener('click', Controller.renderLessonNote);
 
         } else {
             LessonView.hideLessonsOptions(event);

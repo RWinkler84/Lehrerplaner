@@ -3,9 +3,9 @@ import AbstractController from './Controller/AbstractController.js';
 import TaskController from './Controller/TaskController.js';
 import SettingsController from './Controller/SettingsController.js';
 import AbstractView from './View/AbstractView.js';
-import LessonView from './View/LessonView.js';
 import TaskView from './View/TaskView.js';
 import SettingsView from './View/SettingsView.js';
+import LessonView from './View/LessonView.js';
 import Fn from './inc/utils.js';
 import LessonNote from './Model/LessonNote.js';
 

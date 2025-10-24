@@ -1,13 +1,15 @@
 import AbstractModel from "./AbstractModel.js";
 
 export default class LessonNote extends AbstractModel {
-    #id
-    #date
-    #weekday
-    #timeslot
-    #class
-    #subject
-    #content
+    #id;
+    #date;
+    #weekday;
+    #timeslot;
+    #class;
+    #subject;
+    #content;
+    #created;
+    #lastEdited;
 
     constructor() {
         super();
@@ -51,11 +53,14 @@ export default class LessonNote extends AbstractModel {
         return notesArray;
     }
 
-    static async getAllNotesInTimeRange(startDate, endDate) {
+    static async getAllNotesInTimeRange(startDate, endDate = null) {
         let model = new AbstractModel;
         let db = await model.openIndexedDB();
         let store = db.transaction('lessonNotes', 'readonly').objectStore('lessonNotes');
         let index = store.index('date');
+
+        if (!endDate) endDate = startDate;
+
         let range = IDBKeyRange.bound(model.formatDate(startDate), model.formatDate(endDate));
 
         return new Promise((resolve, reject) => {
@@ -85,46 +90,42 @@ export default class LessonNote extends AbstractModel {
         });
     }
 
-    static async updateLessonNote(noteData) {
-        let note = this.getById(noteData.id);
-
-        note = this.writeDataToInstance(note, noteData);
-
-        note.update();
-    }
-
     static createMockData() {
         const mockLessonNotes = [
             {
                 id: 1,
-                date: '2025-10-13',
-                timeslot: '08:00–08:45',
-                class: '10A',
-                subject: 'Mathematik',
+                date: '2025-10-23',
+                weekday: '4',
+                timeslot: '1',
+                class: '7c',
+                subject: 'De',
                 content: 'Einführung in lineare Gleichungen'
             },
             {
                 id: 2,
-                date: '2025-10-13',
-                timeslot: '09:00–09:45',
-                class: '10A',
-                subject: 'Englisch',
+                date: '2025-10-27',
+                weekday: '1',
+                timeslot: '1',
+                class: '12a',
+                subject: 'Fra',
                 content: 'Simple Past vs. Present Perfect'
             },
             {
                 id: 3,
-                date: '2025-10-14',
-                timeslot: '08:00–08:45',
-                class: '10B',
-                subject: 'Physik',
+                date: '2025-10-27',
+                weekday: '1',
+                timeslot: '2',
+                class: '12a',
+                subject: 'Info',
                 content: 'Newtonsche Gesetze – Grundlagen'
             },
             {
                 id: 4,
-                date: '2025-10-14',
-                timeslot: '09:00–09:45',
-                class: '10A',
-                subject: 'Biologie',
+                date: '2025-10-28',
+                timeslot: '1',
+                weekday: '2',
+                class: '7c',
+                subject: 'Ge',
                 content: 'Zellaufbau und Zellteilung'
             },
             {
@@ -187,6 +188,7 @@ export default class LessonNote extends AbstractModel {
     }
 
     async save() {
+        this.lastEdited = this.formatDateTime(new Date());
 
         await this.writeToLocalDB('lessonNotes', this.serialize());
         let result = await this.makeAjaxQuery('lessonNotes', 'save', this.serialize());
@@ -197,10 +199,10 @@ export default class LessonNote extends AbstractModel {
     }
 
     async update() {
+        this.lastEdited = this.formatDateTime(new Date());
+
         await this.updateOnLocalDB('lessonNotes', this.serialize());
         let result = await this.makeAjaxQuery('lessonNotes', 'update', this.serialize());
-
-        console.log(result)
 
         if (result.status == 'failed') {
             await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
@@ -220,21 +222,29 @@ export default class LessonNote extends AbstractModel {
         return {
             id: this.id,
             date: this.date,
+            weekday: this.weekday,
             timeslot: this.timeslot,
             class: this.class,
             subject: this.subject,
-            content: this.content
+            content: this.content,
+            created: this.created,
+            lastEdited: this.lastEdited
         }
     }
 
-    static writeDataToInstance(instance, noteData) {
-        instance.id ?? noteData.id;
+    static writeDataToInstance(instance = null, noteData) {
+        let model = new AbstractModel;
+        if (!instance) instance = new LessonNote;
+
+        instance.id = instance.id ?? noteData.id;
         if (noteData.date) instance.date = noteData.date;
         if (noteData.weekday) instance.weekday = noteData.weekday;
         if (noteData.timeslot) instance.timeslot = noteData.timeslot;
         if (noteData.class) instance.class = noteData.class;
         if (noteData.subject) instance.subject = noteData.subject;
         if (noteData.content) instance.content = noteData.content;
+        if (noteData.created) {instance.created = noteData.created} else {instance.created = model.formatDateTime(new Date())};
+        if (noteData.lastEdited) {instance.lastEdited = noteData.lastEdited} else {instance.lastEdited = model.formatDateTime(new Date())};
 
         return instance;
     }
@@ -247,6 +257,8 @@ export default class LessonNote extends AbstractModel {
     get class() { return this.#class; }
     get subject() { return this.#subject; }
     get content() { return this.#content; }
+    get created() { return this.#created; }
+    get lastEdited() { return this.#lastEdited; }
 
     // Setter
     set id(value) { this.#id = value; }
@@ -256,5 +268,7 @@ export default class LessonNote extends AbstractModel {
     set class(value) { this.#class = value; }
     set subject(value) { this.#subject = value; }
     set content(value) { this.#content = value; }
+    set created(value) { this.#created = value; }
+    set lastEdited(value) { this.#lastEdited = value; }
 
 }

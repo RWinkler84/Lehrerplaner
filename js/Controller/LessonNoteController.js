@@ -1,7 +1,13 @@
-import AbstractController from "./AbstractController.js";
 import LessonNote from "../Model/LessonNote.js";
+import LessonNoteView from "../View/LessonNoteView.js";
+import AbstractController from "./AbstractController.js";
 
-export default class LessonNoteController extends AbstractController {
+export default class LessonNoteController {
+    static renderLessonNote(event) {
+        console.log('da')
+        LessonNoteView.renderLessonNotesModal(event);
+    }
+
     static async getAllLessonNotes() {
         return await LessonNote.getAllLessonNotes();
     }
@@ -15,26 +21,22 @@ export default class LessonNoteController extends AbstractController {
     }
 
     static async saveLessonNote(noteData) {
-        let note = this.#createNoteObjectFromData(noteData);
+        let note = LessonNote.writeDataToInstance(noteData);
 
         return await note.save();
     }
 
     static async updateLessonNote(noteData) {
-        return await LessonNote.updateLessonNote(noteData); 
+        let note = await LessonNote.getById(noteData.id);
+
+        note = LessonNote.writeDataToInstance(note, noteData);
+
+        note.update();
     }
 
-    static #createNoteObjectFromData(noteData) {
-        let note = new LessonNote;
+    static async deleteLessonNote(id) {
+        let note = await LessonNote.getById(id);
 
-        note.id = noteData.id;
-        note.date = noteData.date;
-        note.weekday = noteData.weekday;
-        note.timeslot = noteData.timeslot;
-        note.class = noteData.class;
-        note.subject = noteData.subject;
-        note.content = noteData.content;
-
-        return note;
+        note.delete();
     }
 }

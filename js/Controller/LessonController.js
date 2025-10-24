@@ -2,6 +2,7 @@ import Lesson from '../Model/Lesson.js';
 import View from '../View/LessonView.js';
 import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
+import LessonNoteController from './LessonNoteController.js';
 
 export default class LessonController {
 
@@ -139,6 +140,10 @@ export default class LessonController {
 
     static async getAllTasksInTimespan(startDate, endDate) {
         return await TaskController.getAllTasksInTimespan(startDate, endDate);
+    }
+
+    static renderLessonNote(event) {
+        LessonNoteController.renderLessonNote(event);
     }
 
     static #lessonDataToLessonObject(lessonData) {

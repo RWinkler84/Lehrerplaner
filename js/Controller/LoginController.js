@@ -2,7 +2,7 @@ import AbstractController from "./AbstractController.js";
 import View from "../View/LoginView.js";
 import Model from "../Model/Login.js";
 
-export default class LoginController extends AbstractController {
+export default class LoginController {
 
     static async openLoginDialog(event, forceOpen = false) {
         event?.preventDefault();
