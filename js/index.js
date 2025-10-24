@@ -7,6 +7,7 @@ import LessonView from './View/LessonView.js';
 import TaskView from './View/TaskView.js';
 import SettingsView from './View/SettingsView.js';
 import Fn from './inc/utils.js';
+import LessonNote from './Model/LessonNote.js';
 
 //config
 export const ONEDAY = 86400000;
@@ -28,6 +29,8 @@ export let taskBackupArray = [];
 async function startApp() {
     AbstractController.setVersion('0.9.34');
     await abstCtrl.syncData();
+    
+    LessonNote.createMockData()
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
     window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl))

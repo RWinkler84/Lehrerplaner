@@ -25,13 +25,7 @@ export default class LessonNote extends AbstractModel {
 
         let note = new LessonNote;
 
-        note.id = noteData.id;
-        note.date = noteData.date;
-        note.weekday = noteData.weekday;
-        note.timeslot = noteData.timeslot;
-        note.class = noteData.class;
-        note.subject = noteData.subject;
-        note.content = noteData.content;
+        note = this.writeDataToInstance(note, noteData);
 
         return note;
     }
@@ -49,13 +43,7 @@ export default class LessonNote extends AbstractModel {
         notesDataArray.forEach(noteData => {
             let note = new LessonNote;
 
-            note.id = noteData.id;
-            note.date = noteData.date;
-            note.weekday = noteData.weekday;
-            note.timeslot = noteData.timeslot;
-            note.class = noteData.class;
-            note.subject = noteData.subject;
-            note.content = noteData.content;
+            note = this.writeDataToInstance(note, noteData);
 
             notesArray.push(note);
         })
@@ -66,8 +54,43 @@ export default class LessonNote extends AbstractModel {
     static async getAllNotesInTimeRange(startDate, endDate) {
         let model = new AbstractModel;
         let db = await model.openIndexedDB();
+        let store = db.transaction('lessonNotes', 'readonly').objectStore('lessonNotes');
+        let index = store.index('date');
+        let range = IDBKeyRange.bound(model.formatDate(startDate), model.formatDate(endDate));
 
+        return new Promise((resolve, reject) => {
+            let results = [];
+            let search = index.openCursor(range);
 
+            search.onsuccess = (event) => {
+                let cursor = event.target.result;
+
+                if (cursor) {
+                    let note = new LessonNote;
+                    let noteData = cursor.value;
+
+                    note = this.writeDataToInstance(note, noteData);
+
+                    results.push(note);
+                    cursor.continue();
+                } else {
+                    resolve(results);
+                }
+            };
+
+            search.onerror = (event) => {
+                console.error('Fetching failed', event.target.error);
+                reject(event.target.error);
+            }
+        });
+    }
+
+    static async updateLessonNote(noteData) {
+        let note = this.getById(noteData.id);
+
+        note = this.writeDataToInstance(note, noteData);
+
+        note.update();
     }
 
     static createMockData() {
@@ -156,16 +179,10 @@ export default class LessonNote extends AbstractModel {
 
         mockLessonNotes.map(async (noteData) => {
             let note = new LessonNote;
-            
-            note.id = noteData.id;
-            note.date = noteData.date;
-            note.weekday = noteData.weekday;
-            note.timeslot = noteData.timeslot;
-            note.class = noteData.class;
-            note.subject = noteData.subject;
-            note.content = noteData.content;
 
-            await note.save();
+            note = this.writeDataToInstance(note, noteData);
+
+            await note.update();
         })
     }
 
@@ -175,7 +192,7 @@ export default class LessonNote extends AbstractModel {
         let result = await this.makeAjaxQuery('lessonNotes', 'save', this.serialize());
 
         if (result.status == 'failed') {
-            await this.writeRemoteToLocalDB('unsyncedLessonNotes', this.serialize());
+            await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
         }
     }
 
@@ -183,8 +200,10 @@ export default class LessonNote extends AbstractModel {
         await this.updateOnLocalDB('lessonNotes', this.serialize());
         let result = await this.makeAjaxQuery('lessonNotes', 'update', this.serialize());
 
+        console.log(result)
+
         if (result.status == 'failed') {
-            await this.writeRemoteToLocalDB('unsyncedLessonNotes', this.serialize());
+            await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
         }
     }
 
@@ -193,7 +212,7 @@ export default class LessonNote extends AbstractModel {
         let result = await this.makeAjaxQuery('lessonNotes', 'delete', this.serialize());
 
         if (result.status == 'failed') {
-            await this.writeRemoteToLocalDB('unsyncedLessonNotes', this.serialize());
+            await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
         }
     }
 
@@ -206,6 +225,18 @@ export default class LessonNote extends AbstractModel {
             subject: this.subject,
             content: this.content
         }
+    }
+
+    static writeDataToInstance(instance, noteData) {
+        instance.id ?? noteData.id;
+        if (noteData.date) instance.date = noteData.date;
+        if (noteData.weekday) instance.weekday = noteData.weekday;
+        if (noteData.timeslot) instance.timeslot = noteData.timeslot;
+        if (noteData.class) instance.class = noteData.class;
+        if (noteData.subject) instance.subject = noteData.subject;
+        if (noteData.content) instance.content = noteData.content;
+
+        return instance;
     }
 
     // Getter
