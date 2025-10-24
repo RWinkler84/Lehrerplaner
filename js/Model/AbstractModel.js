@@ -181,6 +181,7 @@ export default class AbstractModel {
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
             let request = window.indexedDB.open('eduplanio', 3);
+            let store;
 
             request.onupgradeneeded = (event) => {
                 let db = request.result;
@@ -192,7 +193,8 @@ export default class AbstractModel {
                         db.createObjectStore('tasks', { keyPath: 'id' });
                         db.createObjectStore('subjects', { keyPath: 'id' });
                         db.createObjectStore('settings', { keyPath: 'id' });
-                        db.createObjectStore('lessonNotes', { keyPath: 'id' });
+                        store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
+                        store.createIndex('date', 'date');
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });
@@ -204,9 +206,9 @@ export default class AbstractModel {
                         break;
                     //case 1 was skipped
                     case 2:
-                        db.createObjectStore('lessonNotes', { keyPath: 'id' });
+                        store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
+                        store.createIndex('date', 'date');
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
-
                 }
             }
 
