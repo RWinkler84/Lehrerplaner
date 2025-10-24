@@ -1,6 +1,6 @@
 import LessonNoteController from "../Controller/LessonNoteController.js";
 import AbstractView from "./AbstractView.js";
-import Fn from "../inc/utils.js"; 
+import Fn from "../inc/utils.js";
 
 export default class LessonNoteView extends AbstractView {
     static async renderLessonNotesModal(event) {
@@ -10,6 +10,7 @@ export default class LessonNoteView extends AbstractView {
         const date = lesson.closest('.weekday').dataset.date;
         const timeslot = lesson.closest('.timeslot').dataset.timeslot;
         const lessonNotes = await LessonNoteController.getAllLessonNotesInTimeRange(date);
+
 
         let matchedNote;
 
@@ -22,12 +23,32 @@ export default class LessonNoteView extends AbstractView {
             matchedNote = note;
         })
 
-        
+        const dialog = document.querySelector('#lessonNoteDialog');
+        const noteContentContainer = dialog.querySelector('#noteContentContainer');
+        const noteContent = dialog.querySelector('#noteContent');
+        const editorContainer = dialog.querySelector('#noteEditorContainer');
+        const textarea = dialog.querySelector('#noteContentEditor');
 
-        console.log(date)
-        console.log(timeslot)
-        console.log(lessonNotes)
-        
+        if (matchedNote) {
+            dialog.dataset.noteid = matchedNote.id;
+            noteContent.textContent = matchedNote.content;
+            textarea.value = matchedNote.content;
+            
+            editorContainer.style.display = 'none';
+            noteContentContainer.removeAttribute('style');
 
+        }
+
+        if (!matchedNote) {
+            noteContentContainer.style.display = 'none';
+            editorContainer.removeAttribute('style');
+            textarea.value = '';
+        }
+
+        dialog.showModal();
+    }
+
+    static closeLessonNotesModal() {
+        document.querySelector('#lessonNoteDialog').close();
     }
 }

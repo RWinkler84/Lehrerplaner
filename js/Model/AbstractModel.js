@@ -108,7 +108,7 @@ export default class AbstractModel {
                 entry.id = Number(entry.id);
                 let transaction = db.transaction(store, 'readwrite').objectStore(store).add();
                 transaction.onsuccess = () => {
-                    this.markLocalDBUpdated()
+                    this.markLocalDBUpdated();
                 }
             });
 

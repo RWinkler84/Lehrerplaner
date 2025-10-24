@@ -4,7 +4,6 @@ import AbstractController from "./AbstractController.js";
 
 export default class LessonNoteController {
     static renderLessonNote(event) {
-        console.log('da')
         LessonNoteView.renderLessonNotesModal(event);
     }
 
@@ -38,5 +37,9 @@ export default class LessonNoteController {
         let note = await LessonNote.getById(id);
 
         note.delete();
+    }
+
+    static handleClickEvents(event) {
+        console.log(event);
     }
 }

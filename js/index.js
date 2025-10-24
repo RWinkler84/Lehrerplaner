@@ -8,6 +8,7 @@ import SettingsView from './View/SettingsView.js';
 import LessonView from './View/LessonView.js';
 import Fn from './inc/utils.js';
 import LessonNote from './Model/LessonNote.js';
+import LessonNoteController from './Controller/LessonNoteController.js';
 
 //config
 export const ONEDAY = 86400000;
@@ -75,6 +76,9 @@ async function startApp() {
     //on site login
     document.addEventListener('click', LoginController.dialogEventHandler);
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
+
+    //lesson note handler
+    document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents)
 
     AbstractController.renderTopMenu();
 

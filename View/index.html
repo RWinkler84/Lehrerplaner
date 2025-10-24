@@ -658,6 +658,25 @@
         </div>
     </dialog>
 
+    <dialog id="lessonNoteDialog" data-noteid>
+        <div class="headline flex spaceBetween">
+            <h3>Stundennotiz</h3><button class="deleteItemButton closeLessonNoteDialog" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <div id="noteContentContainer">
+                <p id="noteContent"></p>
+                <div class="flex justifyEnd"><button class="confirmationButton">Bearbeiten</button></div>
+            </div>
+            <div id="noteEditorContainer" class="marginTop">
+                <textarea id="noteContentEditor" placeholder="Hier kannst du Vermerke zur Stunde hinterlegen, zum Beispiel welche Inhalte behandelt wurden."></textarea>
+                <div class="flex halfGap justifyEnd">
+                    <button class="confirmationButton">Speichern</button>
+                    <button class="cancelButton">Abbrechen</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
     <script src="./js/index.js" type="module"></script>
 </body>
 

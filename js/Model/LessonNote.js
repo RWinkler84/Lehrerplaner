@@ -1,4 +1,5 @@
 import AbstractModel from "./AbstractModel.js";
+import Fn from "../inc/utils.js";
 
 export default class LessonNote extends AbstractModel {
     #id;
@@ -14,7 +15,6 @@ export default class LessonNote extends AbstractModel {
     constructor() {
         super();
     }
-
 
     static async getById(id) {
         let db = new AbstractModel;
@@ -39,7 +39,7 @@ export default class LessonNote extends AbstractModel {
 
         if (notesDataArray.length == 0) {
             console.log('No lesson notes found!');
-            return;
+            return notesArray;
         }
 
         notesDataArray.forEach(noteData => {
@@ -108,7 +108,7 @@ export default class LessonNote extends AbstractModel {
                 timeslot: '1',
                 class: '12a',
                 subject: 'Fra',
-                content: 'Simple Past vs. Present Perfect'
+                content: 'rumbaguetten bis einer richtig hart weint, sich ne flasche wein vor den kopf haut und abopfert. bonjour et au revoir!'
             },
             {
                 id: 3,
@@ -188,6 +188,9 @@ export default class LessonNote extends AbstractModel {
     }
 
     async save() {
+        let allLessonNotes = await LessonNote.getAllLessonNotes();
+
+        this.id = Fn.generateId(allLessonNotes);
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.writeToLocalDB('lessonNotes', this.serialize());
@@ -270,5 +273,4 @@ export default class LessonNote extends AbstractModel {
     set content(value) { this.#content = value; }
     set created(value) { this.#created = value; }
     set lastEdited(value) { this.#lastEdited = value; }
-
 }
