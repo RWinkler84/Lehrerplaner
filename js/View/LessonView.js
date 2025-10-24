@@ -22,6 +22,7 @@ export default class LessonView {
             let lessonOptionsHTML = `
                         <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
                         <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
+                        <div class="lessonOption"><button data-add_note>Notiz</button></div>
                         <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
             `;
 
@@ -66,6 +67,7 @@ export default class LessonView {
             let lessonOptionsHTML = `
                     <div class="lessonOption"><button data-update_lesson>bearbeiten</button></div>
                     <div class="lessonOption"><button data-add_new_task>neue Aufgabe</button></div>
+                    <div class="lessonOption"><button data-add_note>Notiz</button></div>
                     <div class="lessonOption"><button data-lesson_canceled>fällt aus</button></div>
             `;
 

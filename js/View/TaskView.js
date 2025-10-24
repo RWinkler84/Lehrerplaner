@@ -463,10 +463,18 @@ export default class TaskView extends AbstractView {
         let taskDate = new Date(taskElement.dataset.date);
         let select = document.createElement('select');
         let optionElement = document.createElement('option');
+        let optionsMaxAfterSelected = 4;
+        let optionsCount = 0;
+        let startCount = false;
+
         select.classList.add('taskDateSelect');
         select.setAttribute('name', 'taskDateSelect');
 
+        console.log(upcomingLessons);
+
         upcomingLessons.forEach(lesson => {
+            if (optionsCount >= optionsMaxAfterSelected) return;
+
             let lessonDate = Fn.formatDate(lesson.date);
             let lessonDateFullYear = lesson.date;
             let option = optionElement.cloneNode();
@@ -474,9 +482,13 @@ export default class TaskView extends AbstractView {
             option.setAttribute('value', lessonDateFullYear);
             option.setAttribute('data-timeslot', lesson.timeslot);
             option.textContent = lessonDate;
-            if (taskDate.setHours(12) == lesson.date.setHours(12)) option.setAttribute('selected', '');
+            if (taskDate.setHours(12) == lesson.date.setHours(12) && taskElement.dataset.timeslot == lesson.timeslot) {
+                option.setAttribute('selected', '');
+                startCount = true;
+            }
 
             select.append(option);
+            if (startCount) optionsCount++;
         });
 
         return select;

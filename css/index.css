@@ -158,6 +158,7 @@ main {
 #timetableContainer {
     overflow-y: hidden;
     scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
+    scrollbar-width: none;
 }
 
 #isCurrentWeekDot {

@@ -148,7 +148,7 @@ export default class TaskController {
     static async tasksTableEventHandler(event) {
         if (event.type == 'dblclick') {
             let taskData = View.getTaskDataFromTr(event);
-            let upcomingLessons = await Task.calculateAllLessonDates(taskData.class, taskData.subject, new Date().setHours(12) + ONEDAY * 30);
+            let upcomingLessons = await Task.calculateAllLessonDates(taskData.class, taskData.subject, new Date().setHours(12) + ONEDAY * 60);
 
             View.makeEditable(event, upcomingLessons);
             return;
