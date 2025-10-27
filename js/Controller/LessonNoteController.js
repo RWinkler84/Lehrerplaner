@@ -1,6 +1,5 @@
 import LessonNote from "../Model/LessonNote.js";
 import LessonNoteView from "../View/LessonNoteView.js";
-import AbstractController from "./AbstractController.js";
 
 export default class LessonNoteController {
     static renderLessonNote(event) {
@@ -19,16 +18,25 @@ export default class LessonNoteController {
         return await LessonNote.getById(id);
     }
 
-    static async saveLessonNote(noteData) {
-        let note = LessonNote.writeDataToInstance(noteData);
+    static async saveLessonNote() {
+        let noteData = LessonNoteView.getNoteDataFromForm();
 
-        return await note.save();
+        if (noteData.id) {
+            LessonNoteController.updateLessonNote(noteData);
+            return;
+        }
+
+        let note = LessonNote.writeDataToInstance(noteData);
+        console.log(note)
+
+        note.save();
     }
 
     static async updateLessonNote(noteData) {
         let note = await LessonNote.getById(noteData.id);
 
-        note = LessonNote.writeDataToInstance(note, noteData);
+        note = LessonNote.writeDataToInstance(noteData, note);
+        console.log(note);
 
         note.update();
     }
@@ -39,7 +47,36 @@ export default class LessonNoteController {
         note.delete();
     }
 
+    static normalizeInput(){
+        LessonNoteView.normalizeInput();
+    }
+
     static handleClickEvents(event) {
-        console.log(event);
+        console.log(event.target);
+        const clickedElement = event.target;
+
+        switch (clickedElement.id) {
+            case 'noteContentEditor':
+                LessonNoteView.removePlaceholderText();
+                break;
+            case 'closeLessonNotesButton':
+                LessonNoteView.closeLessonNotesDialog();
+                break;
+            case 'saveLessonNotesButton':
+                LessonNoteController.saveLessonNote();
+        }
+
+        switch (true) {
+            case clickedElement.classList.contains('placeholder'):
+                LessonNoteView.removePlaceholderText();
+                break;
+        }
+    }
+
+    static handleKeyDown(event) {
+        const key = event.code;
+
+        switch (key) {
+        }
     }
 }

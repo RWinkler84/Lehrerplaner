@@ -13,6 +13,7 @@ import LessonNoteController from './Controller/LessonNoteController.js';
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
+export const ALLOWEDTAGS = ['div', 'ul', 'ol', 'li', 'b', 'p', 'br']
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
@@ -31,7 +32,7 @@ async function startApp() {
     AbstractController.setVersion('0.9.34');
     await abstCtrl.syncData();
     
-    LessonNote.createMockData()
+    // LessonNote.createMockData()
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
     window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl))
@@ -78,7 +79,8 @@ async function startApp() {
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
 
     //lesson note handler
-    document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents)
+    document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents);
+    document.querySelector('#lessonNoteDialog').addEventListener('input', LessonNoteController.normalizeInput);
 
     AbstractController.renderTopMenu();
 

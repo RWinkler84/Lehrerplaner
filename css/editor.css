@@ -1,0 +1,20 @@
+#noteContentEditor {
+    border: solid 1px var(--bodyBackground);
+    padding: 0.5rem;
+    background-color: white;
+    min-height: 10rem;
+}
+
+#noteContentEditor>*:first-child {
+    margin-top: 0;
+}
+
+.placeholder {
+    color: var(--lightgrey);
+}
+
+#noteContentEditor p, 
+#noteContentEditor div {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}

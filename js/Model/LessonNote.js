@@ -27,7 +27,7 @@ export default class LessonNote extends AbstractModel {
 
         let note = new LessonNote;
 
-        note = this.writeDataToInstance(note, noteData);
+        note = this.writeDataToInstance(noteData, note);
 
         return note;
     }
@@ -45,7 +45,7 @@ export default class LessonNote extends AbstractModel {
         notesDataArray.forEach(noteData => {
             let note = new LessonNote;
 
-            note = this.writeDataToInstance(note, noteData);
+            note = this.writeDataToInstance(noteData, note);
 
             notesArray.push(note);
         })
@@ -74,7 +74,7 @@ export default class LessonNote extends AbstractModel {
                     let note = new LessonNote;
                     let noteData = cursor.value;
 
-                    note = this.writeDataToInstance(note, noteData);
+                    note = this.writeDataToInstance(noteData, note);
 
                     results.push(note);
                     cursor.continue();
@@ -181,7 +181,7 @@ export default class LessonNote extends AbstractModel {
         mockLessonNotes.map(async (noteData) => {
             let note = new LessonNote;
 
-            note = this.writeDataToInstance(note, noteData);
+            note = this.writeDataToInstance(noteData, note);
 
             await note.update();
         })
@@ -224,7 +224,7 @@ export default class LessonNote extends AbstractModel {
     serialize() {
         return {
             id: this.id,
-            date: this.date,
+            date: this.formatDate(this.date),
             weekday: this.weekday,
             timeslot: this.timeslot,
             class: this.class,
@@ -235,7 +235,7 @@ export default class LessonNote extends AbstractModel {
         }
     }
 
-    static writeDataToInstance(instance = null, noteData) {
+    static writeDataToInstance(noteData, instance = null) {
         let model = new AbstractModel;
         if (!instance) instance = new LessonNote;
 
