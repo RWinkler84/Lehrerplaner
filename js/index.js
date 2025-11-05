@@ -80,7 +80,9 @@ async function startApp() {
 
     //lesson note handler
     document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents);
+    document.querySelector('#editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
     document.querySelector('#lessonNoteDialog').addEventListener('input', LessonNoteController.normalizeInput);
+    document.addEventListener('selectionchange', LessonNoteController.updateButtonStatus);
 
     AbstractController.renderTopMenu();
 

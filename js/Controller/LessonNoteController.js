@@ -51,8 +51,12 @@ export default class LessonNoteController {
         LessonNoteView.normalizeInput();
     }
 
+    static updateButtonStatus() {
+        LessonNoteView.updateButtonStatus();
+    }
+
     static handleClickEvents(event) {
-        console.log(event.target);
+        // console.log(event.target);
         const clickedElement = event.target;
 
         switch (clickedElement.id) {
@@ -64,6 +68,12 @@ export default class LessonNoteController {
                 break;
             case 'saveLessonNotesButton':
                 LessonNoteController.saveLessonNote();
+                break;
+            // editor styling buttons
+            case 'boldButton':
+                event.preventDefault();
+                LessonNoteView.addBoldText(event);
+                break;
         }
 
         switch (true) {
