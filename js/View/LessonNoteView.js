@@ -66,8 +66,6 @@ export default class LessonNoteView extends AbstractView {
 
         content = this.serializeNodeContent(editor, true);
 
-        console.log('string', content);
-
         return {
             id: dialog.dataset.noteid,
             class: dialog.dataset.class,
@@ -130,7 +128,6 @@ export default class LessonNoteView extends AbstractView {
     }
 
     static normalizeInput() {
-        console.log('input')
         const editor = document.querySelector('#noteContentEditor');
 
         editor.childNodes.forEach(node => {
@@ -153,7 +150,6 @@ export default class LessonNoteView extends AbstractView {
     //text manipulation and styling
     static addBoldText() {
         const selection = document.getSelection();
-        const range = document.createRange();
 
         let startNode = selection.anchorNode, startOffset = selection.anchorOffset;
         let endNode = selection.focusNode, endOffset = selection.focusOffset;
@@ -174,7 +170,16 @@ export default class LessonNoteView extends AbstractView {
         // if the selection spans only one node
         if (startNode == endNode) {
             if (endOffset < startOffset) [startOffset, endOffset] = [endOffset, startOffset];
-            this.#wrapTextNodeInBTag(startNode, startOffset, endOffset);
+
+            //creates the text node, that should be bold
+            let node = startNode.splitText(startOffset);
+            node.splitText(endOffset - startOffset);
+
+            this.#wrapTextNodeInBTag(node, 0, node.textContent.length);
+            this.#setSelectionStartOrEndMarker(node, 'startMarker');
+            this.#setSelectionStartOrEndMarker(node, 'endMarker');
+            this.#restoreSelection();
+
             return;
         }
 
@@ -190,16 +195,25 @@ export default class LessonNoteView extends AbstractView {
                 if (endNodeReached) return
                 if (node.nodeType != Node.TEXT_NODE) return;
                 if (node.textContent.trim() == '') return;
+
                 if (node == startNode) {
                     startAddingTags = true;
-                    this.#wrapTextNodeInBTag(node, startOffset, node.textContent.length, 'startNode');
+                    node = node.splitText(startOffset);
+                    this.#wrapTextNodeInBTag(node, 0, node.textContent.length, 'startNode');
+                    this.#setSelectionStartOrEndMarker(node, 'startMarker');
+
                     return;
                 }
+
                 if (node == endNode) {
                     endNodeReached = true;
-                    this.#wrapTextNodeInBTag(node, 0, endOffset, 'endNode');
+                    node.splitText(endOffset);
+                    this.#wrapTextNodeInBTag(node, 0, node.textContent.length, 'endNode');
+                    this.#setSelectionStartOrEndMarker(node, 'endMarker');
+
                     return;
                 }
+
                 if (startAddingTags) this.#wrapTextNodeInBTag(node, 0, node.textContent.length);
             });
 
@@ -211,9 +225,10 @@ export default class LessonNoteView extends AbstractView {
 
     /**@param nodeType can be startNode or endNode and inserts a selectionMarker before/after the node, which is later used to restore the user selection */
     static #wrapTextNodeInBTag(node, startOffset, endOffset, nodeType = null) {
-        if (node.parentElement.tagName == 'B') return;
+
         const selection = document.getSelection();
         const range = document.createRange();
+        const previousParent = node.parentElement;
 
         range.setStart(node, startOffset);
         range.setEnd(node, endOffset);
@@ -222,22 +237,16 @@ export default class LessonNoteView extends AbstractView {
         selection.addRange(range);
 
         const b = document.createElement('b');
-        b.append(range.extractContents());
+        b.append(node);
+
+        //prevent nesting
+        if (previousParent.tagName == 'B' && nodeType != null) {
+            if (nodeType == 'startNode') previousParent.parentElement.insertBefore(b, previousParent.nextSibling);
+            if (nodeType == 'endNode') previousParent.parentElement.insertBefore(b, previousParent);
+            return;
+        }
+
         range.insertNode(b);
-
-        if (nodeType == 'startNode') {
-            const marker = document.createElement('span');
-            marker.classList.add('startMarker');
-            range.collapse(true);
-            range.insertNode(marker);
-        }
-
-        if (nodeType == 'endNode') {
-            const marker = document.createElement('span');
-            marker.classList.add('endMarker');
-            range.collapse(false);
-            range.insertNode(marker);
-        }
     }
 
     static removeBoldText(startNode, startOffset, endNode, endOffset) {
@@ -245,8 +254,9 @@ export default class LessonNoteView extends AbstractView {
 
         if (startNode == endNode) {
             if (startOffset != 0) this.#splitBoldTextNode(startNode, 0, startOffset, 'startNode');
-            console.log(startNode)
             if (endOffset != startNode.textContent.length) this.#splitBoldTextNode(startNode, endOffset - startOffset, startNode.textContent.length, 'endNode'); //because of the split the endOffset needs to be reduced or the selection will shift by the startOffset amount
+            this.#setSelectionStartOrEndMarker(startNode, 'startMarker');
+            this.#setSelectionStartOrEndMarker(startNode, 'endMarker');
             this.#removeBoldFromTextNode(startNode);
             this.#restoreSelection();
             return
@@ -265,10 +275,12 @@ export default class LessonNoteView extends AbstractView {
                 if (node == startNode) {
                     startRemoving = true;
                     if (startOffset != 0) this.#splitBoldTextNode(node, 0, startOffset, 'startNode');
+                    this.#setSelectionStartOrEndMarker(node, 'startMarker');
                 }
                 if (node == endNode) {
                     endNodeReached = true;
                     if (endOffset != node.textContent.length) this.#splitBoldTextNode(node, endOffset, node.textContent.length, 'endNode');
+                    this.#setSelectionStartOrEndMarker(node, 'endMarker');
                 }
 
                 if (startRemoving) this.#removeBoldFromTextNode(node);
@@ -289,8 +301,6 @@ export default class LessonNoteView extends AbstractView {
         const marker = document.createElement('span');
         const b = document.createElement('b');
 
-        console.log(node);
-
         range.setStart(node, startOffset);
         range.setEnd(node, endOffset);
 
@@ -301,20 +311,33 @@ export default class LessonNoteView extends AbstractView {
         b.textContent = contents.textContent;
 
         if (nodeType == 'startNode') {
-            marker.classList.add('startMarker');
             node.parentElement.parentElement.insertBefore(b, node.parentElement); //insert into the parent of the b tag of the given text node
-            node.parentElement.parentElement.insertBefore(marker, node.parentElement);
         }
 
         if (nodeType == 'endNode') {
-            marker.classList.add('endMarker');
             node.parentElement.parentElement.insertBefore(b, node.parentElement.nextSibling); //insert into the parent of the b tag of the given text node
-            node.parentElement.parentElement.insertBefore(marker, node.parentElement.nextSibling);
         }
     }
 
     static #removeBoldFromTextNode(node) {
-        node.parentElement.replaceWith(node)
+        if (node.parentElement.tagName == 'B') {
+            node.parentElement.replaceWith(node);
+        }
+    }
+
+    /**@param markerType 'startMarker' or 'endMarker', depending on whether it should be placed before or after the given node */
+    static #setSelectionStartOrEndMarker(node, markerType) {
+        const marker = document.createElement('span');
+
+        if (markerType == 'startMarker') {
+            marker.classList.add('startMarker');
+            node.parentElement.parentElement.insertBefore(marker, node.parentElement);
+        }
+
+        if (markerType == 'endMarker') {
+            marker.classList.add('endMarker');
+            node.parentElement.parentElement.insertBefore(marker, node.parentElement.nextSibling);
+        }
     }
 
     static updateButtonStatus() {
@@ -341,6 +364,7 @@ export default class LessonNoteView extends AbstractView {
     }
 
     static #getAllChildNodes(element) {
+        console.log(element)
         const childNodes = [];
 
         element.childNodes.forEach(node => {
@@ -369,17 +393,42 @@ export default class LessonNoteView extends AbstractView {
     static #restoreSelection() {
         const startMarker = document.querySelector('.startMarker');
         const endMarker = document.querySelector('.endMarker');
+        const startMarkerParent = startMarker.parentElement;
+        const endMarkerParent = endMarker.parentElement;
+
         const selection = document.getSelection();
         const range = document.createRange();
 
-        range.setStartAfter(startMarker);
-        range.setEndBefore(endMarker);
+        const startTextNode = getNeighbouringTextNode(startMarker, 'forward');
+        const endTextNode = getNeighbouringTextNode(endMarker, 'backward');
+
+        range.setStart(startTextNode, 0);
+        range.setEnd(endTextNode, endTextNode.textContent.length);
 
         selection.removeAllRanges();
         selection.addRange(range);
 
         startMarker.remove();
         endMarker.remove();
+
+        startMarkerParent.normalize();
+        endMarkerParent.normalize();
+
+        function getNeighbouringTextNode(node, direction) {
+            if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') return node;
+
+            let nextNeighbour = direction == 'forward' ? node.nextSibling : node.previousSibling;
+            let textNode;
+
+            if (nextNeighbour.nodeType == Node.TEXT_NODE && nextNeighbour.textContent.trim() != '') return nextNeighbour;
+            if (nextNeighbour.nodeType == Node.TEXT_NODE && nextNeighbour.textContent.trim() == '') textNode = getNeighbouringTextNode(nextNeighbour, direction);
+
+            if (nextNeighbour.childNodes.length > 0) {
+                nextNeighbour.childNodes.forEach(child => textNode = getNeighbouringTextNode(child, direction));
+            }
+
+            return textNode;
+        }
     }
 
     /**@param :returns the position of node B compared to node A in the DOM as 'before', 'after' or 'same', if it is the same node  */
