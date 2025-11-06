@@ -225,6 +225,7 @@ export default class LessonNoteView extends AbstractView {
 
     /**@param nodeType can be startNode or endNode and inserts a selectionMarker before/after the node, which is later used to restore the user selection */
     static #wrapTextNodeInBTag(node, startOffset, endOffset, nodeType = null) {
+        // if (node.parentElement.tagName == 'B' && !nodeType) return
 
         const selection = document.getSelection();
         const range = document.createRange();
@@ -243,6 +244,14 @@ export default class LessonNoteView extends AbstractView {
         if (previousParent.tagName == 'B' && nodeType != null) {
             if (nodeType == 'startNode') previousParent.parentElement.insertBefore(b, previousParent.nextSibling);
             if (nodeType == 'endNode') previousParent.parentElement.insertBefore(b, previousParent);
+            
+            if (previousParent.textContent.trim() == '') previousParent.remove();
+
+            return;
+        }
+
+        if (previousParent.tagName == 'B') {
+            previousParent.replaceWith(b);
             return;
         }
 
