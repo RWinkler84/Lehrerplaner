@@ -149,10 +149,14 @@ export default class LessonNoteView extends AbstractView {
 
     //text manipulation and styling
     static addBoldText() {
-        const selection = document.getSelection();
+        const selection = this.#getSelection();
+
+        if (selection.isCollapsed) return;
 
         let startNode = selection.anchorNode, startOffset = selection.anchorOffset;
         let endNode = selection.focusNode, endOffset = selection.focusOffset;
+
+        console.log(endNode);
 
         if (this.#compareNodePosition(startNode, endNode) == 'before') {
             [startNode, endNode] = [endNode, startNode];
@@ -244,7 +248,7 @@ export default class LessonNoteView extends AbstractView {
         if (previousParent.tagName == 'B' && nodeType != null) {
             if (nodeType == 'startNode') previousParent.parentElement.insertBefore(b, previousParent.nextSibling);
             if (nodeType == 'endNode') previousParent.parentElement.insertBefore(b, previousParent);
-            
+
             if (previousParent.textContent.trim() == '') previousParent.remove();
 
             return;
@@ -372,6 +376,8 @@ export default class LessonNoteView extends AbstractView {
         }
     }
 
+    // helper functions
+
     static #getAllChildNodes(element) {
         console.log(element)
         const childNodes = [];
@@ -391,12 +397,76 @@ export default class LessonNoteView extends AbstractView {
         return childNodes;
     }
 
+    /**@param : returns a given nodes parent that sits just one level below the editor container */
     static #getFirstLevelElement(element) {
         while (element.parentElement != document.querySelector('#noteContentEditor')) {
             element = element.parentElement;
         }
 
         return element;
+    }
+
+    /**@param :instead of the normal selection API selection object this returns selection where the focusNode and anchorNode are shifted to the closest text node, if those nodes where not text nodes on the browser selection object */
+    static #getSelection() {
+        const selection = document.getSelection();
+        const direction = this.#compareNodePosition(selection.anchorNode, selection.focusNode);
+        const textNodeSelection = {
+            anchorNode: selection.anchorNode,
+            focusNode: selection.focusNode,
+            anchorOffset: selection.anchorOffset,
+            focusOffset: selection.focusOffset,
+            isCollapsed: selection.isCollapsed
+        };
+
+        if (selection.anchorNode.nodeType != Node.TEXT_NODE) {
+            //text was selected left to right
+            if (direction == 'after') {
+                let childNodes = this.#getAllChildNodes(selection.anchorNode.nextElementSibling);
+
+                childNodes.forEach(node => {
+                    if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.anchorNode = node;
+                });
+
+                textNodeSelection.anchorOffset = 0;
+            }
+
+            //text was selected right to left
+            if (direction == 'before') {
+                let childNodes = this.#getAllChildNodes(selection.anchorNode.previousElementSibling);
+
+                childNodes.forEach(node => {
+                    if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.anchorNode = node;
+                });
+
+                textNodeSelection.anchorOffset = textNodeSelection.anchorNode.textContent.length;
+            }
+        }
+
+        if (selection.focusNode.nodeType != Node.TEXT_NODE) {
+            //text was selected left to right
+            if (direction == 'after') {
+                let childNodes = this.#getAllChildNodes(selection.focusNode.previousElementSibling);
+
+                childNodes.forEach(node => {
+                    if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.focusNode = node;
+                });
+
+                textNodeSelection.focusOffset = textNodeSelection.focusNode.textContent.length;
+            }
+
+            //text was selected right to left
+            if (direction == 'before') {
+                let childNodes = this.#getAllChildNodes(selection.focusNode.nextElementSibling);
+
+                childNodes.forEach(node => {
+                    if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.focusNode = node;
+                });
+
+                textNodeSelection.focusOffset = 0;
+            }
+        }
+
+        return textNodeSelection;
     }
 
     static #restoreSelection() {
