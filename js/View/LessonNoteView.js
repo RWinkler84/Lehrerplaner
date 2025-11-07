@@ -4,6 +4,11 @@ import Fn from "../inc/utils.js";
 import { ALLOWEDTAGS } from "../index.js";
 
 export default class LessonNoteView extends AbstractView {
+
+    /////////////////////////////////
+    // handle rendering and saving //
+    /////////////////////////////////
+
     static async renderLessonNotesModal(event) {
         const lesson = event.target.closest('.lesson');
         const className = lesson.dataset.class;
@@ -77,6 +82,7 @@ export default class LessonNoteView extends AbstractView {
             content: content
         }
     }
+
     /**@param node Returns the elements inner structure as a string. If the parent element should not be included, ignoreParent must be set to true */
     static serializeNodeContent(node, ignoreParent = false) {
         if (node.nodeType == Node.TEXT_NODE && node.textContent.includes('\n')) return node.textContent.replace(/</g, '&lt;').replace(/>/g, '&gt;').trim();
@@ -147,16 +153,17 @@ export default class LessonNoteView extends AbstractView {
         });
     }
 
-    //text manipulation and styling
-    static addBoldText() {
-        const selection = this.#getSelection();
+    ///////////////////////////////////
+    // text manipulation and styling //
+    ///////////////////////////////////
 
-        if (selection.isCollapsed) return;
+    // bold //
+
+    static toggleBoldText() {
+        const selection = this.#getTextNodeSelection();
 
         let startNode = selection.anchorNode, startOffset = selection.anchorOffset;
         let endNode = selection.focusNode, endOffset = selection.focusOffset;
-
-        console.log(endNode);
 
         if (this.#compareNodePosition(startNode, endNode) == 'before') {
             [startNode, endNode] = [endNode, startNode];
@@ -165,6 +172,7 @@ export default class LessonNoteView extends AbstractView {
 
         // if the text is already bold, bold styling should be removed
         if (startNode.parentElement.tagName == 'B' && endNode.parentElement.tagName == 'B') {
+            if (endOffset < startOffset) [startOffset, endOffset] = [endOffset, startOffset];
             this.removeBoldText(startNode, startOffset, endNode, endOffset);
             return;
         }
@@ -178,6 +186,7 @@ export default class LessonNoteView extends AbstractView {
             //creates the text node, that should be bold
             let node = startNode.splitText(startOffset);
             node.splitText(endOffset - startOffset);
+            if (node.textContent.trim() == '') node.textContent = '\u200B';
 
             this.#wrapTextNodeInBTag(node, 0, node.textContent.length);
             this.#setSelectionStartOrEndMarker(node, 'startMarker');
@@ -229,11 +238,12 @@ export default class LessonNoteView extends AbstractView {
 
     /**@param nodeType can be startNode or endNode and inserts a selectionMarker before/after the node, which is later used to restore the user selection */
     static #wrapTextNodeInBTag(node, startOffset, endOffset, nodeType = null) {
-        // if (node.parentElement.tagName == 'B' && !nodeType) return
 
         const selection = document.getSelection();
         const range = document.createRange();
         const previousParent = node.parentElement;
+        const b = document.createElement('b');
+        const invisibleChar = '\u200B';
 
         range.setStart(node, startOffset);
         range.setEnd(node, endOffset);
@@ -241,7 +251,7 @@ export default class LessonNoteView extends AbstractView {
         selection.removeAllRanges();
         selection.addRange(range);
 
-        const b = document.createElement('b');
+        // if (node.textContent.trim() == '') node.textContent = invisibleChar;
         b.append(node);
 
         //prevent nesting
@@ -333,25 +343,17 @@ export default class LessonNoteView extends AbstractView {
     }
 
     static #removeBoldFromTextNode(node) {
+        if (node.textContent.trim() == '') node.textContent = '\u200B'; //text nodes must not be empty after removing bold around them
         if (node.parentElement.tagName == 'B') {
             node.parentElement.replaceWith(node);
         }
     }
 
-    /**@param markerType 'startMarker' or 'endMarker', depending on whether it should be placed before or after the given node */
-    static #setSelectionStartOrEndMarker(node, markerType) {
-        const marker = document.createElement('span');
+    // lists //
 
-        if (markerType == 'startMarker') {
-            marker.classList.add('startMarker');
-            node.parentElement.parentElement.insertBefore(marker, node.parentElement);
-        }
 
-        if (markerType == 'endMarker') {
-            marker.classList.add('endMarker');
-            node.parentElement.parentElement.insertBefore(marker, node.parentElement.nextSibling);
-        }
-    }
+
+
 
     static updateButtonStatus() {
         const selection = document.getSelection();
@@ -362,13 +364,16 @@ export default class LessonNoteView extends AbstractView {
         const oLButton = document.querySelector('#orderedListButton');
         const uLButton = document.querySelector('#unorderedListButton');
 
-        switch (parentElement.tagName) {
-            case 'B':
+        switch (true) {
+            case parentElement.tagName == 'B':
+            case cursorNode.tagName == 'B':
                 boldButton.setAttribute('aria-pressed', 'true');
                 if (parentElement.closest('ul')) uLButton.setAttribute('aria-pressed', 'true');
                 if (parentElement.closest('ol')) oLButton.setAttribute('aria-pressed', 'true');
                 break;
-            case 'P':
+
+            case parentElement.tagName == 'P':
+            case cursorNode.tagName == 'B':
                 boldButton.setAttribute('aria-pressed', 'false');
                 uLButton.setAttribute('aria-pressed', 'false');
                 oLButton.setAttribute('aria-pressed', 'false');
@@ -376,7 +381,9 @@ export default class LessonNoteView extends AbstractView {
         }
     }
 
-    // helper functions
+    //////////////////////
+    // helper functions //
+    //////////////////////
 
     static #getAllChildNodes(element) {
         console.log(element)
@@ -406,8 +413,23 @@ export default class LessonNoteView extends AbstractView {
         return element;
     }
 
+    /**@param markerType 'startMarker' or 'endMarker', depending on whether it should be placed before or after the given node */
+    static #setSelectionStartOrEndMarker(node, markerType) {
+        const marker = document.createElement('span');
+
+        if (markerType == 'startMarker') {
+            marker.classList.add('startMarker');
+            node.parentElement.parentElement.insertBefore(marker, node.parentElement);
+        }
+
+        if (markerType == 'endMarker') {
+            marker.classList.add('endMarker');
+            node.parentElement.parentElement.insertBefore(marker, node.parentElement.nextSibling);
+        }
+    }
+
     /**@param :instead of the normal selection API selection object this returns selection where the focusNode and anchorNode are shifted to the closest text node, if those nodes where not text nodes on the browser selection object */
-    static #getSelection() {
+    static #getTextNodeSelection() {
         const selection = document.getSelection();
         const direction = this.#compareNodePosition(selection.anchorNode, selection.focusNode);
         const textNodeSelection = {

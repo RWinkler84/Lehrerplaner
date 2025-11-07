@@ -72,7 +72,7 @@ export default class LessonNoteController {
             // editor styling buttons
             case 'boldButton':
                 event.preventDefault();
-                LessonNoteView.addBoldText(event);
+                LessonNoteView.toggleBoldText(event);
                 break;
         }
 
