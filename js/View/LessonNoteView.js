@@ -351,8 +351,77 @@ export default class LessonNoteView extends AbstractView {
 
     // lists //
 
+    static toggleList(listType) {
+        const selection = this.#getTextNodeSelection();
+        const startNode = selection.anchorNode;
+        const endNode = selection.focusNode;
+        let startElement = this.#getFirstLevelElement(startNode);
+        let endElement = this.#getFirstLevelElement(endNode);
 
+        if (this.#compareNodePosition(startElement, endElement) == 'before') { // start and end are switched
+            [startElement, endElement] = [endElement, startElement];
+        }
 
+        if (startElement == endElement) {
+            if (startElement.tagName == 'LI') {
+                this.#convertListItemToPara(startElement);
+
+                return;
+            }
+
+            if (startElement.parentElement.tagName != 'UL' || startElement.parentElement.tagName != 'OL') {
+                this.#wrapElementsInListTag(listType, startElement);
+
+                return;
+            }
+
+            this.#convertElementToListItem(startElement);
+
+            return;
+        }
+
+        this.#wrapElementsInListTag(listType, startElement, endElement);
+    }
+
+    static #wrapElementsInListTag(listType, startElement, endElement = null) {
+        if (!endElement) endElement = startElement;
+
+        const editor = document.querySelector('#noteContentEditor');
+        const allChildNodes = this.#getAllChildNodes(editor);
+        const listElement = document.createElement(listType);
+        const listNextNeighbour = endElement.nextElementSibling;
+
+        let startWrapping = false;
+        let endElementReached = false;
+
+        allChildNodes.forEach(node => {
+            if (node.nodeType != Node.ELEMENT_NODE) return;
+            if (endElementReached) return;
+
+            if (node == startElement) startWrapping = true;
+            if (node == endElement) endElementReached = true;
+
+            if (startWrapping) {
+                if (node.tagName != 'LI') node = this.#convertElementToListItem(node);
+                listElement.append(node);
+            }
+        });
+
+        editor.insertBefore(listElement, listNextNeighbour);
+    }
+
+    static #convertElementToListItem(element) {
+        const li = document.createElement('li');
+
+        li.append(...element.childNodes);
+        element.replaceWith(li);
+
+        return li;
+    }
+
+    static #convertListItemToPara(element) {
+
+    }
 
 
     static updateButtonStatus() {
@@ -444,7 +513,6 @@ export default class LessonNoteView extends AbstractView {
             //text was selected left to right
             if (direction == 'after') {
                 let childNodes = this.#getAllChildNodes(selection.anchorNode.nextElementSibling);
-
                 childNodes.forEach(node => {
                     if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.anchorNode = node;
                 });
@@ -455,7 +523,6 @@ export default class LessonNoteView extends AbstractView {
             //text was selected right to left
             if (direction == 'before') {
                 let childNodes = this.#getAllChildNodes(selection.anchorNode.previousElementSibling);
-
                 childNodes.forEach(node => {
                     if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.anchorNode = node;
                 });
@@ -468,7 +535,6 @@ export default class LessonNoteView extends AbstractView {
             //text was selected left to right
             if (direction == 'after') {
                 let childNodes = this.#getAllChildNodes(selection.focusNode.previousElementSibling);
-
                 childNodes.forEach(node => {
                     if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.focusNode = node;
                 });
@@ -479,12 +545,32 @@ export default class LessonNoteView extends AbstractView {
             //text was selected right to left
             if (direction == 'before') {
                 let childNodes = this.#getAllChildNodes(selection.focusNode.nextElementSibling);
-
                 childNodes.forEach(node => {
                     if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') textNodeSelection.focusNode = node;
                 });
 
                 textNodeSelection.focusOffset = 0;
+            }
+        }
+
+        if (direction == 'same' && selection.anchorNode.nodeType != Node.TEXT_NODE) {
+            let childNodes = this.#getAllChildNodes(selection.anchorNode);
+            let match = false;
+            childNodes.forEach(node => {
+                if (node.nodeType == Node.TEXT_NODE) {
+                    textNodeSelection.anchorNode = node;
+                    textNodeSelection.focusNode = node;
+                    match = true;
+                }
+            });
+
+            //if there is no match, it is an empty html element with a br-tag inside, this must be replaced by an invisible charakter
+            if (!match) {
+                const invisibleChar = '\u200B';
+                textNodeSelection.anchorNode.textContent = invisibleChar;
+
+                textNodeSelection.anchorNode = textNodeSelection.anchorNode.childNodes[0];
+                textNodeSelection.focusNode = textNodeSelection.focusNode.childNodes[0];
             }
         }
 

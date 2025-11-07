@@ -56,7 +56,6 @@ export default class LessonNoteController {
     }
 
     static handleClickEvents(event) {
-        // console.log(event.target);
         const clickedElement = event.target;
 
         switch (clickedElement.id) {
@@ -69,10 +68,16 @@ export default class LessonNoteController {
             case 'saveLessonNotesButton':
                 LessonNoteController.saveLessonNote();
                 break;
+            
             // editor styling buttons
             case 'boldButton':
-                event.preventDefault();
                 LessonNoteView.toggleBoldText(event);
+                break;
+            case 'unorderedListButton':
+                LessonNoteView.toggleList('ul');
+                break;
+            case 'orderedListButton':
+                LessonNoteView.toggleList('ol');
                 break;
         }
 
