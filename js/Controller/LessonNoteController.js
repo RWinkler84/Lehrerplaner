@@ -47,7 +47,7 @@ export default class LessonNoteController {
         note.delete();
     }
 
-    static normalizeInput(){
+    static normalizeInput() {
         LessonNoteView.normalizeInput();
     }
 
@@ -68,7 +68,7 @@ export default class LessonNoteController {
             case 'saveLessonNotesButton':
                 LessonNoteController.saveLessonNote();
                 break;
-            
+
             // editor styling buttons
             case 'boldButton':
                 LessonNoteView.toggleBoldText(event);
@@ -85,6 +85,14 @@ export default class LessonNoteController {
             case clickedElement.classList.contains('placeholder'):
                 LessonNoteView.removePlaceholderText();
                 break;
+            case clickedElement.classList.contains('ulIcon'):
+                LessonNoteView.toggleList('ul');
+                break;
+            case clickedElement.classList.contains('olIcon'):
+                LessonNoteView.toggleList('ol');
+                break;
+
+
         }
     }
 

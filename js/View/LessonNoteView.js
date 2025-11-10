@@ -191,7 +191,7 @@ export default class LessonNoteView extends AbstractView {
             this.#wrapTextNodeInBTag(node, 0, node.textContent.length);
             this.#setSelectionStartOrEndMarker(node, 'startMarker');
             this.#setSelectionStartOrEndMarker(node, 'endMarker');
-            this.#restoreSelection();
+            this.#restoreSelectionFromMarker();
 
             return;
         }
@@ -233,7 +233,7 @@ export default class LessonNoteView extends AbstractView {
             currentElement = currentElement.nextElementSibling;
         }
 
-        this.#restoreSelection();
+        this.#restoreSelectionFromMarker();
     }
 
     /**@param nodeType can be startNode or endNode and inserts a selectionMarker before/after the node, which is later used to restore the user selection */
@@ -281,7 +281,7 @@ export default class LessonNoteView extends AbstractView {
             this.#setSelectionStartOrEndMarker(startNode, 'startMarker');
             this.#setSelectionStartOrEndMarker(startNode, 'endMarker');
             this.#removeBoldFromTextNode(startNode);
-            this.#restoreSelection();
+            this.#restoreSelectionFromMarker();
             return
         }
 
@@ -314,7 +314,7 @@ export default class LessonNoteView extends AbstractView {
             startElement = startElement.nextElementSibling;
         }
 
-        this.#restoreSelection();
+        this.#restoreSelectionFromMarker();
     }
 
     static #splitBoldTextNode(node, startOffset, endOffset, nodeType = null) {
@@ -360,27 +360,52 @@ export default class LessonNoteView extends AbstractView {
 
         if (this.#compareNodePosition(startElement, endElement) == 'before') { // start and end are switched
             [startElement, endElement] = [endElement, startElement];
+            [selection.anchorNode, selection.focusNode] = [selection.focusNode, selection.anchorNode];
+            [selection.anchorOffset, selection.focusOffset] = [selection.focusOffset, selection.anchorOffset];
         }
 
         if (startElement == endElement) {
-            if (startElement.tagName == 'LI') {
-                this.#convertListItemToPara(startElement);
+            //is already list item -> convert back to p
+            if (startElement.parentElement.tagName == 'OL' || startElement.parentElement.tagName == 'UL') {
+                const list = startElement.parentElement;
+
+                this.#convertListItemsToPara(startElement);
+                this.#restoreSelectionWithoutMarker(selection);
+                this.#extractParagraphsFromList(list);
+                this.#removeEmptyList(list);
 
                 return;
             }
 
             if (startElement.parentElement.tagName != 'UL' || startElement.parentElement.tagName != 'OL') {
                 this.#wrapElementsInListTag(listType, startElement);
+                this.#restoreSelectionWithoutMarker(selection);
 
                 return;
             }
 
             this.#convertElementToListItem(startElement);
+            this.#restoreSelectionWithoutMarker(selection);
+
+            return;
+        }
+
+        //selection spans only list items, convert it to p elements
+        if (startElement.tagName == 'LI' && endElement.tagName == 'LI') {
+            const list = startElement.parentElement;
+
+            this.#convertListItemsToPara(startElement, endElement);
+            this.#restoreSelectionWithoutMarker(selection);
+            this.#extractParagraphsFromList(list);
+            this.#removeEmptyList(list);
+            this.#restoreSelectionWithoutMarker(selection);
 
             return;
         }
 
         this.#wrapElementsInListTag(listType, startElement, endElement);
+        this.#restoreSelectionWithoutMarker(selection);
+
     }
 
     static #wrapElementsInListTag(listType, startElement, endElement = null) {
@@ -388,26 +413,35 @@ export default class LessonNoteView extends AbstractView {
 
         const editor = document.querySelector('#noteContentEditor');
         const allChildNodes = this.#getAllChildNodes(editor);
-        const listElement = document.createElement(listType);
         const listNextNeighbour = endElement.nextElementSibling;
+        let listElement = document.createElement(listType);
+        let extendExistingList = false;
+
+        //recycle an existing list element, if it fits the user selection and list type
+        if ((startElement.parentElement.tagName == 'UL' || startElement.parentElement.tagName == 'OL') && startElement.parentElement.tagName == listType.toUpperCase()) {
+            listElement = startElement.parentElement;
+            extendExistingList = true;
+        }
 
         let startWrapping = false;
         let endElementReached = false;
 
         allChildNodes.forEach(node => {
             if (node.nodeType != Node.ELEMENT_NODE) return;
+            if (node.tagName == 'OL' || node.tagName == 'UL' || node.tagName == 'B') return;
             if (endElementReached) return;
 
             if (node == startElement) startWrapping = true;
             if (node == endElement) endElementReached = true;
 
-            if (startWrapping) {
+            if (startWrapping || extendExistingList) {
                 if (node.tagName != 'LI') node = this.#convertElementToListItem(node);
                 listElement.append(node);
             }
         });
 
         editor.insertBefore(listElement, listNextNeighbour);
+
     }
 
     static #convertElementToListItem(element) {
@@ -419,10 +453,83 @@ export default class LessonNoteView extends AbstractView {
         return li;
     }
 
-    static #convertListItemToPara(element) {
+    static #convertListItemsToPara(startElement, endElement = null) {
+        if (!endElement) endElement = startElement;
 
+        const childNodeList = this.#getAllChildNodes(startElement.parentElement);
+        let startConverting = false;
+        let endNodeReached = false;
+
+        childNodeList.forEach(node => {
+            if (endNodeReached) return;
+            if (node.nodeType == Node.TEXT_NODE) return;
+            if (node.tagName == 'UL' || node.tagName == 'OL' || node.tagName == 'B') return;
+
+            if (node == startElement) startConverting = true;
+            if (node == endElement) endNodeReached = true;
+
+            if (startConverting) {
+                const p = document.createElement('p');
+                p.append(...node.childNodes);
+
+                node.replaceWith(p);
+            }
+        });
     }
 
+    static #extractParagraphsFromList(list) {
+        const childElements = Array.from(list.children);
+        const editor = document.querySelector('#noteContentEditor');
+        let listSplit = false; // if a list is split, the first loop should stop processing the children of the initial list
+
+        childElements.forEach(element => {
+            if (listSplit) return;
+            if (element.tagName == 'P') {
+                //if it is the first element, reappend it before the list
+                if (!element.previousElementSibling) {
+                    editor.insertBefore(element, element.parentElement);
+                    return;
+                }
+
+                //if it is the last element, reappend it after the list
+                if (!element.nextElementSibling) {
+                    editor.insertBefore(element, list.nextElementSibling);
+                    return;
+                }
+
+                //if it is in the middle, split the list
+                if (element.previousElementSibling && element.nextElementSibling) {
+                    const newList = list.cloneNode();
+                    let startMoving = false;
+                    listSplit = true;
+
+                    childElements.forEach(child => {
+                        if (child == element) startMoving = true;
+                        if (startMoving) newList.append(child);
+                    });
+
+                    editor.insertBefore(newList, list.nextElementSibling);
+                    LessonNoteView.#extractParagraphsFromList(newList);
+                    LessonNoteView.#removeEmptyList(newList);
+                }
+            }
+        })
+    }
+
+    static #removeEmptyList(list) {
+        const childNodeList = this.#getAllChildNodes(list);
+        const editor = document.querySelector('#noteContentEditor');
+        let listItemsFound = false;
+
+        childNodeList.forEach(node => {
+            if (node.tagName && node.tagName == 'LI') listItemsFound = true;
+        });
+
+        if (!listItemsFound) {
+            Array.from(list.children).forEach(element => editor.insertBefore(element, list));
+            list.remove();
+        }
+    }
 
     static updateButtonStatus() {
         const selection = document.getSelection();
@@ -433,20 +540,31 @@ export default class LessonNoteView extends AbstractView {
         const oLButton = document.querySelector('#orderedListButton');
         const uLButton = document.querySelector('#unorderedListButton');
 
-        switch (true) {
-            case parentElement.tagName == 'B':
-            case cursorNode.tagName == 'B':
-                boldButton.setAttribute('aria-pressed', 'true');
-                if (parentElement.closest('ul')) uLButton.setAttribute('aria-pressed', 'true');
-                if (parentElement.closest('ol')) oLButton.setAttribute('aria-pressed', 'true');
-                break;
+        //reset all
+        uLButton.setAttribute('aria-pressed', 'false');
+        oLButton.setAttribute('aria-pressed', 'false');
+        boldButton.setAttribute('aria-pressed', 'false');
 
-            case parentElement.tagName == 'P':
-            case cursorNode.tagName == 'B':
-                boldButton.setAttribute('aria-pressed', 'false');
+        //is cursor on a b tag?
+        if (parentElement.tagName == 'B' || cursorNode.tagName == 'B') {
+            boldButton.setAttribute('aria-pressed', 'true');
+        } else {
+            boldButton.setAttribute('aria-pressed', 'false');
+        }
+
+        //is cursor on a list item? 
+        if (parentElement.closest('li')) {
+            if (parentElement.closest('ul')) {
+                uLButton.setAttribute('aria-pressed', 'true');
+            } else {
                 uLButton.setAttribute('aria-pressed', 'false');
+            }
+
+            if (parentElement.closest('ol')) {
+                oLButton.setAttribute('aria-pressed', 'true');
+            } else {
                 oLButton.setAttribute('aria-pressed', 'false');
-                break;
+            }
         }
     }
 
@@ -455,7 +573,6 @@ export default class LessonNoteView extends AbstractView {
     //////////////////////
 
     static #getAllChildNodes(element) {
-        console.log(element)
         const childNodes = [];
 
         element.childNodes.forEach(node => {
@@ -475,9 +592,11 @@ export default class LessonNoteView extends AbstractView {
 
     /**@param : returns a given nodes parent that sits just one level below the editor container */
     static #getFirstLevelElement(element) {
-        while (element.parentElement != document.querySelector('#noteContentEditor')) {
+        const relevantParents = ['P', 'LI'];
+
+        do {
             element = element.parentElement;
-        }
+        } while (!relevantParents.includes(element.tagName))
 
         return element;
     }
@@ -577,7 +696,18 @@ export default class LessonNoteView extends AbstractView {
         return textNodeSelection;
     }
 
-    static #restoreSelection() {
+    static #restoreSelectionWithoutMarker(prevSelection) {
+        const selection = document.getSelection();
+        const range = document.createRange();
+
+        range.setStart(prevSelection.anchorNode, prevSelection.anchorOffset);
+        range.setEnd(prevSelection.focusNode, prevSelection.focusOffset);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    static #restoreSelectionFromMarker() {
         const startMarker = document.querySelector('.startMarker');
         const endMarker = document.querySelector('.endMarker');
         const startMarkerParent = startMarker.parentElement;

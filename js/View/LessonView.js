@@ -31,8 +31,7 @@ export default class LessonView {
             //deactive the lesson options, when the weekday it is rendered on already passed
             if (timeslot.closest('.weekday').classList.contains('passed')) {
                 lessonOptionsHTML = `
-                    <div class="lessonOption lessonPastMessage"><button>Stunde hat bereits stattgefunden.</button></div>
-                    <div class="lessonOption lessonPastMessage responsive"><button>Stunde hat bereits statt-gefunden.</button></div>
+                        <div class="lessonOption"><button data-add_note>Notiz</button></div>
                 `;
             }
 
@@ -83,8 +82,7 @@ export default class LessonView {
             //deactive the lesson options, when the weekday it is rendered on already passed
             if (timeslot.closest('.weekday').classList.contains('passed')) {
                 lessonOptionsHTML = `
-                        <div class="lessonOption lessonPastMessage"><button>Stunde hat bereits stattgefunden.</button></div>
-                        <div class="lessonOption lessonPastMessage responsive"><button>Stunde hat bereits statt-gefunden.</button></div>
+                    <div class="lessonOption"><button data-add_note>Notiz</button></div>
                 `;
             }
 
