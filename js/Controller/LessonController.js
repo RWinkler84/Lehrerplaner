@@ -3,6 +3,7 @@ import View from '../View/LessonView.js';
 import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
 import LessonNoteController from './LessonNoteController.js';
+import LessonView from '../View/LessonView.js';
 
 export default class LessonController {
 
@@ -96,6 +97,10 @@ export default class LessonController {
         let model = new Lesson;
 
         await model.handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate);
+    }
+
+    static getLessonDataFromElement(event) {
+        return LessonView.getLessonDataFromElement(event);
     }
 
     static createNewTask(event) {

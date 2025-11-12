@@ -1,5 +1,6 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js";
+import { lessonNoteChangesArray } from "../index.js";
 
 export default class LessonNote extends AbstractModel {
     #id;
@@ -88,6 +89,22 @@ export default class LessonNote extends AbstractModel {
                 reject(event.target.error);
             }
         });
+    }
+
+    static async getLessonNoteForLesson(date, timeslot, className, subject) {
+        const lessonNotes = await LessonNote.getAllNotesInTimeRange(date);
+        let matchedNote;
+
+        lessonNotes.forEach(note => {
+            if (Fn.formatDate(note.date) != Fn.formatDate(date)) return;
+            if (note.timeslot != timeslot) return;
+            if (note.class != className) return;
+            if (note.subject != subject) return;
+
+            matchedNote = note;
+        });
+
+        return matchedNote;
     }
 
     static createMockData() {
@@ -221,6 +238,30 @@ export default class LessonNote extends AbstractModel {
         }
     }
 
+    static trackLessonNoteChanges(currentContent) {
+        let noteVersion = lessonNoteChangesArray.length;
+        lessonNoteChangesArray.push({ version: noteVersion, content: currentContent });
+        console.log(lessonNoteChangesArray);
+
+        return noteVersion;
+    }
+
+    static clearLessonNoteChanges() {
+        do {
+            lessonNoteChangesArray.pop();
+        } while (lessonNoteChangesArray.length != 0); 
+    }
+
+    static getPreviousChange(displayedVersion) {
+        if (displayedVersion == 0) return;
+        return lessonNoteChangesArray[displayedVersion - 1];
+    }
+
+    static getNextChange(displayedVersion) {
+        if (displayedVersion == lessonNoteChangesArray.length) return;
+        return lessonNoteChangesArray[displayedVersion + 1];
+    }
+
     serialize() {
         return {
             id: this.id,
@@ -246,8 +287,8 @@ export default class LessonNote extends AbstractModel {
         if (noteData.class) instance.class = noteData.class;
         if (noteData.subject) instance.subject = noteData.subject;
         if (noteData.content) instance.content = noteData.content;
-        if (noteData.created) {instance.created = noteData.created} else {instance.created = model.formatDateTime(new Date())};
-        if (noteData.lastEdited) {instance.lastEdited = noteData.lastEdited} else {instance.lastEdited = model.formatDateTime(new Date())};
+        if (noteData.created) { instance.created = noteData.created } else { instance.created = model.formatDateTime(new Date()) };
+        if (noteData.lastEdited) { instance.lastEdited = noteData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
 
         return instance;
     }

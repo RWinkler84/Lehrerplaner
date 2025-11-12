@@ -1,9 +1,14 @@
 import LessonNote from "../Model/LessonNote.js";
 import LessonNoteView from "../View/LessonNoteView.js";
+import LessonController from "./LessonController.js";
 
 export default class LessonNoteController {
-    static renderLessonNote(event) {
-        LessonNoteView.renderLessonNotesModal(event);
+    static async renderLessonNote(event) {
+        let lessonData = LessonController.getLessonDataFromElement(event);
+        let note = await this.getLessonNoteForLesson(lessonData.date, lessonData.timeslot, lessonData.className, lessonData.subject);
+
+        LessonNoteView.renderLessonNotesModal(note, lessonData);
+        LessonNote.trackLessonNoteChanges(note.content);
     }
 
     static async getAllLessonNotes() {
@@ -12,6 +17,10 @@ export default class LessonNoteController {
 
     static async getAllLessonNotesInTimeRange(startDate, endDate) {
         return await LessonNote.getAllNotesInTimeRange(startDate, endDate);
+    }
+
+    static async getLessonNoteForLesson(date, timeslot, className, subject) {
+        return await LessonNote.getLessonNoteForLesson(date, timeslot, className, subject);
     }
 
     static async getLessonNoteById(id) {
@@ -27,7 +36,6 @@ export default class LessonNoteController {
         }
 
         let note = LessonNote.writeDataToInstance(noteData);
-        console.log(note)
 
         note.save();
     }
@@ -36,7 +44,6 @@ export default class LessonNoteController {
         let note = await LessonNote.getById(noteData.id);
 
         note = LessonNote.writeDataToInstance(noteData, note);
-        console.log(note);
 
         note.update();
     }
@@ -47,8 +54,29 @@ export default class LessonNoteController {
         note.delete();
     }
 
+    static changeNoteVersion(action) {
+        let displayedVersion = LessonNoteView.getDisplayedNoteVersion();
+        let versionToDisplay = null;
+
+        if (action == 'revert') versionToDisplay = LessonNote.getPreviousChange(displayedVersion);
+        if (action == 'redo') versionToDisplay = LessonNote.getNextChange(displayedVersion);
+
+        if (!versionToDisplay) return;
+
+        LessonNoteView.updateEditorContent(versionToDisplay.content);
+        LessonNoteView.setDisplayedNoteVersion(versionToDisplay.version);
+    }
+
     static normalizeInput() {
         LessonNoteView.normalizeInput();
+    }
+
+    static trackLessonNoteChanges(forceVersionBackup = false) {
+
+        const editor = document.querySelector('#noteContentEditor');
+        let currentContent = LessonNoteView.serializeNodeContent(editor, true);
+        let version = LessonNote.trackLessonNoteChanges(currentContent);
+        LessonNoteView.setDisplayedNoteVersion(version);
     }
 
     static updateButtonStatus() {
@@ -64,6 +92,7 @@ export default class LessonNoteController {
                 break;
             case 'closeLessonNotesButton':
                 LessonNoteView.closeLessonNotesDialog();
+                LessonNote.clearLessonNoteChanges();
                 break;
             case 'saveLessonNotesButton':
                 LessonNoteController.saveLessonNote();
@@ -72,12 +101,23 @@ export default class LessonNoteController {
             // editor styling buttons
             case 'boldButton':
                 LessonNoteView.toggleBoldText(event);
+                LessonNoteController.trackLessonNoteChanges(true);
                 break;
             case 'unorderedListButton':
                 LessonNoteView.toggleList('ul');
+                LessonNoteController.trackLessonNoteChanges(true);
                 break;
             case 'orderedListButton':
                 LessonNoteView.toggleList('ol');
+                LessonNoteController.trackLessonNoteChanges(true);
+                break;
+
+            //change edit version forward/backward
+            case 'revertChangeButton':
+                LessonNoteController.changeNoteVersion('revert');
+                break;
+            case 'redoChangeButton':
+                LessonNoteController.changeNoteVersion('redo');
                 break;
         }
 
@@ -87,19 +127,46 @@ export default class LessonNoteController {
                 break;
             case clickedElement.classList.contains('ulIcon'):
                 LessonNoteView.toggleList('ul');
+                LessonNoteController.trackLessonNoteChanges(true);
                 break;
             case clickedElement.classList.contains('olIcon'):
                 LessonNoteView.toggleList('ol');
+                LessonNoteController.trackLessonNoteChanges(true);
                 break;
-
-
         }
     }
 
-    static handleKeyDown(event) {
+    static handleKeyDownEvents(event) {
         const key = event.code;
 
         switch (key) {
+            case 'Escape':
+                event.preventDefault();
+
+                break;
+
+            case 'Space':
+            case 'Backspace':
+            case 'Delete':
+            case 'Enter':
+            case 'Period':
+            case 'Digit1': //exclamtion mark
+            case 'Minus': //question mark
+                setTimeout(() => { LessonNoteController.trackLessonNoteChanges(true); }, 100);
+                break;
+
+            case 'KeyY':
+                if (event.getModifierState('Control') || event.getModifierState('Meta')) {
+                    event.preventDefault();
+                    LessonNoteController.changeNoteVersion('revert');
+                }
+                break;
+            case 'KeyZ':
+                if (event.getModifierState('Control') || event.getModifierState('Meta')) {
+                    event.preventDefault();
+                    LessonNoteController.changeNoteVersion('redo');
+                }
+                break;
         }
     }
 }

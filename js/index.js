@@ -19,6 +19,9 @@ export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
 export let unsyncedDeletedTimetableChanges = [];
 
+//track lessonNote inputs
+export let lessonNoteChangesArray = [];
+
 export let mailStatus = {
     authMailAlreadySend: false,
     resetMailAlreadySend: false
@@ -80,6 +83,7 @@ async function startApp() {
 
     //lesson note handler
     document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents);
+    document.querySelector('#lessonNoteDialog').addEventListener('keydown', LessonNoteController.handleKeyDownEvents);
     document.querySelector('#editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
     document.querySelector('#lessonNoteDialog').addEventListener('input', LessonNoteController.normalizeInput);
     document.addEventListener('selectionchange', LessonNoteController.updateButtonStatus);

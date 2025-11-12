@@ -403,6 +403,19 @@ export default class LessonView {
         });
     }
 
+    static getLessonDataFromElement(event) {
+        const lesson = event.target.closest('.lesson');
+
+        return {
+            className : lesson.dataset.class,
+            subject : lesson.dataset.subject,
+            date : lesson.closest('.weekday').dataset.date,
+            timeslot : lesson.closest('.timeslot').dataset.timeslot,
+            weekday : lesson.closest('.weekday').dataset.weekday_number,
+            created: lesson.dataset.created
+        }
+    }
+
     static #getTimeslotOfLesson(lesson) {
 
         let allWeekdays = document.querySelectorAll('.weekday');

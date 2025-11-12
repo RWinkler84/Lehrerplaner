@@ -9,43 +9,24 @@ export default class LessonNoteView extends AbstractView {
     // handle rendering and saving //
     /////////////////////////////////
 
-    static async renderLessonNotesModal(event) {
-        const lesson = event.target.closest('.lesson');
-        const className = lesson.dataset.class;
-        const subject = lesson.dataset.subject;
-        const date = lesson.closest('.weekday').dataset.date;
-        const timeslot = lesson.closest('.timeslot').dataset.timeslot;
-        const weekday = lesson.closest('.weekday').dataset.weekday_number;
-        const lessonNotes = await LessonNoteController.getAllLessonNotesInTimeRange(date);
-
-        let matchedNote;
-
-        lessonNotes.forEach(note => {
-            if (Fn.formatDate(note.date) != Fn.formatDate(date)) return;
-            if (note.timeslot != timeslot) return;
-            if (note.class != className) return;
-            if (note.subject != subject) return;
-
-            matchedNote = note;
-        })
+    static async renderLessonNotesModal(note, lessonData) {
 
         const dialog = document.querySelector('#lessonNoteDialog');
         const editor = dialog.querySelector('#noteContentEditor');
 
-        dialog.dataset.class = className;
-        dialog.dataset.subject = subject;
-        dialog.dataset.date = date;
-        dialog.dataset.timeslot = timeslot;
-        dialog.dataset.weekday = weekday;
+        dialog.dataset.class = lessonData.className;
+        dialog.dataset.subject = lessonData.subject;
+        dialog.dataset.date = lessonData.date;
+        dialog.dataset.timeslot = lessonData.timeslot;
+        dialog.dataset.weekday = lessonData.weekday;
 
-        if (matchedNote) {
-
-            dialog.dataset.noteid = matchedNote.id;
-            dialog.dataset.created = matchedNote.created;
-            editor.innerHTML = matchedNote.content;
+        if (note) {
+            dialog.dataset.noteid = note.id;
+            dialog.dataset.created = note.created;
+            editor.innerHTML = note.content;
         }
 
-        if (!matchedNote) {
+        if (!note) {
             const p = document.createElement('p');
             p.classList.add('placeholder');
             editor.append(p);
@@ -53,6 +34,10 @@ export default class LessonNoteView extends AbstractView {
         }
 
         dialog.showModal();
+    }
+
+    static updateEditorContent(content) {
+        document.querySelector('#noteContentEditor').innerHTML = content;
     }
 
     static getNoteDataFromForm() {
@@ -107,6 +92,18 @@ export default class LessonNoteView extends AbstractView {
         return `<${tagName}>${nodeText}</${tagName}>`;
     }
 
+    static setDisplayedNoteVersion(version) {
+        document.querySelector('#noteContentEditor').dataset.noteversion = version;     
+    }
+
+    static getDisplayedNoteVersion() {
+       let displayedVersion = document.querySelector('#noteContentEditor').dataset.noteversion;
+
+       if (displayedVersion == '') displayedVersion = 0;
+
+       return Number(displayedVersion);
+    }
+
     static closeLessonNotesDialog() {
         const dialog = document.querySelector('#lessonNoteDialog');
         const editor = dialog.querySelector('#noteContentEditor');
@@ -136,21 +133,26 @@ export default class LessonNoteView extends AbstractView {
     static normalizeInput() {
         const editor = document.querySelector('#noteContentEditor');
 
-        editor.childNodes.forEach(node => {
-            if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') {
-                const selection = document.getSelection();
-                const range = document.createRange();
+        if (editor.childElementCount == 0 || editor.firstElementChild.tagName == 'DIV') {
+            const selection = document.getSelection();
+            const range = document.createRange();
 
-                const p = document.createElement('p');
-                p.textContent = node.textContent;
-                node.replaceWith(p);
-
-                range.setStart(p, p.textContent.length);
-                range.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(range);
+            const p = document.createElement('p');
+            p.textContent = editor.textContent;
+            if (p.textContent.trim() == '') {
+                const br = document.createElement('br');
+                p.append(br);
             }
-        });
+
+            this.clearEditor();
+            editor.append(p);
+
+            range.setStart(p, p.textContent.length);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
     }
 
     ///////////////////////////////////
@@ -370,9 +372,9 @@ export default class LessonNoteView extends AbstractView {
                 const list = startElement.parentElement;
 
                 this.#convertListItemsToPara(startElement);
-                this.#restoreSelectionWithoutMarker(selection);
                 this.#extractParagraphsFromList(list);
                 this.#removeEmptyList(list);
+                this.#restoreSelectionWithoutMarker(selection);
 
                 return;
             }
@@ -762,5 +764,13 @@ export default class LessonNoteView extends AbstractView {
         }
 
         return order;
+    }
+
+    static clearEditor(childNode = null) {
+        const editor = document.querySelector('#noteContentEditor')
+        if (!childNode && editor.childNodes.length != 0) { childNode = editor.childNodes[0]; } else { return; }
+        if (childNode.childNodes.length != 0) this.clearEditor(childNode.childNodes[0]);
+
+        editor.removeChild(childNode);
     }
 }
