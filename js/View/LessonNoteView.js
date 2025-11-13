@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import Fn from '../inc/utils.js';
 import { ALLOWEDTAGS } from "../index.js";
 
 export default class LessonNoteView extends AbstractView {
@@ -10,13 +11,19 @@ export default class LessonNoteView extends AbstractView {
     static async renderLessonNotesModal(note, lessonData) {
 
         const dialog = document.querySelector('#lessonNoteDialog');
+        const headlineInfo = dialog.querySelector('#lessonNoteInfo');
         const editor = dialog.querySelector('#noteContentEditor');
+
+        const lessonDate = Fn.formatDate(lessonData.date);
+
+        headlineInfo.textContent = `${lessonData.className}/${lessonData.subject} am ${lessonDate}`;
 
         dialog.dataset.class = lessonData.className;
         dialog.dataset.subject = lessonData.subject;
         dialog.dataset.date = lessonData.date;
         dialog.dataset.timeslot = lessonData.timeslot;
         dialog.dataset.weekday = lessonData.weekday;
+
 
         if (note) {
             dialog.dataset.noteid = note.id;
