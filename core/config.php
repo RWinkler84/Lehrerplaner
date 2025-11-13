@@ -1,6 +1,6 @@
 <?php
 
-const ALLOWEDCONTROLLER = ['task', 'lesson', 'abstract', 'settings', 'user'];
+const ALLOWEDCONTROLLER = ['task', 'lesson', 'lessonNote', 'abstract', 'settings', 'user'];
 const ALLOWEDACTIONS = ['getSubjects', 'getTimetable', 'getTimetableChanges', 'getAllTasks', 'syncDatabase', 'getDbUpdateTimestamps', 'getUserLoginStatus',
     'save', 'update', 'addCanceled', 'cancel', 'uncancel', 'delete', 'setInProgress', 'setDbUpdateTimestamp',
     'deleteSubjects', 'saveSubject', 'saveTimetable', 'saveTimetableUpdates',

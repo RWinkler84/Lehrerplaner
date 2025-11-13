@@ -6,9 +6,9 @@ export default class LessonNoteController {
     static async renderLessonNote(event) {
         let lessonData = LessonController.getLessonDataFromElement(event);
         let note = await this.getLessonNoteForLesson(lessonData.date, lessonData.timeslot, lessonData.className, lessonData.subject);
-
+        
         LessonNoteView.renderLessonNotesModal(note, lessonData);
-        LessonNote.trackLessonNoteChanges(note.content);
+        if (note) LessonNote.trackLessonNoteChanges(note.content);
     }
 
     static async getAllLessonNotes() {
@@ -30,6 +30,12 @@ export default class LessonNoteController {
     static async saveLessonNote() {
         let noteData = LessonNoteView.getNoteDataFromForm();
 
+        if (noteData.content == '<p><br></p>' && noteData.id) {
+            LessonNoteController.deleteLessonNote(noteData.id);
+            LessonNoteView.removeIdFromLessonNoteDialog();
+            return;
+        } 
+
         if (noteData.id) {
             LessonNoteController.updateLessonNote(noteData);
             return;
@@ -37,7 +43,8 @@ export default class LessonNoteController {
 
         let note = LessonNote.writeDataToInstance(noteData);
 
-        note.save();
+        await note.save();
+        LessonNoteView.setIdOnLessonNoteDialog(note.id);
     }
 
     static async updateLessonNote(noteData) {

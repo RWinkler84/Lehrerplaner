@@ -1,6 +1,4 @@
-import LessonNoteController from "../Controller/LessonNoteController.js";
 import AbstractView from "./AbstractView.js";
-import Fn from "../inc/utils.js";
 import { ALLOWEDTAGS } from "../index.js";
 
 export default class LessonNoteView extends AbstractView {
@@ -27,6 +25,8 @@ export default class LessonNoteView extends AbstractView {
         }
 
         if (!note) {
+            dialog.dataset.noteid = '';
+
             const p = document.createElement('p');
             p.classList.add('placeholder');
             editor.append(p);
@@ -34,6 +34,14 @@ export default class LessonNoteView extends AbstractView {
         }
 
         dialog.showModal();
+    }
+
+    static setIdOnLessonNoteDialog(id) {
+        document.querySelector('#lessonNoteDialog').dataset.noteid = id;
+    }
+
+    static removeIdFromLessonNoteDialog() {
+        document.querySelector('#lessonNoteDialog').dataset.noteid = '';
     }
 
     static updateEditorContent(content) {

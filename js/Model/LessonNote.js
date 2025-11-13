@@ -211,7 +211,7 @@ export default class LessonNote extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.writeToLocalDB('lessonNotes', this.serialize());
-        let result = await this.makeAjaxQuery('lessonNotes', 'save', this.serialize());
+        let result = await this.makeAjaxQuery('lessonNote', 'save', this.serialize());
 
         if (result.status == 'failed') {
             await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
@@ -222,7 +222,7 @@ export default class LessonNote extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.updateOnLocalDB('lessonNotes', this.serialize());
-        let result = await this.makeAjaxQuery('lessonNotes', 'update', this.serialize());
+        let result = await this.makeAjaxQuery('lessonNote', 'update', this.serialize());
 
         if (result.status == 'failed') {
             await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
@@ -231,7 +231,7 @@ export default class LessonNote extends AbstractModel {
 
     async delete() {
         await this.deleteFromLocalDB('lessonNotes', this.id);
-        let result = await this.makeAjaxQuery('lessonNotes', 'delete', this.serialize());
+        let result = await this.makeAjaxQuery('lessonNote', 'delete', this.serialize());
 
         if (result.status == 'failed') {
             await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
@@ -241,7 +241,6 @@ export default class LessonNote extends AbstractModel {
     static trackLessonNoteChanges(currentContent) {
         let noteVersion = lessonNoteChangesArray.length;
         lessonNoteChangesArray.push({ version: noteVersion, content: currentContent });
-        console.log(lessonNoteChangesArray);
 
         return noteVersion;
     }
