@@ -36,12 +36,14 @@ export default class LessonNoteView extends AbstractView {
         dialog.showModal();
     }
 
-    static setIdOnLessonNoteDialog(id) {
-        document.querySelector('#lessonNoteDialog').dataset.noteid = id;
+    static updateLessonNoteDialog(note) {
+        document.querySelector('#lessonNoteDialog').dataset.noteid = note.id;
+        document.querySelector('#lessonNoteDialog').dataset.created = note.created;
     }
 
-    static removeIdFromLessonNoteDialog() {
+    static removeIdAndCreatedFromLessonNoteDialog() {
         document.querySelector('#lessonNoteDialog').dataset.noteid = '';
+        document.querySelector('#lessonNoteDialog').dataset.created = '';
     }
 
     static updateEditorContent(content) {
@@ -542,6 +544,9 @@ export default class LessonNoteView extends AbstractView {
     }
 
     static updateButtonStatus() {
+        const lessonNoteDialog = document.querySelector('#lessonNoteDialog');
+        if (!lessonNoteDialog.hasAttribute('open')) return;
+
         const selection = document.getSelection();
         const cursorNode = selection.focusNode;
         const parentElement = cursorNode.parentElement;

@@ -39,7 +39,6 @@ export default class LessonNote extends AbstractModel {
         let notesArray = [];
 
         if (notesDataArray.length == 0) {
-            console.log('No lesson notes found!');
             return notesArray;
         }
 
@@ -225,16 +224,17 @@ export default class LessonNote extends AbstractModel {
         let result = await this.makeAjaxQuery('lessonNote', 'update', this.serialize());
 
         if (result.status == 'failed') {
-            await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
+            await this.updateOnLocalDB('unsyncedLessonNotes', this.serialize());
         }
     }
 
     async delete() {
         await this.deleteFromLocalDB('lessonNotes', this.id);
+        await this.deleteFromLocalDB('unsyncedLessonNotes', this.id);
         let result = await this.makeAjaxQuery('lessonNote', 'delete', this.serialize());
-
+        console.log(result);
         if (result.status == 'failed') {
-            await this.writeToLocalDB('unsyncedLessonNotes', this.serialize());
+            await this.writeToLocalDB('unsyncedDeletedLessonNotes', this.serialize());
         }
     }
 

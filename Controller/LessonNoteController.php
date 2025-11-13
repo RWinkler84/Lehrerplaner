@@ -39,4 +39,14 @@ class LessonNoteController extends AbstractController
 
         echo json_encode($result);
     }
+
+    public static function syncLessonNotes($lessonNotes, $deletedLessonNotes)
+    {
+        $result = [];
+        $model = new LessonNote;
+
+        $result = $model->syncLessonNotes($lessonNotes, $deletedLessonNotes);
+
+        return $result;
+    }
 }

@@ -30,12 +30,12 @@ export default class LessonNoteController {
     static async saveLessonNote() {
         let noteData = LessonNoteView.getNoteDataFromForm();
 
-        if (noteData.content == '<p><br></p>' && noteData.id) {
+        if (noteData.content.trim() == '<p><br></p>' && noteData.id) {
             LessonNoteController.deleteLessonNote(noteData.id);
-            LessonNoteView.removeIdFromLessonNoteDialog();
+            LessonNoteView.removeIdAndCreatedFromLessonNoteDialog();
             return;
         } 
-
+        
         if (noteData.id) {
             LessonNoteController.updateLessonNote(noteData);
             return;
@@ -44,7 +44,7 @@ export default class LessonNoteController {
         let note = LessonNote.writeDataToInstance(noteData);
 
         await note.save();
-        LessonNoteView.setIdOnLessonNoteDialog(note.id);
+        LessonNoteView.updateLessonNoteDialog(note);
     }
 
     static async updateLessonNote(noteData) {

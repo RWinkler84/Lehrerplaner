@@ -422,7 +422,6 @@ export default class TaskView extends AbstractView {
         }
 
         taskData.timeslot = taskTr.querySelector(`option[value="${taskData.date}"]`).dataset.timeslot;
-        console.log(taskData);
 
         Controller.updateTask(taskData, event);
     }
@@ -465,6 +464,15 @@ export default class TaskView extends AbstractView {
         let optionElement = document.createElement('option');
         select.classList.add('taskDateSelect');
         select.setAttribute('name', 'taskDateSelect');
+
+        //upcoming lessons are empty
+        if (upcomingLessons.length == 0) {
+            optionElement.textContent = Fn.formatDate(taskElement.dataset.date);
+            optionElement.setAttribute('data-timeslot', taskElement.dataset.timeslot);
+            optionElement.setAttribute('value', Fn.formatDateSqlCompatible(taskElement.dataset.date));
+            optionElement.setAttribute('selected', '');
+            select.append(optionElement);
+        }
 
         upcomingLessons.forEach(lesson => {
             let lessonDate = Fn.formatDate(lesson.date);
