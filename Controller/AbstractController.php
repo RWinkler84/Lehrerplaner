@@ -45,6 +45,12 @@ class AbstractController
         echo json_encode($result);
     }
 
+    public function getAllLessonNotes() {
+        $result = $this->db->getAllLessonNotes();
+
+        echo json_encode($result);
+    }
+
     public function setDbUpdateTimestamp($updatedTableName, $dateTime)
     {
         $this->db->setDbUpdateTimestamp($updatedTableName, $dateTime);
@@ -64,6 +70,7 @@ class AbstractController
         $timetableResults = [];
         $timetableChangesResults = [];
         $taskResults = [];
+        $lessonNotesResults = [];
 
         if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
             $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
@@ -81,11 +88,16 @@ class AbstractController
             $taskResults = TaskController::syncTasks($dataToSync['tasks'], $dataToSync['deletedTasks']);
         }
 
+        if (!empty($dataToSync['lessonNotes']) || !empty($dataToSync['deletedLessonNotes'])) {
+            $lessonNotesResults = LessonNoteController::syncLessonNotes($dataToSync['lessonNotes'], $dataToSync['deletedLessonNotes']);
+        }
+
         $result = [
             'subjects' => $subjectsResults,
             'timetable' => $timetableResults,
             'timetableChanges' => $timetableChangesResults,
             'tasks' => $taskResults,
+            'lessonNotes' => $lessonNotesResults
         ];
 
         echo json_encode($result);

@@ -88,7 +88,7 @@ class Lesson extends AbstractModel
         global $user;
         $finalResult = ['status' => 'success'];
 
-        //remove deleted lessonChanges, preprocessing an picking of the right db entries is handeled by deleteLesson()
+        //remove deleted lessonChanges, preprocessing and picking of the right db entries is handeled by deleteLesson()
         if (!empty($changesToDelete)) {
             foreach ($changesToDelete as $lesson) {
                 $result = $this->deleteLesson($lesson);

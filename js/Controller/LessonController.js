@@ -2,6 +2,8 @@ import Lesson from '../Model/Lesson.js';
 import View from '../View/LessonView.js';
 import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
+import LessonNoteController from './LessonNoteController.js';
+import LessonView from '../View/LessonView.js';
 
 export default class LessonController {
 
@@ -97,6 +99,10 @@ export default class LessonController {
         await model.handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate);
     }
 
+    static getLessonDataFromElement(event) {
+        return LessonView.getLessonDataFromElement(event);
+    }
+
     static createNewTask(event) {
         TaskController.createNewTask(event);
     }
@@ -139,6 +145,25 @@ export default class LessonController {
 
     static async getAllTasksInTimespan(startDate, endDate) {
         return await TaskController.getAllTasksInTimespan(startDate, endDate);
+    }
+
+    static async getAllLessonNotesInTimespan(startDate, endDate) {
+        return await LessonNoteController.getAllLessonNotesInTimeRange(startDate, endDate);
+    }
+
+    static renderLessonNote(event) {
+        LessonNoteController.renderLessonNote(event);
+    }
+
+    static timetableClickHandler(event) {
+        const target = event.target;
+
+        switch (true) {
+            case target.classList.contains('noteIcon'):
+            console.log('drin')
+                this.renderLessonNote(event);
+                break;
+        }
     }
 
     static #lessonDataToLessonObject(lessonData) {

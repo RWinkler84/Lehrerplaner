@@ -200,6 +200,24 @@ class AbstractModel
         return $this->escapeDbData($dataFromDb);
     }
 
+    public function getAllLessonNotes()
+    {
+        global $user;
+
+        $userId = $user->getId();
+        $tableName = TABLEPREFIX . 'lessonNotes';
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
+        $params = [];
+
+        $dataFromDb = $this->read($query, $params);
+        $dataFromDb = $this->preprocessReadData($dataFromDb);
+
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+
+        return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
+    }
+
     public function getDbUpdateTimestamps()
     {
         global $user;

@@ -3,18 +3,24 @@ import AbstractController from './Controller/AbstractController.js';
 import TaskController from './Controller/TaskController.js';
 import SettingsController from './Controller/SettingsController.js';
 import AbstractView from './View/AbstractView.js';
-import LessonView from './View/LessonView.js';
 import TaskView from './View/TaskView.js';
 import SettingsView from './View/SettingsView.js';
+import LessonView from './View/LessonView.js';
 import Fn from './inc/utils.js';
+import LessonNoteController from './Controller/LessonNoteController.js';
+import LessonController from './Controller/LessonController.js';
 
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
+export const ALLOWEDTAGS = ['div', 'ul', 'ol', 'li', 'b', 'p', 'br']
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
 export let unsyncedDeletedTimetableChanges = [];
+
+//track lessonNote inputs
+export let lessonNoteChangesArray = [];
 
 export let mailStatus = {
     authMailAlreadySend: false,
@@ -26,7 +32,7 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
-    AbstractController.setVersion('0.9.35');
+    AbstractController.setVersion('0.9.4');
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
@@ -34,6 +40,11 @@ async function startApp() {
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
+
+    document.addEventListener('click', (event) => {
+        LoginController.dialogEventHandler(event);
+        LessonController.timetableClickHandler(event);
+    });
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
@@ -66,12 +77,17 @@ async function startApp() {
 
     //handlers for settings
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
-
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
 
     //on site login
-    document.addEventListener('click', LoginController.dialogEventHandler);
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
+
+    //lesson note handler
+    document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents);
+    document.querySelector('#lessonNoteDialog').addEventListener('keydown', LessonNoteController.handleKeyDownEvents);
+    document.querySelector('#editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
+    document.querySelector('#lessonNoteDialog').addEventListener('input', LessonNoteController.normalizeInput);
+    document.addEventListener('selectionchange', LessonNoteController.updateButtonStatus);
 
     AbstractController.renderTopMenu();
 
