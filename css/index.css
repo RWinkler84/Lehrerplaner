@@ -9,7 +9,7 @@
     --lightText: rgb(164, 164, 164);
     --lighterText: #F3F5F7;
     --matteRed: #F05D5E;
-    --matteGreen: #0F7173;
+    --matteGreen: #138e90;
     --mint: #C7F2A7;
     --darkMint: #acef79;
     --lightMatteGreen: #17B2B5;
@@ -57,6 +57,7 @@ input[type="checkbox"] {
 textarea {
     width: 100%;
     height: 7rem;
+    font-size: 1rem;
 }
 
 a {
@@ -179,6 +180,7 @@ dialog {
     min-width: 460px;
     max-width: 460px;
     padding: 1rem 2rem;
+    border: solid 1px var(--bodyBackground);
 }
 
 dialog::backdrop {
@@ -669,6 +671,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 /* Buttons */
 .confirmationButton,
+.orangeButton,
 .cancelButton {
     border: none;
     padding: 0.25rem 1rem;
@@ -682,8 +685,16 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--lightMatteRed);
 }
 
+.orangeButton {
+    background-color: var(--lightPumpkin);
+}
+
 .confirmationButton:hover {
     background-color: var(--matteGreen);
+}
+
+.orangeButton:hover {
+    background-color: var(--pumpkin);
 }
 
 .cancelButton:hover {
@@ -696,21 +707,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
     color: var(--lighterText);
     border: none;
     background-color: transparent;
-}
-
-.taskDone button,
-.discardNewLessonButton,
-.saveNewLessonButton {
-    border: none;
-    padding: 0 1rem;
-    border-radius: var(--smallRadius);
-    background-color: var(--lightMatteGreen);
-    font-size: 1rem;
-    color: var(--lighterText);
-}
-
-.taskDone button:hover {
-    background-color: var(--matteGreen);
 }
 
 #createSubjectButton,
@@ -747,8 +743,11 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 .lessonSelect,
-.reoccuringIntervalSelect {
+.reoccuringIntervalSelect,
+.taskDateSelect {
     appearance: none;
+    padding: 0 0.25rem;
+    color: black;
 }
 
 .lessonSelect option:first-child,
@@ -823,30 +822,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 .lessonOption.lessonPastMessage.responsive {
     display: none;
-}
-
-.saveNewLessonButton {
-    background-color: var(--lightMatteGreen);
-    margin-right: 0.5rem;
-}
-
-.discardNewTaskButton,
-.discardUpdateTaskButton,
-.discardNewLessonButton {
-    background-color: var(--lightMatteRed) !important;
-}
-
-.saveTaskButton:hover,
-.updateTaskButton:hover,
-.setTaskDoneButton:hover,
-.saveNewLessonButton:hover {
-    background-color: var(--matteGreen);
-}
-
-.discardNewTaskButton:hover,
-.discardUpdateTaskButton:hover,
-.discardNewLessonButton:hover {
-    background-color: var(--matteRed) !important;
 }
 
 #taskContainer th,
@@ -1494,10 +1469,35 @@ h3 {
 }
 
 /* svg */
+.icon {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+}
+
 .noteIcon {
     mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='none' height='85' id='svg_1' rx='8' ry='8' stroke='%23000000' stroke-width='10' transform='matrix(1 0 0 1 0 0)' width='87' x='6' y='7'/%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='20.43' x2='78.14' y1='26.55' y2='26.31'/%3E%3Cline fill='none' id='svg_3' stroke='%23494747' stroke-width='10' x1='20.45' x2='78.16' y1='42.09' y2='41.85'/%3E%3Cline fill='none' id='svg_4' stroke='%23494747' stroke-width='10' transform='matrix(1 0 0 1 0 0)' x1='20.22' x2='45.36' y1='57.71' y2='57.47'/%3E%3C/g%3E%3C/svg%3E");
     -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='none' height='85' id='svg_1' rx='8' ry='8' stroke='%23000000' stroke-width='10' transform='matrix(1 0 0 1 0 0)' width='87' x='6' y='7'/%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='20.43' x2='78.14' y1='26.55' y2='26.31'/%3E%3Cline fill='none' id='svg_3' stroke='%23494747' stroke-width='10' x1='20.45' x2='78.16' y1='42.09' y2='41.85'/%3E%3Cline fill='none' id='svg_4' stroke='%23494747' stroke-width='10' transform='matrix(1 0 0 1 0 0)' x1='20.22' x2='45.36' y1='57.71' y2='57.47'/%3E%3C/g%3E%3C/svg%3E");
     background-color: currentColor;
     width: 100%;
     height: 100%;
+}
+
+.inProgressIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='45' id='svg_1' rx='5' ry='5' stroke='%23000000' stroke-width='9' width='90' x='5' y='27.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-width='16' x1='23.16' x2='23.16' y1='38.86' y2='61.79'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-width='16' x1='46' x2='46' y1='38.82' y2='61.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_31' stroke='%23000000' stroke-width='9' x1='65.46' x2='65.46' y1='38.86' y2='61.79'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='45' id='svg_1' rx='5' ry='5' stroke='%23000000' stroke-width='9' width='90' x='5' y='27.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-width='16' x1='23.16' x2='23.16' y1='38.86' y2='61.79'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-width='16' x1='46' x2='46' y1='38.82' y2='61.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_31' stroke='%23000000' stroke-width='9' x1='65.46' x2='65.46' y1='38.86' y2='61.79'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+}
+
+.checkIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath d='m22,57.41l20.67,17.68l34.81,-48.1' fill='none' fill-opacity='0' id='svg_1' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath d='m22,57.41l20.67,17.68l34.81,-48.1' fill='none' fill-opacity='0' id='svg_1' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+}
+
+.crossIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' fill-opacity='0' id='svg_3' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='26' y2='76'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='76' y2='26'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' fill-opacity='0' id='svg_3' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='26' y2='76'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='76' y2='26'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
 }

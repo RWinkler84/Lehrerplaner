@@ -53,6 +53,7 @@
 }
 
 #editorButtonContainer button {
+    color: black;
     display: flex;
     align-items: center;
     border: none;
@@ -64,7 +65,7 @@
 #editorButtonContainer button svg {
     width: 1rem;
     height: 1rem;
-    fill: currentColor;
+    fill: black;
 }
 
 @media screen and (max-width: 620px) {

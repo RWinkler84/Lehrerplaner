@@ -211,8 +211,8 @@ export default class SettingsView {
                             <div class="alertRing">${subjectSelectHTML}</div>
                         </div>
                         <div class="flex alignCenter halfGap">
-                            <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
-                            <button class="discardNewLessonButton">&#x2718;</button>
+                            <button type="submit" class="saveNewLessonButton confirmationButton" style="margin-right: 0px"><span class="icon checkIcon"></span></button>
+                            <button class="discardNewLessonButton cancelButton"><span class="icon crossIcon"></span></button>
                         </div>
                     </div>
                 </form>

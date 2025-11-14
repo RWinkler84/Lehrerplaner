@@ -266,19 +266,22 @@ export default class TaskView extends AbstractView {
                 <td class="taskDescription" data-taskDescription="" data-heading="Beschreibung:">${task.description}</td>
                 <td class="taskDone">
                     <div class="openTask">
-                        <button class="setTaskDoneButton">&#x2714;</button>
-                        <button class="setTaskInProgressButton">&#x279C;</button>
+                        <button class="confirmationButton setTaskDoneButton" title="erledigt"><span class="icon checkIcon"></span></button>
+                        <button class="orangeButton setTaskInProgressButton" title="in Arbeit"><span class="icon inProgressIcon"></span></button>
+
                     </div>
                     <div class="editableTask" style="display: none">
-                        <button class="saveTaskButton">&#x2714;</button>
-                        <button class="discardNewTaskButton">&#x2718;</button>
+                        <button class="confirmationButton saveTaskButton" title="speichern"><span class="icon checkIcon"></span></button>
+                        <button class="cancelButton discardNewTaskButton" title="verwerfen"><span class="icon crossIcon"></span></button>
                     </div>
                     <div class="inProgressTask" style="display: none">
-                        <button class="setTaskDoneButton">&#x2714;</button>
+                        <button class="confirmationButton setTaskDoneButton" title="erledigt"><span class="icon checkIcon"></span></button>
                     </div>                      
                 </td>
             </tr>
             `;
+
+                                    // <button class="setTaskInProgressButton">&#x279C;</button>
 
         if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
 
