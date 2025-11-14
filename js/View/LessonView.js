@@ -41,7 +41,10 @@ export default class LessonView {
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}" data-created="${lesson.created}">
                     <div class="lessonContentContainer" style="width: 100%;">
-                        <div class="lessonHasTaskIndicator"></div>
+                        <div class="flex column spaceBetween" style="width: 1rem; height: 100%;">
+                            <div class="lessonHasTaskIndicator"></div>
+                            <div class="lessonNoteIndicator"><div class="noteIcon"></div></div>
+                        </div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
@@ -92,7 +95,10 @@ export default class LessonView {
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}" data-created="${lesson.created}">
                     <div class="lessonContentContainer" style="width: 100%;">
-                        <div class="lessonHasTaskIndicator"></div>
+                        <div class="flex column spaceBetween" style="width: 1rem; height: 100%;">
+                            <div class="lessonHasTaskIndicator"></div>
+                            <div class="lessonNoteIndicator"><div class="noteIcon"></div></div>
+                        </div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
                             <div style="display: flex; justify-content: left; align-items: center; width: 1.5rem;">
@@ -107,6 +113,7 @@ export default class LessonView {
         })
 
         this.showLessonHasTaskIndicator();
+        this.showLessonHasNoteIndicator();
 
         document.querySelectorAll('.lesson').forEach((lesson) => {
             lesson.addEventListener('mouseenter', AbstractView.highlightTask);
@@ -135,6 +142,25 @@ export default class LessonView {
                 if (task.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
 
                 lesson.querySelector('.lessonHasTaskIndicator').style.visibility = 'visible';
+            });
+        });
+    }
+
+    static async showLessonHasNoteIndicator() {
+        let monday = document.querySelector('div[data-weekday_number="1"]').dataset.date;
+        let sunday = document.querySelector('div[data-weekday_number="0"]').dataset.date;
+        let lessonNotes = await Controller.getAllLessonNotesInTimespan(monday, sunday);
+        let allLessons = document.querySelectorAll('.lesson');
+
+        allLessons.forEach(lesson => {
+            lessonNotes.forEach((note) => {
+
+                if (new Date(note.date).setHours(12, 0, 0, 0) != new Date(lesson.dataset.date).setHours(12, 0, 0, 0)) return;
+                if (note.class != lesson.dataset.class) return;
+                if (note.subject != lesson.dataset.subject) return;
+                if (note.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
+
+                lesson.querySelector('.lessonNoteIndicator').style.visibility = 'visible';
             });
         });
     }
@@ -407,11 +433,11 @@ export default class LessonView {
         const lesson = event.target.closest('.lesson');
 
         return {
-            className : lesson.dataset.class,
-            subject : lesson.dataset.subject,
-            date : lesson.closest('.weekday').dataset.date,
-            timeslot : lesson.closest('.timeslot').dataset.timeslot,
-            weekday : lesson.closest('.weekday').dataset.weekday_number,
+            className: lesson.dataset.class,
+            subject: lesson.dataset.subject,
+            date: lesson.closest('.weekday').dataset.date,
+            timeslot: lesson.closest('.timeslot').dataset.timeslot,
+            weekday: lesson.closest('.weekday').dataset.weekday_number,
             created: lesson.dataset.created
         }
     }

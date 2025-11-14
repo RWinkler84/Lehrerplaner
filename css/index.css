@@ -20,7 +20,7 @@
     --darkChampagne: #FFDAAD;
     --rose: #F77896;
     --darkRose: #F55178;
-    --purple: #6C56B3; 
+    --purple: #6C56B3;
     --lightPurple: #8472C0;
     --pumpkin: #FA7921;
     --lightPumpkin: #FB924B;
@@ -358,14 +358,21 @@ dialog .errorMessageDisplay {
 .lessonContentContainer {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .lessonHasTaskIndicator {
     visibility: hidden;
+    width: 0.3rem;
     height: 0.3rem;
-    aspect-ratio: 1/1;
     border-radius: 50%;
     margin-right: -0.3rem;
+}
+
+.lessonNoteIndicator {
+    visibility: hidden;
+    width: 0.5rem;
+    height: 0.5rem;
 }
 
 .spacerBlock {
@@ -1056,6 +1063,7 @@ h3 {
     background-color: var(--mint);
     color: black;
 }
+
 .subjectColorSix {
     background-color: var(--robinBlue);
     color: black;
@@ -1128,6 +1136,28 @@ h3 {
 .undefined .lessonHasTaskIndicator,
 .appointement .lessonHasTaskIndicator {
     background-color: var(--labelgrey);
+}
+
+.subjectColorOne .noteIcon,
+.subjectColorTwo .noteIcon,
+.subjectColorThree .noteIcon,
+.subjectColorFour .noteIcon,
+.subjectColorNine .noteIcon,
+.subjectColorTen .noteIcon {
+    background-color: var(--lightergrey);
+}
+
+.subjectColorFive .noteIcon,
+.subjectColorSix .noteIcon,
+.subjectColorSeven .noteIcon,
+.subjectColorEight .noteIcon,
+.undefined .noteIcon,
+.appointement .noteIcon {
+    background-color: var(--labelgrey);
+}
+
+.canceled .noteIcon {
+    background-color: var(--lightgrey);
 }
 
 .subjectColorOne.light {
@@ -1461,4 +1491,13 @@ h3 {
     .wrap {
         justify-content: end;
     }
+}
+
+/* svg */
+.noteIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='none' height='85' id='svg_1' rx='8' ry='8' stroke='%23000000' stroke-width='10' transform='matrix(1 0 0 1 0 0)' width='87' x='6' y='7'/%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='20.43' x2='78.14' y1='26.55' y2='26.31'/%3E%3Cline fill='none' id='svg_3' stroke='%23494747' stroke-width='10' x1='20.45' x2='78.16' y1='42.09' y2='41.85'/%3E%3Cline fill='none' id='svg_4' stroke='%23494747' stroke-width='10' transform='matrix(1 0 0 1 0 0)' x1='20.22' x2='45.36' y1='57.71' y2='57.47'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='none' height='85' id='svg_1' rx='8' ry='8' stroke='%23000000' stroke-width='10' transform='matrix(1 0 0 1 0 0)' width='87' x='6' y='7'/%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='20.43' x2='78.14' y1='26.55' y2='26.31'/%3E%3Cline fill='none' id='svg_3' stroke='%23494747' stroke-width='10' x1='20.45' x2='78.16' y1='42.09' y2='41.85'/%3E%3Cline fill='none' id='svg_4' stroke='%23494747' stroke-width='10' transform='matrix(1 0 0 1 0 0)' x1='20.22' x2='45.36' y1='57.71' y2='57.47'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+    width: 100%;
+    height: 100%;
 }

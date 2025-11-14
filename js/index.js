@@ -7,8 +7,8 @@ import TaskView from './View/TaskView.js';
 import SettingsView from './View/SettingsView.js';
 import LessonView from './View/LessonView.js';
 import Fn from './inc/utils.js';
-import LessonNote from './Model/LessonNote.js';
 import LessonNoteController from './Controller/LessonNoteController.js';
+import LessonController from './Controller/LessonController.js';
 
 //config
 export const ONEDAY = 86400000;
@@ -32,16 +32,19 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
-    AbstractController.setVersion('0.9.34');
+    AbstractController.setVersion('0.9.4');
     await abstCtrl.syncData();
-    
-    // LessonNote.createMockData()
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl))
     window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl))
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
+
+    document.addEventListener('click', (event) => {
+        LoginController.dialogEventHandler(event);
+        LessonController.timetableClickHandler(event);
+    });
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
@@ -74,11 +77,9 @@ async function startApp() {
 
     //handlers for settings
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
-
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
 
     //on site login
-    document.addEventListener('click', LoginController.dialogEventHandler);
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
 
     //lesson note handler
@@ -86,7 +87,7 @@ async function startApp() {
     document.querySelector('#lessonNoteDialog').addEventListener('keydown', LessonNoteController.handleKeyDownEvents);
     document.querySelector('#editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
     document.querySelector('#lessonNoteDialog').addEventListener('input', LessonNoteController.normalizeInput);
-    // document.addEventListener('selectionchange', LessonNoteController.updateButtonStatus);
+    document.addEventListener('selectionchange', LessonNoteController.updateButtonStatus);
 
     AbstractController.renderTopMenu();
 

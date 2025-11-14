@@ -45,6 +45,7 @@ export default class LessonNoteController {
 
         await note.save();
         LessonNoteView.updateLessonNoteDialog(note);
+        LessonController.renderLesson();
     }
 
     static async updateLessonNote(noteData) {

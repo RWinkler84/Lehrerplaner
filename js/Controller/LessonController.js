@@ -147,8 +147,23 @@ export default class LessonController {
         return await TaskController.getAllTasksInTimespan(startDate, endDate);
     }
 
+    static async getAllLessonNotesInTimespan(startDate, endDate) {
+        return await LessonNoteController.getAllLessonNotesInTimeRange(startDate, endDate);
+    }
+
     static renderLessonNote(event) {
         LessonNoteController.renderLessonNote(event);
+    }
+
+    static timetableClickHandler(event) {
+        const target = event.target;
+
+        switch (true) {
+            case target.classList.contains('noteIcon'):
+            console.log('drin')
+                this.renderLessonNote(event);
+                break;
+        }
     }
 
     static #lessonDataToLessonObject(lessonData) {
