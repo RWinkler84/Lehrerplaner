@@ -13,6 +13,7 @@ export default class LessonNoteView extends AbstractView {
         const dialog = document.querySelector('#lessonNoteDialog');
         const headlineInfo = dialog.querySelector('#lessonNoteInfo');
         const editor = dialog.querySelector('#noteContentEditor');
+        const saveButton = dialog.querySelector('#saveLessonNotesButton');
 
         const lessonDate = Fn.formatDate(lessonData.date);
 
@@ -29,10 +30,12 @@ export default class LessonNoteView extends AbstractView {
             dialog.dataset.noteid = note.id;
             dialog.dataset.created = note.created;
             editor.innerHTML = note.content;
+            saveButton.setAttribute('disabled', '');
         }
 
         if (!note) {
             dialog.dataset.noteid = '';
+            saveButton.removeAttribute('disabled');
 
             const p = document.createElement('p');
             p.classList.add('placeholder');
@@ -41,6 +44,23 @@ export default class LessonNoteView extends AbstractView {
         }
 
         dialog.showModal();
+    }
+
+    static toggleSaveLessonNoteButton(activate = false) {
+        if (activate) {
+            document.querySelector('#saveLessonNotesButton').removeAttribute('disabled');
+            return;
+        }
+
+        document.querySelector('#saveLessonNotesButton').setAttribute('disabled', '');
+    }
+
+    static showLessonNoteSavedMessage() {
+        const message = document.querySelector('#noteSavedMessage');
+        message.classList.add('active');
+        setTimeout(() => {
+            message.classList.remove('active');
+        }, 2000);
     }
 
     static updateLessonNoteDialog(note) {
@@ -110,15 +130,15 @@ export default class LessonNoteView extends AbstractView {
     }
 
     static setDisplayedNoteVersion(version) {
-        document.querySelector('#noteContentEditor').dataset.noteversion = version;     
+        document.querySelector('#noteContentEditor').dataset.noteversion = version;
     }
 
     static getDisplayedNoteVersion() {
-       let displayedVersion = document.querySelector('#noteContentEditor').dataset.noteversion;
+        let displayedVersion = document.querySelector('#noteContentEditor').dataset.noteversion;
 
-       if (displayedVersion == '') displayedVersion = 0;
+        if (displayedVersion == '') displayedVersion = 0;
 
-       return Number(displayedVersion);
+        return Number(displayedVersion);
     }
 
     static closeLessonNotesDialog() {

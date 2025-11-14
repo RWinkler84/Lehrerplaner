@@ -45,6 +45,8 @@ export default class LessonNoteController {
 
         await note.save();
         LessonNoteView.updateLessonNoteDialog(note);
+        LessonNoteView.toggleSaveLessonNoteButton(false);
+        LessonNoteView.showLessonNoteSavedMessage()
         LessonController.renderLesson();
     }
 
@@ -54,6 +56,8 @@ export default class LessonNoteController {
         note = LessonNote.writeDataToInstance(noteData, note);
 
         note.update();
+        LessonNoteView.toggleSaveLessonNoteButton(false);
+        LessonNoteView.showLessonNoteSavedMessage()
     }
 
     static async deleteLessonNote(id) {
@@ -77,6 +81,7 @@ export default class LessonNoteController {
 
     static normalizeInput() {
         LessonNoteView.normalizeInput();
+        LessonNoteView.toggleSaveLessonNoteButton(true);
     }
 
     static trackLessonNoteChanges(forceVersionBackup = false) {

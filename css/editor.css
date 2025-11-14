@@ -68,6 +68,24 @@
     fill: black;
 }
 
+#noteSavedMessage {
+    visibility: hidden;
+    color: var(--matteGreen);
+}
+
+#noteSavedMessage.active {
+    visibility: visible;
+    animation-name: showSavedMessage;
+    animation-duration: 2s;
+    animation-timing-function: ease-out;
+}
+
+@keyframes showSavedMessage {
+    0% {opacity: 100}
+    50% {opacity: 100}
+    100% {opacity: 0}
+}
+ 
 @media screen and (max-width: 620px) {
     
     #lessonNoteDialog {

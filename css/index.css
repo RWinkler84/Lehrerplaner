@@ -13,7 +13,7 @@
     --mint: #C7F2A7;
     --darkMint: #acef79;
     --lightMatteGreen: #17B2B5;
-    --lightMatteRed: #F58F8F;
+    --lightMatteRed: #f78181;
     --robinBlue: #1ECBE1;
     --darkRobinBlue: #1bb2c5;
     --champagne: #FFEAD0;
@@ -670,6 +670,11 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 /* Buttons */
+button:disabled,
+button:disabled:hover  {
+    background-color: var(--lightgrey);
+}
+
 .confirmationButton,
 .orangeButton,
 .cancelButton {
