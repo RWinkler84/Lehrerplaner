@@ -64,6 +64,7 @@ export default class LessonNoteController {
         let note = await LessonNote.getById(id);
 
         note.delete();
+        LessonController.renderLesson();
     }
 
     static changeNoteVersion(action) {

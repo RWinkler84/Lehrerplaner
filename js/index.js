@@ -13,6 +13,7 @@ import LessonController from './Controller/LessonController.js';
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
+export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'ul', 'ol', 'li', 'b', 'p', 'br']
 
 export let unsyncedDeletedSubjects = [];

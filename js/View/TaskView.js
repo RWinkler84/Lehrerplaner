@@ -1,6 +1,7 @@
 import AbstractView from './AbstractView.js';
 import Controller from '../Controller/TaskController.js';
 import Fn from '../inc/utils.js';
+import { ANIMATIONRUNTIME } from '../index.js';
 
 export default class TaskView extends AbstractView {
 
@@ -281,7 +282,7 @@ export default class TaskView extends AbstractView {
             </tr>
             `;
 
-                                    // <button class="setTaskInProgressButton">&#x279C;</button>
+        // <button class="setTaskInProgressButton">&#x279C;</button>
 
         if (new Date(task.date) < new Date()) taskTr.querySelector('.taskAdditionalInfo').classList.add('overdue');
 
@@ -593,7 +594,6 @@ export default class TaskView extends AbstractView {
         Controller.setTaskBackupData(taskId);
     }
 
-
     static showSaveOrDiscardChangesButtons(event) {
         let buttonWrapper = event.target.closest('tr').querySelector('.taskDone');
 
@@ -628,6 +628,36 @@ export default class TaskView extends AbstractView {
                 }
             });
         }
+    }
+
+    static async runSetInProgressAnimation(event) {
+        const taskElement = event.target.closest('tr');
+        
+        taskElement.classList.add('fadeOut');
+
+        setTimeout(() => {
+            taskElement.classList.remove('fadeOut');
+            taskElement.classList.add('fadeIn');
+        }, ANIMATIONRUNTIME);
+
+        setTimeout(() => { taskElement.classList.remove('fadeIn') }, ANIMATIONRUNTIME * 2);
+
+        return new Promise((resolve) => {
+            setTimeout(() => { resolve() }, ANIMATIONRUNTIME);
+        })
+    }
+
+    static async runRemoveTaskAnimation(event) {
+        const taskElement = event.target.closest('tr');
+        taskElement.classList.add('shrink');
+
+        setTimeout(() => {
+            taskElement.classList.remove('shrink');
+        }, ANIMATIONRUNTIME);
+
+        return new Promise((resolve) => {
+            setTimeout(() => { resolve() }, ANIMATIONRUNTIME);
+        })
     }
 
     //validation errors

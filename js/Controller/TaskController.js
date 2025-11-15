@@ -113,6 +113,7 @@ export default class TaskController {
     static async setTaskInProgress(taskId, event) {
         let task = await Task.getById(taskId);
 
+        await View.runSetInProgressAnimation(event);
         task.setInProgress();
         this.renderTaskChanges();
         View.showSetDoneOrInProgressButtons(event);
@@ -121,6 +122,7 @@ export default class TaskController {
     static async setTaskDone(id, event) {
         let task = await Task.getById(id);
 
+        await View.runRemoveTaskAnimation(event);
         task.setDone();
         this.renderTaskChanges();
 
