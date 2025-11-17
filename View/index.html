@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/editor.css">
+    <link rel="stylesheet" href="./css/animations.css">
     <link rel="icon" type="image/png" href="../favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
     <link rel="shortcut icon" href="../favicon.ico" />
@@ -28,6 +30,7 @@
                 <div><button id="openMenuButton">&#x2630;</button></div>
                 <div id="topMenu" class="flex column justifyCenter ">
                     <button id="openSettingsButton" class="menuButton">Einstellungen</button>
+                    <button id="openSupportDialogButton" class="menuButton">Support</button>
                     <button id="openLoginButton" class="menuButton">Login</button>
                     <button id="createAccountButton" class="menuButton">Registrieren</button>
                     <button id="logoutButton" class="menuButton">Abmelden</button>
@@ -67,7 +70,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="1" data-date="">
-                        <div class="weekdayLabel">Mo<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Mo<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -81,7 +85,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="2" data-date="">
-                        <div class="weekdayLabel">Di<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Di<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -95,7 +100,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="3" data-date="">
-                        <div class="weekdayLabel">Mi<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Mi<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
 
                         <div class="timeslot" data-timeslot="1"></div>
@@ -110,7 +116,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="4" data-date="">
-                        <div class="weekdayLabel">Do<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Do<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
 
                         <div class="timeslot" data-timeslot="1"></div>
@@ -125,7 +132,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="5" data-date="">
-                        <div class="weekdayLabel">Fr<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Fr<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -139,7 +147,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="6" data-date="">
-                        <div class="weekdayLabel">Sa<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">Sa<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -153,7 +162,8 @@
                     </div>
 
                     <div class="weekday" data-weekday_number="0" data-date="">
-                        <div class="weekdayLabel">So<span class="isTodayDot"></span><div class="smallDate"></div>
+                        <div class="weekdayLabel">So<span class="isTodayDot"></span>
+                            <div class="smallDate"></div>
                         </div>
                         <div class="timeslot" data-timeslot="1"></div>
                         <div class="timeslot" data-timeslot="2"></div>
@@ -569,6 +579,7 @@
                                 <th>Kl.</th>
                                 <th>Fach</th>
                                 <th>Datum</th>
+                                <!-- <th>St.</th> -->
                                 <th class="taskDescription">Typ</th>
                                 <th style="border: none"></th>
                             </tr>
@@ -598,6 +609,79 @@
                 <div class="marginTop flex justifyEnd">
                     <button id="closeLessonChangesAndTasksToKeepDialogButton"
                         class="confirmationButton">Erledigt</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="supportDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Support</h3><button class="deleteItemButton closeSupportDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <p>
+                Du hast eine Frage zu einem Feature, hast ein Problem entdeckt oder einen Verbesserungsvorschlag? Dann
+                schick uns eine Nachricht!
+            </p>
+            <form id="supportFrom">
+                <div class="flex column halfGap marginTop" class="formBody">
+                    <div>
+                        <label for="supportTicketUserEmail" style="display: block">Deine E-Mail-Adresse</label>
+                        <div class="alertRing"><input type="email" name="supportTicketUserEmail"
+                                id="supportTicketUserEmail" autofocus>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="supportTicketTopic" style="display: block">Thema des Tickets</label>
+                        <div class="alertRing"><input type="text" name="supportTicketTopic" id="supportTicketTopic">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="supportTicketContent" style="display: block">Beschreibung</label>
+                        <div class="alertRing"><textarea name="supportTicketContent" id="supportTicketContent"
+                                placeholder="Bei technischen Problemen beschreibe bitte möglichst genau, was du getan hast, bevor das Problem aufgetreten ist. So können wir es leichter nachvollziehen."></textarea>
+                        </div>
+                    </div>
+                    <div class="flex spaceBetween" style="display: none">
+                        <div id="supportTicketQuestionDisplay">Platzhalter</div>
+                        <div class="alertRing" style="width:fit-content"><input type="text" name="answer"
+                                id="supportTicketAnswer" style="width: 2rem;">
+                        </div>
+                    </div>
+                </div>
+                <div id="supportTicketErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
+            </form>
+            <div class="flex justifyEnd alignEnd marginTop navigation">
+                <button type="submit" id="sendSupportTicketButton" class="confirmationButton"
+                    style="margin-right: 3px">Senden</button>
+                <button class="confirmationButton closeSupportDialogButton" id="closeSupportDialogButton"
+                    style="margin-right: 3px; display: none">Schließen</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="lessonNoteDialog" data-noteid data-class data-subject data-date data-timeslot data-weekday data-created>
+        <div class="headline flex spaceBetween">
+            <h3>Stundennotiz <span id="lessonNoteInfo"></span></h3><button id="closeLessonNotesButton" class="deleteItemButton"
+                style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <div id="noteEditorContainer" class="flex column halfGap marginTop">
+                <div id="editorButtonContainer" class="flex spaceBetween">
+                <div class="flex halfGap">
+                    <button id="boldButton" style="font-weight: bold;">b</button>
+                    <button id="orderedListButton"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="olIcon"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path class="olIcon" d="M64 136C64 122.8 74.7 112 88 112L136 112C149.3 112 160 122.7 160 136L160 240L184 240C197.3 240 208 250.7 208 264C208 277.3 197.3 288 184 288L88 288C74.7 288 64 277.3 64 264C64 250.7 74.7 240 88 240L112 240L112 160L88 160C74.7 160 64 149.3 64 136zM94.4 365.2C105.8 356.6 119.7 352 134 352L138.9 352C172.6 352 200 379.4 200 413.1C200 432.7 190.6 451 174.8 462.5L150.8 480L184 480C197.3 480 208 490.7 208 504C208 517.3 197.3 528 184 528L93.3 528C77.1 528 64 514.9 64 498.7C64 489.3 68.5 480.5 76.1 475L146.6 423.7C150 421.2 152 417.3 152 413.1C152 405.9 146.1 400 138.9 400L134 400C130.1 400 126.3 401.3 123.2 403.6L102.4 419.2C91.8 427.2 76.8 425 68.8 414.4C60.8 403.8 63 388.8 73.6 380.8L94.4 365.2zM288 128L544 128C561.7 128 576 142.3 576 160C576 177.7 561.7 192 544 192L288 192C270.3 192 256 177.7 256 160C256 142.3 270.3 128 288 128zM288 288L544 288C561.7 288 576 302.3 576 320C576 337.7 561.7 352 544 352L288 352C270.3 352 256 337.7 256 320C256 302.3 270.3 288 288 288zM288 448L544 448C561.7 448 576 462.3 576 480C576 497.7 561.7 512 544 512L288 512C270.3 512 256 497.7 256 480C256 462.3 270.3 448 288 448z"/></svg></button>
+                    <button id="unorderedListButton"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="ulIcon"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path class="ulIcon" d="M104 112C90.7 112 80 122.7 80 136L80 184C80 197.3 90.7 208 104 208L152 208C165.3 208 176 197.3 176 184L176 136C176 122.7 165.3 112 152 112L104 112zM256 128C238.3 128 224 142.3 224 160C224 177.7 238.3 192 256 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L256 128zM256 288C238.3 288 224 302.3 224 320C224 337.7 238.3 352 256 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L256 288zM256 448C238.3 448 224 462.3 224 480C224 497.7 238.3 512 256 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L256 448zM80 296L80 344C80 357.3 90.7 368 104 368L152 368C165.3 368 176 357.3 176 344L176 296C176 282.7 165.3 272 152 272L104 272C90.7 272 80 282.7 80 296zM104 432C90.7 432 80 442.7 80 456L80 504C80 517.3 90.7 528 104 528L152 528C165.3 528 176 517.3 176 504L176 456C176 442.7 165.3 432 152 432L104 432z"/></svg></button>
+                </div>
+                <div class="flex halfGap">
+                <button id="revertChangeButton">&#8617;</button>
+                <button id="redoChangeButton">&#8618;</button>
+                </div>
+                </div>
+                <div id="noteContentEditor" contenteditable="true" data-noteversion>
+                </div>
+                <div class="flex halfGap spaceBetween">
+                    <div id="noteSavedMessage">gespeichert</div><button id="saveLessonNotesButton" class="confirmationButton">Speichern</button>
                 </div>
             </div>
         </div>
@@ -689,8 +773,8 @@
     <div id="window7" class="introWindow flex column">
         <h4>Die Wochenübersicht 5/6</h4>
         <p>Hast du deine Eintragungen gemacht, kannst die Stunde über <button
-                class="confirmationButton">&#x2714;</button>
-            speichern. Willst du doch keine Stunde anlegen, drücke auf <button class="cancelButton">&#x2718;</button>.
+                class="confirmationButton"><span class="icon checkIcon"></span></button>
+            speichern. Willst du doch keine Stunde anlegen, drücke auf <button class="cancelButton"><span class="icon crossIcon"></span></button>.
         </p>
         <p>Hast du das Formular gespeichert, taucht deine neu angelegte Stunde in der Wochenübersicht auf. Ihre Farbe
             hängt vom Fach ab, wobei du selbst aus einer Reihe von Farben wählen kannst, welches Fach wie dargestellt
@@ -748,13 +832,13 @@
     <div id="window11" class="introWindow flex column">
         <h4>Die Aufgabenübersicht 3/6</h4>
         <p>Dir ist sicher aufgefallen, dass du jetzt nicht nur den Text der Beschreibung bearbeiten kannst, sondern dass
-            sich auch die Buttons verändert haben. Mit dem <button class="confirmationButton">&#x2714;</button>
-            speicherst du deine Änderungen. Mit <button class="cancelButton">&#x2718;</button> verwirfst du sie.
+            sich auch die Buttons verändert haben. Mit dem <button class="confirmationButton"><span class="icon checkIcon"></span></button>
+            speicherst du deine Änderungen. Mit <button class="cancelButton"><span class="icon crossIcon"></span></button> verwirfst du sie.
         </p>
-        <p>Wie du siehst, gibt es den <button class="confirmationButton">&#x2714;</button>-Button auch bei anderen
+        <p>Wie du siehst, gibt es den <button class="confirmationButton"><span class="icon checkIcon"></span></button>-Button auch bei anderen
             Aufgaben. Hier hat er allerdings einen anderen Zweck. Klickst du ihn, wird die Aufgabe auf 'erledigt'
             gesetzt und verschwindet aus der Liste. In der Liste der anstehenden Aufgaben gibt es außerdem den <button
-                class="confirmationButton">&#x279C;</button>-Button. Ein Klick auf diesen ändert den Status der Aufgabe
+                class="orangeButton"><span class="icon inProgressIcon"></span></button>-Button. Ein Klick auf diesen ändert den Status der Aufgabe
             auf "in Bearbeitung".</p>
         <div class="buttons flex halfGap alignEnd justifyEnd">
             <button class="cancelButton cancelTour">Reicht schon...</button>

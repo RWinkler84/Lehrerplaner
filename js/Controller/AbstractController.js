@@ -72,6 +72,47 @@ export default class AbstractController {
         View.renderTopMenu(userInfo);
     }
 
+    static openSupportDialog() {
+        View.openSupportDialog();
+    }
+
+    static closeSupportDialog() {
+        View.closeSupportDialog();
+    }
+
+    static async sendSupportTicket(event) {
+        event.preventDefault();
+        let formData = View.getSupportTicketContentFromForm();
+
+        if (formData.userEmail == '') { View.alertSupportTicketUserEmail(); return; }
+        if (formData.ticketTopic == '') { View.alertSupportTicketTopic(); return; }
+        if (formData.ticketContent == '') { View.alertSupportTicketContent(); return; }
+        // if (formData.captchaAnswer == '') { View.alertSupportTicketCaptcha(); return; } //not yet implemented
+
+        const mailRegEx = /^[^@]+@[^@]+\.[^@]+$/;
+
+        if (!mailRegEx.test(formData.userEmail)) {
+            let message = 'Ungültige E-Mail-Adresse'
+            View.alertSupportTicketUserEmail(message);
+            return false;
+        }
+
+        View.toggleSupportDialogButtons('sending');
+
+        let db = new AbstractModel;
+        let result = await db.sendSupportTicket(formData);
+
+        if (result.status == 'success') {
+            result.message = 'Das Ticket wurde erfolgreich verschickt. Wir melden uns schnellstmöglich bei dir.'
+            View.toggleSupportDialogButtons('success');
+            View.displayMessageOnSupportDialog(result);
+        } else {
+            result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später noch einmal.'
+            View.toggleSupportDialogButtons('failed');
+            View.displayMessageOnSupportDialog(result);
+        }
+    }
+
     static topMenuClickEventHandler(event) {
         let target = event.target.id;
 
@@ -87,13 +128,17 @@ export default class AbstractController {
             case 'openSettingsButton':
                 SettingsController.openSettings();
                 break;
- 
+
             case 'openMenuButton':
                 View.toggleTopMenu(event);
                 break;
 
             case 'createAccountButton':
                 LoginController.openCreateAccountDialog();
+                break;
+
+            case 'openSupportDialogButton':
+                AbstractController.openSupportDialog();
                 break;
         }
     }

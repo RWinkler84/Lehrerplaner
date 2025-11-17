@@ -46,6 +46,11 @@ export default class SettingsView {
             'subjectColorThree',
             'subjectColorFour',
             'subjectColorFive',
+            'subjectColorSix',
+            'subjectColorSeven',
+            'subjectColorEight',
+            'subjectColorNine',
+            'subjectColorTen',
         ];
 
         let selectionContainer = document.querySelector('#colourSelection');
@@ -139,7 +144,12 @@ export default class SettingsView {
 
         //hide timetable changing buttons, if necessary
         document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
-        if (allValidDates.length <= 1) document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+
+        if (allValidDates.length <= 1) {
+            document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
+        } else {
+            document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
+        }
 
         //hide edit timetable button, if there is not yet a timetable
         if (date == undefined) document.querySelector('#editTimetableButton').style.display = 'none';
@@ -201,8 +211,8 @@ export default class SettingsView {
                             <div class="alertRing">${subjectSelectHTML}</div>
                         </div>
                         <div class="flex alignCenter halfGap">
-                            <button type="submit" class="saveNewLessonButton" style="margin-right: 0px">&#x2714;</button>
-                            <button class="discardNewLessonButton">&#x2718;</button>
+                            <button type="submit" class="saveNewLessonButton confirmationButton" style="margin-right: 0px"><span class="icon checkIcon"></span></button>
+                            <button class="discardNewLessonButton cancelButton"><span class="icon crossIcon"></span></button>
                         </div>
                     </div>
                 </form>
@@ -401,7 +411,7 @@ export default class SettingsView {
         Controller.saveTimetableUpdates(validFrom, lessons);
     }
 
-    static renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks) {
+    static renderLessonChangesAndTasksToKeepDialog(affectedLessonChanges, affectedTasks, timetableValidFromDate) {
         let dialog = document.querySelector('#LessonChangesAndTasksToKeepDialog');
         let lessonConflictsContainer = dialog.querySelector('#lessonChangesConflictsContainer');
         let taskConflictsContainer = dialog.querySelector('#taskConflictsContainer');
@@ -417,21 +427,30 @@ export default class SettingsView {
             taskConflictsContainer.style.display = 'none';
         }
 
+        dialog.setAttribute('data-timetablevalidfrom', timetableValidFromDate);
         dialog.querySelector('#descriptionPara').innerText = descriptionText;
 
         affectedLessonChanges.forEach(entry => {
             if (new Date(entry.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) return;
-            if (entry.canceled == 'true') return;
 
-            let type = entry.type == 'sub' ? 'Vertretung' : 'Termin';
             let subject = entry.subject == 'Termin' ? ' - ' : entry.subject;
             let date = Fn.formatDate(entry.date)
+            let day = Fn.getAbbreviatedDayName(entry.weekday);
+            let type;
+
+            if (entry.type == 'sub') type = 'Vertretung';
+            if (entry.type == 'appointement') type = 'Termin';
+            if (entry.canceled == 'true') type = 'Ausfall';
 
             let html = `
                 <tr data-type="lessonChange" data-id="${entry.id}">
                     <td>${entry.class}</td>
                     <td>${subject}</td>
-                    <td>${date}</td>
+                    <td>
+                        <div>${day}</div>
+                        <div style="font-size: 0.8rem;">${date}</div>
+                        <div style="font-size: 0.8rem; text-wrap: nowrap;">${entry.timeslot}. Stunde</div>
+                    </td>
                     <td>${type}</td>
                     <td style="border: none;"><button class="deleteItemButton" style="width: 1.5rem">&#215;</button></td>
                 </tr>
@@ -464,15 +483,20 @@ export default class SettingsView {
         dialog.querySelectorAll('.deleteItemButton').forEach(button => {
             button.addEventListener('click', SettingsView.deleteLessonChangeOrTaskConflict)
         });
+
         dialog.querySelector('#closeLessonChangesAndTasksToKeepDialogButton').addEventListener('click', SettingsView.closeLessonChangesAndTasksToKeepDialog);
 
-        dialog.setAttribute('open', '');
+        if (lessonConflictsContainer.querySelector('table tbody').children.length > 0 || taskConflictsContainer.querySelector('table tbody').children.length > 0) dialog.showModal();
     }
 
     static closeLessonChangesAndTasksToKeepDialog() {
-        document.querySelector('#LessonChangesAndTasksToKeepDialog').removeAttribute('open');
-        Controller.renderLesson();
-        Controller.renderTaskChanges();
+        let remainingLessonIds = [];
+        let timetableValidFromDate = document.querySelector('#LessonChangesAndTasksToKeepDialog').dataset.timetablevalidfrom;
+        
+        document.querySelectorAll('#lessonChangesConflictsTable tbody>tr').forEach(tr => remainingLessonIds.push(tr.dataset.id));
+        document.querySelector('#LessonChangesAndTasksToKeepDialog').close();
+
+        Controller.handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate);
     }
 
     static deleteLessonChangeOrTaskConflict(event) {

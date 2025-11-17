@@ -41,7 +41,7 @@ export default class Login extends AbstractModel {
         await this.writeToLocalDB('subjects', data);
 
         data = [
-            { "id": "3", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "Ge", "description": "Römische Expansion Germanien vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:46:50" },
+            { "id": "3", "date": "2025-06-24", "timeslot": "2", "class": "8a", "subject": "Ge", "description": "Beginnende Industrialisierung vorbereiten", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:46:50" },
             { "id": "6", "date": "2025-06-23", "timeslot": "4", "class": "7c", "subject": "Ge", "description": "Steckbrief Ludwig XIV", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:47:26" },
             { "id": "7", "date": "2025-06-24", "timeslot": "3", "class": "6a", "subject": "De", "description": "Arbeitsblatt Wortarten", "status": "inProgress", "fixedTime": "0", "lastEdited": "2025-06-19 13:57:59" },
             { "id": "8", "date": "2025-06-25", "timeslot": "3", "class": "8b", "subject": "Sk", "description": "Leben in der Gemeinde", "status": "open", "fixedTime": "0", "lastEdited": "2025-06-19 13:48:42" },
@@ -91,6 +91,10 @@ export default class Login extends AbstractModel {
         ];
 
         await this.writeToLocalDB('timetableChanges', data);
+
+        data = {"id": "1", "class": "8a", "content": "<p><b>Stundenthemen:</b></p><ul><li>​Arbeit in der Manufaktur</li><li>Erfindung der Dampfmaschine</li><li>​Wechsel von Handarbeit zur maschinellen Fertigung</li></ul><p>abschließend kurze Diskussion zum Thema:</p><p>Welche Veränderungen könnte die Automatisierung der Arbeit für die Arbeiter mit sich bringen?</p>", "created": "2025-11-17 10:08:38", "date": "2025-06-24", "lastEdited": "2025-11-17 10:08:38", "subject": "Ge", "timeslot": "2", "weekday": "2" };
+
+        await this.writeToLocalDB('lessonNotes', data)
     }
 
     async updateAccountType() {

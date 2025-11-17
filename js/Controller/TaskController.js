@@ -1,3 +1,4 @@
+import { ONEDAY } from '../index.js';
 import Task from '../Model/Task.js';
 import View from '../View/TaskView.js';
 import LessonController from './LessonController.js';
@@ -86,6 +87,8 @@ export default class TaskController {
 
         task.class = taskData.class;
         task.subject = taskData.subject;
+        task.date = taskData.date;
+        task.timeslot = taskData.timeslot;
         task.description = taskData.description;
         task.fixedTime = taskData.fixedTime;
         task.reoccuring = taskData.reoccuring;
@@ -110,6 +113,7 @@ export default class TaskController {
     static async setTaskInProgress(taskId, event) {
         let task = await Task.getById(taskId);
 
+        await View.runSetInProgressAnimation(event);
         task.setInProgress();
         this.renderTaskChanges();
         View.showSetDoneOrInProgressButtons(event);
@@ -118,6 +122,7 @@ export default class TaskController {
     static async setTaskDone(id, event) {
         let task = await Task.getById(id);
 
+        await View.runRemoveTaskAnimation(event);
         task.setDone();
         this.renderTaskChanges();
 
@@ -130,15 +135,24 @@ export default class TaskController {
         View.renderTasks();
     }
 
+    static revertTaskChanges(event) {
+        View.removeEditability(event);
+        View.showSetDoneOrInProgressButtons(event);
+        View.renderTasks();
+    }
+
     static async reorderTasks(oldTimetable, oldTimetableChanges) {
 
         await Task.reorderTasks(oldTimetable, oldTimetableChanges);
         this.renderTaskChanges();
     }
 
-    static tasksTableEventHandler(event) {
+    static async tasksTableEventHandler(event) {
         if (event.type == 'dblclick') {
-            View.makeEditable(event);
+            let taskData = View.getTaskDataFromTr(event);
+            let upcomingLessons = await Task.calculateAllLessonDates(taskData.class, taskData.subject, new Date().setHours(12) + ONEDAY * 60);
+
+            View.makeEditable(event, upcomingLessons);
             return;
         }
 
@@ -151,7 +165,7 @@ export default class TaskController {
         if (event.target.classList.contains('setTaskDoneButton')) View.setTaskDone(event);
         if (event.target.classList.contains('setTaskInProgressButton')) View.setTaskInProgress(event);
         if (event.target.classList.contains('saveTaskButton')) View.saveTask(event);
-        if (event.target.classList.contains('discardUpdateTaskButton')) View.revertChanges(event);
+        if (event.target.classList.contains('discardUpdateTaskButton')) this.revertTaskChanges(event);
         if (event.target.classList.contains('discardNewTaskButton')) View.removeTaskForm(event);
     }
 }

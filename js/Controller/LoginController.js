@@ -2,7 +2,7 @@ import AbstractController from "./AbstractController.js";
 import View from "../View/LoginView.js";
 import Model from "../Model/Login.js";
 
-export default class LoginController extends AbstractController {
+export default class LoginController extends AbstractController{
 
     static async openLoginDialog(event, forceOpen = false) {
         event?.preventDefault();
@@ -272,6 +272,10 @@ export default class LoginController extends AbstractController {
                 LoginController.attemptPasswordReset(event);
                 break;
 
+            case 'sendSupportTicketButton':
+                AbstractController.sendSupportTicket(event);
+                break;
+
             //links
             case 'continueAsGuest':
                 LoginController.createGuestAccount();
@@ -294,6 +298,10 @@ export default class LoginController extends AbstractController {
 
             case elementClassList.contains('backToLoginLink'):
                 LoginController.openLoginDialog(event, true);
+                break;
+
+            case elementClassList.contains('closeSupportDialogButton'):
+                AbstractController.closeSupportDialog();
                 break;
         }
 

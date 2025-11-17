@@ -9,11 +9,22 @@
     --lightText: rgb(164, 164, 164);
     --lighterText: #F3F5F7;
     --matteRed: #F05D5E;
-    --matteGreen: #0F7173;
+    --matteGreen: #138e90;
     --mint: #C7F2A7;
     --darkMint: #acef79;
     --lightMatteGreen: #17B2B5;
-    --lightMatteRed: #F58F8F;
+    --lightMatteRed: #f78181;
+    --robinBlue: #1ECBE1;
+    --darkRobinBlue: #1bb2c5;
+    --champagne: #FFEAD0;
+    --darkChampagne: #FFDAAD;
+    --rose: #F77896;
+    --darkRose: #F55178;
+    --purple: #6C56B3;
+    --lightPurple: #8472C0;
+    --pumpkin: #FA7921;
+    --lightPumpkin: #FB924B;
+
     --lightgrey: rgb(184, 184, 184);
     --lightergrey: rgb(227, 227, 227);
     --labelgrey: rgb(106, 106, 106);
@@ -43,6 +54,12 @@ input[type="checkbox"] {
     vertical-align: middle;
 }
 
+textarea {
+    width: 100%;
+    height: 7rem;
+    font-size: 1rem;
+}
+
 a {
     text-decoration: none;
 }
@@ -51,13 +68,14 @@ a {
 nav {
     position: fixed;
     width: 100%;
-    z-index: 1;
+    z-index: 4;
     top: 0;
     left: 0;
 }
 
 #topMenuContainer,
 #settingsTitleBar {
+    position: relative;
     background-color: var(--topMenuBackgound);
     color: var(--lighterText);
     padding: 0.5rem 2rem;
@@ -102,7 +120,6 @@ nav {
     position: absolute;
     top: 2rem;
     right: 0rem;
-    z-index: 1;
     padding: 1rem 1rem;
 }
 
@@ -125,13 +142,13 @@ main {
 #settingsContainer {
     display: none;
     position: absolute;
-    z-index: 2;
+    z-index: 4;
     background-color: var(--bodyBackground);
     top: 1rem;
     left: 2rem;
     right: 2rem;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-    border: solid 0.5rem var(--bodyBackground);
+    border: solid 0.3rem var(--bodyBackground);
 }
 
 #settingsTimetableContainer {
@@ -142,6 +159,7 @@ main {
 #timetableContainer {
     overflow-y: hidden;
     scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
+    scrollbar-width: none;
 }
 
 #isCurrentWeekDot {
@@ -161,6 +179,8 @@ dialog {
     background-color: var(--contentContainerBackground);
     min-width: 460px;
     max-width: 460px;
+    padding: 1rem 2rem;
+    border: solid 1px var(--bodyBackground);
 }
 
 dialog::backdrop {
@@ -185,19 +205,16 @@ dialog .errorMessageDisplay {
 
 .headline {
     background-color: var(--topMenuBackgound);
-    margin: -1rem -1rem 0 -1rem;
+    margin: -1rem -2rem 0 -2rem;
     padding: 0.5rem 1rem;
 }
 
 /* tasks and timetable changes conflicts dialog */
 #LessonChangesAndTasksToKeepDialog {
-    top: 25%;
     width: fit-content;
     min-width: 700px;
-}
-
-.dialogBody {
-    padding: 0 1.5rem 1rem;
+    /* overflow-y: auto; */
+    scrollbar-color: inherit transparent;
 }
 
 #LessonChangesAndTasksToKeepDialog label {
@@ -270,6 +287,7 @@ dialog .errorMessageDisplay {
     left: 0;
     background-color: var(--contentContainerBackground);
     border-right: solid 1px var(--lightgrey);
+    z-index: 3;
 }
 
 .timeslotLabel,
@@ -311,7 +329,7 @@ dialog .errorMessageDisplay {
 .settingsWeekday[data-weekday_number="1"] {
     border-left: none;
 }
- 
+
 .weekday.passed {
     background-color: var(--lightergrey);
 }
@@ -327,6 +345,7 @@ dialog .errorMessageDisplay {
 
 .lesson,
 .settingsLesson {
+    position: relative;
     max-width: 100%;
     display: flex;
     flex-grow: 1;
@@ -338,21 +357,24 @@ dialog .errorMessageDisplay {
     transition: all 0.3s ease-out;
 }
 
-.lesson:hover {
-    transform: translate(-1px, -1px);
-}
-
 .lessonContentContainer {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .lessonHasTaskIndicator {
     visibility: hidden;
+    width: 0.3rem;
     height: 0.3rem;
-    aspect-ratio: 1/1;
     border-radius: 50%;
     margin-right: -0.3rem;
+}
+
+.lessonNoteIndicator {
+    visibility: hidden;
+    width: 0.5rem;
+    height: 0.5rem;
 }
 
 .spacerBlock {
@@ -415,6 +437,7 @@ dialog .errorMessageDisplay {
     border-radius: var(--standardRadius);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     padding: 0.5rem 0.5rem;
+    z-index: 1;
 }
 
 .addLessonButtonWrapper {
@@ -456,8 +479,8 @@ dialog .errorMessageDisplay {
     background-color: var(--lightergrey);
 }
 
-#upcomingTasksTable tbody tr:hover+tr,
-#inProgressTasksTable tbody tr:hover+tr {
+#upcomingTasksTable tbody tr[data-taskid]:hover+tr,
+#inProgressTasksTable tbody tr[data-taskid]:hover+tr {
     background-color: var(--lightergrey);
 }
 
@@ -505,6 +528,17 @@ dialog .errorMessageDisplay {
     text-overflow: ellipsis;
 }
 
+.taskDateSelectWrapper {
+    display: none;
+}
+
+.taskDateSelect {
+    font-size: 0.8rem;
+    padding: initial;
+    text-align: initial;
+    height: initial;
+}
+
 .taskDescription {
     width: 100%;
     max-width: 0px;
@@ -519,7 +553,7 @@ dialog .errorMessageDisplay {
 
 .taskDone div {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     justify-content: end;
     vertical-align: center;
 }
@@ -636,7 +670,13 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 /* Buttons */
+button:disabled,
+button:disabled:hover  {
+    background-color: var(--lightgrey);
+}
+
 .confirmationButton,
+.orangeButton,
 .cancelButton {
     border: none;
     padding: 0.25rem 1rem;
@@ -650,8 +690,16 @@ tr[data-new]:has(td[data-taskDescription]) td {
     background-color: var(--lightMatteRed);
 }
 
+.orangeButton {
+    background-color: var(--lightPumpkin);
+}
+
 .confirmationButton:hover {
     background-color: var(--matteGreen);
+}
+
+.orangeButton:hover {
+    background-color: var(--pumpkin);
 }
 
 .cancelButton:hover {
@@ -664,21 +712,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
     color: var(--lighterText);
     border: none;
     background-color: transparent;
-}
-
-.taskDone button,
-.discardNewLessonButton,
-.saveNewLessonButton {
-    border: none;
-    padding: 0 1rem;
-    border-radius: var(--smallRadius);
-    background-color: var(--lightMatteGreen);
-    font-size: 1rem;
-    color: var(--lighterText);
-}
-
-.taskDone button:hover {
-    background-color: var(--matteGreen);
 }
 
 #createSubjectButton,
@@ -715,8 +748,11 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 .lessonSelect,
-.reoccuringIntervalSelect {
+.reoccuringIntervalSelect,
+.taskDateSelect {
     appearance: none;
+    padding: 0 0.25rem;
+    color: black;
 }
 
 .lessonSelect option:first-child,
@@ -742,6 +778,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
     border-radius: var(--smallRadius);
     padding: 0 0.2em;
     background-color: transparent;
+    font-size: 1rem;
 }
 
 .lessonOptionsButton:hover,
@@ -792,33 +829,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
     display: none;
 }
 
-
-.saveTaskButton,
-.updateTaskButton,
-.saveNewLessonButton {
-    background-color: var(--lightMatteGreen);
-    margin-right: 0.5rem;
-}
-
-.discardNewTaskButton,
-.discardUpdateTaskButton,
-.discardNewLessonButton {
-    background-color: var(--lightMatteRed) !important;
-}
-
-.saveTaskButton:hover,
-.updateTaskButton:hover,
-.setTaskDoneButton:hover,
-.saveNewLessonButton:hover {
-    background-color: var(--matteGreen);
-}
-
-.discardNewTaskButton:hover,
-.discardUpdateTaskButton:hover,
-.discardNewLessonButton:hover {
-    background-color: var(--matteRed) !important;
-}
-
 #taskContainer th,
 #LessonChangesAndTasksToKeepDialog th {
     color: var(--lightgrey);
@@ -861,7 +871,7 @@ h3 {
     visibility: hidden;
     position: absolute;
     right: calc(100% + 15px);
-    z-index: 4;
+    z-index: 5;
     min-width: 250px;
     padding: 1rem;
     border-radius: var(--standardRadius);
@@ -1003,10 +1013,16 @@ h3 {
     margin-top: 1rem;
 }
 
+.centeredText {
+    text-align: center;
+}
+
 .marginBottom {
     margin-bottom: 1rem;
 }
 
+
+/* Lesson Colors */
 .subjectColorOne {
     background-color: var(--matteGreen);
 }
@@ -1028,20 +1044,100 @@ h3 {
     color: black;
 }
 
+.subjectColorSix {
+    background-color: var(--robinBlue);
+    color: black;
+}
+
+.subjectColorSeven {
+    background-color: var(--champagne);
+    color: black;
+}
+
+.subjectColorEight {
+    background-color: var(--rose);
+    /* color: black; */
+}
+
+.subjectColorNine {
+    background-color: var(--purple);
+}
+
+.subjectColorTen {
+    background-color: var(--pumpkin);
+    /* color: black; */
+}
+
 .subjectColorFive.light.lessonOptionsWrapper .lessonOption button {
     color: black;
+}
+
+.subjectColorSix button,
+.subjectColorSix.light.lessonOptionsWrapper .lessonOption button {
+    color: black;
+}
+
+.subjectColorSeven.light.lessonOptionsWrapper .lessonOption button {
+    color: black;
+}
+
+.subjectColorEight button {
+    color: var(--lighterText);
+}
+
+.subjectColorTen button {
+    /* color: black; */
+    color: var(--lighterText);
+
+}
+
+/* .undefined button, */
+.undefined.light.lessonOptionsWrapper .lessonOption button {
+    color: black;
+}
+
+.canceled button {
+    color: var(--lightgrey);
 }
 
 .subjectColorOne .lessonHasTaskIndicator,
 .subjectColorTwo .lessonHasTaskIndicator,
 .subjectColorThree .lessonHasTaskIndicator,
-.subjectColorFour .lessonHasTaskIndicator {
+.subjectColorFour .lessonHasTaskIndicator,
+.subjectColorNine .lessonHasTaskIndicator,
+.subjectColorTen .lessonHasTaskIndicator {
     background-color: var(--lightergrey);
 }
 
 .subjectColorFive .lessonHasTaskIndicator,
+.subjectColorSix .lessonHasTaskIndicator,
+.subjectColorSeven .lessonHasTaskIndicator,
+.subjectColorEight .lessonHasTaskIndicator,
+.undefined .lessonHasTaskIndicator,
 .appointement .lessonHasTaskIndicator {
     background-color: var(--labelgrey);
+}
+
+.subjectColorOne .noteIcon,
+.subjectColorTwo .noteIcon,
+.subjectColorThree .noteIcon,
+.subjectColorFour .noteIcon,
+.subjectColorNine .noteIcon,
+.subjectColorTen .noteIcon {
+    background-color: var(--lightergrey);
+}
+
+.subjectColorFive .noteIcon,
+.subjectColorSix .noteIcon,
+.subjectColorSeven .noteIcon,
+.subjectColorEight .noteIcon,
+.undefined .noteIcon,
+.appointement .noteIcon {
+    background-color: var(--labelgrey);
+}
+
+.canceled .noteIcon {
+    background-color: var(--lightgrey);
 }
 
 .subjectColorOne.light {
@@ -1062,6 +1158,26 @@ h3 {
 
 .subjectColorFive.light {
     background-color: var(--darkMint);
+}
+
+.subjectColorSix.light {
+    background-color: var(--darkRobinBlue);
+}
+
+.subjectColorSeven.light {
+    background-color: var(--darkChampagne);
+}
+
+.subjectColorEight.light {
+    background-color: var(--darkRose);
+}
+
+.subjectColorNine.light {
+    background-color: var(--lightPurple);
+}
+
+.subjectColorTen.light {
+    background-color: var(--lightPumpkin);
 }
 
 .blankWeekTable {
@@ -1310,7 +1426,7 @@ h3 {
         position: absolute;
         top: 2rem;
         right: 0rem;
-        z-index: 2;
+        z-index: 4;
         flex-direction: column;
         gap: 0;
         background-color: var(--lightMenuBackground);
@@ -1380,8 +1496,13 @@ html {
 }
 
 .introWindow p>button.confirmationButton,
-.introWindow p>button.cancelButton {
+.introWindow p>button.cancelButton,
+.introWindow p>button.orangeButton {
     padding: 0 1rem;
+}
+
+#window1 {
+    top: 4rem;
 }
 
 #window6,
@@ -1546,5 +1667,40 @@ p {
         transform: translate(0,0);
         bottom: 0px;
         left: 0px;
+        top: unset;
     }
+}
+
+/* svg */
+.icon {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+}
+
+.noteIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='none' height='85' id='svg_1' rx='8' ry='8' stroke='%23000000' stroke-width='10' transform='matrix(1 0 0 1 0 0)' width='87' x='6' y='7'/%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='20.43' x2='78.14' y1='26.55' y2='26.31'/%3E%3Cline fill='none' id='svg_3' stroke='%23494747' stroke-width='10' x1='20.45' x2='78.16' y1='42.09' y2='41.85'/%3E%3Cline fill='none' id='svg_4' stroke='%23494747' stroke-width='10' transform='matrix(1 0 0 1 0 0)' x1='20.22' x2='45.36' y1='57.71' y2='57.47'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='none' height='85' id='svg_1' rx='8' ry='8' stroke='%23000000' stroke-width='10' transform='matrix(1 0 0 1 0 0)' width='87' x='6' y='7'/%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='20.43' x2='78.14' y1='26.55' y2='26.31'/%3E%3Cline fill='none' id='svg_3' stroke='%23494747' stroke-width='10' x1='20.45' x2='78.16' y1='42.09' y2='41.85'/%3E%3Cline fill='none' id='svg_4' stroke='%23494747' stroke-width='10' transform='matrix(1 0 0 1 0 0)' x1='20.22' x2='45.36' y1='57.71' y2='57.47'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+    width: 100%;
+    height: 100%;
+}
+
+.inProgressIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='45' id='svg_1' rx='5' ry='5' stroke='%23000000' stroke-width='9' width='90' x='5' y='27.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-width='16' x1='23.16' x2='23.16' y1='38.86' y2='61.79'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-width='16' x1='46' x2='46' y1='38.82' y2='61.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_31' stroke='%23000000' stroke-width='9' x1='65.46' x2='65.46' y1='38.86' y2='61.79'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='45' id='svg_1' rx='5' ry='5' stroke='%23000000' stroke-width='9' width='90' x='5' y='27.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-width='16' x1='23.16' x2='23.16' y1='38.86' y2='61.79'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-width='16' x1='46' x2='46' y1='38.82' y2='61.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_31' stroke='%23000000' stroke-width='9' x1='65.46' x2='65.46' y1='38.86' y2='61.79'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+}
+
+.checkIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath d='m22,57.41l20.67,17.68l34.81,-48.1' fill='none' fill-opacity='0' id='svg_1' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath d='m22,57.41l20.67,17.68l34.81,-48.1' fill='none' fill-opacity='0' id='svg_1' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+}
+
+.crossIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' fill-opacity='0' id='svg_3' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='26' y2='76'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='76' y2='26'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' fill-opacity='0' id='svg_3' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='26' y2='76'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='16' x1='22' x2='76' y1='76' y2='26'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
 }

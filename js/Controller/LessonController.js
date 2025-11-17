@@ -2,6 +2,8 @@ import Lesson from '../Model/Lesson.js';
 import View from '../View/LessonView.js';
 import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
+import LessonNoteController from './LessonNoteController.js';
+import LessonView from '../View/LessonView.js';
 
 export default class LessonController {
 
@@ -55,7 +57,7 @@ export default class LessonController {
         let oldTimetable = await Lesson.getOldTimetableCopy();
         let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 
-        await lesson.update();
+        await lesson.save();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         this.renderLesson();
@@ -83,6 +85,22 @@ export default class LessonController {
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         this.renderLesson();
+    }
+    /** @param isNewTimetable bool, indicates, if the affected lessons fall into the validity timespan of a new or a an updated timetable, triggering different filter methods */
+    static async filterAffectedLessonChanges(affectedLessonChanges, timetable, isNewTimetable) {
+        let model = new Lesson;
+
+        return await model.filterAffectedLessonChanges(affectedLessonChanges, timetable, isNewTimetable);
+    }
+
+    static async handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate) {
+        let model = new Lesson;
+
+        await model.handleTimetableChangesCarryover(remainingLessonIds, timetableValidFromDate);
+    }
+
+    static getLessonDataFromElement(event) {
+        return LessonView.getLessonDataFromElement(event);
     }
 
     static createNewTask(event) {
@@ -127,6 +145,25 @@ export default class LessonController {
 
     static async getAllTasksInTimespan(startDate, endDate) {
         return await TaskController.getAllTasksInTimespan(startDate, endDate);
+    }
+
+    static async getAllLessonNotesInTimespan(startDate, endDate) {
+        return await LessonNoteController.getAllLessonNotesInTimeRange(startDate, endDate);
+    }
+
+    static renderLessonNote(event) {
+        LessonNoteController.renderLessonNote(event);
+    }
+
+    static timetableClickHandler(event) {
+        const target = event.target;
+
+        switch (true) {
+            case target.classList.contains('noteIcon'):
+            console.log('drin')
+                this.renderLessonNote(event);
+                break;
+        }
     }
 
     static #lessonDataToLessonObject(lessonData) {
