@@ -52,9 +52,9 @@ export default class Task extends AbstractModel {
         await this.deleteFromLocalDB('tasks', this.id);
         await this.deleteFromLocalDB('unsyncedTasks', this.id);
 
-        // let result = await this.makeAjaxQuery('task', 'delete', [this.serialize()]);
+        let result = await this.makeAjaxQuery('task', 'delete', [this.serialize()]);
 
-        // if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTasks', this.serialize());
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTasks', this.serialize());
     }
 
     async setInProgress() {
