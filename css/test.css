@@ -1,59 +1,95 @@
-* {
+:root {
+    --borderWidth: 3px;
+}
+
+#addTimespanForm{
+    display: none;
 }
 
 .month {
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    gap: 0.1rem;
+    gap: 0.2rem;
 }
 
 .week {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 0.3fr 0.3fr;
 }
+
 .day {
     position: relative;
-    border: solid 0.5px black;
     box-sizing: border-box;
     height: 4rem;
-    padding: 0.5rem;
+    padding: 1rem;
+    border: solid 1px black;
 }
 
-.day.active {
-    border-top: solid 3px red;
-    border-bottom: solid 3px red;
+.day[data-weekdaynumber="6"],
+.day[data-weekdaynumber="0"] {
+    background-color: var(--lightgrey, grey);
 }
 
-.day.active.solo {
-    border: solid 3px red;
+.day.selected[data-weekdaynumber="6"],
+.day.selected[data-weekdaynumber="0"] {
+    background-color: var(--lightgrey, rgb(166, 103, 103));
 }
 
-.day.active.start {
-    border-left: solid 3px red;
+.day.selected {
+    border-top: solid var(--borderWidth) red;
+    border-bottom: solid var(--borderWidth) red;
+    background-color: rgba(255, 0, 0, 0.5);
 }
 
-.day.active.end {
-    border-right: solid 3px red;
+/* .day.selected.start {
+    border-left: solid var(--borderWidth) red;
 }
 
+.day.selected.end {
+    border-right: solid var(--borderWidth) red;
+} */
 
 
-.handle {
+
+
+.handleContainer {
     position: absolute;
-    border: solid 2px black;
-    border-radius: 25%;
+    width: 1.25rem;
+    height: 100%;
+}
+
+.handleContainer:has(.startHandle) {
+    left: calc(-1 * var(--borderWidth));
+    top: calc(-1 * var(--borderWidth));
+    transform: translateX(-50%)
+}
+
+.handleContainer:has(.endHandle) {
+    right: calc(-1 * var(--borderWidth));
+    bottom: calc(-1 * var(--borderWidth));
+    transform: translateX(50%);
+    z-index: 1;
+}
+
+.startHandle,
+.endHandle {
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
     cursor: grab;
+    border-radius: 50%;
+    pointer-events: none;
 }
 
-.handle.start {
-    top: 1rem;
-    left: -5px;
+.startHandle {
+    background-color: red;
+    top: 0.25rem;
 }
 
-.handle.end {
-    top: 1rem;
-    right: -5px;
+.endHandle {
+    background-color: red;
+    bottom: 0.25rem;
 }
 
 .dayName,
@@ -77,6 +113,11 @@
     background-color: white;
 }
 
-#cancelSpanCreationButtonContainer {
-    display: none;
+/* generics */
+.hidden {
+    visibility: hidden;
+}
+
+.noTouchActions {
+    touch-action: none;
 }
