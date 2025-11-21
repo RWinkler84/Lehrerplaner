@@ -62,6 +62,7 @@
                 <div class="monthName">Januar</div>
             `;
             blankWeek.classList.add('week');
+            blankWeek.setAttribute('data-weeknumber', '0');
             blankWeek.innerHTML = `
                 <div class="day" data-weekdayNumber="1"></div>
                 <div class="day" data-weekdayNumber="2"></div>
@@ -76,6 +77,7 @@
             let currentMonth = blankMonth.cloneNode(true);
             let currentWeek = blankWeek.cloneNode(true);
             let monthIterator = 0;
+            let weekIterator = 1;
 
             do {
                 let currentDay = new Date(dateIterator);
@@ -91,7 +93,10 @@
                 }
                 if (currentDay.getDay() == 1) {
                     currentMonth.appendChild(currentWeek);
+
                     currentWeek = blankWeek.cloneNode(true);
+                    currentWeek.dataset.weeknumber = weekIterator;
+                    weekIterator++;
                 }
 
                 currentWeek.querySelectorAll('.day').forEach(day => {
@@ -321,8 +326,8 @@
                 }
 
                 //if the spans start/end index expands into the neighbors, reset them
-                    if (endIndex >= neighboringStartIndex) endIndex = neighboringStartIndex - 1;
-                    if (startIndex <= neighboringEndIndex) startIndex = neighboringEndIndex + 1;
+                if (endIndex >= neighboringStartIndex) endIndex = neighboringStartIndex - 1;
+                if (startIndex <= neighboringEndIndex) startIndex = neighboringEndIndex + 1;
 
                 //get all span days and style them
                 for (let i = startIndex; i <= endIndex; i++) {
@@ -345,6 +350,9 @@
                     if (index == 0) day.classList.add('start');
                     if (index == spanDays.length - 1) day.classList.add('end');
                 });
+
+                drawSpanContentContainer(spanId);
+
             }
 
             function endHandleMovement() {
@@ -378,6 +386,65 @@
             document.querySelectorAll('.day').forEach(day => enableTouchActions(day));
         }
 
+        function drawSpanContentContainer(spanId) {
+            const startElement = document.querySelector(`.day.start[data-spanid="${spanId}"]`);
+            const endElement = document.querySelector(`.day.end[data-spanid="${spanId}"]`);
+            const startWeekNumber = startElement.closest('.week').dataset.weeknumber;
+            const endWeekNumber = endElement.closest('.week').dataset.weeknumber;
+            const startElementRect = startElement.getBoundingClientRect();
+            const endElementRect = endElement.getBoundingClientRect();
+            const elementStyle = getComputedStyle(startElement);
+
+            document.querySelectorAll(`.spanContentContainer[data-spanid="${spanId}"]`).forEach(container => container.remove());
+
+            const contentContainer = document.createElement('div');
+            contentContainer.classList.add('spanContentContainer');
+            contentContainer.setAttribute('data-spanid', spanId);
+
+            let i = startWeekNumber;
+
+            do {
+                const weekElement = document.querySelector(`.week[data-weeknumber="${i}"]`);
+                const currentContainer = contentContainer.cloneNode();
+
+                let firstElement = weekElement.firstElementChild;
+                let lastElement = weekElement.lastElementChild;
+                let offset = (parseFloat(getComputedStyle(startElement).paddingLeft) + parseFloat(getComputedStyle(startElement).borderLeftWidth));
+
+                if (startWeekNumber == endWeekNumber) offset *= 2;
+                if (i != startWeekNumber && i != endWeekNumber) offset = 2;
+                
+                if (i == startWeekNumber) {
+                    firstElement = startElement;
+                    currentContainer.classList.add('start');
+                }
+
+                if (i == endWeekNumber) {
+                    lastElement = endElement;
+                    currentContainer.classList.add('end');
+                }
+
+                const leftRect = firstElement.getBoundingClientRect();
+                const rightRect = lastElement.getBoundingClientRect();
+
+                currentContainer.style.width = `${rightRect.right - leftRect.left - offset}px`;
+                currentContainer.style.top = `${getComputedStyle(firstElement).paddingTop}`;
+
+                firstElement.append(currentContainer);
+
+                i++
+            } while (i <= endWeekNumber)
+        }
+
+        function getPaddingPlusBorderWidth(element) {
+            const properties = getComputedStyle(element);
+            const paddingLeft = parseFloat(properties.paddingLeft);
+            const paddingRight = parseFloat(properties.paddingRight);
+            const borderLeft = parseFloat(properties.borderLeft);
+            const borderRight = parseFloat(properties.borderRight);
+
+            return paddingLeft + paddingRight + borderLeft + borderRight;
+        }
 
         ////////////////
         // controller //

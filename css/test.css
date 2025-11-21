@@ -15,14 +15,14 @@
 
 .week {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 0.3fr 0.3fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 5rem 5rem;
 }
 
 .day {
     position: relative;
     box-sizing: border-box;
     height: 4rem;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     border: solid 1px black;
 }
 
@@ -42,16 +42,34 @@
     background-color: rgba(255, 0, 0, 0.5);
 }
 
-/* .day.selected.start {
+.day.selected.start {
     border-left: solid var(--borderWidth) red;
 }
 
 .day.selected.end {
     border-right: solid var(--borderWidth) red;
-} */
+}
 
+.spanContentContainer {
+    position: absolute;
+    background-color: aliceblue;
+    z-index: 1;
+    pointer-events: none;
+    height: calc(100% - 1rem);
+    left: 0;
+    right: 0;
+}
+.spanContentContainer.start {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    left: 1rem;
+}
 
-
+.spanContentContainer.end {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    /* right: 1rem; */
+}
 
 .handleContainer {
     position: absolute;
