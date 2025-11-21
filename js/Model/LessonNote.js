@@ -10,6 +10,7 @@ export default class LessonNote extends AbstractModel {
     #class;
     #subject;
     #content;
+    #fixedDate;
     #created;
     #lastEdited;
 
@@ -122,6 +123,8 @@ export default class LessonNote extends AbstractModel {
 
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
+        console.log(this.serialize());
+
 
         await this.updateOnLocalDB('lessonNotes', this.serialize());
         let result = await this.makeAjaxQuery('lessonNote', 'update', this.serialize());
@@ -173,6 +176,7 @@ export default class LessonNote extends AbstractModel {
             class: this.class,
             subject: this.subject,
             content: this.content,
+            fixedDate: this.fixedDate,
             created: this.created,
             lastEdited: this.lastEdited
         }
@@ -189,6 +193,7 @@ export default class LessonNote extends AbstractModel {
         if (noteData.class) instance.class = noteData.class;
         if (noteData.subject) instance.subject = noteData.subject;
         if (noteData.content) instance.content = noteData.content;
+        if (noteData.fixedDate) {instance.fixedDate = noteData.fixedDate } else {instance.fixedDate = false};
         if (noteData.created) { instance.created = noteData.created } else { instance.created = model.formatDateTime(new Date()) };
         if (noteData.lastEdited) { instance.lastEdited = noteData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
 
@@ -203,6 +208,7 @@ export default class LessonNote extends AbstractModel {
     get class() { return this.#class; }
     get subject() { return this.#subject; }
     get content() { return this.#content; }
+    get fixedDate() { return this.#fixedDate; }
     get created() { return this.#created; }
     get lastEdited() { return this.#lastEdited; }
 
@@ -214,6 +220,7 @@ export default class LessonNote extends AbstractModel {
     set class(value) { this.#class = value; }
     set subject(value) { this.#subject = value; }
     set content(value) { this.#content = value; }
+    set fixedDate(value) { this.#fixedDate = value; }
     set created(value) { this.#created = value; }
     set lastEdited(value) { this.#lastEdited = value; }
 }

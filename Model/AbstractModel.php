@@ -321,6 +321,7 @@ class AbstractModel
                 if (isset($data['id'])) $data['itemId'] = $data['id'];
 
                 if (isset($data['fixedTime']) && $data['fixedTime'] == '') $data['fixedTime'] = 0;
+                if (isset($data['fixedDate']) && $data['fixedDate'] == '') $data['fixedDate'] = 0;
                 if (isset($data['reoccuring']) && $data['reoccuring'] == '') $data['reoccuring'] = 0;
 
                 unset($data['id']);
@@ -333,6 +334,7 @@ class AbstractModel
             if (isset($dataArray['id'])) $dataArray['itemId'] = $dataArray['id'];
 
             if (isset($dataArray['fixedTime']) && $dataArray['fixedTime'] == '') $dataArray['fixedTime'] = 0;
+            if (isset($dataArray['fixedDate']) && $dataArray['fixedDate'] == '') $dataArray['fixedDate'] = 0;
             if (isset($dataArray['reoccuring']) && $dataArray['reoccuring'] == '') $dataArray['reoccuring'] = 0;
 
             unset($dataArray['id']);

@@ -14,6 +14,7 @@ export default class LessonNoteView extends AbstractView {
         const headlineInfo = dialog.querySelector('#lessonNoteInfo');
         const editor = dialog.querySelector('#noteContentEditor');
         const saveButton = dialog.querySelector('#saveLessonNotesButton');
+        const fixedDateCheckbox = dialog.querySelector('#noteFixedDateCheckbox');
 
         const lessonDate = Fn.formatDate(lessonData.date);
 
@@ -25,16 +26,20 @@ export default class LessonNoteView extends AbstractView {
         dialog.dataset.timeslot = lessonData.timeslot;
         dialog.dataset.weekday = lessonData.weekday;
 
+        console.log(note)
+
 
         if (note) {
             dialog.dataset.noteid = note.id;
             dialog.dataset.created = note.created;
             editor.innerHTML = note.content;
             saveButton.setAttribute('disabled', '');
+            if (note.fixedDate) fixedDateCheckbox.checked = true;
         }
 
         if (!note) {
             dialog.dataset.noteid = '';
+            fixedDateCheckbox.checked = false;
             saveButton.removeAttribute('disabled');
 
             const p = document.createElement('p');
@@ -101,7 +106,8 @@ export default class LessonNoteView extends AbstractView {
             weekday: dialog.dataset.weekday,
             timeslot: dialog.dataset.timeslot,
             created: dialog.dataset.created,
-            content: content
+            content: content,
+            fixedDate: dialog.querySelector('#noteFixedDateCheckbox').checked
         }
     }
 

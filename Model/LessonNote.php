@@ -13,8 +13,8 @@ class LessonNote extends AbstractModel
     {
         $lessonNote = $this->preprocessDataToWrite($lessonNote);
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, content, created, lastEdited)
-            VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :content, :created, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, content, fixedDate, created, lastEdited)
+            VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :content,:fixedDate, :created, :lastEdited)
             ";
 
         $result = $this->write($query, $lessonNote);
@@ -27,7 +27,7 @@ class LessonNote extends AbstractModel
     {
         $lessonNote = $this->preprocessDataToWrite($lessonNote);
         $query = "
-            UPDATE $this->tableName SET date = :date, weekday = :weekday, timeslot = :timeslot, class = :class, subject = :subject, content = :content, lastEdited = :lastEdited 
+            UPDATE $this->tableName SET date = :date, weekday = :weekday, timeslot = :timeslot, class = :class, subject = :subject, content = :content, fixedDate = :fixedDate, lastEdited = :lastEdited 
             WHERE userId = :userId AND itemId = :itemId AND created = :created
             ";
 
@@ -98,7 +98,7 @@ class LessonNote extends AbstractModel
             if (!is_null($matchingNote)) {
                 if ($noteToSync['created'] == $matchingNote['created'] && $noteToSync['lastEdited'] > $matchingNote['lastEdited']) {
                     $query = "
-                        UPDATE $this->tableName SET date = :date, weekday = :weekday, timeslot = :timeslot, class = :class, subject = :subject, content = :content, lastEdited = :lastEdited 
+                        UPDATE $this->tableName SET date = :date, weekday = :weekday, timeslot = :timeslot, class = :class, subject = :subject, content = :content, fixedDate = :fixedDate, lastEdited = :lastEdited 
                         WHERE userId = :userId AND itemId = :itemId AND created = :created
                     ";
                 }
@@ -109,9 +109,9 @@ class LessonNote extends AbstractModel
                     $noteToSync['itemId'] = $newId;
                     $storedNotes[] = $noteToSync;
 
-                            $query = "
-                                INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, content, created, lastEdited)
-                                VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :content, :created, :lastEdited)
+                    $query = "
+                                INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, content, fixedDate, created, lastEdited)
+                                VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :content, :fixedDate ,:created, :lastEdited)
                             ";
                 }
             }
