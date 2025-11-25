@@ -72,6 +72,7 @@ export default class LessonController {
         await lesson.cancel();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
         this.renderLesson();
 
         return lesson.id;
