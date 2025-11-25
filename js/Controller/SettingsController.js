@@ -2,6 +2,7 @@ import { ONEDAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import LessonController from "./LessonController.js";
+import LessonNoteController from "./LessonNoteController.js";
 import TaskController from "./TaskController.js";
 
 export default class SettingsController {
@@ -74,8 +75,10 @@ export default class SettingsController {
         }
 
         //triggers reordering of tasks for each lesson
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
         LessonController.renderLesson();
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+
 
         View.discardNewTimetable();
     }

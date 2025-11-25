@@ -26,14 +26,12 @@ export default class LessonNoteView extends AbstractView {
         dialog.dataset.timeslot = lessonData.timeslot;
         dialog.dataset.weekday = lessonData.weekday;
 
-        console.log(note)
-
-
         if (note) {
             dialog.dataset.noteid = note.id;
             dialog.dataset.created = note.created;
             editor.innerHTML = note.content;
             saveButton.setAttribute('disabled', '');
+            fixedDateCheckbox.checked = false;
             if (note.fixedDate) fixedDateCheckbox.checked = true;
         }
 

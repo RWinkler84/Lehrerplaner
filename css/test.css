@@ -2,8 +2,14 @@
     --borderWidth: 3px;
 }
 
-#addTimespanForm{
+#addTimespanForm {
     display: none;
+}
+
+#yearContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .month {
@@ -11,54 +17,73 @@
     flex-direction: column;
     padding: 1rem;
     gap: 0.2rem;
+    background-color: var(--contentContainerBackground);
 }
 
-.week {
+.week,
+#dayNameContainer {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 5rem 5rem;
+}
+
+#dayNameContainer {
+    position: sticky;
+    top: 0;
+    background-color: var(--topMenuBackgound);
+    color: var(--matteRed);
+    padding: 1rem 1rem 0.5rem;
+    margin-bottom: -1rem;
+    gap: 0.2rem;
+    z-index: 3;
+}
+
+.monthName {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--labelgrey);
+}
+
+.dayName {
+    padding: 0.5rem 1rem;
+    font-weight: bold;
 }
 
 .day {
     position: relative;
     box-sizing: border-box;
-    height: 4rem;
+    height: 5rem;
     padding: 0.5rem 1rem;
-    border: solid 1px black;
+    border: solid 1px var(--lightgrey);
 }
 
 .day[data-weekdaynumber="6"],
 .day[data-weekdaynumber="0"] {
-    background-color: var(--lightgrey, grey);
+    background-color: var(--lightergrey);
 }
 
-.day.selected[data-weekdaynumber="6"],
-.day.selected[data-weekdaynumber="0"] {
-    background-color: var(--lightgrey, rgb(166, 103, 103));
-}
-
-.day.selected {
-    border-top: solid var(--borderWidth) red;
-    border-bottom: solid var(--borderWidth) red;
-    background-color: rgba(255, 0, 0, 0.5);
-}
-
-.day.selected.start {
-    border-left: solid var(--borderWidth) red;
-}
-
-.day.selected.end {
-    border-right: solid var(--borderWidth) red;
+.day .dateContainer {
+    display: flex;
+    height: 100%;
+    align-items: end;
+    gap: 1rem;
+    pointer-events: none;
+    font-size: 0.75rem;
 }
 
 .spanContentContainer {
     position: absolute;
-    background-color: aliceblue;
-    z-index: 1;
-    pointer-events: none;
-    height: calc(100% - 1rem);
+    background-color: var(--matteRed);
+    padding: 0.5rem 0.5rem;    
+    height: calc(100% - 2.5rem);
     left: 0;
     right: 0;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    color: var(--lighterText);
+    z-index: 1;
+    pointer-events: none;
+
 }
+
 .spanContentContainer.start {
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
@@ -68,31 +93,32 @@
 .spanContentContainer.end {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-    /* right: 1rem; */
 }
 
 .handleContainer {
     position: absolute;
     width: 1.25rem;
     height: 100%;
+    z-index: 2;
 }
 
 .handleContainer:has(.startHandle) {
-    left: calc(-1 * var(--borderWidth));
-    top: calc(-1 * var(--borderWidth));
+    left: 1rem;
+    top: 0.5rem;
     transform: translateX(-50%)
 }
 
 .handleContainer:has(.endHandle) {
-    right: calc(-1 * var(--borderWidth));
-    bottom: calc(-1 * var(--borderWidth));
+    right: 1rem;
+    top: 0.5rem;
     transform: translateX(50%);
-    z-index: 1;
 }
 
 .startHandle,
 .endHandle {
     position: absolute;
+    border: 3px solid var(--bodyBackground);
+    background-color: var(--lightergrey);
     width: 1.25rem;
     height: 1.25rem;
     cursor: grab;
@@ -101,25 +127,16 @@
 }
 
 .startHandle {
-    background-color: red;
     top: 0.25rem;
 }
 
 .endHandle {
-    background-color: red;
-    bottom: 0.25rem;
+    top: 0.25rem;
 }
 
 .dayName,
 .dayDate {
     pointer-events: none;
-}
-
-.topicDisplay {
-    position: absolute;
-    left: 4rem;
-    top: 1rem;
-    background-color: antiquewhite;
 }
 
 #addTimespanForm {

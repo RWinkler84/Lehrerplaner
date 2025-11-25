@@ -152,17 +152,47 @@ export default class LessonView {
         let lessonNotes = await Controller.getAllLessonNotesInTimespan(monday, sunday);
         let allLessons = document.querySelectorAll('.lesson');
 
+        let fixedDateLessonNotes = [];
+
         allLessons.forEach(lesson => {
             lessonNotes.forEach((note) => {
-
+                if (note.fixedDate && !fixedDateLessonNotes.includes(note)) fixedDateLessonNotes.push(note);
                 if (new Date(note.date).setHours(12, 0, 0, 0) != new Date(lesson.dataset.date).setHours(12, 0, 0, 0)) return;
                 if (note.class != lesson.dataset.class) return;
                 if (note.subject != lesson.dataset.subject) return;
                 if (note.timeslot != lesson.closest('.timeslot').dataset.timeslot) return;
 
-                lesson.querySelector('.lessonNoteIndicator').style.visibility = 'visible';
+                const lessonNoteIndicator = lesson.querySelector('.lessonNoteIndicator')
+                lessonNoteIndicator.style.visibility = 'visible';
+                lessonNoteIndicator.setAttribute('data-noteid', note.id);
             });
         });
+
+        //fixedDateLessonNotes are fixed to a date, but not a timeslot. So if the schedule for that day changes they must show up 
+        //on the subject and class, even the lesson doesn't take place the same time, the note was originally asigned to. Therefore check
+        //whether the timeslot class and subject still align and if not, display the note on a lesson, where class and subject are equal
+        if (fixedDateLessonNotes.length != 0) {
+            fixedDateLessonNotes.forEach(note => {
+                const day = document.querySelector(`.weekday[data-date="${new Date(new Date(note.date).setHours(12))}"]`);
+                const allLessonsOnDay = Array.from(day.querySelectorAll('.lesson'));
+
+                let matchingLesson = allLessonsOnDay.find(lesson => {
+                    return lesson.dataset.timeslot == note.timeslot && lesson.dataset.class == note.class && lesson.dataset.subject == note.subject;
+                });
+
+                if (!matchingLesson) {
+                    let alternateLesson = allLessonsOnDay.find(lesson => { return lesson.dataset.class == note.class && lesson.dataset.subject == note.subject });
+
+                    if (alternateLesson) {
+                        const lessonNoteIndicator = alternateLesson.querySelector('.lessonNoteIndicator')
+                        lessonNoteIndicator.style.visibility = 'visible';
+                        lessonNoteIndicator.setAttribute('data-noteid', note.id);
+                    }
+                }
+
+            });
+        }
+
     }
 
     static async createLessonForm(event, oldLessonData = undefined) {
@@ -440,6 +470,11 @@ export default class LessonView {
             weekday: lesson.closest('.weekday').dataset.weekday_number,
             created: lesson.dataset.created
         }
+    }
+
+        
+    static getLessonNoteIdFromLessonElement(event) {
+        return event.target.closest('.lesson').querySelector('.lessonNoteIndicator').dataset.noteid;
     }
 
     static #getTimeslotOfLesson(lesson) {

@@ -30,6 +30,7 @@ export default class LessonController {
         await lesson.save();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
         this.renderLesson();
     }
 
@@ -101,6 +102,10 @@ export default class LessonController {
 
     static getLessonDataFromElement(event) {
         return LessonView.getLessonDataFromElement(event);
+    }
+
+    static getLessonNoteIdFromLessonElement(event) {
+        return LessonView.getLessonNoteIdFromLessonElement(event);
     }
 
     static createNewTask(event) {

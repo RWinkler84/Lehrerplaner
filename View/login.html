@@ -5,13 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../css/test.css">
 </head>
 
 <body>
     <div data-span_edit_active="false"></div>
     <div id="yearContainer">
+        <div id="dayNameContainer">
+            <div class="dayName">Mo</div>
+            <div class="dayName">Di</div>
+            <div class="dayName">Mi</div>
+            <div class="dayName">Do</div>
+            <div class="dayName">Fr</div>
+            <div class="dayName">Sa</div>
+            <div class="dayName">So</div>
+        </div>
     </div>
     <div id="addTimespanForm">
         <input type="text" name="topic" id="topicInput">
@@ -51,6 +60,8 @@
             }
 
             let today = new Date();
+            let monthIterator = 0;
+            let weekIterator = 1;
             let dateIterator = new Date(`${today.getFullYear()}-01-01`).setHours(12, 0, 0, 0);
             let oneday = 86400000;
 
@@ -61,8 +72,9 @@
             blankMonth.innerHTML = `
                 <div class="monthName">Januar</div>
             `;
+
             blankWeek.classList.add('week');
-            blankWeek.setAttribute('data-weeknumber', '0');
+            blankWeek.setAttribute('data-weeknumber', weekIterator);
             blankWeek.innerHTML = `
                 <div class="day" data-weekdayNumber="1"></div>
                 <div class="day" data-weekdayNumber="2"></div>
@@ -72,12 +84,9 @@
                 <div class="day" data-weekdayNumber="6"></div>
                 <div class="day" data-weekdayNumber="0"></div>
             `
-
             let isYearCompleted = false;
             let currentMonth = blankMonth.cloneNode(true);
             let currentWeek = blankWeek.cloneNode(true);
-            let monthIterator = 0;
-            let weekIterator = 1;
 
             do {
                 let currentDay = new Date(dateIterator);
@@ -91,23 +100,25 @@
                     currentMonth.querySelector('.monthName').textContent = monthNames[currentDay.getMonth()];
                     monthIterator++;
                 }
-                if (currentDay.getDay() == 1) {
+
+                if (currentDay.getDay() == 1 && currentWeek.querySelector('.dateContainer')) {
                     currentMonth.appendChild(currentWeek);
 
                     currentWeek = blankWeek.cloneNode(true);
-                    currentWeek.dataset.weeknumber = weekIterator;
                     weekIterator++;
                 }
+
+                currentWeek.dataset.weeknumber = weekIterator;
 
                 currentWeek.querySelectorAll('.day').forEach(day => {
                     if (day.dataset.weekdaynumber != currentDay.getDay()) return;
 
                     day.setAttribute('data-date', currentDay);
                     day.innerHTML = `
-                        <div class="dayName">${dayNames[currentDay.getDay()]}</div>
-                        <div class="dayDate">${currentDay.getDate()}.${currentDay.getMonth() + 1}.</div>
+                        <div class="dateContainer">
+                            <div class="dayDate">${currentDay.getDate()}.${currentDay.getMonth() + 1}.</div>
+                        </div>
                     `;
-
                 });
 
                 if (currentDay.getDate() == 31 && currentDay.getMonth() == 11) {
@@ -151,6 +162,7 @@
             target.setAttribute('new', '');
 
             setAnchor(target);
+            drawSpanContentContainer(newSpanId);
 
             return newSpanId;
         }
@@ -164,6 +176,7 @@
 
             allSpanElements.forEach(day => {
                 day.classList.remove('selected');
+                // day.classList.remove('active');
                 day.classList.remove('start');
                 day.classList.remove('end');
                 day.classList.remove('anchor');
@@ -219,12 +232,18 @@
         }
 
         function saveSpan() {
-            const spanId = document.querySelector('.day:has(.handleContainer)').dataset.spanid;
+            const topicInput = document.querySelector('#topicInput');
+            const firstSpanDay = document.querySelector('.day:has(.handleContainer)');
+            const spanId = firstSpanDay.dataset.spanid;
+            const allSpanElements = document.querySelectorAll(`.day[data-spanid="${spanId}"]`);
             let isNewSpan = getNewSpan()
 
             if (isNewSpan) {
                 isNewSpan.removeAttribute('new');
             }
+
+            firstSpanDay.querySelector('.spanContentContainer').textContent = topicInput.value;
+
         }
 
         function getSpanId(event) {
@@ -413,7 +432,7 @@
 
                 if (startWeekNumber == endWeekNumber) offset *= 2;
                 if (i != startWeekNumber && i != endWeekNumber) offset = 2;
-                
+
                 if (i == startWeekNumber) {
                     firstElement = startElement;
                     currentContainer.classList.add('start');
@@ -543,6 +562,7 @@
             }
 
             activateSpanEditing();
+            disableTouchActionsOnDayElements();
             removeAllHandles();
             addHandlesToSpan(spanId);
 

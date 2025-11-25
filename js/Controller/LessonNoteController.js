@@ -5,7 +5,10 @@ import LessonController from "./LessonController.js";
 export default class LessonNoteController {
     static async renderLessonNote(event) {
         let lessonData = LessonController.getLessonDataFromElement(event);
-        let note = await this.getLessonNoteForLesson(lessonData.date, lessonData.timeslot, lessonData.className, lessonData.subject);
+        let noteId = LessonController.getLessonNoteIdFromLessonElement(event);
+        let note;
+
+        if (noteId) note = await this.getLessonNoteById(noteId);
         
         LessonNoteView.renderLessonNotesModal(note, lessonData);
         if (note) LessonNote.trackLessonNoteChanges(note.content);
@@ -68,6 +71,10 @@ export default class LessonNoteController {
         LessonController.renderLesson();
     }
 
+    static async reorderLessonNotes(oldTimetable, oldTimetableChanges) {
+        await LessonNote.reorderLessonNotes(oldTimetable, oldTimetableChanges);
+    }
+
     static changeNoteVersion(action) {
         let displayedVersion = LessonNoteView.getDisplayedNoteVersion();
         let versionToDisplay = null;
@@ -79,6 +86,14 @@ export default class LessonNoteController {
 
         LessonNoteView.updateEditorContent(versionToDisplay.content);
         LessonNoteView.setDisplayedNoteVersion(versionToDisplay.version);
+    }
+
+    static async getAllRegularLessons() {
+        return await LessonController.getAllRegularLessons();
+    }
+
+    static async getAllTimetableChanges() {
+        return await LessonController.getAllTimetableChanges();
     }
 
     static normalizeInput() {

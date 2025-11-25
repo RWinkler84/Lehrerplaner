@@ -671,7 +671,7 @@ tr[data-new]:has(td[data-taskDescription]) td {
 
 /* Buttons */
 button:disabled,
-button:disabled:hover  {
+button:disabled:hover {
     background-color: var(--lightgrey);
 }
 
@@ -867,7 +867,8 @@ h3 {
 
 .tooltipTextLeft,
 .tooltipTextRight,
-.tooltipTextBottom {
+.tooltipTextBottom,
+.tooltipTextTop {
     visibility: hidden;
     position: absolute;
     right: calc(100% + 15px);
@@ -886,6 +887,13 @@ h3 {
     left: calc(100% + 15px);
 }
 
+.tooltipTextTop {
+    visibility: hidden;
+    position: absolute;
+    bottom: calc(100% + 15px);
+    right: unset;
+}
+
 #syncIndicator span {
     top: -10px;
 }
@@ -896,6 +904,7 @@ h3 {
 
 .tooltip:hover .tooltipTextLeft,
 .tooltip:hover .tooltipTextRight,
+.tooltip:hover .tooltipTextTop,
 .tooltip:hover .tooltipTextBottom {
     visibility: visible;
 }
@@ -920,6 +929,16 @@ h3 {
     border-width: 10px;
     border-style: solid;
     border-color: transparent var(--lightergrey) transparent transparent;
+}
+
+.tooltip .tooltipTextTop::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: calc(50% - 10px);
+    border-width: 10px;
+    border-style: solid;
+    border-color: var(--lightergrey) transparent transparent transparent;
 }
 
 #syncIndicator span::after {
