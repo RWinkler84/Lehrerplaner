@@ -1,6 +1,7 @@
 import { ONEDAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
+import CurriculumController from "./CurriculumController.js";
 import LessonController from "./LessonController.js";
 import LessonNoteController from "./LessonNoteController.js";
 import TaskController from "./TaskController.js";
@@ -202,6 +203,11 @@ export default class SettingsController {
             case 'openTimetableSettingsButton':
                 View.openTimetableSettings();
                 break;
+            
+            case 'openCurriculumEditorButton':
+                View.openCurriculumEditor();
+                CurriculumController.renderEmptyCalendar();
+                break
 
             case 'openAccountSettingsButton':
                 View.openAccountSettings();

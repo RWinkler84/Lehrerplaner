@@ -180,7 +180,7 @@ export default class AbstractModel {
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio', 3);
+            let request = window.indexedDB.open('eduplanio', 4);
             let store;
 
             request.onupgradeneeded = (event) => {
@@ -194,6 +194,7 @@ export default class AbstractModel {
                         db.createObjectStore('settings', { keyPath: 'id' });
                         store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
+                        db.createObjectStore('curriculum', {keyPath: 'id'});
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });
@@ -203,6 +204,8 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedCurriculum', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedCurriculum', { keyPath: 'id' });
                         break;
                     //case 1 was skipped
                     case 2:
@@ -210,6 +213,11 @@ export default class AbstractModel {
                         store.createIndex('date', 'date');
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
+                        break;
+                    case 3:
+                        db.createObjectStore('curriculum', {keyPath: 'id'});
+                        db.createObjectStore('unsyncedCurriculum', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedCurriculum', { keyPath: 'id' });
                         break;
                 }
             }

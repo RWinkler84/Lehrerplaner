@@ -80,7 +80,6 @@ nav {
     color: var(--lighterText);
     padding: 0.5rem 2rem;
     margin-bottom: 0.5rem;
-    flex: 1 0 100%;
 }
 
 #topMenuButtonContainer {
@@ -141,14 +140,22 @@ main {
 
 #settingsContainer {
     display: none;
+    flex-direction: column;
     position: absolute;
     z-index: 4;
     background-color: var(--bodyBackground);
     top: 1rem;
     left: 2rem;
     right: 2rem;
+    bottom: 1rem;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     border: solid 0.3rem var(--bodyBackground);
+}
+
+.settingsSubContainer {
+    position: relative;
+    overflow-y: scroll;
+    flex: 1 1 100%;
 }
 
 #settingsTimetableContainer {
@@ -767,12 +774,10 @@ button:disabled:hover {
 .lessonOptionsButton,
 .deleteItemButton,
 .deleteLessonButton,
+.settingsMenuButton,
 #closeSettingsButton,
-#closeSettingsButtonResponsive,
 #openMenuButton,
-#openSettingsMenuButton,
-#openTimetableSettingsButton,
-#openAccountSettingsButton {
+#openSettingsMenuButton {
     color: var(--lightgrey);
     border: none;
     border-radius: var(--smallRadius);
@@ -790,8 +795,7 @@ button:disabled:hover {
 #openMenuButton:hover,
 #openSettingsMenuButton:hover,
 #openTimetableSettingsButton:hover,
-#openAccountSettingsButton:hover,
-#closeSettingsButtonResponsive:hover,
+.settingsMenuButton:hover,
 .menuButton:hover {
     background-color: rgba(256, 256, 256, 0.1);
 }
@@ -808,16 +812,12 @@ button:disabled:hover {
     font-size: 1.5rem;
 }
 
-#openTimetableSettingsButton,
-#openAccountSettingsButton,
-#closeSettingsButtonResponsive {
+.settingsMenuButton {
     font-size: 1rem;
     padding: 0 1rem;
-
 }
 
-#openTimetableSettingsButton.selected,
-#openAccountSettingsButton.selected {
+.settingsMenuButton.selected {
     background-color: rgba(256, 256, 256, 0.1);
 }
 
@@ -1452,9 +1452,7 @@ h3 {
         padding: 1rem 1rem;
     }
 
-    #openTimetableSettingsButton,
-    #openAccountSettingsButton,
-    #closeSettingsButtonResponsive {
+    .settingsMenuButton {
         font-size: 1rem;
         padding: 0.5rem 2rem;
         color: var(--lighterText);

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/index.css">
     <link rel="stylesheet" href="./css/editor.css">
+    <link rel="stylesheet" href="./css/curriculum.css">
     <link rel="stylesheet" href="./css/animations.css">
     <link rel="icon" type="image/png" href="../favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
@@ -249,15 +250,17 @@
                 <h3>Einstellungen</h3>
                 <div style="position: relative;"><button id="openSettingsMenuButton">&#x2630;</button>
                     <div id="settingsMenu">
-                        <button id="openTimetableSettingsButton" class="selected">Stundenplan</button>
-                        <button id="openAccountSettingsButton">Konto</button>
-                        <button id="closeSettingsButton">&#215;</button>
-                        <button id="closeSettingsButtonResponsive">schließen</button>
+                        <button id="openTimetableSettingsButton"
+                            class="selected settingsMenuButton">Stundenplan</button>
+                        <button id="openCurriculumEditorButton" class="settingsMenuButton">Stoffverteilung</button>
+                        <button id="openAccountSettingsButton" class="settingsMenuButton">Konto</button>
+                        <button id="closeSettingsButton" class="settingsMenuButton">&#215;</button>
+                        <button id="closeSettingsButtonResponsive" class="settingsMenuButton">schließen</button>
                     </div>
                 </div>
             </div>
 
-            <div id="timetableSettingsContainer">
+            <div id="timetableSettingsContainer" class="settingsSubContainer">
                 <div id="settingsSubjectsContainer" class="flex doubleGap">
                     <div id="subjectsInfoTooltip" class="tooltip">?
                         <span class="tooltipTextLeft">Hier kannst du die von dir unterrichteten Fächer anlegen
@@ -432,8 +435,31 @@
                 </div>
             </div>
 
+            <!-- curriculum editor -->
+            <div id="curriculumContainer" class="settingsSubContainer" style="display: none">
+                <div data-span_edit_active="false"></div>
+                <div id="dayNameContainer">
+                    <div class="dayName">Mo</div>
+                    <div class="dayName">Di</div>
+                    <div class="dayName">Mi</div>
+                    <div class="dayName">Do</div>
+                    <div class="dayName">Fr</div>
+                    <div class="dayName" data-weekdaynumber="6">Sa</div>
+                    <div class="dayName" data-weekdaynumber="0">So</div>
+                </div>
+                <div id="yearContainer">
+                </div>
+                <div id="addTimespanForm">
+                    <input type="text" name="topic" id="topicInput">
+                    <div id="cancelSpanCreationButtonContainer">
+                        <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
+                        <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- account settings -->
-            <div id="accountSettingsContainer" style="display: none;">
+            <div id="accountSettingsContainer" style="display: none;" class="settingsSubContainer">
                 <div id="deleteAccountContainer">
                     <label>Konto löschen:</label>
                     <div id="requestDeletionContainer">
@@ -691,7 +717,9 @@
                 <div class="flex alignCenter">
                     <label><input type="checkbox" id="noteFixedDateCheckbox">festes Datum</label>
                     <div id="noteFixedDateTooltip" class="tooltip">?
-                        <span class="tooltipTextTop">Notizen zu zukünftigen Stunden verschieben sich bei Änderungen am Stundenplan mit der Stunde, der sie zugewiesen wurden. Soll eine Notiz sich nicht verschieben, muss 'festes Datum' angehakt sein.</span>
+                        <span class="tooltipTextTop">Notizen zu zukünftigen Stunden verschieben sich bei Änderungen am
+                            Stundenplan mit der Stunde, der sie zugewiesen wurden. Soll eine Notiz sich nicht
+                            verschieben, muss 'festes Datum' angehakt sein.</span>
                     </div>
                 </div>
                 <div class="flex halfGap spaceBetween">

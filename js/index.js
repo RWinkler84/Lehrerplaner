@@ -9,6 +9,7 @@ import LessonView from './View/LessonView.js';
 import Fn from './inc/utils.js';
 import LessonNoteController from './Controller/LessonNoteController.js';
 import LessonController from './Controller/LessonController.js';
+import CurriculumController from './Controller/CurriculumController.js';
 
 //config
 export const ONEDAY = 86400000;
@@ -33,7 +34,7 @@ let abstCtrl = new AbstractController();
 export let taskBackupArray = [];
 
 async function startApp() {
-    AbstractController.setVersion('0.9.41');
+    AbstractController.setVersion('0.9.42');
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));
@@ -79,6 +80,11 @@ async function startApp() {
     //handlers for settings
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
+    
+    //curriculum 
+    document.querySelector('#addTimespanForm').addEventListener('click', CurriculumController.timespanFormHandler);
+    document.querySelector('#yearContainer').addEventListener('click', CurriculumController.handleClicksOnDayElements);
+    document.querySelector('#yearContainer').addEventListener('pointerdown', CurriculumController.handleMouseDownOnDayElements);
 
     //on site login
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
