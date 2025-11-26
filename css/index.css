@@ -150,6 +150,7 @@ main {
     bottom: 1rem;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     border: solid 0.3rem var(--bodyBackground);
+    scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
 }
 
 .settingsSubContainer {
@@ -1299,7 +1300,8 @@ h3 {
     #settingsContainer {
         left: 0;
         right: 0;
-
+        top: 0;
+        bottom: 0;
     }
 }
 
