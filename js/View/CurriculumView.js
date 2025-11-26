@@ -59,24 +59,23 @@ export default class CurriculumView extends AbstractView {
         do {
             let currentDay = new Date(dateIterator);
 
-            if (currentDay.getMonth() != monthIterator) {
-                currentMonth.appendChild(currentWeek);
-                currentWeek = blankWeek.cloneNode(true);
-                rowCounter++;
-
-                yearContainer.appendChild(currentMonth);
-                currentMonth = blankMonth.cloneNode(true);
-                currentMonth.querySelector('.monthName').textContent = monthNames[currentDay.getMonth()];
-                monthIterator++;
-            }
-
             if (currentDay.getDay() == 1 && currentWeek.querySelector('.dateContainer')) {
                 currentMonth.appendChild(currentWeek);
 
+                if (
+                    (rowCounter != 0 &&
+                    new Date(currentWeek.firstElementChild.dataset.date).getMonth() != new Date(currentWeek.lastElementChild.dataset.date).getMonth()) ||
+                    currentDay.getDate() == 1
+                ) {
+                    yearContainer.appendChild(currentMonth);
+                    currentMonth = blankMonth.cloneNode(true);
+                    currentMonth.querySelector('.monthName').textContent = monthNames[currentDay.getMonth()];
+                    monthIterator++;
+                }
+
                 currentWeek = blankWeek.cloneNode(true);
                 rowCounter++;
             }
-
 
             currentWeek.querySelectorAll('.day').forEach(day => {
                 if (day.dataset.weekdaynumber != currentDay.getDay()) return;
@@ -103,8 +102,6 @@ export default class CurriculumView extends AbstractView {
             if (day.children.length == 0) day.classList.add('hidden');
         });
     }
-
-
 
     static activateSpanEditing() {
         document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
