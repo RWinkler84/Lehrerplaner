@@ -216,8 +216,7 @@ export default class AbstractModel {
                         break;
                     case 3:
                         db.createObjectStore('curriculum', {keyPath: 'id'});
-                        db.createObjectStore('unsyncedCurriculum', { keyPath: 'id' });
-                        db.createObjectStore('unsyncedDeletedCurriculum', { keyPath: 'id' });
+                        db.createObjectStore('schoolYears', {keyPath: 'id'});
                         break;
                 }
             }

@@ -437,7 +437,57 @@
 
             <!-- curriculum editor -->
             <div id="curriculumContainer" class="settingsSubContainer" style="display: none">
-                <div data-span_edit_active="false"></div>
+                <div id="schoolYearInfoContainer" class="flex column gap">
+
+                    <div class="flex spaceBetween alignCenter">
+                        <div>
+                            <label>Schuljahr auswählen:</label>
+                            <select name="schoolYearNameSelect" id="schoolYearNameSelect"></select>
+                        </div>
+                        <button id="createNewSchoolYearButton" class="confirmationButton">Schuljahr anlegen</button>
+                    </div>
+                    <div id="schoolYearDatesContainer" class="flex doubleGap spaceBetween">
+                        <div class="flex gap alignEnd growEqually">
+                            <div class="flex column doubleGap">
+                                <div>
+                                    <label>Schuljahresbeginn:</label>
+                                    <div id="schoolYearStartDateDisplay">Leg ein Schuljahr an,...</div>
+                                </div>
+                                <div>
+                                    <label>Schuljahresende:</label>
+                                    <div id="schoolYearEndDateDisplay">...damit hier etwas stehen kann.</div>
+                                </div>
+                            </div>
+                            <div>
+                                <button id="editSchoolYearDates" class="confirmationButton notDisplayed">bearbeiten</button>
+                                <button id="saveSchoolYearDates" class="confirmationButton notDisplayed">speichern</button>
+                            </div>
+                        </div>
+
+                        <div id="holidaysInfoContainer" class="flex doubleGap growEqually alignEnd spaceBetween">
+                            <div id="holidaysContainer" class="flex column halfGap">
+                                <div><label>Ferien und freie Tage:</label></div>
+                            </div>
+                            <div>
+                                <button id="editHolidayDatesButton" class="confirmationButton notDisplayed">bearbeiten</button>
+                                <button id="createHolidayDatesButton" class="confirmationButton notDisplayed">anlegen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="schoolYearFormsContainer">
+
+                    <form id="newSchoolYearFormBody" class="flex column" style="display: none;">
+                        <div class="flex column">
+                            <label for="schoolYearStart">Beginn des Schuljahres</label>
+                            <input type="date" id="schoolYearStart" name="schoolYearStart">
+                            <label for="schoolYearEnd">Ende des Schuljahres</label>
+                            <input type="date" id="schoolYearEnd" name="schoolYearEnd" value="2026-07-01">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- curriculum -->
                 <div id="dayNameContainer">
                     <div class="dayName">Mo</div>
                     <div class="dayName">Di</div>
@@ -448,6 +498,7 @@
                     <div class="dayName" data-weekdaynumber="0">So</div>
                 </div>
                 <div id="yearContainer">
+                    <div data-span_edit_active="false"></div>
                 </div>
                 <div id="addTimespanForm">
                     <input type="text" name="topic" id="topicInput">

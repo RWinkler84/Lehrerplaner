@@ -129,6 +129,8 @@ main {
 
 #settingsSubjectsContainer,
 #settingsTimetableContainer,
+#schoolYearInfoContainer,
+#dayNameContainer,
 #deleteAccountContainer,
 #timetableContainer,
 #taskContainer {
@@ -851,6 +853,10 @@ h3 {
     color: var(--matteRed);
 }
 
+h4 {
+    margin: 1rem 0 0rem;
+}
+
 /* tooltips */
 
 .tooltip {
@@ -989,6 +995,10 @@ h3 {
     flex-wrap: wrap;
 }
 
+.growEqually {
+    flex: 1 1 100%;
+}
+
 .column {
     flex-direction: column;
 }
@@ -1039,6 +1049,10 @@ h3 {
 
 .marginBottom {
     margin-bottom: 1rem;
+}
+
+.notDisplayed {
+    display: none;
 }
 
 

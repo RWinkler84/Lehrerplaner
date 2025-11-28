@@ -4,6 +4,7 @@ import View from "../View/SettingsView.js";
 import CurriculumController from "./CurriculumController.js";
 import LessonController from "./LessonController.js";
 import LessonNoteController from "./LessonNoteController.js";
+import SchoolYearController from "./SchoolYearController.js";
 import TaskController from "./TaskController.js";
 
 export default class SettingsController {
@@ -206,6 +207,7 @@ export default class SettingsController {
             
             case 'openCurriculumEditorButton':
                 View.openCurriculumEditor();
+                SchoolYearController.renderSchoolYearInfoSection();
                 CurriculumController.renderEmptyCalendar();
                 break
 
