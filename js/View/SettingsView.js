@@ -603,7 +603,7 @@ export default class SettingsView {
         document.querySelector('#openCurriculumEditorButton').classList.remove('selected');
         document.querySelector('#openTimetableSettingsButton').classList.add('selected');
 
-        document.querySelector('#curriculumContainer').style.display = 'none';
+        document.querySelector('#curriculumViewContainer').style.display = 'none';
         document.querySelector('#accountSettingsContainer').style.display = 'none';
         document.querySelector('#timetableSettingsContainer').style.display = 'block';
     }
@@ -615,13 +615,13 @@ export default class SettingsView {
 
         document.querySelector('#accountSettingsContainer').style.display = 'none';
         document.querySelector('#timetableSettingsContainer').style.display = 'none';
-        document.querySelector('#curriculumContainer').style.display = 'block';
+        document.querySelector('#curriculumViewContainer').style.display = 'block';
     }
 
     static openAccountSettings() {
         let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
         let timetableSettingsContainer = document.querySelector('#timetableSettingsContainer');
-        let curriculumEditor = document.querySelector('#curriculumContainer');
+        let curriculumEditor = document.querySelector('#curriculumViewContainer');
 
         let containerHeight = timetableSettingsContainer.clientHeight;
 

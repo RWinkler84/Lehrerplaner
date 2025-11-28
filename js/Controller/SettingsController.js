@@ -195,6 +195,8 @@ export default class SettingsController {
     static settingsClickEventHandler(event) {
         let target = event.target.id;
 
+        if (event.target.closest('#schoolYearInfoContainer')) SchoolYearController.clickEventHandler(event);
+
         switch (target) {
             //top menu
             case 'openSettingsMenuButton':

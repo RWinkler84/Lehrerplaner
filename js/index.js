@@ -10,6 +10,7 @@ import Fn from './inc/utils.js';
 import LessonNoteController from './Controller/LessonNoteController.js';
 import LessonController from './Controller/LessonController.js';
 import CurriculumController from './Controller/CurriculumController.js';
+import SchoolYearController from './Controller/SchoolYearController.js';
 
 //config
 export const ONEDAY = 86400000;
@@ -81,6 +82,9 @@ async function startApp() {
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
     
+    //school year info
+    document.querySelector('#schoolYearInfoContainer').addEventListener('change', SchoolYearController.changeEventHandler);
+
     //curriculum 
     document.querySelector('#addTimespanForm').addEventListener('click', CurriculumController.timespanFormHandler);
     document.querySelector('#yearContainer').addEventListener('click', CurriculumController.handleClicksOnDayElements);
