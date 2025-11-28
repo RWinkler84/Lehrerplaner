@@ -1,0 +1,263 @@
+import AbstractView from "./AbstractView.js";
+import Controller from "../Controller/SchoolYearController.js";
+import Fn from "../inc/utils.js";
+
+export default class SchoolYearView extends AbstractView {
+    static async renderSchoolYearInfoSection(schoolYearId = null) {
+        let schoolYear = await Controller.getSchoolYearById(schoolYearId);
+
+        if (!schoolYearId) schoolYear = await Controller.getCurrentSchoolYear();
+
+        const infoContainer = document.querySelector('#schoolYearInfoContainer');
+        const schoolYearSelect = infoContainer.querySelector('#schoolYearNameSelect');
+        const startDateDisplay = infoContainer.querySelector('#schoolYearStartDateDisplay');
+        const endDateDisplay = infoContainer.querySelector('#schoolYearEndDateDisplay');
+        const holidaysContainer = infoContainer.querySelector('#holidaysContainer');
+
+        while (schoolYearSelect.childElementCount != 0) { schoolYearSelect.firstElementChild.remove(); }
+        while (holidaysContainer.childElementCount != 1) { holidaysContainer.lastElementChild.remove(); }
+
+        schoolYearSelect.append(await this.getSchoolYearSelectHTML(schoolYear));
+        holidaysContainer.append(this.getHolidayDatesHTML(schoolYear));
+
+        if (!schoolYear) return;
+        infoContainer.dataset.school_year_id = schoolYear.id;
+
+        startDateDisplay.setAttribute('data-date', schoolYear.startDate);
+        endDateDisplay.setAttribute('data-date', schoolYear.endDate);
+        startDateDisplay.textContent = Fn.formatDateWithFullYear(schoolYear.startDate);
+        endDateDisplay.textContent = Fn.formatDateWithFullYear(schoolYear.endDate);
+
+        //show the right buttons
+        if (holidaysContainer.childElementCount == 1) { //one element is always present (label)
+            this.showCreateHolidayDatesButton();
+            this.hideEditHolidayDatesButton();
+            return;
+        }
+
+        this.showEditHolidayDatesButton();
+        this.showEditSchoolYearDatesButton();
+        this.showCreateNewSchoolYearButton();
+
+        this.hideCreateHolidayDatesButton();
+        this.hideSaveSchoolYearDatesButton();
+        this.hideSchoolYearCreationButtonsContainer();
+    }
+
+    static async getSchoolYearSelectHTML(preSelectedYear) {
+        const allSchoolYears = await Controller.getAllSchoolYears();
+        const fragment = document.createDocumentFragment();
+        const blankOption = document.createElement('option');
+
+        allSchoolYears.forEach(year => {
+            const option = blankOption.cloneNode();
+            option.textContent = year.name;
+            option.setAttribute('value', year.name);
+            option.setAttribute('data-yearid', year.id);
+            if (preSelectedYear && year.name == preSelectedYear.name) option.setAttribute('selected', '');
+
+            fragment.append(option);
+        });
+
+        if (!fragment.firstElementChild) {
+            blankOption.textContent = '-';
+            fragment.append(blankOption);
+        }
+
+        return fragment;
+    }
+
+    static getHolidayDatesHTML(schoolYear) {
+
+        const fragment = document.createDocumentFragment();
+        const div = document.createElement('div');
+
+        if (!schoolYear) {
+            div.innerHTML = '<div>Hier gibt es noch nichts zu sehen.</div>';
+            return div;
+        }
+
+        const container = div.cloneNode();
+
+        container.classList.add('singleHolidayContainer');
+
+        schoolYear.holidays.forEach(holiday => {
+            const holidayContainer = container.cloneNode();
+
+            if (holiday.startDate.setHours(12) == holiday.endDate.setHours(12)) {
+                holidayContainer.innerHTML = `
+                    <div class="holidayName">${holiday.name}</div>
+                    <div class="holidayDates">
+                        <div class="holidayDate">${Fn.formatDateWithFullYear(holiday.startDate)}</div>
+                    </div>
+                    `;
+            } else {
+                holidayContainer.innerHTML = `
+                    <div class="holidayName">${holiday.name}</div>
+                    <div class="holidayDates">
+                        <div class="holidayDate">${Fn.formatDateWithFullYear(holiday.startDate)}</div>
+                        <div class="holidayDateHyphen">&nbsp;-&nbsp;</div>
+                        <div class="holidayDate">${Fn.formatDateWithFullYear(holiday.endDate)}</div>
+                    </div>
+                    `;
+            }
+            fragment.append(holidayContainer);
+        });
+
+        if (!fragment.firstElementChild) {
+            div.innerHTML = '<div>Hier gibt es noch nichts zu sehen.</div>';
+            fragment.append(div);
+        }
+
+        return fragment;
+    }
+
+    static editSchoolYearDates(newYearForm = false) {
+        const startDateDisplay = document.querySelector('#schoolYearStartDateDisplay');
+        const endDateDisplay = document.querySelector('#schoolYearEndDateDisplay');
+        const picker = document.createElement('input');
+        const alertRing = document.createElement('div');
+
+        picker.setAttribute('type', 'date');
+        alertRing.classList.add('alertRing');
+
+        const startPicker = picker.cloneNode();
+        const endPicker = picker.cloneNode();
+        const alertStart = alertRing.cloneNode();
+        const alertEnd = alertRing.cloneNode();
+
+        startPicker.setAttribute('id', 'yearStartDatePicker');
+        endPicker.setAttribute('id', 'yearEndDatePicker');
+
+        if (!newYearForm) {
+            endPicker.setAttribute('value', Fn.formatDateSqlCompatible(endDateDisplay.dataset.date));
+            startPicker.setAttribute('value', Fn.formatDateSqlCompatible(startDateDisplay.dataset.date));
+        }
+
+        while (startDateDisplay.childNodes.length != 0) startDateDisplay.childNodes[0].remove();
+        while (endDateDisplay.childNodes.length != 0) endDateDisplay.childNodes[0].remove();
+
+        alertStart.append(startPicker);
+        alertEnd.append(endPicker);
+        startDateDisplay.append(alertStart);
+        endDateDisplay.append(alertEnd);
+    }
+
+    static getSchoolYearDatesFromPicker() {
+        const infoContainer = document.querySelector('#schoolYearInfoContainer')
+        const startPicker = infoContainer.querySelector('#yearStartDatePicker');
+        const endPicker = infoContainer.querySelector('#yearEndDatePicker');
+
+        return {
+            id: infoContainer.dataset.school_year_id,
+            startDate: startPicker.value,
+            endDate: endPicker.value
+        }
+    }
+
+    static removeSchoolYearDatePicker() {
+        const infoContainer = document.querySelector('#schoolYearInfoContainer')
+        const startPicker = infoContainer.querySelector('#yearStartDatePicker');
+        const endPicker = infoContainer.querySelector('#yearEndDatePicker');
+
+        const startDate = Fn.formatDateWithFullYear(startPicker.value);
+        const endDate = Fn.formatDateWithFullYear(endPicker.value);
+
+        startPicker.parentElement.dataset.date = new Date(startPicker.value);
+        endPicker.parentElement.dataset.date = new Date(endPicker.value);
+        startPicker.parentElement.textContent = startDate;
+        endPicker.parentElement.textContent = endDate;
+    }
+
+    static getSelectedYearId() {
+        const select = document.querySelector('#schoolYearNameSelect');
+        const selectedValue = select.value;
+        const selectedOption = select.querySelector(`option[value="${selectedValue}"]`);
+
+        return selectedOption.dataset.yearid;
+    }
+
+    static showNewSchoolYearForm() {
+        const infoContainer = document.querySelector('#schoolYearInfoContainer');
+        const holidaysContainer = infoContainer.querySelector('#holidaysContainer');
+        const div = document.createElement('div');
+
+        infoContainer.dataset.school_year_id = '';
+
+        infoContainer.querySelector('#schoolYearNameSelect').parentElement.classList.add('hidden');
+        infoContainer.querySelector('#createHolidayDatesButton').classList.add('hidden');
+
+        this.editSchoolYearDates(true);
+
+        while (holidaysContainer.childElementCount != 1) { holidaysContainer.lastElementChild.remove() };
+        div.textContent = 'Hier gibt es noch nichts zu sehen...';
+        holidaysContainer.append(div);
+    }
+
+    //show and hide buttons
+    static showEditHolidayDatesButton() {
+        document.querySelector('#editHolidayDatesButton').classList.remove('notDisplayed');
+    }
+    static showCreateHolidayDatesButton() {
+        document.querySelector('#createHolidayDatesButton').classList.remove('notDisplayed');
+    }
+    static showEditSchoolYearDatesButton() {
+        document.querySelector('#editSchoolYearDatesButton').classList.remove('notDisplayed');
+    }
+    static showSaveSchoolYearDatesButton() {
+        document.querySelector('#saveSchoolYearDatesButton').classList.remove('notDisplayed');
+    }
+    static showCreateNewSchoolYearButton() {
+        document.querySelector('#createNewSchoolYearButton').classList.remove('notDisplayed');
+    }
+    static showSchoolYearCreationButtonsContainer() {
+        document.querySelector('#schoolYearCreationButtonsContainer').classList.remove('notDisplayed');
+    }
+
+    //hide
+    static hideEditHolidayDatesButton() {
+        document.querySelector('#editHolidayDatesButton').classList.add('notDisplayed');
+    }
+    static hideCreateHolidayDatesButton() {
+        document.querySelector('#createHolidayDatesButton').classList.add('notDisplayed');
+    }
+    static hideEditSchoolYearDatesButton() {
+        document.querySelector('#editSchoolYearDatesButton').classList.add('notDisplayed');
+    }
+    static hideSaveSchoolYearDatesButton() {
+        document.querySelector('#saveSchoolYearDatesButton').classList.add('notDisplayed');
+    }
+    static hideCreateNewSchoolYearButton() {
+        document.querySelector('#createNewSchoolYearButton').classList.add('notDisplayed');
+    }
+    static hideSchoolYearCreationButtonsContainer() {
+        document.querySelector('#schoolYearCreationButtonsContainer').classList.add('notDisplayed');
+    }
+
+    //displayed, but hidden
+    static removeHiddenFromCreateHolidaysButton() {
+        document.querySelector('#createHolidayDatesButton').classList.remove('hidden');
+    }
+    static removeHiddenFromSchoolYearSelect() {
+        document.querySelector('#schoolYearNameSelect').parentElement.classList.remove('hidden');
+    }
+
+    //validation error
+    static alertSchoolYearStartDatePicker() {
+        const alertRing = document.querySelector('#yearStartDatePicker').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertSchoolYearEndDatePicker() {
+        const alertRing = document.querySelector('#yearEndDatePicker').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+}
