@@ -79,6 +79,7 @@ export default class LessonView {
                 canceled = 'canceled';
                 optionsColorClass = ''
                 lessonOptionsHTML = `
+                    <div class="lessonOption"><button data-add_note>Notiz</button></div>
                     <div class="lessonOption"><button data-lesson_uncanceled>findet statt</button></div>
                 `;
             }
