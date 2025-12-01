@@ -207,7 +207,7 @@ export default class SettingsController {
                 View.openTimetableSettings();
                 break;
             
-            case 'openCurriculumEditorButton':
+            case 'openSchoolYearSettingsButton':
                 View.openCurriculumEditor();
                 SchoolYearController.renderSchoolYearInfoSection();
                 CurriculumController.renderEmptyCalendar();

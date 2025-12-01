@@ -600,7 +600,7 @@ export default class SettingsView {
     
     static openTimetableSettings() {
         document.querySelector('#openAccountSettingsButton').classList.remove('selected');
-        document.querySelector('#openCurriculumEditorButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
         document.querySelector('#openTimetableSettingsButton').classList.add('selected');
 
         document.querySelector('#curriculumViewContainer').style.display = 'none';
@@ -611,7 +611,7 @@ export default class SettingsView {
     static openCurriculumEditor() {
         document.querySelector('#openAccountSettingsButton').classList.remove('selected');
         document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
-        document.querySelector('#openCurriculumEditorButton').classList.add('selected');
+        document.querySelector('#openSchoolYearSettingsButton').classList.add('selected');
 
         document.querySelector('#accountSettingsContainer').style.display = 'none';
         document.querySelector('#timetableSettingsContainer').style.display = 'none';
@@ -626,7 +626,7 @@ export default class SettingsView {
         let containerHeight = timetableSettingsContainer.clientHeight;
 
         document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
-        document.querySelector('#openCurriculumEditorButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
         document.querySelector('#openAccountSettingsButton').classList.add('selected');
 
         accountSettingsContainer.style.height = containerHeight + 'px';
