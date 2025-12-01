@@ -242,7 +242,7 @@ export default class LessonView {
         }
 
         //the left
-        if (lessonFormProps.left < timetableProps.left) {
+        if (lessonFormProps.left < timetableProps.left || lessonForm.closest('.weekday').dataset.weekday_number == '1') {
             lessonForm.removeAttribute('style');
         }
 
