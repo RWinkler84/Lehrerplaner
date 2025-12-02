@@ -210,7 +210,6 @@ export default class SettingsController {
             case 'openSchoolYearSettingsButton':
                 View.openCurriculumEditor();
                 SchoolYearController.renderSchoolYearInfoSection();
-                CurriculumController.renderEmptyCalendar();
                 break
 
             case 'openAccountSettingsButton':

@@ -487,8 +487,8 @@
 
                 <!-- curriculum -->
                 <div id="curriculumContainer">
-                    <div class="marginBottom"><label>Stoffverteilungsplan <span id="schoolYearNameSpan"></span>:</label></div>
-                    <div id="dayNameContainer">
+                    <div class="marginBottom"><label><span id="schoolYearNameSpan">Jahresübersicht</span>:</label></div>
+                    <div id="dayNameContainer" style="display: none;">
                         <div class="dayName">Mo</div>
                         <div class="dayName">Di</div>
                         <div class="dayName">Mi</div>
@@ -497,8 +497,9 @@
                         <div class="dayName" data-weekdaynumber="6">Sa</div>
                         <div class="dayName" data-weekdaynumber="0">So</div>
                     </div>
-                    <div id="yearContainer">
                         <div data-span_edit_active="false"></div>
+                    <div id="yearContainer">
+                        <div class="marginTop">Bisher hast du noch keine Jahrespläne angelegt. Um die Jahresübersicht zu nutzen, lege zuerst ein neues Schuljahr an.</div>
                     </div>
                     <div id="addTimespanForm">
                         <input type="text" name="topic" id="topicInput">

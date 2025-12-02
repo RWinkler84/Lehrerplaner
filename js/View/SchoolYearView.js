@@ -3,10 +3,7 @@ import Controller from "../Controller/SchoolYearController.js";
 import Fn from "../inc/utils.js";
 
 export default class SchoolYearView extends AbstractView {
-    static async renderSchoolYearInfoSection(schoolYearId = null) {
-        let schoolYear = await Controller.getSchoolYearById(schoolYearId);
-
-        if (!schoolYearId) schoolYear = await Controller.getCurrentSchoolYear();
+    static async renderSchoolYearInfoSection(schoolYear) {
 
         const infoContainer = document.querySelector('#schoolYearInfoContainer');
         const schoolYearSelect = infoContainer.querySelector('#schoolYearNameSelect');

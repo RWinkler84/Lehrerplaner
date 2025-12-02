@@ -32,7 +32,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
-    
+
 }
 
 .week,
@@ -46,7 +46,7 @@
     top: 0;
     background-color: var(--contentContainerBackground);
     color: var(--lightgrey);
-    margin-bottom: -0.5rem;
+    margin-bottom: 0.5rem;
     gap: 0.2rem;
     z-index: 3;
     border-bottom: solid 1px var(--lightgrey);
@@ -72,7 +72,8 @@
 }
 
 .day[data-weekdaynumber="6"],
-.day[data-weekdaynumber="0"] {
+.day[data-weekdaynumber="0"],
+.day.holiday {
     background-color: var(--lightergrey);
 }
 
@@ -83,6 +84,21 @@
     gap: 1rem;
     pointer-events: none;
     font-size: 0.75rem;
+}
+
+.dateContainer {
+    justify-content: space-between;
+}
+
+.dayDate {
+    flex: 1 1 20%;
+}
+
+.holidayNameWrapper {
+    flex: 1 1 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
 }
 
 .spanContentContainer {
@@ -164,6 +180,7 @@
 }
 
 @media screen and (max-width: 620px) {
+
     .week,
     #dayNameContainer {
         display: grid;

@@ -1,10 +1,21 @@
 import View from '../View/SchoolYearView.js';
 import SchoolYear from "../Model/SchoolYear.js";
+import CurriculumController from './CurriculumController.js';
 
 export default class SchoolYearController {
 
-    static renderSchoolYearInfoSection(id = null) {
-        View.renderSchoolYearInfoSection(id);
+    static async renderSchoolYearInfoSection(id = null) {
+        let schoolYear = await this.getSchoolYearById(id);
+
+        if (!id) schoolYear = await this.getCurrentSchoolYear();
+
+        if (schoolYear) {
+            CurriculumController.renderSchoolYearCurriculum(schoolYear);
+        } else {
+            CurriculumController.renderEmptyCalendar();
+        }
+
+        View.renderSchoolYearInfoSection(schoolYear);
     }
 
     static async getSchoolYearById(id) {

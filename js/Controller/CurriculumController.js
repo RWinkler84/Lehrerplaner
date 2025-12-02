@@ -1,8 +1,14 @@
 import View from "../View/CurriculumView.js";
+import SchoolYearController from "./SchoolYearController.js";
 
 export default class CurriculumController {
-    static renderEmptyCalendar() {
-        View.renderEmptyCalendar();
+    static renderEmptyCalendar(startDate, endDate) {
+        View.renderEmptyCalendar(startDate, endDate);
+    }
+
+    static renderSchoolYearCurriculum(schoolYear){
+        this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
+        View.renderSchoolYearCurriculum(schoolYear);
     }
 
     static handleClicksOnDayElements(event) {
@@ -103,5 +109,9 @@ export default class CurriculumController {
 
     static modifySpanRange(event) {
         View.modifySpanRange(event)
+    }
+
+    static async getSchoolYearById(id) {
+        return await SchoolYearController.getSchoolYearById(id);
     }
 }

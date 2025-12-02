@@ -1,8 +1,15 @@
+import { ONEDAY } from "../index.js";
 import AbstractView from "./AbstractView.js";
+import Controller from '../Controller/CurriculumController.js'
 
 export default class CurriculumView extends AbstractView {
-    static renderEmptyCalendar() {
+    static renderEmptyCalendar(startDate, endDate) {
         const yearContainer = document.querySelector('#yearContainer');
+
+        while (yearContainer.firstElementChild) {
+            yearContainer.firstElementChild.remove();
+        }
+
         const monthNames = {
             0: 'Januar',
             1: 'Februar',
@@ -27,10 +34,10 @@ export default class CurriculumView extends AbstractView {
             6: 'Sa',
         }
 
-        let today = new Date();
+        let dateIterator = new Date(startDate).setHours(12);
+        endDate = new Date(endDate).setHours(12);
         let monthIterator = 0;
         let rowCounter = 0;
-        let dateIterator = new Date(`${today.getFullYear()}-01-01`).setHours(12, 0, 0, 0);
         let oneday = 86400000;
 
         let blankMonth = document.createElement('div');
@@ -38,7 +45,7 @@ export default class CurriculumView extends AbstractView {
 
         blankMonth.classList.add('month');
         blankMonth.innerHTML = `
-                <div class="monthName">Januar</div>
+                <div class="monthName">${monthNames[startDate.getMonth()]} ${startDate.getFullYear()}</div>
             `;
 
         blankWeek.classList.add('week');
@@ -64,12 +71,12 @@ export default class CurriculumView extends AbstractView {
 
                 if (
                     (rowCounter != 0 &&
-                    new Date(currentWeek.firstElementChild.dataset.date).getMonth() != new Date(currentWeek.lastElementChild.dataset.date).getMonth()) ||
+                        new Date(currentWeek.firstElementChild.dataset.date).getMonth() != new Date(currentWeek.lastElementChild.dataset.date).getMonth()) ||
                     currentDay.getDate() == 1
                 ) {
                     yearContainer.appendChild(currentMonth);
                     currentMonth = blankMonth.cloneNode(true);
-                    currentMonth.querySelector('.monthName').textContent = monthNames[currentDay.getMonth()];
+                    currentMonth.querySelector('.monthName').textContent = `${monthNames[currentDay.getMonth()]} ${currentDay.getFullYear()}`;
                     monthIterator++;
                 }
 
@@ -88,7 +95,7 @@ export default class CurriculumView extends AbstractView {
                     `;
             });
 
-            if (currentDay.getDate() == 31 && currentDay.getMonth() == 11) {
+            if (currentDay.setHours(12) == endDate) {
                 isYearCompleted = true;
                 currentMonth.appendChild(currentWeek);
                 yearContainer.appendChild(currentMonth);
@@ -98,8 +105,70 @@ export default class CurriculumView extends AbstractView {
             dateIterator += oneday;
         } while (!isYearCompleted);
 
+
+        //hide empty day containers
         yearContainer.querySelectorAll('.day').forEach(day => {
             if (day.children.length == 0) day.classList.add('hidden');
+        });
+
+        //show sticky day name bar
+        document.querySelector('#dayNameContainer').removeAttribute('style');
+
+    }
+
+    static renderSchoolYearCurriculum(schoolYear) {
+        const allDays = yearContainer.querySelectorAll('.day');
+
+        document.querySelector('#schoolYearNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
+        this.markHolidays(schoolYear, allDays);
+
+        // get the curriculum from the database and render every single span...this is not going to be fun
+    }
+
+    static renderHolidayEditor(schoolYear) {
+        
+    }
+
+    static async markHolidays(schoolYear, allDays) {
+        const previousSchoolYear = await Controller.getSchoolYearById(schoolYear.id - 1);
+        const dayLookup = {};
+        const div = document.createElement('div');
+
+        allDays.forEach(day => {
+            if (day.classList.contains('hidden')) return;
+            dayLookup[new Date(day.dataset.date).setHours(12)] = day;
+        });
+
+        //makes sure the summer holidays are marked correctly
+        if (previousSchoolYear) {
+            previousSchoolYear.holidays.forEach(holiday => {
+                let currentDay = holiday.startDate.setHours(12);
+
+                while (currentDay <= holiday.endDate.setHours(12)) {
+                    if (dayLookup[currentDay]) dayLookup[currentDay].classList.add('holiday');
+                    currentDay += ONEDAY;
+                }
+            });
+        }
+
+        schoolYear.holidays.forEach(holiday => {
+            let currentDay = holiday.startDate.setHours(12);
+            let holidayNameWrapper = div.cloneNode();
+            holidayNameWrapper.classList.add('holidayNameWrapper');
+
+            holidayNameWrapper.textContent = holiday.name;
+            dayLookup[currentDay].querySelector('.dateContainer').append(holidayNameWrapper);
+
+            // add holiday class to every day in the holiday timespan and additionaly the a name container to mondays
+            while (currentDay <= holiday.endDate.setHours(12)) {
+                if (!dayLookup[currentDay]) break;
+                if (new Date(currentDay).getDay() == 1 && !dayLookup[currentDay].querySelector('.holidayNameWrapper')) {
+                    dayLookup[currentDay].querySelector('.dateContainer').append(holidayNameWrapper.cloneNode(true));
+                }
+
+                dayLookup[currentDay].classList.add('holiday');
+                currentDay += ONEDAY;
+            }
         });
     }
 
