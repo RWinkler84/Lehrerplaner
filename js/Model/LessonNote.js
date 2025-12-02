@@ -124,8 +124,6 @@ export default class LessonNote extends AbstractModel {
 
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
-        console.log(this.serialize());
-
 
         await this.updateOnLocalDB('lessonNotes', this.serialize());
         let result = await this.makeAjaxQuery('lessonNote', 'update', this.serialize());

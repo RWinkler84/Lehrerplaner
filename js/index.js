@@ -40,7 +40,7 @@ async function startApp() {
     window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl));
 
     //checking for unsynced changes
-    setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
+    setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 15);
 
     document.addEventListener('click', (event) => {
         LoginController.dialogEventHandler(event);

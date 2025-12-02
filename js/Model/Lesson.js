@@ -110,6 +110,8 @@ export default class Lesson extends AbstractModel {
             lesson.created = entry.created;
             lesson.lastEdited = entry.lastEdited;
 
+            lesson.date.setHours(12,0,0,0);
+
             changes.push(lesson);
         });
 
