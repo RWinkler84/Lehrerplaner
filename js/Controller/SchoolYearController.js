@@ -61,6 +61,12 @@ export default class SchoolYearController {
         SchoolYear.saveSchoolYearDates(dates);
     }
 
+    static async editHolidayDates() {
+        const schoolYearId = View.getSelectedYearId();
+        const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
+        CurriculumController.renderHolidayEditor(schoolYear);
+    }
+
     static createNewSchoolYear() {
         View.hideEditSchoolYearDatesButton();
         View.hideEditHolidayDatesButton();
@@ -101,7 +107,7 @@ export default class SchoolYearController {
                 this.saveSchoolYearDates();
                 break;
             case 'editHolidayDatesButton':
-
+                this.editHolidayDates();
                 break;
             case 'createHolidayDatesButton':
 

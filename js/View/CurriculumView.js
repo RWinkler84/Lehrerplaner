@@ -125,10 +125,6 @@ export default class CurriculumView extends AbstractView {
         // get the curriculum from the database and render every single span...this is not going to be fun
     }
 
-    static renderHolidayEditor(schoolYear) {
-        
-    }
-
     static async markHolidays(schoolYear, allDays) {
         const previousSchoolYear = await Controller.getSchoolYearById(schoolYear.id - 1);
         const dayLookup = {};
@@ -199,21 +195,17 @@ export default class CurriculumView extends AbstractView {
         target.setAttribute('new', '');
 
         this.setAnchor(target);
-        this.drawSpanContentContainer(newSpanId);
+        this.renderSpanContentContainer(newSpanId);
 
         return newSpanId;
     }
 
-    static cancelSpanCreation() {
-        const spanElement = document.querySelector('.day:has(.handleContainer)');
+    static cancelSpanCreation(spanId) {
         const isNewSpan = this.getNewSpan();
-
-        const spanId = spanElement.dataset.spanid
         const allSpanElements = document.querySelectorAll(`.day[data-spanid="${spanId}"]`);
 
         allSpanElements.forEach(day => {
             day.classList.remove('selected');
-            // day.classList.remove('active');
             day.classList.remove('start');
             day.classList.remove('end');
             day.classList.remove('anchor');
@@ -222,19 +214,54 @@ export default class CurriculumView extends AbstractView {
 
         document.querySelector('#topicInput').value = '';
 
-        if (this.isNewSpan) {
-            this.isNewSpan.removeAttribute('new');
-
-            return;
-        }
-
-        this.drawSpan(spanId);
+        if (isNewSpan) isNewSpan.removeAttribute('new');
     }
 
-    static drawSpan(spanId) {
-        console.log('i will get the span data by its id and redraw it the way it was saved. But this is not ready yet');
+    /**@param spanData is the start and end date of the span, as well as its text content,  @param id is the id that is given to the span to identify it later. */
+    static renderSpan(id, spanData) {
+        const yearContainer = document.querySelector('#yearContainer');
+        const allDays = yearContainer.querySelectorAll('.day:not(.hidden)');
+        const dayLookup = {};
+        const startDate = new Date(spanData.startDate);
+        const endDate = new Date(spanData.endDate);
+        const startDateTimestamp = startDate.setHours(12, 0, 0, 0);
+        const endDateTimestamp = endDate.setHours(12, 0, 0, 0);
+
+        allDays.forEach(day => {
+            dayLookup[new Date(day.dataset.date).setHours(12, 0, 0, 0)] = day;
+        })
+
         //first remove all spanId elements
+        yearContainer.querySelectorAll(`.day[data-spanId="${id}"]`).forEach(day => {
+            day.classList.remove('selected');
+            day.classList.remove('start');
+            day.classList.remove('end');
+            day.removeAttribute('data-spanid');
+        });
+
         //then add them newly based on the saved data
+        if (dayLookup[startDateTimestamp]) {
+            dayLookup[startDateTimestamp].classList.add('start');
+        } else {
+            allDays[0].classList.add('start');
+        }
+
+        if (dayLookup[endDateTimestamp]) {
+            dayLookup[endDateTimestamp].classList.add('end');
+        } else {
+            allDays[allDays.length - 1].classList.add('end');
+        }
+
+        let dayIterator = startDate.setHours(12);
+
+        while (dayIterator <= endDate.setHours(12)) {
+            if (dayLookup[dayIterator]) {
+                dayLookup[dayIterator].classList.add('selected');
+                dayLookup[dayIterator].setAttribute('data-spanid', id);
+            }
+
+            dayIterator += ONEDAY;
+        }
     }
 
     static addHandlesToSpan(spanId) {
@@ -407,7 +434,7 @@ export default class CurriculumView extends AbstractView {
                 if (index == spanDays.length - 1) day.classList.add('end');
             });
 
-            CurriculumView.drawSpanContentContainer(spanId);
+            CurriculumView.renderSpanContentContainer(spanId);
 
         }
 
@@ -442,14 +469,11 @@ export default class CurriculumView extends AbstractView {
         document.querySelectorAll('.day').forEach(day => this.enableTouchActions(day));
     }
 
-    static drawSpanContentContainer(spanId) {
+    static renderSpanContentContainer(spanId, spanData = null) {
         const startElement = document.querySelector(`.day.start[data-spanid="${spanId}"]`);
         const endElement = document.querySelector(`.day.end[data-spanid="${spanId}"]`);
         const startWeekNumber = startElement.closest('.week').dataset.row;
         const endWeekNumber = endElement.closest('.week').dataset.row;
-        const startElementRect = startElement.getBoundingClientRect();
-        const endElementRect = endElement.getBoundingClientRect();
-        const elementStyle = getComputedStyle(startElement);
 
         document.querySelectorAll(`.spanContentContainer[data-spanid="${spanId}"]`).forEach(container => container.remove());
 
@@ -502,6 +526,7 @@ export default class CurriculumView extends AbstractView {
             currentContainer.style.top = `${getComputedStyle(firstElement).paddingTop}`;
 
             //append the container
+            if (spanData) currentContainer.textContent = spanData.name;
             firstElement.append(currentContainer);
 
             i++

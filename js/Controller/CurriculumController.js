@@ -6,9 +6,19 @@ export default class CurriculumController {
         View.renderEmptyCalendar(startDate, endDate);
     }
 
-    static renderSchoolYearCurriculum(schoolYear){
+    static renderSchoolYearCurriculum(schoolYear) {
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
         View.renderSchoolYearCurriculum(schoolYear);
+    }
+
+    static renderHolidayEditor(schoolYear) {
+        View.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate);
+
+        schoolYear.holidays.forEach((holiday, id) => {
+            View.renderSpan(id, holiday);
+            View.renderSpanContentContainer(id, holiday);
+        });
+
     }
 
     static handleClicksOnDayElements(event) {
@@ -83,10 +93,18 @@ export default class CurriculumController {
     }
 
     static cancelSpanCreation() {
-        View.cancelSpanCreation();
+        const spanId = View.getActiveSpanId();
+        const isNewSpan = View.getNewSpan();
+        const spanData //after span is canceled, it should be redrawn, if it wasnt a completely new one
+
+        View.cancelSpanCreation(spanId);
         View.deactivateSpanEditing();
         View.removeAllHandles();
         View.enableTouchActionsOnDayElements();
+
+        if (!isNewSpan) {
+            View.renderSpan(spanId, spanData);
+        }
     }
 
     static selectSpan(event) {
@@ -97,7 +115,7 @@ export default class CurriculumController {
             if (View.getNewSpan()) {
                 View.cancelSpanCreation();
             } else {
-                View.drawSpan(currentlyActiveSpanId);
+                View.renderSpan(currentlyActiveSpanId);
             }
         }
 
