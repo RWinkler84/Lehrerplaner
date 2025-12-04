@@ -1,14 +1,30 @@
 import { ONEDAY } from "../index.js";
 import AbstractView from "./AbstractView.js";
 import Controller from '../Controller/CurriculumController.js';
-import Fn from '../inc/utils.js';
 
 export default class CurriculumView extends AbstractView {
-    static renderEmptyCalendar(startDate, endDate) {
+    static renderEmptyCalendar(startDate = null, endDate = null) {
         const yearContainer = document.querySelector('#yearContainer');
+        const editorNameSpan = document.querySelector('#editorNameSpan');
+
+        if (startDate && startDate instanceof Date == false) startDate = new Date(startDate);
+        if (endDate && endDate instanceof Date == false) endDate = new Date(endDate);
 
         while (yearContainer.firstElementChild) {
             yearContainer.firstElementChild.remove();
+        }
+
+        editorNameSpan.textContent = 'Stoffverteilungsplan';
+
+        if (!startDate) {
+            const div = document.createElement('div');
+            div.classList.add('marginTop');
+            div.textContent = 'Bisher hast du noch keinen Jahresplan angelegt. Um die Jahresübersicht zu nutzen, lege zuerst ein neues Schuljahr mit Start- und Enddatum an.';
+
+            yearContainer.append(div);
+            document.querySelector('#dayNameContainer').setAttribute('style', 'display: none');
+
+            return;
         }
 
         const monthNames = {
@@ -35,7 +51,7 @@ export default class CurriculumView extends AbstractView {
             6: 'Sa',
         }
 
-        let dateIterator = new Date(startDate).setHours(12,0,0,0);
+        let dateIterator = new Date(startDate).setHours(12, 0, 0, 0);
         endDate = new Date(endDate).setHours(12);
         let monthIterator = 0;
         let rowCounter = 0;
@@ -112,37 +128,57 @@ export default class CurriculumView extends AbstractView {
             if (day.children.length == 0) day.classList.add('hidden');
         });
 
-        //show sticky day name bar
         document.querySelector('#dayNameContainer').removeAttribute('style');
-
     }
 
-    static renderHolidayEditor(schoolYear) {
+    static openHolidayEditor(schoolYear, newSchoolYear) {
         const yearContainer = document.querySelector('#yearContainer');
 
-        schoolYear.holidays.forEach((holiday, id) => {
-            console.log(id, holiday);
-            this.renderSpan(id, holiday);
-            this.renderSpanContentContainer(id, holiday);
-        });
+        if (!newSchoolYear) {
+            schoolYear.holidays.forEach((holiday, id) => {
+                this.renderSpan(id, holiday);
+                this.renderSpanContentContainer(id, holiday);
+            });
+
+            document.querySelector('#editorNameSpan').textContent = `Ferien und freie Tage ${schoolYear.name}`;
+        } else {
+            const startFullYear = schoolYear.startDate.getFullYear().toString();
+            const endFullYear = schoolYear.endDate.getFullYear().toString();
+            const schoolYearName = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
+
+            document.querySelector('#editorNameSpan').textContent = `Ferien und freie Tage ${schoolYearName}`;
+        }
 
         yearContainer.classList.remove('curriculumEditor');
         yearContainer.classList.add('holidayEditor');
 
-        document.querySelector('#schoolYearNameSpan').textContent = `Ferien und freie Tage ${schoolYear.name}`;
+        document.querySelector('#closeHolidayEditorButton').classList.remove('notDisplayed');
     }
 
-    static renderSchoolYearCurriculumEditor(schoolYear) {
+    static closeHolidayEditor() {
+        document.querySelector('#closeHolidayEditorButton').classList.add('notDisplayed');
+    }
+
+    static renderSchoolYearCurriculumEditor(schoolYear, isNewSchoolYear) {
         const yearContainer = document.querySelector('#yearContainer');
         const allDays = yearContainer.querySelectorAll('.day');
 
         yearContainer.classList.remove('holidayEditor');
         yearContainer.classList.add('curriculumEditor');
 
-        document.querySelector('#schoolYearNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
-        this.markHolidays(schoolYear, allDays);
 
-        // get the curriculum from the database and render every single span...this is not going to be fun
+        if (!isNewSchoolYear) {
+            document.querySelector('#editorNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
+            this.markHolidays(schoolYear, allDays);
+            // get the curriculum from the database and render every single span...this is not going to be fun
+        } else {
+            const startFullYear = new Date(schoolYear.startDate).getFullYear().toString();
+            const endFullYear = new Date(schoolYear.endDate).getFullYear().toString();
+            const schoolYearName = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
+
+            document.querySelector('#editorNameSpan').textContent = `Stoffverteilungsplan ${schoolYearName}`;
+        }
+
     }
 
     static async markHolidays(schoolYear, allDays) {
@@ -190,7 +226,7 @@ export default class CurriculumView extends AbstractView {
 
     static activateSpanEditing(spanData) {
         const form = document.querySelector('#addTimespanForm');
-        
+
         form.style.display = 'flex';
         if (spanData) form.querySelector('input').value = spanData.name;
 
@@ -198,11 +234,12 @@ export default class CurriculumView extends AbstractView {
     }
 
     static deactivateSpanEditing() {
+        console.log('called');
         const form = document.querySelector('#addTimespanForm');
 
         form.removeAttribute('style');
         form.querySelector('input').value = '';
-        
+
         document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
     }
 
@@ -489,7 +526,7 @@ export default class CurriculumView extends AbstractView {
         document.querySelectorAll(`.spanContentContainer[data-spanid="${spanId}"]`).forEach(container => {
             textContent = container.textContent;
             container.remove()
-            });
+        });
 
         const contentContainer = document.createElement('div');
         contentContainer.classList.add('spanContentContainer');

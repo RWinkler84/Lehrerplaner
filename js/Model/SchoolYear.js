@@ -145,6 +145,13 @@ export default class SchoolYear extends AbstractModel {
         return instance;
     }
 
+    saveStartAndEndDate(dates) {
+        this.startDate = dates.startDate;
+        this.endDate = dates.endDate;
+
+        this.#updateName();
+    }
+
     addHoliday(holiday) {
         if (!(holiday instanceof Holiday)) throw new TypeError('Value is not an instance of Holiday.');
         this.#holidays.push(holiday);
@@ -157,6 +164,13 @@ export default class SchoolYear extends AbstractModel {
 
     getHolidayByIndex(index) {
         return this.#holidays[index];
+    }
+
+    #updateName() {
+        let startFullYear = this.startDate.getFullYear().toString();
+        let endFullYear = this.endDate.getFullYear().toString();
+        
+        this.name = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
     }
 
     //getter

@@ -86,8 +86,7 @@ async function startApp() {
     document.querySelector('#schoolYearInfoContainer').addEventListener('change', SchoolYearController.changeEventHandler);
 
     //curriculum 
-    document.querySelector('#addTimespanForm').addEventListener('click', CurriculumController.timespanFormHandler);
-    document.querySelector('#yearContainer').addEventListener('click', CurriculumController.handleClicksOnDayElements);
+    document.querySelector('#curriculumContainer').addEventListener('click', CurriculumController.handleClickEvents);
     document.querySelector('#yearContainer').addEventListener('pointerdown', CurriculumController.handleMouseDownOnDayElements);
 
     //on site login

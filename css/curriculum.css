@@ -21,12 +21,13 @@
     display: none;
     flex-direction: column;
     gap: 1rem;
-    border: solid 3px black;
+    border: solid 1px var(--bodyBackground);
     padding: 1rem 2rem;
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    background-color: white;
+    background-color: var(--contentContainerBackground);
+    z-index: 2;
 }
 
 #yearContainer {

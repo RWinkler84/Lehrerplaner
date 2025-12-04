@@ -152,7 +152,7 @@ main {
     bottom: 1rem;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     border: solid 0.3rem var(--bodyBackground);
-    scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
+    scrollbar-color: var(--lightgrey) transparent;
 }
 
 .settingsSubContainer {

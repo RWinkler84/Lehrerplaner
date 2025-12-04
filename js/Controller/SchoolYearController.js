@@ -62,16 +62,24 @@ export default class SchoolYearController {
 
         if (dates.id == '') { //no id means school year in creation
             View.removeHiddenFromCreateHolidaysButton();
+            CurriculumController.renderSchoolYearCurriculumEditor(dates, true);
             return;
         }
 
-        SchoolYear.saveSchoolYearDates(dates);
+        const schoolYear = SchoolYear.getSchoolYearById(dates.id);
+
+        schoolYear.saveSchoolYearDates(dates);
+    }
+
+    static createHolidayDates() {
+        const dates = View.getSchoolYearDatesFromDisplay();
+        CurriculumController.openHolidayEditor(dates, true);
     }
 
     static async editHolidayDates() {
         const schoolYearId = View.getSelectedYearId();
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
-        CurriculumController.renderHolidayEditor(schoolYear);
+        CurriculumController.openHolidayEditor(schoolYear);
     }
 
     static createNewSchoolYear() {
@@ -83,6 +91,8 @@ export default class SchoolYearController {
         View.showSaveSchoolYearDatesButton();
         View.showCreateHolidayDatesButton();
         View.showNewSchoolYearForm();
+
+        CurriculumController.renderEmptyCalendar();
     }
 
     static saveNewSchoolYear() {
@@ -118,7 +128,7 @@ export default class SchoolYearController {
                 this.editHolidayDates();
                 break;
             case 'createHolidayDatesButton':
-
+                this.createHolidayDates();
                 break;
         }
     }

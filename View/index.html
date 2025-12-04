@@ -487,7 +487,10 @@
 
                 <!-- curriculum -->
                 <div id="curriculumContainer">
-                    <div class="marginBottom"><label><span id="schoolYearNameSpan">Jahresübersicht</span>:</label></div>
+                    <div class="marginBottom flex spaceBetween">
+                        <label><span id="editorNameSpan">Jahresübersicht</span>:</label>
+                        <button id="closeHolidayEditorButton" class="cancelButton notDisplayed">schließen</button>
+                    </div>
                     <div id="dayNameContainer" style="display: none;">
                         <div class="dayName">Mo</div>
                         <div class="dayName">Di</div>
@@ -499,9 +502,7 @@
                     </div>
                     <div data-span_edit_active="false"></div>
                     <div id="yearContainer">
-                        <div class="marginTop">Bisher hast du noch keine Jahrespläne angelegt. Um die Jahresübersicht zu
-                            nutzen, lege zuerst ein neues Schuljahr an.</div>
-                    </div>
+ </div>
                     <div id="addTimespanForm">
                         <div class="flex column">
                             <label for="topic">Beschreibung:</label>

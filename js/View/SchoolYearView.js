@@ -152,18 +152,27 @@ export default class SchoolYearView extends AbstractView {
         }
     }
 
+    static getSchoolYearDatesFromDisplay() {
+        return {
+            startDate: new Date(document.querySelector('#schoolYearStartDateDisplay').dataset.date),
+            endDate: new Date(document.querySelector('#schoolYearEndDateDisplay').dataset.date)
+        }
+    }
+
     static removeSchoolYearDatePicker() {
         const infoContainer = document.querySelector('#schoolYearInfoContainer')
+        const startDateDisplay = infoContainer.querySelector('#schoolYearStartDateDisplay');
+        const endDateDisplay = infoContainer.querySelector('#schoolYearEndDateDisplay');
         const startPicker = infoContainer.querySelector('#yearStartDatePicker');
         const endPicker = infoContainer.querySelector('#yearEndDatePicker');
 
         const startDate = Fn.formatDateWithFullYear(startPicker.value);
         const endDate = Fn.formatDateWithFullYear(endPicker.value);
 
-        startPicker.parentElement.dataset.date = new Date(startPicker.value);
-        endPicker.parentElement.dataset.date = new Date(endPicker.value);
-        startPicker.parentElement.textContent = startDate;
-        endPicker.parentElement.textContent = endDate;
+        startDateDisplay.dataset.date = new Date(startPicker.value);
+        startDateDisplay.textContent = startDate;
+        endDateDisplay.dataset.date = new Date(endPicker.value);
+        endDateDisplay.textContent = endDate;
     }
 
     static getSelectedYearId() {
