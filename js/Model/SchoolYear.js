@@ -8,11 +8,15 @@ export class Holiday {
     constructor(name, startDate, endDate = null) {
         this.#name = name;
         this.#startDate = new Date(startDate);
+        
         if (!endDate) {
             this.#endDate = this.#startDate;
         } else {
             this.#endDate = new Date(endDate);
         }
+
+        this.#startDate.setHours(12);
+        this.#endDate.setHours(12);
     }
 
     get name() { return this.#name };

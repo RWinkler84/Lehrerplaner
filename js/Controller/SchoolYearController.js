@@ -91,8 +91,9 @@ export default class SchoolYearController {
 
     static cancelSchoolYearCreation() {
         View.removeHiddenFromSchoolYearSelect();
-        View.renderSchoolYearInfoSection();
+        this.renderSchoolYearInfoSection();
     }
+
     static changeDisplayedSchoolYear() {
         this.renderSchoolYearInfoSection(View.getSelectedYearId());
     }

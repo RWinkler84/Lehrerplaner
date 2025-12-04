@@ -1,6 +1,7 @@
 import { ONEDAY } from "../index.js";
 import AbstractView from "./AbstractView.js";
-import Controller from '../Controller/CurriculumController.js'
+import Controller from '../Controller/CurriculumController.js';
+import Fn from '../inc/utils.js';
 
 export default class CurriculumView extends AbstractView {
     static renderEmptyCalendar(startDate, endDate) {
@@ -34,11 +35,10 @@ export default class CurriculumView extends AbstractView {
             6: 'Sa',
         }
 
-        let dateIterator = new Date(startDate).setHours(12);
+        let dateIterator = new Date(startDate).setHours(12,0,0,0);
         endDate = new Date(endDate).setHours(12);
         let monthIterator = 0;
         let rowCounter = 0;
-        let oneday = 86400000;
 
         let blankMonth = document.createElement('div');
         let blankWeek = document.createElement('div');
@@ -65,6 +65,7 @@ export default class CurriculumView extends AbstractView {
 
         do {
             let currentDay = new Date(dateIterator);
+            currentDay.setHours(12);
 
             if (currentDay.getDay() == 1 && currentWeek.querySelector('.dateContainer')) {
                 currentMonth.appendChild(currentWeek);
@@ -102,7 +103,7 @@ export default class CurriculumView extends AbstractView {
             }
 
             currentWeek.dataset.row = rowCounter;
-            dateIterator += oneday;
+            dateIterator += ONEDAY;
         } while (!isYearCompleted);
 
 
@@ -120,6 +121,7 @@ export default class CurriculumView extends AbstractView {
         const yearContainer = document.querySelector('#yearContainer');
 
         schoolYear.holidays.forEach((holiday, id) => {
+            console.log(id, holiday);
             this.renderSpan(id, holiday);
             this.renderSpanContentContainer(id, holiday);
         });
@@ -282,9 +284,13 @@ export default class CurriculumView extends AbstractView {
         let dayIterator = startDate.setHours(12);
 
         while (dayIterator <= endDate.setHours(12)) {
-            if (dayLookup[dayIterator]) {
-                dayLookup[dayIterator].classList.add('selected');
-                dayLookup[dayIterator].setAttribute('data-spanid', id);
+            //necessary because of summer and normal time
+            let normalizedIterator = new Date(dayIterator).setHours(12);
+            if (normalizedIterator != dayIterator) dayIterator = normalizedIterator;
+
+            if (dayLookup[normalizedIterator]) {
+                dayLookup[normalizedIterator].classList.add('selected');
+                dayLookup[normalizedIterator].setAttribute('data-spanid', id);
             }
 
             dayIterator += ONEDAY;
