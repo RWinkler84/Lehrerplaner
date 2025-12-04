@@ -5,8 +5,9 @@ import CurriculumController from './CurriculumController.js';
 export default class SchoolYearController {
 
     static async renderSchoolYearInfoSection(id = null) {
-        let schoolYear = await this.getSchoolYearById(id);
+        let schoolYear;
 
+        if (id) schoolYear = await this.getSchoolYearById(id);
         if (!id) schoolYear = await this.getCurrentSchoolYear();
 
         if (schoolYear) {
@@ -43,7 +44,7 @@ export default class SchoolYearController {
         View.editSchoolYearDates();
     }
 
-    static saveSchoolYearDates() {
+    static async saveSchoolYearDates() {
         const dates = View.getSchoolYearDatesFromPicker();
 
         if (dates.startDate == '') {
@@ -60,9 +61,15 @@ export default class SchoolYearController {
         View.hideSaveSchoolYearDatesButton();
         View.showEditSchoolYearDatesButton();
 
-        if (dates.id == '') { //no id means school year in creation
+        if (dates.id == '') {
+            let schoolYear = SchoolYear.writeDataToInstance(dates);
+            await schoolYear.save();
+
+            View.setDisplayedSchoolYearId(schoolYear.id);
             View.removeHiddenFromCreateHolidaysButton();
-            CurriculumController.renderSchoolYearCurriculumEditor(dates, true);
+            
+            CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
+            
             return;
         }
 
@@ -71,13 +78,8 @@ export default class SchoolYearController {
         schoolYear.saveSchoolYearDates(dates);
     }
 
-    static createHolidayDates() {
-        const dates = View.getSchoolYearDatesFromDisplay();
-        CurriculumController.openHolidayEditor(dates, true);
-    }
-
     static async editHolidayDates() {
-        const schoolYearId = View.getSelectedYearId();
+        const schoolYearId = View.getDisplayedSchoolYearId();
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
         CurriculumController.openHolidayEditor(schoolYear);
     }
@@ -128,7 +130,7 @@ export default class SchoolYearController {
                 this.editHolidayDates();
                 break;
             case 'createHolidayDatesButton':
-                this.createHolidayDates();
+                this.editHolidayDates();
                 break;
         }
     }

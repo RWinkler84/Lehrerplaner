@@ -1,4 +1,5 @@
 import AbstractModel from "./AbstractModel.js";
+import Fn from '../inc/utils.js';
 
 export class Holiday {
     #name;
@@ -8,7 +9,7 @@ export class Holiday {
     constructor(name, startDate, endDate = null) {
         this.#name = name;
         this.#startDate = new Date(startDate);
-        
+
         if (!endDate) {
             this.#endDate = this.#startDate;
         } else {
@@ -17,6 +18,14 @@ export class Holiday {
 
         this.#startDate.setHours(12);
         this.#endDate.setHours(12);
+    }
+
+    serialize() {
+        return {
+            name: this.name,
+            startDate: this.startDate,
+            endDate: this.endDate
+        }
     }
 
     get name() { return this.#name };
@@ -84,9 +93,18 @@ export default class SchoolYear extends AbstractModel {
         }
     ];
 
+    static async writeMockupDataToDB(){
+        const db = new AbstractModel();
+        const mockupData = await this.getAllSchoolYears();
+        mockupData.forEach(item => {
+            db.writeToLocalDB('schoolYears', item.serialize());
+        })
+    }
+
     static async getSchoolYearById(id) {
-        const allSchoolYears = await this.getAllSchoolYears();
-        const schoolYear = allSchoolYears.find(year => { return year.id == id });
+        const db = new AbstractModel();
+        const yearData = await db.readFromLocalDB('schoolYears', id);
+        const schoolYear = this.writeDataToInstance(yearData)
 
         return schoolYear;
     }
@@ -116,8 +134,9 @@ export default class SchoolYear extends AbstractModel {
     }
 
     static async getAllSchoolYears() {
+        const db = new AbstractModel();
         const instanceArray = [];
-        const allSchoolYears = this.schoolYearMockup;
+        const allSchoolYears = await db.readAllFromLocalDB('schoolYears');
 
         allSchoolYears.forEach(schoolYear => {
             schoolYear = this.writeDataToInstance(schoolYear);
@@ -127,22 +146,20 @@ export default class SchoolYear extends AbstractModel {
         return instanceArray;
     }
 
-    static writeDataToInstance(yearData, instance = null) {
-        if(!instance) instance = new SchoolYear;
+    async save() {
+        const allSchoolYears = await SchoolYear.getAllSchoolYears();
+        this.id = Fn.generateId(allSchoolYears);
+        this.lastEdited = this.formatDateTime(new Date());
 
-        instance.id = yearData.id;
-        instance.name = yearData.name;
-        instance.startDate = new Date(yearData.startDate);
-        instance.endDate = new Date(yearData.endDate);
-        instance.created = yearData.created;
-        instance.lastEdited = yearData.lastEdited;
+        console.log(this.serialize());
 
-        yearData.holidays.forEach(holiday => {
-            let holidayInstance = new Holiday(holiday.name, holiday.startDate, holiday.endDate);
-            instance.#holidays.push(holidayInstance);
-        });
+        this.writeToLocalDB('schoolYears', this.serialize());
+    }
 
-        return instance;
+    update() { }
+
+    delete() {
+
     }
 
     saveStartAndEndDate(dates) {
@@ -169,8 +186,48 @@ export default class SchoolYear extends AbstractModel {
     #updateName() {
         let startFullYear = this.startDate.getFullYear().toString();
         let endFullYear = this.endDate.getFullYear().toString();
-        
+
         this.name = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
+    }
+
+    serialize() {
+        const serialized = {
+            id: this.id,
+            name: this.name,
+            startDate: this.formatDate(this.startDate),
+            endDate: this.formatDate(this.endDate),
+            holidays: [],
+            created: this.created,
+            lastEdited: this.lastEdited,
+        }
+
+        this.holidays.forEach(holiday => {
+            let item = holiday.serialize();
+            serialized.holidays.push(item);
+        })
+
+        return serialized;
+    }
+
+    static writeDataToInstance(yearData, instance = null) {
+        const model = new AbstractModel;
+
+        if (!instance) instance = new SchoolYear;
+
+        instance.id = instance.id ?? yearData.id;
+        instance.startDate = new Date(yearData.startDate);
+        instance.endDate = new Date(yearData.endDate);
+        if (yearData.name) { instance.name = yearData.name; } else { instance.#updateName() };
+        if (yearData.created) { instance.created = yearData.created } else { instance.created = model.formatDateTime(new Date()) };
+        if (yearData.lastEdited) { instance.lastEdited = yearData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
+        if (yearData.holidays) {
+            yearData.holidays.forEach(holiday => {
+                let holidayInstance = new Holiday(holiday.name, holiday.startDate, holiday.endDate);
+                instance.#holidays.push(holidayInstance);
+            });
+        }
+
+        return instance;
     }
 
     //getter

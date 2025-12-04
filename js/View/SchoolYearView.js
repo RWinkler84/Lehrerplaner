@@ -51,7 +51,7 @@ export default class SchoolYearView extends AbstractView {
             option.textContent = year.name;
             option.setAttribute('value', year.name);
             option.setAttribute('data-yearid', year.id);
-            if (preSelectedYear && year.name == preSelectedYear.name) option.setAttribute('selected', '');
+            if (preSelectedYear && year.id == preSelectedYear.id) option.setAttribute('selected', '');
 
             fragment.append(option);
         });
@@ -177,10 +177,18 @@ export default class SchoolYearView extends AbstractView {
 
     static getSelectedYearId() {
         const select = document.querySelector('#schoolYearNameSelect');
-        const selectedValue = select.value;
-        const selectedOption = select.querySelector(`option[value="${selectedValue}"]`);
+        const selectedOptions = select.selectedOptions;
 
-        return selectedOption.dataset.yearid;
+        return selectedOptions[0].dataset.yearid;
+    }
+
+    static setDisplayedSchoolYearId(id){
+        document.querySelector('#schoolYearInfoContainer').dataset.school_year_id = id;
+    }
+
+    static getDisplayedSchoolYearId() {
+        return document.querySelector('#schoolYearInfoContainer').dataset.school_year_id;
+         
     }
 
     static showNewSchoolYearForm() {

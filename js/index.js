@@ -11,6 +11,7 @@ import LessonNoteController from './Controller/LessonNoteController.js';
 import LessonController from './Controller/LessonController.js';
 import CurriculumController from './Controller/CurriculumController.js';
 import SchoolYearController from './Controller/SchoolYearController.js';
+import SchoolYear from './Model/SchoolYear.js';
 
 //config
 export const ONEDAY = 86400000;
@@ -37,6 +38,8 @@ export let taskBackupArray = [];
 async function startApp() {
     AbstractController.setVersion('0.9.42');
     await abstCtrl.syncData();
+
+    // await SchoolYear.writeMockupDataToDB();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));
     window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl));

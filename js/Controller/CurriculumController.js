@@ -8,16 +8,16 @@ export default class CurriculumController {
         View.deactivateSpanEditing();
     }
 
-    static async renderSchoolYearCurriculumEditor(schoolYear = null, isNewSchoolYear = false) {
+    static async renderSchoolYearCurriculumEditor(schoolYear = null) {
         if (!schoolYear) schoolYear = await SchoolYearController.getCurrentSchoolYear()
 
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
-        View.renderSchoolYearCurriculumEditor(schoolYear, isNewSchoolYear);
+        View.renderSchoolYearCurriculumEditor(schoolYear);
     }
 
-    static openHolidayEditor(schoolYear, newSchoolYear = false) {
+    static openHolidayEditor(schoolYear) {
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate);
-        View.openHolidayEditor(schoolYear, newSchoolYear);
+        View.openHolidayEditor(schoolYear);
     }
 
     static closeHolidayEditor() {
@@ -109,8 +109,6 @@ export default class CurriculumController {
     static handleClickEvents(event) {
         const spanEditOngoing = document.querySelector('div[data-span_edit_active]').dataset.span_edit_active;
         const classList = event.target.classList;
-
-        console.log(event.target);
 
         // handle clicks on day elements
         if (classList.contains('day')) {

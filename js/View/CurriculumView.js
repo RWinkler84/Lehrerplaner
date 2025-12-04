@@ -131,58 +131,39 @@ export default class CurriculumView extends AbstractView {
         document.querySelector('#dayNameContainer').removeAttribute('style');
     }
 
-    static openHolidayEditor(schoolYear, newSchoolYear) {
+    static openHolidayEditor(schoolYear) {
         const yearContainer = document.querySelector('#yearContainer');
 
-        if (!newSchoolYear) {
-            schoolYear.holidays.forEach((holiday, id) => {
-                this.renderSpan(id, holiday);
-                this.renderSpanContentContainer(id, holiday);
-            });
-
-            document.querySelector('#editorNameSpan').textContent = `Ferien und freie Tage ${schoolYear.name}`;
-        } else {
-            const startFullYear = schoolYear.startDate.getFullYear().toString();
-            const endFullYear = schoolYear.endDate.getFullYear().toString();
-            const schoolYearName = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
-
-            document.querySelector('#editorNameSpan').textContent = `Ferien und freie Tage ${schoolYearName}`;
-        }
+        schoolYear.holidays.forEach((holiday, id) => {
+            this.renderSpan(id, holiday);
+            this.renderSpanContentContainer(id, holiday);
+        });
 
         yearContainer.classList.remove('curriculumEditor');
         yearContainer.classList.add('holidayEditor');
 
         document.querySelector('#closeHolidayEditorButton').classList.remove('notDisplayed');
+        document.querySelector('#editorNameSpan').textContent = `Ferien und freie Tage ${schoolYear.name}`;
     }
 
     static closeHolidayEditor() {
         document.querySelector('#closeHolidayEditorButton').classList.add('notDisplayed');
     }
 
-    static renderSchoolYearCurriculumEditor(schoolYear, isNewSchoolYear) {
+    static renderSchoolYearCurriculumEditor(schoolYear) {
         const yearContainer = document.querySelector('#yearContainer');
         const allDays = yearContainer.querySelectorAll('.day');
 
         yearContainer.classList.remove('holidayEditor');
         yearContainer.classList.add('curriculumEditor');
 
-
-        if (!isNewSchoolYear) {
-            document.querySelector('#editorNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
-            this.markHolidays(schoolYear, allDays);
-            // get the curriculum from the database and render every single span...this is not going to be fun
-        } else {
-            const startFullYear = new Date(schoolYear.startDate).getFullYear().toString();
-            const endFullYear = new Date(schoolYear.endDate).getFullYear().toString();
-            const schoolYearName = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
-
-            document.querySelector('#editorNameSpan').textContent = `Stoffverteilungsplan ${schoolYearName}`;
-        }
+        document.querySelector('#editorNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
+        this.markHolidays(schoolYear, allDays);
+        // get the curriculum from the database and render every single span...this is not going to be fun
 
     }
 
     static async markHolidays(schoolYear, allDays) {
-        const previousSchoolYear = await Controller.getSchoolYearById(schoolYear.id - 1);
         const dayLookup = {};
         const div = document.createElement('div');
 
@@ -190,18 +171,6 @@ export default class CurriculumView extends AbstractView {
             if (day.classList.contains('hidden')) return;
             dayLookup[new Date(day.dataset.date).setHours(12)] = day;
         });
-
-        //makes sure the summer holidays are marked correctly
-        if (previousSchoolYear) {
-            previousSchoolYear.holidays.forEach(holiday => {
-                let currentDay = holiday.startDate.setHours(12);
-
-                while (currentDay <= holiday.endDate.setHours(12)) {
-                    if (dayLookup[currentDay]) dayLookup[currentDay].classList.add('holiday');
-                    currentDay += ONEDAY;
-                }
-            });
-        }
 
         schoolYear.holidays.forEach(holiday => {
             let currentDay = holiday.startDate.setHours(12);
@@ -234,7 +203,6 @@ export default class CurriculumView extends AbstractView {
     }
 
     static deactivateSpanEditing() {
-        console.log('called');
         const form = document.querySelector('#addTimespanForm');
 
         form.removeAttribute('style');
