@@ -123,8 +123,8 @@ export default class SchoolYear extends AbstractModel {
         return instanceArray;
     }
 
-    static writeDataToInstance(yearData) {
-        let instance = new SchoolYear;
+    static writeDataToInstance(yearData, instance = null) {
+        if(!instance) instance = new SchoolYear;
 
         instance.id = yearData.id;
         instance.name = yearData.name;
@@ -154,7 +154,6 @@ export default class SchoolYear extends AbstractModel {
     getHolidayByIndex(index) {
         return this.#holidays[index];
     }
-
 
     //getter
     get id() { return this.#id; }

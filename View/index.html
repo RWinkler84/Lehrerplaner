@@ -497,12 +497,16 @@
                         <div class="dayName" data-weekdaynumber="6">Sa</div>
                         <div class="dayName" data-weekdaynumber="0">So</div>
                     </div>
-                        <div data-span_edit_active="false"></div>
+                    <div data-span_edit_active="false"></div>
                     <div id="yearContainer">
-                        <div class="marginTop">Bisher hast du noch keine Jahrespläne angelegt. Um die Jahresübersicht zu nutzen, lege zuerst ein neues Schuljahr an.</div>
+                        <div class="marginTop">Bisher hast du noch keine Jahrespläne angelegt. Um die Jahresübersicht zu
+                            nutzen, lege zuerst ein neues Schuljahr an.</div>
                     </div>
                     <div id="addTimespanForm">
-                        <input type="text" name="topic" id="topicInput">
+                        <div class="flex column">
+                            <label for="topic">Beschreibung:</label>
+                            <input type="text" name="topic" id="topicInput">
+                        </div>
                         <div id="cancelSpanCreationButtonContainer">
                             <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
                             <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>

@@ -116,8 +116,26 @@ export default class CurriculumView extends AbstractView {
 
     }
 
-    static renderSchoolYearCurriculum(schoolYear) {
+    static renderHolidayEditor(schoolYear) {
+        const yearContainer = document.querySelector('#yearContainer');
+
+        schoolYear.holidays.forEach((holiday, id) => {
+            this.renderSpan(id, holiday);
+            this.renderSpanContentContainer(id, holiday);
+        });
+
+        yearContainer.classList.remove('curriculumEditor');
+        yearContainer.classList.add('holidayEditor');
+
+        document.querySelector('#schoolYearNameSpan').textContent = `Ferien und freie Tage ${schoolYear.name}`;
+    }
+
+    static renderSchoolYearCurriculumEditor(schoolYear) {
+        const yearContainer = document.querySelector('#yearContainer');
         const allDays = yearContainer.querySelectorAll('.day');
+
+        yearContainer.classList.remove('holidayEditor');
+        yearContainer.classList.add('curriculumEditor');
 
         document.querySelector('#schoolYearNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
         this.markHolidays(schoolYear, allDays);
@@ -168,14 +186,22 @@ export default class CurriculumView extends AbstractView {
         });
     }
 
-    static activateSpanEditing() {
+    static activateSpanEditing(spanData) {
+        const form = document.querySelector('#addTimespanForm');
+        
+        form.style.display = 'flex';
+        if (spanData) form.querySelector('input').value = spanData.name;
+
         document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
-        document.querySelector('#addTimespanForm').style.display = 'block';
     }
 
     static deactivateSpanEditing() {
+        const form = document.querySelector('#addTimespanForm');
+
+        form.removeAttribute('style');
+        form.querySelector('input').value = '';
+        
         document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
-        document.querySelector('#addTimespanForm').removeAttribute('style');
     }
 
     static createNewSpan(event) {
@@ -205,6 +231,7 @@ export default class CurriculumView extends AbstractView {
         const allSpanElements = document.querySelectorAll(`.day[data-spanid="${spanId}"]`);
 
         allSpanElements.forEach(day => {
+            if (day.querySelector('.spanContentContainer')) day.querySelector('.spanContentContainer').remove();
             day.classList.remove('selected');
             day.classList.remove('start');
             day.classList.remove('end');
@@ -308,29 +335,6 @@ export default class CurriculumView extends AbstractView {
 
         firstSpanDay.querySelector('.spanContentContainer').textContent = topicInput.value;
 
-    }
-
-    static getSpanId(event) {
-        return event.target.closest('.day').dataset.spanid;
-    }
-
-    static getActiveSpanId() {
-        const activeSpan = document.querySelector('.day:has(.handleContainer)');
-        let activeSpanId;
-
-        if (activeSpan) activeSpanId = activeSpan.dataset.spanid;
-
-        if (activeSpanId) return activeSpanId;
-
-        return false
-    }
-
-    static getNewSpan() {
-        const spanElementWithNewTag = document.querySelector('.day[new]');
-
-        if (spanElementWithNewTag) return spanElementWithNewTag;
-
-        return false;
     }
 
     static modifySpanRange(event) {
@@ -475,7 +479,11 @@ export default class CurriculumView extends AbstractView {
         const startWeekNumber = startElement.closest('.week').dataset.row;
         const endWeekNumber = endElement.closest('.week').dataset.row;
 
-        document.querySelectorAll(`.spanContentContainer[data-spanid="${spanId}"]`).forEach(container => container.remove());
+        let textContent;
+        document.querySelectorAll(`.spanContentContainer[data-spanid="${spanId}"]`).forEach(container => {
+            textContent = container.textContent;
+            container.remove()
+            });
 
         const contentContainer = document.createElement('div');
         contentContainer.classList.add('spanContentContainer');
@@ -526,6 +534,7 @@ export default class CurriculumView extends AbstractView {
             currentContainer.style.top = `${getComputedStyle(firstElement).paddingTop}`;
 
             //append the container
+            if (textContent) currentContainer.textContent = textContent; //if the span is not a new one and edited, reinsert the old text
             if (spanData) currentContainer.textContent = spanData.name;
             firstElement.append(currentContainer);
 
@@ -533,6 +542,7 @@ export default class CurriculumView extends AbstractView {
         } while (i <= endWeekNumber)
     }
 
+    //helper function
     static getPaddingPlusBorderWidth(element) {
         const properties = getComputedStyle(element);
         const paddingLeft = parseFloat(properties.paddingLeft);
@@ -543,7 +553,6 @@ export default class CurriculumView extends AbstractView {
         return paddingLeft + paddingRight + borderLeft + borderRight;
     }
 
-    //helper function
     static comparePosition(elementA, elementB) {
         let position = elementA.compareDocumentPosition(elementB);
         if (position == Node.DOCUMENT_POSITION_PRECEDING) return 'A after B';
@@ -558,5 +567,33 @@ export default class CurriculumView extends AbstractView {
 
     static enableTouchActions(element) {
         element.classList.remove('noTouchActions');
+    }
+
+    static getEditorType() {
+        if (document.querySelector('#yearContainer').classList.contains('holidayEditor')) return 'Holiday Editor';
+        if (document.querySelector('#yearContainer').classList.contains('curriculumEditor')) return 'Curriculum Editor';
+    }
+
+    static getSpanId(event) {
+        return event.target.closest('.day').dataset.spanid;
+    }
+
+    static getActiveSpanId() {
+        const activeSpan = document.querySelector('.day:has(.handleContainer)');
+        let activeSpanId;
+
+        if (activeSpan) activeSpanId = activeSpan.dataset.spanid;
+
+        if (activeSpanId) return activeSpanId;
+
+        return false
+    }
+
+    static getNewSpan() {
+        const spanElementWithNewTag = document.querySelector('.day[new]');
+
+        if (spanElementWithNewTag) return spanElementWithNewTag;
+
+        return false;
     }
 }

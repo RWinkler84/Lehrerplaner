@@ -6,19 +6,14 @@ export default class CurriculumController {
         View.renderEmptyCalendar(startDate, endDate);
     }
 
-    static renderSchoolYearCurriculum(schoolYear) {
+    static renderSchoolYearCurriculumEditor(schoolYear) {
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
-        View.renderSchoolYearCurriculum(schoolYear);
+        View.renderSchoolYearCurriculumEditor(schoolYear);
     }
 
     static renderHolidayEditor(schoolYear) {
         View.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate);
-
-        schoolYear.holidays.forEach((holiday, id) => {
-            View.renderSpan(id, holiday);
-            View.renderSpanContentContainer(id, holiday);
-        });
-
+        View.renderHolidayEditor(schoolYear)
     }
 
     static handleClicksOnDayElements(event) {
@@ -29,7 +24,7 @@ export default class CurriculumController {
         if (classList.contains('day')) {
             switch (true) {
                 case !classList.contains('selected'):
-                    if (spanEditOngoing == 'false') CurriculumController.createNewSpan();
+                    if (spanEditOngoing == 'false') CurriculumController.createNewSpan(event);
                     break;
 
                 case classList.contains('selected'):
@@ -71,7 +66,7 @@ export default class CurriculumController {
         }
     }
 
-    static createNewSpan() {
+    static createNewSpan(event) {
         View.disableTouchActionsOnDayElements();
         View.activateSpanEditing();
         let spanId = View.createNewSpan(event);
@@ -92,10 +87,9 @@ export default class CurriculumController {
         View.enableTouchActionsOnDayElements();
     }
 
-    static cancelSpanCreation() {
+    static async cancelSpanCreation() {
         const spanId = View.getActiveSpanId();
         const isNewSpan = View.getNewSpan();
-        const spanData //after span is canceled, it should be redrawn, if it wasnt a completely new one
 
         View.cancelSpanCreation(spanId);
         View.deactivateSpanEditing();
@@ -103,23 +97,28 @@ export default class CurriculumController {
         View.enableTouchActionsOnDayElements();
 
         if (!isNewSpan) {
+            const spanData = await this.getSpanDataById(spanId);
             View.renderSpan(spanId, spanData);
+            View.renderSpanContentContainer(spanId, spanData);
         }
     }
 
-    static selectSpan(event) {
-        const currentlyActiveSpanId = View.getActiveSpanId();
+    static async selectSpan(event) {
+        const previouslyActiveSpanId = View.getActiveSpanId();
         const spanId = View.getSpanId(event);
+        const spanData = await this.getSpanDataById(spanId);
 
-        if (currentlyActiveSpanId) {
+        if (previouslyActiveSpanId) {
             if (View.getNewSpan()) {
-                View.cancelSpanCreation();
+                View.cancelSpanCreation(previouslyActiveSpanId);
             } else {
-                View.renderSpan(currentlyActiveSpanId);
+                const spanData = await this.getSpanDataById(previouslyActiveSpanId);
+                View.renderSpan(previouslyActiveSpanId, spanData);
+                View.renderSpanContentContainer(previouslyActiveSpanId, spanData);
             }
         }
 
-        View.activateSpanEditing();
+        View.activateSpanEditing(spanData);
         View.disableTouchActionsOnDayElements();
         View.removeAllHandles();
         View.addHandlesToSpan(spanId);
@@ -131,5 +130,19 @@ export default class CurriculumController {
 
     static async getSchoolYearById(id) {
         return await SchoolYearController.getSchoolYearById(id);
+    }
+
+    static async getSpanDataById(spanId) {
+        const editorType = View.getEditorType();
+
+        if (editorType == 'Holiday Editor') {
+            return await SchoolYearController.getHolidayById(spanId)
+        }
+
+        if (editorType == 'Curriculum Editor'){
+            // still work in progress
+            //getCurriculumById()
+        }
+
     }
 }

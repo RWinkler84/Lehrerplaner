@@ -10,7 +10,7 @@ export default class SchoolYearController {
         if (!id) schoolYear = await this.getCurrentSchoolYear();
 
         if (schoolYear) {
-            CurriculumController.renderSchoolYearCurriculum(schoolYear);
+            CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
         } else {
             CurriculumController.renderEmptyCalendar();
         }
@@ -28,6 +28,13 @@ export default class SchoolYearController {
 
     static async getAllSchoolYears() {
         return await SchoolYear.getAllSchoolYears();
+    }
+
+    static async getHolidayById(id) {
+        const schoolYearId = View.getSelectedYearId();
+        const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
+
+        return schoolYear.getHolidayByIndex(id);
     }
 
     static editSchoolYearDates() {
