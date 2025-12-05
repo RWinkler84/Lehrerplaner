@@ -1323,6 +1323,9 @@ h4 {
 }
 
 @media screen and (max-width: 620px) {
+    body {
+        margin: 0;
+    }
 
     #topMenuContainer,
     #settingsTitleBar {
@@ -1332,7 +1335,9 @@ h4 {
     #timetableContainer,
     #taskContainer,
     #settingsSubjectsContainer,
-    #settingsTimetableContainer {
+    #settingsTimetableContainer,
+    #schoolYearInfoContainer,
+    #curriculumContainer {
         padding: 1.5rem 0.5rem;
     }
 
