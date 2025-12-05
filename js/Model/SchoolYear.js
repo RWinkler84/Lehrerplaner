@@ -8,7 +8,7 @@ export class Holiday {
     #endDate;
 
     constructor(id, name, startDate, endDate = null) {
-        this.#id = id;
+        this.#id = Number(id);
         this.#name = name;
         this.#startDate = new Date(startDate);
 
@@ -36,7 +36,7 @@ export class Holiday {
     get startDate() { return this.#startDate };
     get endDate() { return this.#endDate };
 
-    set id(value) { this.#id = value };
+    set id(value) { this.#id = Number(value) };
     set name(value) { this.#name = value };
     set startDate(value) { this.#startDate = new Date(value) };
     set endDate(value) { this.#endDate = new Date(value) };
@@ -188,16 +188,22 @@ export default class SchoolYear extends AbstractModel {
     }
 
     // holiday instance functions
-    async addHoliday(holiday) {
-        if (!(holiday instanceof Holiday)) throw new TypeError('Value is not an instance of Holiday.');
+    async addHoliday(holidayData) {
+        const holiday = new Holiday(holidayData.id, holidayData.name, holidayData.startDate, holidayData.endDate);
         this.#holidays.push(holiday);
 
-        this.update();
+        await this.update();
     }
 
     async updateHoliday(holidayData) {
         const holiday = this.getHolidayById(holidayData.id);
-        
+
+        if (!holiday) {
+            this.addHoliday(holidayData);
+
+            return;
+        }
+
         holiday.name = holidayData.name;
         holiday.startDate = holidayData.startDate;
         holiday.endDate = holidayData.endDate;
@@ -274,9 +280,12 @@ export default class SchoolYear extends AbstractModel {
     get startDate() { return this.#startDate; }
     get endDate() { return this.#endDate; }
     get name() { return this.#name; }
-    get holidays() { return [...this.#holidays]; }
     get created() { return this.#created; }
     get lastEdited() { return this.#lastEdited; }
+    get holidays() {
+        this.#holidays.sort((a, b) => { return a.startDate.setHours(12, 0, 0, 0) - b.startDate.setHours(12, 0, 0, 0) });
+        return [...this.#holidays];
+    }
 
     //setter
     set id(value) { this.#id = value; }

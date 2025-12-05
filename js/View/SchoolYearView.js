@@ -65,8 +65,6 @@ export default class SchoolYearView extends AbstractView {
     }
 
     static getHolidayDatesHTML(schoolYear) {
-        console.log(schoolYear);
-
         const fragment = document.createDocumentFragment();
         const div = document.createElement('div');
 
@@ -265,7 +263,6 @@ export default class SchoolYearView extends AbstractView {
             alertRing.classList.remove('validationError');
         }, 300);
     }
-
     static alertSchoolYearEndDatePicker() {
         const alertRing = document.querySelector('#yearEndDatePicker').parentElement;
 
