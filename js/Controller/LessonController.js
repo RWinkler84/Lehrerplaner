@@ -61,6 +61,7 @@ export default class LessonController {
         await lesson.save();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
         this.renderLesson();
     }
 
@@ -166,7 +167,6 @@ export default class LessonController {
 
         switch (true) {
             case target.classList.contains('noteIcon'):
-            console.log('drin')
                 this.renderLessonNote(event);
                 break;
         }

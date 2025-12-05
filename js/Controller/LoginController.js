@@ -135,7 +135,7 @@ export default class LoginController {
     static async createGuestAccount() {
         let db = new Model;
         await db.createGuestAccount();
-        this.renderTopMenu();
+        AbstractController.renderTopMenu();
     }
 
     static async sendResetPasswordMail(event) {
