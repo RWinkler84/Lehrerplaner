@@ -31,11 +31,15 @@ export default class SchoolYearController {
         return await SchoolYear.getAllSchoolYears();
     }
 
+    static getDisplayedSchoolYearId() {
+        return View.getDisplayedSchoolYearId();
+    }
+
     static async getHolidayById(id) {
         const schoolYearId = View.getSelectedYearId();
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
 
-        return schoolYear.getHolidayByIndex(id);
+        return schoolYear.getHolidayById(id);
     }
 
     static editSchoolYearDates() {
@@ -73,9 +77,11 @@ export default class SchoolYearController {
             return;
         }
 
-        const schoolYear = SchoolYear.getSchoolYearById(dates.id);
+        const schoolYear = await SchoolYear.getSchoolYearById(dates.id);
+        schoolYear.updateStartAndEndDate(dates);
 
-        schoolYear.saveSchoolYearDates(dates);
+        View.renderSchoolYearInfoSection(schoolYear);
+        CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
     }
 
     static async editHolidayDates() {

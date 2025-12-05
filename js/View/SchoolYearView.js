@@ -65,6 +65,7 @@ export default class SchoolYearView extends AbstractView {
     }
 
     static getHolidayDatesHTML(schoolYear) {
+        console.log(schoolYear);
 
         const fragment = document.createDocumentFragment();
         const div = document.createElement('div');
@@ -187,8 +188,7 @@ export default class SchoolYearView extends AbstractView {
     }
 
     static getDisplayedSchoolYearId() {
-        return document.querySelector('#schoolYearInfoContainer').dataset.school_year_id;
-         
+        return document.querySelector('#schoolYearInfoContainer').dataset.school_year_id;      
     }
 
     static showNewSchoolYearForm() {

@@ -134,9 +134,9 @@ export default class CurriculumView extends AbstractView {
     static openHolidayEditor(schoolYear) {
         const yearContainer = document.querySelector('#yearContainer');
 
-        schoolYear.holidays.forEach((holiday, id) => {
-            this.renderSpan(id, holiday);
-            this.renderSpanContentContainer(id, holiday);
+        schoolYear.holidays.forEach((holiday) => {
+            this.renderSpan(holiday.id, holiday);
+            this.renderSpanContentContainer(holiday.id, holiday);
         });
 
         yearContainer.classList.remove('curriculumEditor');
@@ -178,7 +178,7 @@ export default class CurriculumView extends AbstractView {
             holidayNameWrapper.classList.add('holidayNameWrapper');
 
             holidayNameWrapper.textContent = holiday.name;
-            dayLookup[currentDay].querySelector('.dateContainer').append(holidayNameWrapper);
+            if (dayLookup[currentDay]) dayLookup[currentDay].querySelector('.dateContainer').append(holidayNameWrapper);
 
             // add holiday class to every day in the holiday timespan and additionaly the a name container to mondays
             while (currentDay <= holiday.endDate.setHours(12)) {
@@ -317,6 +317,7 @@ export default class CurriculumView extends AbstractView {
 
         startHandleContainer.firstElementChild.classList.add('startHandle');
         endHandleContainer.firstElementChild.classList.add('endHandle');
+        endHandleContainer.style.right = `${getComputedStyle(endElement).paddingRight}px`;
 
         if (startElement == endElement) {
             startElement.append(startHandleContainer);
@@ -335,17 +336,21 @@ export default class CurriculumView extends AbstractView {
 
     static saveSpan() {
         const topicInput = document.querySelector('#topicInput');
-        const firstSpanDay = document.querySelector('.day:has(.handleContainer)');
+        const firstSpanDay = document.querySelector('.day:has(.startHandle)');
+        const lastSpanDay = document.querySelector('.day:has(.endHandle)')
         const spanId = firstSpanDay.dataset.spanid;
-        const allSpanElements = document.querySelectorAll(`.day[data-spanid="${spanId}"]`);
         let isNewSpan = this.getNewSpan()
 
         if (isNewSpan) {
             isNewSpan.removeAttribute('new');
         }
 
-        firstSpanDay.querySelector('.spanContentContainer').textContent = topicInput.value;
-
+        return {
+            id: spanId,
+            name: topicInput.value,
+            startDate: new Date(firstSpanDay.dataset.date),
+            endDate: new Date(lastSpanDay.dataset.date),
+        }
     }
 
     static modifySpanRange(event) {

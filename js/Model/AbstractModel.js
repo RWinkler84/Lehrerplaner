@@ -195,6 +195,7 @@ export default class AbstractModel {
                         store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
                         db.createObjectStore('curriculum', {keyPath: 'id'});
+                        db.createObjectStore('schoolYears', {keyPath: 'id'});
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });

@@ -103,8 +103,6 @@
 .holidayNameWrapper {
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: right;
-    width: 100%;
 }
 
 .spanContentContainer {
@@ -131,6 +129,7 @@
 .spanContentContainer.end {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
+    right: 1rem;
 }
 
 .handleContainer {
@@ -177,9 +176,53 @@
     pointer-events: none;
 }
 
-@media screen and (max-width: 620px) {
-    
 
+@media screen and (max-width: 850px) {
+
+    .day,
+    .dayName {
+        padding: 0.5rem 0.5rem;
+    }
+
+    .spanContentContainer.start {
+        left: 0.5rem;
+    }
+
+    .spanContentContainer.end {
+        right: 0.5rem;
+    }
+
+    .handleContainer:has(.startHandle) {
+        left: 0.5rem;
+    }
+
+    .handleContainer:has(.endHandle) {
+        right: 0.5rem;
+    }
+
+}
+
+@media screen and (max-width: 620px) {
+
+    /* school year info */
+    #holidaysInfoContainer {
+        flex-direction: column;
+    }
+
+    #holidaysContainer {
+        gap: 1rem;
+    }
+
+    .singleHolidayContainer {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .holidayName::after {
+        content: ':';
+    }
+
+    /* curriculum */
     .week,
     #dayNameContainer {
         display: grid;
@@ -198,6 +241,9 @@
         font-size: 0.5rem;
     }
 
+    .holidayNameWrapper {
+        width: 100%;
+    }
 }
 
 /* generics */

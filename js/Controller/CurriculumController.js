@@ -1,4 +1,5 @@
 import View from "../View/CurriculumView.js";
+import SchoolYearView from "../View/SchoolYearView.js";
 import SchoolYearController from "./SchoolYearController.js";
 
 export default class CurriculumController {
@@ -37,13 +38,28 @@ export default class CurriculumController {
         View.createNewSubSpan(event);
     }
 
-    static saveSpan() {
+    static async saveSpan() {
         const spanId = View.getActiveSpanId();
-        View.saveSpan();
+        const spanData = View.saveSpan();
+        const editorType = View.getEditorType();
+
+        if (editorType == 'Holiday Editor') {
+            const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
+            await schoolYear.updateHoliday(spanData);
+
+            SchoolYearView.renderSchoolYearInfoSection(schoolYear);
+            View.openHolidayEditor(schoolYear);
+        }
+
+        if (editorType == 'Curriculum Editor') {
+
+        }
+
         View.deactivateSpanEditing();
         View.removeAllHandles();
         View.removeAnchorFromSpan(spanId);
         View.enableTouchActionsOnDayElements();
+
     }
 
     static async cancelSpanCreation() {

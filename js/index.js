@@ -39,7 +39,7 @@ async function startApp() {
     AbstractController.setVersion('0.9.42');
     await abstCtrl.syncData();
 
-    // await SchoolYear.writeMockupDataToDB();
+    await SchoolYear.writeMockupDataToDB();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));
     window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl));

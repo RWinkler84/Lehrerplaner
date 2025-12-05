@@ -2,11 +2,13 @@ import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
 
 export class Holiday {
+    #id;
     #name;
     #startDate;
     #endDate;
 
-    constructor(name, startDate, endDate = null) {
+    constructor(id, name, startDate, endDate = null) {
+        this.#id = id;
         this.#name = name;
         this.#startDate = new Date(startDate);
 
@@ -22,15 +24,22 @@ export class Holiday {
 
     serialize() {
         return {
+            id: this.id,
             name: this.name,
             startDate: this.startDate,
             endDate: this.endDate
         }
     }
 
+    get id() { return this.#id };
     get name() { return this.#name };
     get startDate() { return this.#startDate };
     get endDate() { return this.#endDate };
+
+    set id(value) { this.#id = value };
+    set name(value) { this.#name = value };
+    set startDate(value) { this.#startDate = new Date(value) };
+    set endDate(value) { this.#endDate = new Date(value) };
 }
 
 export default class SchoolYear extends AbstractModel {
@@ -49,12 +58,12 @@ export default class SchoolYear extends AbstractModel {
             startDate: new Date('2023-08-01'),
             endDate: new Date('2024-07-31'),
             holidays: [
-                new Holiday('Herbstferien', '2023-10-02', '2023-10-14'),
-                new Holiday('Weihnachtsferien', '2023-12-22', '2024-01-05'),
-                new Holiday('Winterferien', '2024-02-12', '2024-02-16'),
-                new Holiday('schulintern', '2024-03-01'),
-                new Holiday('Osterferien', '2024-03-23', '2024-04-06'),
-                new Holiday('Sommerferien', '2024-06-20', '2024-07-31'),
+                new Holiday(1, 'Herbstferien', '2023-10-02', '2023-10-14'),
+                new Holiday(2, 'Weihnachtsferien', '2023-12-22', '2024-01-05'),
+                new Holiday(3, 'Winterferien', '2024-02-12', '2024-02-16'),
+                new Holiday(4, 'schulintern', '2024-03-01'),
+                new Holiday(5, 'Osterferien', '2024-03-23', '2024-04-06'),
+                new Holiday(6, 'Sommerferien', '2024-06-20', '2024-07-31'),
             ],
             created: '2023-07-23',
             lastEdited: '2023-11-08',
@@ -65,12 +74,12 @@ export default class SchoolYear extends AbstractModel {
             startDate: new Date('2024-08-01'),
             endDate: new Date('2025-07-31'),
             holidays: [
-                new Holiday('Herbstferien', '2024-09-30', '2024-10-12'),
-                new Holiday('Weihnachtsferien', '2024-12-23', '2025-01-03'),
-                new Holiday('schulintern', '2025-02-14'),
-                new Holiday('Winterferien', '2025-02-03', '2025-02-08'),
-                new Holiday('Osterferien', '2025-04-07', '2025-04-19'),
-                new Holiday('Sommerferien', '2025-06-28', '2025-08-08'),
+                new Holiday(1, 'Herbstferien', '2024-09-30', '2024-10-12'),
+                new Holiday(2, 'Weihnachtsferien', '2024-12-23', '2025-01-03'),
+                new Holiday(3, 'schulintern', '2025-02-14'),
+                new Holiday(4, 'Winterferien', '2025-02-03', '2025-02-08'),
+                new Holiday(5, 'Osterferien', '2025-04-07', '2025-04-19'),
+                new Holiday(6, 'Sommerferien', '2025-06-28', '2025-08-08'),
             ],
             created: '2024-11-08',
             lastEdited: '2024-11-08',
@@ -81,21 +90,27 @@ export default class SchoolYear extends AbstractModel {
             startDate: new Date('2025-08-01'),
             endDate: new Date('2026-07-31'),
             holidays: [
-                new Holiday('Herbstferien', '2025-10-06', '2025-10-18'),
-                new Holiday('Weihnachtsferien', '2025-12-22', '2026-01-03'),
-                new Holiday('Winterferien', '2026-02-16', '2026-02-21'),
-                new Holiday('Osterferien', '2026-04-07', '2026-04-17'),
-                new Holiday('schulintern', '2026-05-14'),
-                new Holiday('Sommerferien', '2026-07-04', '2026-08-14'),
+                new Holiday(1, 'Herbstferien', '2025-10-06', '2025-10-18'),
+                new Holiday(2, 'Weihnachtsferien', '2025-12-22', '2026-01-03'),
+                new Holiday(3, 'Winterferien', '2026-02-16', '2026-02-21'),
+                new Holiday(4, 'Osterferien', '2026-04-07', '2026-04-17'),
+                new Holiday(5, 'schulintern', '2026-05-14'),
+                new Holiday(6, 'Sommerferien', '2026-07-04', '2026-08-14'),
             ],
             created: '2024-11-08',
             lastEdited: '2024-11-08',
         }
     ];
 
-    static async writeMockupDataToDB(){
+    static async writeMockupDataToDB() {
         const db = new AbstractModel();
-        const mockupData = await this.getAllSchoolYears();
+        const mockupData = [];
+
+        this.schoolYearMockup.forEach(item => {
+            let year = this.writeDataToInstance(item);
+            mockupData.push(year);
+        })
+
         mockupData.forEach(item => {
             db.writeToLocalDB('schoolYears', item.serialize());
         })
@@ -151,36 +166,60 @@ export default class SchoolYear extends AbstractModel {
         this.id = Fn.generateId(allSchoolYears);
         this.lastEdited = this.formatDateTime(new Date());
 
-        console.log(this.serialize());
-
-        this.writeToLocalDB('schoolYears', this.serialize());
+        await this.writeToLocalDB('schoolYears', this.serialize());
     }
 
-    update() { }
+    async update() {
+        this.lastEdited = this.formatDateTime(new Date());
 
-    delete() {
-
+        await this.updateOnLocalDB('schoolYears', this.serialize());
     }
 
-    saveStartAndEndDate(dates) {
+    async delete() {
+        await this.deleteFromLocalDB('schoolYears', this.id);
+    }
+
+    updateStartAndEndDate(dates) {
         this.startDate = dates.startDate;
         this.endDate = dates.endDate;
 
         this.#updateName();
+        this.update();
     }
 
-    addHoliday(holiday) {
+    // holiday instance functions
+    async addHoliday(holiday) {
         if (!(holiday instanceof Holiday)) throw new TypeError('Value is not an instance of Holiday.');
         this.#holidays.push(holiday);
+
+        this.update();
     }
 
-    removeHolidayByIndex(index) {
-        if (!this.#holidays[index]) throw new Error('Holiday not found');
-        this.#holidays.splice(index, 1);
+    async updateHoliday(holidayData) {
+        const holiday = this.getHolidayById(holidayData.id);
+        
+        holiday.name = holidayData.name;
+        holiday.startDate = holidayData.startDate;
+        holiday.endDate = holidayData.endDate;
+
+        await this.update();
     }
 
-    getHolidayByIndex(index) {
-        return this.#holidays[index];
+    async removeHolidayById(id) {
+        let matchIndex;
+
+        this.holidays.forEach((holiday, index) => {
+            if (holiday.id == id) matchIndex = index;
+        });
+
+        if (!matchIndex) throw new Error('Holiday not found');
+        this.#holidays.splice(matchIndex, 1);
+
+        this.update();
+    }
+
+    getHolidayById(id) {
+        return this.#holidays.find(holiday => { return holiday.id == id });
     }
 
     #updateName() {
@@ -222,7 +261,7 @@ export default class SchoolYear extends AbstractModel {
         if (yearData.lastEdited) { instance.lastEdited = yearData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
         if (yearData.holidays) {
             yearData.holidays.forEach(holiday => {
-                let holidayInstance = new Holiday(holiday.name, holiday.startDate, holiday.endDate);
+                let holidayInstance = new Holiday(holiday.id, holiday.name, holiday.startDate, holiday.endDate);
                 instance.#holidays.push(holidayInstance);
             });
         }
