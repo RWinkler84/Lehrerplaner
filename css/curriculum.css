@@ -23,9 +23,11 @@
     gap: 1rem;
     border: solid 1px var(--bodyBackground);
     padding: 1rem 2rem;
-    position: fixed;
+    position: sticky;
+    width: 40%;
     bottom: 1rem;
-    right: 1rem;
+    margin-top: 0.5rem;
+    left: 100%;
     background-color: var(--contentContainerBackground);
     z-index: 3;
 }
@@ -70,6 +72,10 @@
 .dayName {
     padding: 0.5rem 1rem;
     font-weight: bold;
+}
+
+.holidayName::after {
+    content: ':';
 }
 
 .day {
@@ -200,6 +206,10 @@
         right: 0.5rem;
     }
 
+    #addTimespanForm {
+        width: 60%;
+    }
+
 }
 
 @media screen and (max-width: 620px) {
@@ -210,16 +220,17 @@
     }
 
     #holidaysContainer {
-        gap: 1rem;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .singleHolidayContainer {
         flex-direction: column;
-        gap: 0;
+        gap:0;
     }
 
-    .holidayName::after {
-        content: ':';
+    .holidayDates {
+        margin-left: 1rem;
     }
 
     /* curriculum */
@@ -243,6 +254,12 @@
 
     .holidayNameWrapper {
         width: 100%;
+    }
+
+    #addTimespanForm {
+        transform: translateX(-0.5rem);
+        bottom: 0;
+        width: calc(100% + 1rem);
     }
 }
 

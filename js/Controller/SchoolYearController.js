@@ -107,7 +107,14 @@ export default class SchoolYearController {
 
     }
 
-    static cancelSchoolYearCreation() {
+    static async cancelSchoolYearCreation() {
+        const schoolYearId = View.getDisplayedSchoolYearId();
+
+        if (schoolYearId) {
+            const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
+            schoolYear.delete();
+        }
+
         View.removeHiddenFromSchoolYearSelect();
         this.renderSchoolYearInfoSection();
     }

@@ -94,7 +94,7 @@ export default class CurriculumController {
         if (editorType == 'Curriculum Editor') {
             // do something different
 
-            View.renderSchoolYearCurriculumEditor(schoolYear);
+            CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
         }
     }
 
