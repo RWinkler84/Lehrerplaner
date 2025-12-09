@@ -214,6 +214,8 @@ export default class SchoolYear extends AbstractModel {
     async removeHolidayById(id) {
         let matchIndex;
 
+        console.log(id);
+
         this.holidays.forEach((holiday, index) => {
             if (holiday.id == id) matchIndex = index;
         });
@@ -221,7 +223,7 @@ export default class SchoolYear extends AbstractModel {
         if (!matchIndex) throw new Error('Holiday not found');
         this.#holidays.splice(matchIndex, 1);
 
-        this.update();
+        await this.update();
     }
 
     getHolidayById(id) {

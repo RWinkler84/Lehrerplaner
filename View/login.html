@@ -135,12 +135,12 @@
             });
         }
 
-        function activateSpanEditing() {
+        function openSpanForm() {
             document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
             document.querySelector('#addTimespanForm').style.display = 'block';
         }
 
-        function deactivateSpanEditing() {
+        function closeSpanForm() {
             document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
             document.querySelector('#addTimespanForm').removeAttribute('style');
         }
@@ -522,20 +522,20 @@
 
         function con_createNewSpan() {
             disableTouchActionsOnDayElements();
-            activateSpanEditing();
+            openSpanForm();
             let spanId = createNewSpan(event);
             addHandlesToSpan(spanId);
         }
 
         function con_createNewSubSpan() {
-            activateSpanEditing();
+            openSpanForm();
             createNewSubSpan(event);
         }
 
         function con_saveSpan() {
             const spanId = getActiveSpanId();
             saveSpan();
-            deactivateSpanEditing();
+            closeSpanForm();
             removeAllHandles();
             removeAnchorFromSpan(spanId);
             enableTouchActionsOnDayElements();
@@ -543,7 +543,7 @@
 
         function con_cancelSpanCreation() {
             cancelSpanCreation();
-            deactivateSpanEditing();
+            closeSpanForm();
             removeAllHandles();
             enableTouchActionsOnDayElements();
 
@@ -561,7 +561,7 @@
                 }
             }
 
-            activateSpanEditing();
+            openSpanForm();
             disableTouchActionsOnDayElements();
             removeAllHandles();
             addHandlesToSpan(spanId);

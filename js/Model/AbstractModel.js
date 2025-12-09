@@ -137,7 +137,7 @@ export default class AbstractModel {
                 return new Promise(resolve => {
                     let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
                     transaction.onsuccess = () => {
-                        this.markLocalDBUpdated();
+                        this.markLocalDBUpdated(store);
                         resolve();
                     }
                 })
@@ -267,6 +267,7 @@ export default class AbstractModel {
     }
 
     async markLocalDBUpdated(store, date = null) {
+        console.log(store);
         if (date == null) date = new Date();
         let db = await this.openIndexedDB();
 
@@ -277,7 +278,8 @@ export default class AbstractModel {
                 timetable: null,
                 timetableChanges: null,
                 tasks: null,
-                lessonNotes: null
+                lessonNotes: null,
+                schoolYears: null
             }
         }
 
@@ -289,6 +291,7 @@ export default class AbstractModel {
             dataToStore.lastUpdated.timetableChanges = timestamps.lastUpdated.timetableChanges ? timestamps.lastUpdated.timetableChanges : 0;
             dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
             dataToStore.lastUpdated.lessonNotes = timestamps.lastUpdated.lessonNotes ? timestamps.lastUpdated.lessonNotes : 0;
+            dataToStore.lastUpdated.schoolYears = timestamps.lastUpdated.schoolYears ? timestamps.lastUpdated.schoolYears : 0;
         }
 
         switch (store) {
@@ -307,6 +310,8 @@ export default class AbstractModel {
             case 'lessonNotes':
                 dataToStore.lastUpdated.lessonNotes = this.formatDateTime(date);
                 break;
+            case 'schoolYears':
+                dataToStore.lastUpdated.schoolYears = this.formatDateTime(date);
         }
 
         db.transaction('settings', 'readwrite').objectStore('settings').put(dataToStore)

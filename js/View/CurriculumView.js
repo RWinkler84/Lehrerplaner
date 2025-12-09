@@ -193,16 +193,25 @@ export default class CurriculumView extends AbstractView {
         });
     }
 
-    static activateSpanEditing(spanData) {
+    static openSpanForm(spanData) {
         const form = document.querySelector('#addTimespanForm');
+        const cancelButton = form.querySelector('#cancelSpanCreationButton');
+        const deleteButton = form.querySelector('#deleteSelectedSpanButton');
+        const isNewSpan = this.getNewSpan();
 
-        form.style.display = 'flex';
+        form.querySelector('#cancelSpanCreationButton').removeAttribute('style');
+        form.querySelector('#deleteSelectedSpanButton').removeAttribute('style');
+        console.log(isNewSpan);
+
+        if (isNewSpan) deleteButton.style.display = 'none';
+        if (!isNewSpan) cancelButton.style.display = 'none';
         if (spanData) form.querySelector('input').value = spanData.name;
 
+        form.style.display = 'flex';
         document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
     }
 
-    static deactivateSpanEditing() {
+    static closeSpanForm() {
         const form = document.querySelector('#addTimespanForm');
 
         form.removeAttribute('style');
@@ -607,6 +616,7 @@ export default class CurriculumView extends AbstractView {
 
     static getNewSpan() {
         const spanElementWithNewTag = document.querySelector('.day[new]');
+        console.log(spanElementWithNewTag);
 
         if (spanElementWithNewTag) return spanElementWithNewTag;
 

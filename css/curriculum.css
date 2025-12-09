@@ -27,7 +27,7 @@
     bottom: 1rem;
     right: 1rem;
     background-color: var(--contentContainerBackground);
-    z-index: 2;
+    z-index: 3;
 }
 
 #yearContainer {
