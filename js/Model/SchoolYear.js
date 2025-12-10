@@ -26,8 +26,8 @@ export class Holiday {
         return {
             id: this.id,
             name: this.name,
-            startDate: this.startDate,
-            endDate: this.endDate
+            startDate: Fn.formatDateSqlCompatible(this.startDate),
+            endDate: Fn.formatDateSqlCompatible(this.endDate)
         }
     }
 
@@ -42,12 +42,67 @@ export class Holiday {
     set endDate(value) { this.#endDate = new Date(value) };
 }
 
+export class Curriculum {
+    #id;
+    #name;
+    #note;
+    #grade;
+    #subject;
+    #startDate;
+    #endDate;
+
+    constructor(id, name, grade, subject, startDate, endDate = null, note = null) {
+        this.#id = Number(id);
+        this.#name = name;
+        this.#grade = grade;
+        this.#subject = subject;
+        this.#startDate = new Date(startDate);
+
+        if (!endDate) {
+            this.#endDate = this.#startDate;
+        } else {
+            this.#endDate = new Date(endDate);
+        }
+
+        this.#startDate.setHours(12);
+        this.#endDate.setHours(12);
+    }
+
+    serialize() {
+        return {
+            id: this.id,
+            name: this.name,
+            grade: this.grade,
+            subject: this.subject,
+            startDate: Fn.formatDateSqlCompatible(this.startDate),
+            endDate: Fn.formatDateSqlCompatible(this.endDate),
+            note: this.note,
+        }
+    }
+
+    get id() { return this.#id };
+    get name() { return this.#name };
+    get note() { return this.#note };
+    get grade() { return this.#grade };
+    get subject() { return this.#subject };
+    get startDate() { return this.#startDate };
+    get endDate() { return this.#endDate };
+
+    set id(value) { this.#id = Number(value) };
+    set name(value) { this.#name = value };
+    set note(value) { this.#note = value };
+    set startDate(value) { this.#startDate = new Date(value) };
+    set endDate(value) { this.#endDate = new Date(value) };
+}
+
 export default class SchoolYear extends AbstractModel {
     #id;
     #startDate;
     #endDate;
     #name;
+    #grades = [];
     #holidays = [];
+    #curricula = [];
     #created;
     #lastEdited;
 
@@ -161,6 +216,9 @@ export default class SchoolYear extends AbstractModel {
         return instanceArray;
     }
 
+    ///////////////////////////////////
+    // schoolYear instance functions //
+    ///////////////////////////////////
     async save() {
         const allSchoolYears = await SchoolYear.getAllSchoolYears();
         this.id = Fn.generateId(allSchoolYears);
@@ -187,7 +245,16 @@ export default class SchoolYear extends AbstractModel {
         this.update();
     }
 
-    // holiday instance functions
+    #updateName() {
+        let startFullYear = this.startDate.getFullYear().toString();
+        let endFullYear = this.endDate.getFullYear().toString();
+
+        this.name = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
+    }
+
+    ////////////////////////////////
+    // holiday instance functions //
+    ////////////////////////////////
     async addHoliday(holidayData) {
         const holiday = new Holiday(holidayData.id, holidayData.name, holidayData.startDate, holidayData.endDate);
         this.#holidays.push(holiday);
@@ -214,8 +281,6 @@ export default class SchoolYear extends AbstractModel {
     async removeHolidayById(id) {
         let matchIndex;
 
-        console.log(id);
-
         this.holidays.forEach((holiday, index) => {
             if (holiday.id == id) matchIndex = index;
         });
@@ -230,13 +295,54 @@ export default class SchoolYear extends AbstractModel {
         return this.#holidays.find(holiday => { return holiday.id == id });
     }
 
-    #updateName() {
-        let startFullYear = this.startDate.getFullYear().toString();
-        let endFullYear = this.endDate.getFullYear().toString();
+    ///////////////////////////////////
+    // curriculum instance functions //
+    ///////////////////////////////////
+    async addCurriculum(curriculumData) {
+        const curriculum = new Curriculum(curriculumData.id, curriculumData.name, curriculumData.grade, curriculumData.subject, curriculumData.startDate, curriculumData.endDate, curriculumData.note);
+        this.#curricula.push(curriculum);
 
-        this.name = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
+        await this.update();
     }
 
+    async updateCurriculum(curriculumData) {
+        const curriculum = this.getCurriculumById(curriculumData.id);
+
+        if (!curriculum) {
+            this.addCurriculum(curriculumData);
+
+            return;
+        }
+
+        curriculum.name = curriculumData.name;
+        curriculum.grade = curriculumData.grade;
+        curriculum.subject = curriculumData.subject;
+        curriculum.startDate = curriculumData.startDate;
+        curriculum.endDate = curriculumData.endDate;
+        curriculum.note = curriculumData.note;
+
+        await this.update();
+    }
+
+    async removeCurriculumById(id) {
+        let matchIndex;
+
+        this.curricula.forEach((curriculum, index) => {
+            if (curriculum.id == id) matchIndex = index;
+        });
+
+        if (!matchIndex) throw new Error('Curriculum not found');
+        this.#curricula.splice(matchIndex, 1);
+
+        await this.update();
+    }
+
+    getCurriculumById(id) {
+        return this.curricula.find(curriculum => { return curriculum.id == id });
+    }
+
+
+    //class helper functions
     serialize() {
         const serialized = {
             id: this.id,
@@ -288,6 +394,10 @@ export default class SchoolYear extends AbstractModel {
         this.#holidays.sort((a, b) => { return a.startDate.setHours(12, 0, 0, 0) - b.startDate.setHours(12, 0, 0, 0) });
         return [...this.#holidays];
     }
+    get curricula() {
+        this.#curricula.sort((a, b) => { return a.startDate.setHours(12, 0, 0, 0) - b.startDate.setHours(12, 0, 0, 0) });
+        return [...this.#curricula];
+    }
 
     //setter
     set id(value) { this.#id = value; }
@@ -309,6 +419,9 @@ export default class SchoolYear extends AbstractModel {
 
     set holidays(value) {
         throw new Error('Holidays can only be added by calling the addHoliday method! Add one Instance of Holiday at a time.');
+    }
+    set curriculum(value) {
+        throw new Error('Curriculum entries can only be added by calling the addCurriculum method! Add one Instance of Curriculum at a time.');
     }
 }
 
