@@ -4,6 +4,20 @@
 
 /* school year info section */
 
+.gradeRow {
+    display: grid;
+    grid-auto-columns: max-content;
+    grid-auto-flow: column;
+    column-gap: 0.5rem;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.gradeRow label {
+    display: inline-block !important;
+    color: black !important;
+    font-weight: normal !important;
+}
+
 .singleHolidayContainer {
     display: flex;
     justify-content: space-between;
@@ -219,6 +233,10 @@
         flex-direction: column;
     }
 
+    #schoolYearCreationButtonsContainer {
+        flex-direction: column;
+    }
+
     #holidaysContainer {
         flex-direction: column;
         justify-content: space-between;
@@ -226,7 +244,7 @@
 
     .singleHolidayContainer {
         flex-direction: column;
-        gap:0;
+        gap: 0;
     }
 
     .holidayDates {

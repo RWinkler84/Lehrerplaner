@@ -141,6 +141,10 @@ export default class CurriculumController {
 
     }
 
+    static getEditorType() {
+        return View.getEditorType();
+    }
+
     // event handlers
     static handleClickEvents(event) {
         const spanEditOngoing = document.querySelector('div[data-span_edit_active]').dataset.span_edit_active;

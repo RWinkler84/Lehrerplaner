@@ -181,12 +181,12 @@ export default class SchoolYearView extends AbstractView {
         return selectedOptions[0].dataset.yearid;
     }
 
-    static setDisplayedSchoolYearId(id){
+    static setDisplayedSchoolYearId(id) {
         document.querySelector('#schoolYearInfoContainer').dataset.school_year_id = id;
     }
 
     static getDisplayedSchoolYearId() {
-        return document.querySelector('#schoolYearInfoContainer').dataset.school_year_id;      
+        return document.querySelector('#schoolYearInfoContainer').dataset.school_year_id;
     }
 
     static showNewSchoolYearForm() {
@@ -204,6 +204,24 @@ export default class SchoolYearView extends AbstractView {
         while (holidaysContainer.childElementCount != 1) { holidaysContainer.lastElementChild.remove() };
         div.textContent = 'Hier gibt es noch nichts zu sehen...';
         holidaysContainer.append(div);
+    }
+
+    static editTeachedGrades() {
+        const form = document.querySelector('#gradeSelectionContainer');
+
+        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.removeAttribute('disabled'));
+    }
+
+    static saveTeachedGrades() {
+        const form = document.querySelector('#gradeSelectionContainer');
+        const teachedGrades = [];
+
+        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.checked == true) teachedGrades.push(checkbox.value);
+            checkbox.setAttribute('disabled', '');
+        });
+
+        return teachedGrades;
     }
 
     //show and hide buttons
@@ -225,6 +243,12 @@ export default class SchoolYearView extends AbstractView {
     static showSchoolYearCreationButtonsContainer() {
         document.querySelector('#schoolYearCreationButtonsContainer').classList.remove('notDisplayed');
     }
+    static showEditTeachedGradesButton() {
+        document.querySelector('#editTeachedGradesButton').classList.remove('notDisplayed');
+    }
+    static showSaveTeachedGradesButton() {
+        document.querySelector('#saveTeachedGradesButton').classList.remove('notDisplayed');
+    }
 
     //hide
     static hideEditHolidayDatesButton() {
@@ -244,6 +268,12 @@ export default class SchoolYearView extends AbstractView {
     }
     static hideSchoolYearCreationButtonsContainer() {
         document.querySelector('#schoolYearCreationButtonsContainer').classList.add('notDisplayed');
+    }
+    static hideEditTeachedGradesButton() {
+        document.querySelector('#editTeachedGradesButton').classList.add('notDisplayed');
+    }
+    static hideSaveTeachedGradesButton() {
+        document.querySelector('#saveTeachedGradesButton').classList.add('notDisplayed');
     }
 
     //displayed, but hidden

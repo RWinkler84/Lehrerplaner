@@ -252,6 +252,13 @@ export default class SchoolYear extends AbstractModel {
         this.name = `${startFullYear}/${endFullYear[2]}${endFullYear[3]}`;
     }
 
+    async updateGrades(value) {
+        if (!Array.isArray(value)) throw new TypeError('The given value must be of type array!');
+
+        this.#grades = value;
+        await this.update();
+    }
+
     ////////////////////////////////
     // holiday instance functions //
     ////////////////////////////////
@@ -350,6 +357,8 @@ export default class SchoolYear extends AbstractModel {
             startDate: this.formatDate(this.startDate),
             endDate: this.formatDate(this.endDate),
             holidays: [],
+            curricula: [],
+            grades: this.grades,
             created: this.created,
             lastEdited: this.lastEdited,
         }
@@ -357,7 +366,12 @@ export default class SchoolYear extends AbstractModel {
         this.holidays.forEach(holiday => {
             let item = holiday.serialize();
             serialized.holidays.push(item);
-        })
+        });
+
+        this.curricula.forEach(curriculum => {
+            let item = curriculum.serialize();
+            serialized.curricula.push(item);
+        });
 
         return serialized;
     }
@@ -373,6 +387,7 @@ export default class SchoolYear extends AbstractModel {
         if (yearData.name) { instance.name = yearData.name; } else { instance.#updateName() };
         if (yearData.created) { instance.created = yearData.created } else { instance.created = model.formatDateTime(new Date()) };
         if (yearData.lastEdited) { instance.lastEdited = yearData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
+        if (yearData.grades) {instance.updateGrades(yearData.grades)};
         if (yearData.holidays) {
             yearData.holidays.forEach(holiday => {
                 let holidayInstance = new Holiday(holiday.id, holiday.name, holiday.startDate, holiday.endDate);
@@ -390,6 +405,7 @@ export default class SchoolYear extends AbstractModel {
     get name() { return this.#name; }
     get created() { return this.#created; }
     get lastEdited() { return this.#lastEdited; }
+    get grades() { return [...this.#grades] }
     get holidays() {
         this.#holidays.sort((a, b) => { return a.startDate.setHours(12, 0, 0, 0) - b.startDate.setHours(12, 0, 0, 0) });
         return [...this.#holidays];
@@ -404,6 +420,9 @@ export default class SchoolYear extends AbstractModel {
     set name(value) { this.#name = value; }
     set created(value) { this.#created = value; }
     set lastEdited(value) { this.#lastEdited = value; }
+    set grades(value) {
+        throw new Error('Teached grade entries can only be added by calling the updateGrades method! Provide an array with the grades as an argument.');
+    }
 
     set startDate(value) {
         let date = new Date(value);

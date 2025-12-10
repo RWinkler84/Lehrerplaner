@@ -307,11 +307,11 @@ export default class TaskView extends AbstractView {
         checkboxTr.setAttribute('data-checkboxTr', '');
         checkboxTr.innerHTML = `
             <td colspan="5" style="border-right: none;">
-                <div class="flex doubleGap">
+                <div class="flex doubleGap alignCenter">
                     <div>
                         <label><input type="checkbox" name="fixedDate" value="fixed">fester Termin?</label>
                     </div>
-                    <div class="flex reoccuringTaskContainer" >
+                    <div class="flex alignCenter reoccuringTaskContainer" >
                         <label><input type="checkbox" name="reoccuringTask" value="reoccuring">wiederholen?</label>
                         <div class="alertRing">
                             <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
