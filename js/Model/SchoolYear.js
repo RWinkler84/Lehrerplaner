@@ -26,8 +26,8 @@ export class Holiday {
         return {
             id: this.id,
             name: this.name,
-            startDate: Fn.formatDateSqlCompatible(this.startDate),
-            endDate: Fn.formatDateSqlCompatible(this.endDate)
+            startDate: this.startDate,
+            endDate: this.endDate
         }
     }
 
@@ -230,6 +230,8 @@ export default class SchoolYear extends AbstractModel {
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
 
+        console.trace()
+
         await this.updateOnLocalDB('schoolYears', this.serialize());
     }
 
@@ -387,7 +389,7 @@ export default class SchoolYear extends AbstractModel {
         if (yearData.name) { instance.name = yearData.name; } else { instance.#updateName() };
         if (yearData.created) { instance.created = yearData.created } else { instance.created = model.formatDateTime(new Date()) };
         if (yearData.lastEdited) { instance.lastEdited = yearData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
-        if (yearData.grades) {instance.updateGrades(yearData.grades)};
+        if (yearData.grades) { yearData.grades.forEach(grade => instance.#grades.push(grade)); };
         if (yearData.holidays) {
             yearData.holidays.forEach(holiday => {
                 let holidayInstance = new Holiday(holiday.id, holiday.name, holiday.startDate, holiday.endDate);

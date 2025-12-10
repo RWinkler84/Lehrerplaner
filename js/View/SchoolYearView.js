@@ -17,6 +17,11 @@ export default class SchoolYearView extends AbstractView {
         schoolYearSelect.append(await this.getSchoolYearSelectHTML(schoolYear));
         holidaysContainer.append(this.getHolidayDatesHTML(schoolYear));
 
+        //selected teached grades
+        infoContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (schoolYear.grades.includes(checkbox.value)) checkbox.checked = true;
+        })
+
         if (!schoolYear) return;
         infoContainer.dataset.school_year_id = schoolYear.id;
 

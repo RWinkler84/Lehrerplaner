@@ -201,7 +201,6 @@ export default class CurriculumView extends AbstractView {
 
         form.querySelector('#cancelSpanCreationButton').removeAttribute('style');
         form.querySelector('#deleteSelectedSpanButton').removeAttribute('style');
-        console.log(isNewSpan);
 
         if (isNewSpan) deleteButton.style.display = 'none';
         if (!isNewSpan) cancelButton.style.display = 'none';
@@ -616,7 +615,6 @@ export default class CurriculumView extends AbstractView {
 
     static getNewSpan() {
         const spanElementWithNewTag = document.querySelector('.day[new]');
-        console.log(spanElementWithNewTag);
 
         if (spanElementWithNewTag) return spanElementWithNewTag;
 
