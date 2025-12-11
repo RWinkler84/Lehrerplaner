@@ -192,7 +192,7 @@ export default class SettingsController {
         View.openSettings();
     }
 
-    static settingsClickEventHandler(event) {
+    static async settingsClickEventHandler(event) {
         let target = event.target.id;
 
         if (event.target.closest('#schoolYearInfoContainer')) SchoolYearController.clickEventHandler(event);
@@ -208,8 +208,8 @@ export default class SettingsController {
                 break;
             
             case 'openSchoolYearSettingsButton':
-                View.openCurriculumEditor();
-                SchoolYearController.renderSchoolYearInfoSection();
+                await SchoolYearController.renderSchoolYearInfoSection();
+                View.openSchoolYearSettings();
                 break
 
             case 'openAccountSettingsButton':

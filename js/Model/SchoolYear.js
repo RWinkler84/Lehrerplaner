@@ -230,8 +230,6 @@ export default class SchoolYear extends AbstractModel {
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
 
-        console.trace()
-
         await this.updateOnLocalDB('schoolYears', this.serialize());
     }
 

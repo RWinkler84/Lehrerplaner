@@ -608,7 +608,7 @@ export default class SettingsView {
         document.querySelector('#timetableSettingsContainer').style.display = 'block';
     }
 
-    static openCurriculumEditor() {
+    static openSchoolYearSettings() {
         document.querySelector('#openAccountSettingsButton').classList.remove('selected');
         document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
         document.querySelector('#openSchoolYearSettingsButton').classList.add('selected');

@@ -1,6 +1,6 @@
-import SchoolYear from "../Model/SchoolYear.js";
 import View from "../View/CurriculumView.js";
 import SchoolYearView from "../View/SchoolYearView.js";
+import LessonController from "./LessonController.js";
 import SchoolYearController from "./SchoolYearController.js";
 
 export default class CurriculumController {
@@ -143,6 +143,10 @@ export default class CurriculumController {
 
     static getEditorType() {
         return View.getEditorType();
+    }
+
+    static async getAllSubjects() {
+        return await LessonController.getAllSubjects();
     }
 
     // event handlers

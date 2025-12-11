@@ -163,6 +163,10 @@ export default class CurriculumView extends AbstractView {
 
     }
 
+    static async getSubjectAndGradSelectHTML(schoolYear) {
+        const subjects = await Controller.getAllSubjects()
+    }
+
     static async markHolidays(schoolYear, allDays) {
         const dayLookup = {};
         const div = document.createElement('div');
