@@ -44,19 +44,73 @@ export class Holiday {
 
 export class Curriculum {
     #id;
-    #name;
-    #note;
     #grade;
     #subject;
+    #curriculumSpans = [];
+
+    constructor(id, grade, subject, curriculumSpans = null) {
+        this.#id = Number(id);
+        this.#grade = grade;
+        this.#subject = subject;
+
+        if (curriculumSpans) {
+            curriculumSpans.forEach(span => {
+                this.addSpan(span);
+            })
+        }
+    }
+
+    addSpan(spanInstance) {
+        if (!spanInstance instanceof CurriculumSpan) throw new TypeError('The given argument is not of type CurriculumSpan!');
+
+        this.#curriculumSpans.push(spanInstance);
+    }
+
+    serialize() {
+        const serialized = {
+            id: this.id,
+            grade: this.grade,
+            subject: this.subject,
+            curriculumSpans: []
+        }
+
+        this.curriculumSpans.forEach(span => {
+            serialized.curriculumSpans.push(span.serialize());
+        })
+
+        return serialized;
+    }
+
+    get id() { return this.#id };
+    get grade() { return this.#grade };
+    get subject() { return this.#subject };
+    get curriculumSpans() {
+        const spans = [];
+        this.#curriculumSpans.forEach(span => {
+            const spanInstance = new CurriculumSpan(span.id, span.name, span.startDate, span.endDate, span.note);
+            spans.push(spanInstance);
+        });
+
+        return spans;
+    }
+
+    set curriculumSpans(value) {
+        throw new Error('Curriculum span entries can only be added by calling the addSpan method! Add one instance of a span at a time.');
+    }
+}
+
+export class CurriculumSpan {
+    #id;
+    #name;
+    #note;
     #startDate;
     #endDate;
 
-    constructor(id, name, grade, subject, startDate, endDate = null, note = null) {
+    constructor(id, name, startDate, endDate = null, note = null) {
         this.#id = Number(id);
         this.#name = name;
-        this.#grade = grade;
-        this.#subject = subject;
         this.#startDate = new Date(startDate);
+        this.#note = note;
 
         if (!endDate) {
             this.#endDate = this.#startDate;
@@ -72,27 +126,23 @@ export class Curriculum {
         return {
             id: this.id,
             name: this.name,
-            grade: this.grade,
-            subject: this.subject,
-            startDate: Fn.formatDateSqlCompatible(this.startDate),
-            endDate: Fn.formatDateSqlCompatible(this.endDate),
-            note: this.note,
+            startDate: this.startDate,
+            endDate: this.endDate,
+            note: this.note
         }
     }
 
     get id() { return this.#id };
     get name() { return this.#name };
-    get note() { return this.#note };
-    get grade() { return this.#grade };
-    get subject() { return this.#subject };
     get startDate() { return this.#startDate };
     get endDate() { return this.#endDate };
+    get note() { return this.#note };
 
     set id(value) { this.#id = Number(value) };
     set name(value) { this.#name = value };
-    set note(value) { this.#note = value };
     set startDate(value) { this.#startDate = new Date(value) };
     set endDate(value) { this.#endDate = new Date(value) };
+    set note(value) { this.#note = value; }
 }
 
 export default class SchoolYear extends AbstractModel {
@@ -151,6 +201,17 @@ export default class SchoolYear extends AbstractModel {
                 new Holiday(4, 'Osterferien', '2026-04-07', '2026-04-17'),
                 new Holiday(5, 'schulintern', '2026-05-14'),
                 new Holiday(6, 'Sommerferien', '2026-07-04', '2026-08-14'),
+            ],
+            grades: ["7", "9", "10"],
+            curricula: [
+                new Curriculum(1, 7, 'Fra', [
+                    new CurriculumSpan(1, 'Napoleon', '2025-08-11', '2025-08-20'),
+                    new CurriculumSpan(2, 'Deutscher Bund', '2025-08-21', '2025-08-31'),
+                ]),
+                new Curriculum(2, 9, 'De', [
+                    new CurriculumSpan(1, 'Satzglieder', '2025-08-11', '2025-08-20'),
+                    new CurriculumSpan(2, 'Substantive', '2025-08-21', '2025-08-31'),
+                ]),
             ],
             created: '2024-11-08',
             lastEdited: '2024-11-08',
@@ -394,6 +455,12 @@ export default class SchoolYear extends AbstractModel {
                 instance.#holidays.push(holidayInstance);
             });
         }
+        if (yearData.curricula) {
+            yearData.curricula.forEach(curriculum => {
+                let curriculumInstance = new Curriculum(curriculum.id, curriculum.grade, curriculum.subject, curriculum.curriculumSpans);
+                instance.#curricula.push(curriculumInstance);
+            });
+        }
 
         return instance;
     }
@@ -410,10 +477,7 @@ export default class SchoolYear extends AbstractModel {
         this.#holidays.sort((a, b) => { return a.startDate.setHours(12, 0, 0, 0) - b.startDate.setHours(12, 0, 0, 0) });
         return [...this.#holidays];
     }
-    get curricula() {
-        this.#curricula.sort((a, b) => { return a.startDate.setHours(12, 0, 0, 0) - b.startDate.setHours(12, 0, 0, 0) });
-        return [...this.#curricula];
-    }
+    get curricula() { return [...this.#curricula]; }
 
     //setter
     set id(value) { this.#id = value; }

@@ -5,6 +5,7 @@ import Controller from '../Controller/CurriculumController.js';
 export default class CurriculumView extends AbstractView {
     static renderEmptyCalendar(startDate = null, endDate = null) {
         const yearContainer = document.querySelector('#yearContainer');
+        const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const editorNameSpan = document.querySelector('#editorNameSpan');
 
         if (startDate && startDate instanceof Date == false) startDate = new Date(startDate);
@@ -12,6 +13,10 @@ export default class CurriculumView extends AbstractView {
 
         while (yearContainer.firstElementChild) {
             yearContainer.firstElementChild.remove();
+        }
+
+        while (curriculumSelectionContainer.firstElementChild) {
+            curriculumSelectionContainer.firstElementChild.remove();
         }
 
         editorNameSpan.textContent = 'Stoffverteilungsplan';
@@ -150,21 +155,134 @@ export default class CurriculumView extends AbstractView {
         document.querySelector('#closeHolidayEditorButton').classList.add('notDisplayed');
     }
 
-    static renderSchoolYearCurriculumEditor(schoolYear) {
+    static async renderSchoolYearCurriculumEditor(schoolYear, curriculumId = null) {
+        const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const yearContainer = document.querySelector('#yearContainer');
         const allDays = yearContainer.querySelectorAll('.day');
+        const curriculumElements = await this.getSchoolYearCurriculumElements(schoolYear);
+        const dayNameContainer = document.querySelector('#dayNameContainer');
 
         yearContainer.classList.remove('holidayEditor');
         yearContainer.classList.add('curriculumEditor');
 
         document.querySelector('#editorNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
-        this.markHolidays(schoolYear, allDays);
-        // get the curriculum from the database and render every single span...this is not going to be fun
 
+        if (!curriculumElements) {
+            const div = document.createElement('div');
+            div.classList.add('marginTop');
+            div.textContent = 'Du hast für dieses Schuljahr noch keine Stoffverteilungspläne angelegt.';
+
+            curriculumSelectionContainer.append(div);
+            dayNameContainer.setAttribute('style', 'display: none');
+
+            return;
+        }
+
+        curriculumSelectionContainer.append(curriculumElements);
+
+        this.markHolidays(schoolYear, allDays);
+
+        if (!curriculumId) {
+            schoolYear.curricula[0].curriculumSpans.forEach(span => {
+                this.renderSpan(span.id, span);
+                this.renderSpanContentContainer(span.id, span);
+            });
+
+            document.querySelector('#curriculumContainer').dataset.curriculumid = schoolYear.curricula[0].id;
+            document.querySelector(`.curriculumSelectionItem[data-curriculumid="${schoolYear.curricula[0].id}"]`).classList.add('selected');
+
+            return;
+        }
+
+        const curriculumToRender = schoolYear.curricula.find(entry => { return entry.id == curriculumId });
+
+        curriculumToRender.curriculumSpans.forEach(span => {
+            this.renderSpan(span.id, span);
+            this.renderSpanContentContainer(span.id, span);
+        });
+
+        document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
+        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+    }
+
+    static async getSchoolYearCurriculumElements(schoolYear) {
+        if (schoolYear.curricula.length == 0) return false;
+
+        const subjects = await Controller.getAllSubjects();
+        const blankDiv = document.createElement('div');
+        const fragment = document.createDocumentFragment();
+
+        schoolYear.curricula.forEach(item => {
+            const container = blankDiv.cloneNode();
+            const curriculumName = blankDiv.cloneNode();
+            const subject = subjects.find(subject => { return item.subject == subject.subject });
+
+            container.dataset.curriculumid = item.id;
+            container.classList.add('curriculumSelectionItem');
+            container.classList.add(subject.colorCssClass);
+
+            curriculumName.textContent = `Klasse ${item.grade} ${item.subject}`;
+
+            container.append(curriculumName);
+            fragment.append(container);
+        });
+
+        return fragment;
     }
 
     static async getSubjectAndGradSelectHTML(schoolYear) {
-        const subjects = await Controller.getAllSubjects()
+        const subjects = await Controller.getAllSubjects();
+
+        if (schoolYear.grades.length == 0 || subjects.length == 0) return false;
+
+        const fragment = document.createDocumentFragment();
+        const blankSelect = document.createElement('select');
+        const blankOption = document.createElement('option');
+        const blankDiv = document.createElement('div');
+        const blankLabel = document.createElement('label');
+
+        // prepare the elements and structure
+        const gradeSelect = blankSelect.cloneNode();
+        const subjectSelect = blankSelect.cloneNode();
+        const gradeLabel = blankLabel.cloneNode();
+        const subjectLabel = blankLabel.cloneNode();
+        const gradeSelectContainer = blankDiv.cloneNode();
+        const subjectSelectContainer = blankDiv.cloneNode();
+
+        gradeSelect.setAttribute('id', 'curriculumGradeSelect');
+        subjectSelect.setAttribute('id', 'curriculumSubjectSelect');
+        gradeSelectContainer.setAttribute('id', 'gradeSelectContainer');
+        subjectSelectContainer.setAttribute('id', 'subjectSelectContainer');
+
+        gradeLabel.textContent = 'Klassenstufe:';
+        subjectLabel.textContent = 'Fach:';
+
+        gradeSelectContainer.append(gradeLabel);
+        gradeSelectContainer.append(gradeSelect);
+        subjectSelectContainer.append(subjectLabel);
+        subjectSelectContainer.append(subjectSelect);
+
+        // create the select options and add them
+        schoolYear.grades.forEach(grade => {
+            const option = blankOption.cloneNode();
+            option.setAttribute('value', grade);
+            option.textContent = grade;
+
+            gradeSelect.append(option);
+        });
+
+        subjects.forEach(entry => {
+            const option = blankOption.cloneNode();
+            option.setAttribute('value', entry.subject);
+            option.textContent = entry.subject;
+
+            subjectSelect.append(option);
+        });
+
+        fragment.append(gradeSelectContainer);
+        fragment.append(subjectSelectContainer);
+
+        return fragment;
     }
 
     static async markHolidays(schoolYear, allDays) {
@@ -623,5 +741,9 @@ export default class CurriculumView extends AbstractView {
         if (spanElementWithNewTag) return spanElementWithNewTag;
 
         return false;
+    }
+
+    static getDisplayedCurriculumId() {
+        return document.querySelector('#curriculumContainer').dataset.curriculumid;
     }
 }

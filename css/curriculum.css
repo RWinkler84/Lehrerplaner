@@ -60,6 +60,33 @@
 
 }
 
+.curriculumSelectionItem {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.5rem;
+    border: 2px solid var(--contentContainerBackground);
+    border-radius: var(--standardRadius);
+    color: var(--lighterText);
+    box-sizing: content-box;
+    cursor: default;
+}
+
+.curriculumSelectionItem.selected,
+.curriculumSelectionItem:hover {
+    border: solid 2px var(--lightMatteGreen);
+}
+
+.curriculumSelectionItem div {
+    pointer-events: none;
+}
+
+#curriculumSelectionContainer {
+    display: flex;
+    gap: 1rem;
+    padding: 0 0 1rem;
+}
+
 .week,
 #dayNameContainer {
     display: grid;

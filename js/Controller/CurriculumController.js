@@ -1,5 +1,4 @@
 import View from "../View/CurriculumView.js";
-import SchoolYearView from "../View/SchoolYearView.js";
 import LessonController from "./LessonController.js";
 import SchoolYearController from "./SchoolYearController.js";
 
@@ -10,11 +9,19 @@ export default class CurriculumController {
         View.closeSpanForm();
     }
 
-    static async renderSchoolYearCurriculumEditor(schoolYear = null) {
+    static async renderSchoolYearCurriculumEditor(schoolYear = null, curriculumId = null) {
         if (!schoolYear) schoolYear = await SchoolYearController.getCurrentSchoolYear()
 
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
-        View.renderSchoolYearCurriculumEditor(schoolYear);
+        View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
+    }
+
+    static async changeDisplayedCurriculum(event) {
+        const curriculumId = event.target.dataset.curriculumid;
+        const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+        const schoolYear = await this.getSchoolYearById(schoolYearId);
+
+        this.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
     }
 
     static openHolidayEditor(schoolYear) {
@@ -48,7 +55,7 @@ export default class CurriculumController {
             const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
             await schoolYear.updateHoliday(spanData);
 
-            SchoolYearView.renderSchoolYearInfoSection(schoolYear);
+            SchoolYearController.renderSchoolYearInfoSection(schoolYear.id);
             View.openHolidayEditor(schoolYear);
         }
 
@@ -175,6 +182,13 @@ export default class CurriculumController {
                     if (spanEditOngoing == 'false') CurriculumController.selectSpan(event);
                     break;
             }
+        }
+
+        //handle clicks on curriculum selection elements
+
+        if (classList.contains('curriculumSelectionItem')) {
+            if (classList.contains('selected')) return;
+            CurriculumController.changeDisplayedCurriculum(event);
         }
 
         //handle clicks on buttons
