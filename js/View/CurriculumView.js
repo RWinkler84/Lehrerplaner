@@ -226,14 +226,26 @@ export default class CurriculumView extends AbstractView {
 
         const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
-        curriculumToRender.curriculumSpans.forEach(span => {
-            this.renderSpan(span.id, span);
-            this.renderSpanContentContainer(span.id, span);
-        });
+        if (curriculumToRender) {
+            curriculumToRender.curriculumSpans.forEach(span => {
+                this.renderSpan(span.id, span);
+                this.renderSpanContentContainer(span.id, span);
+            });
+
+            document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+        }
 
         document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
-        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+    }
 
+    static async renderCurriculumSubjectAndGradeSelect(schoolYear) {
+        const selectContainer = document.querySelector('#curriculumSelectionContainer');
+
+        while (selectContainer.firstElementChild) {
+            selectContainer.firstElementChild.remove();
+        }
+
+        selectContainer.append(await this.getSubjectAndGradSelectHTML(schoolYear));
     }
 
     static async getSchoolYearCurriculumElements(schoolYear) {
@@ -717,6 +729,22 @@ export default class CurriculumView extends AbstractView {
 
             i++
         } while (i <= endWeekNumber)
+    }
+
+    //show buttons
+    static showCreateCurriculumButton() {
+        document.querySelector('#createCurriculumButton').classList.remove('notDisplayed');
+    }
+    static showSaveCancelNewCurriculumButtonContainer() {
+        document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.remove('notDisplayed')
+    }
+
+    //hide buttons
+    static hideCreateCurriculumButton() {
+        document.querySelector('#createCurriculumButton').classList.add('notDisplayed');
+    }
+    static hidSaveCancelNewCurriculumButtonContainer() {
+        document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.add('notDisplayed')
     }
 
     //helper function

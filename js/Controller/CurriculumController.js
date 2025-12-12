@@ -1,12 +1,14 @@
 import View from "../View/CurriculumView.js";
 import LessonController from "./LessonController.js";
 import SchoolYearController from "./SchoolYearController.js";
+import Fn from "../inc/utils.js";
 
 export default class CurriculumController {
     static renderEmptyCalendar(startDate, endDate) {
         View.renderEmptyCalendar(startDate, endDate);
         View.cancelSpanCreation();
         View.closeSpanForm();
+        View.hideCreateCurriculumButton();
     }
 
     static async renderSchoolYearCurriculumEditor(schoolYear = null, curriculumId = null) {
@@ -14,6 +16,7 @@ export default class CurriculumController {
 
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
         View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
+        View.showCreateCurriculumButton();
     }
 
     static async rerenderDisplayedCurriculum(event) {
@@ -28,6 +31,7 @@ export default class CurriculumController {
     static openHolidayEditor(schoolYear) {
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate);
         View.openHolidayEditor(schoolYear);
+        View.hideCreateCurriculumButton();
     }
 
     static closeHolidayEditor() {
@@ -35,6 +39,40 @@ export default class CurriculumController {
         this.renderSchoolYearCurriculumEditor()
     }
 
+    /////////////////////////
+    // curriculum creation //
+    /////////////////////////
+    static async createNewCurriculum() {
+        const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+        const schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId);
+        const newCurriculumId = Fn.generateId(schoolYear.curricula);
+
+        View.hideCreateCurriculumButton();
+        
+        View.showSaveCancelNewCurriculumButtonContainer();
+        View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
+        View.renderCurriculumSubjectAndGradeSelect(schoolYear);
+    }
+
+    static async saveNewCurriculum() {
+        // saving is not necessary because all changes are already saved
+        // just rerender the view
+    }
+
+    static async cancelCurriculumCreation() {
+        const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+        const schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId);
+        const curriculumId = View.getDisplayedCurriculumId();
+
+        //remove Curriculum by id
+
+        View.hidSaveCancelNewCurriculumButtonContainer();
+        this.renderSchoolYearCurriculumEditor(schoolYear);
+    }
+
+    ///////////////////////
+    // span manipulation //
+    ///////////////////////
     static createNewSpan(event) {
         View.disableTouchActionsOnDayElements();
         let spanId = View.createNewSpan(event);
@@ -134,6 +172,9 @@ export default class CurriculumController {
         View.modifySpanRange(event)
     }
 
+    /////////////////////
+    //helper functions //
+    /////////////////////
     static async getSchoolYearById(id) {
         return await SchoolYearController.getSchoolYearById(id);
     }
@@ -199,9 +240,23 @@ export default class CurriculumController {
 
         //handle clicks on buttons
         switch (event.target.id) {
+            //curriculum creation
+            case 'createCurriculumButton':
+                CurriculumController.createNewCurriculum();
+                break;
+            case 'saveNewCurriculumButton':
+                CurriculumController.saveNewCurriculum();
+                break;
+            case 'cancelNewCurriculumButton':
+                CurriculumController.cancelCurriculumCreation();
+                break;
+            
+            //holiday editor
             case 'closeHolidayEditorButton':
                 CurriculumController.closeHolidayEditor();
                 break;
+            
+            //span form buttons
             case 'saveSpanCreationButton':
                 CurriculumController.saveSpan();
                 break;
@@ -221,6 +276,17 @@ export default class CurriculumController {
             case classList.contains('handleContainer'):
                 CurriculumController.modifySpanRange(event);
                 break;
+        }
+    }
+
+    static changeEventHandler(event) {
+        const target = event.target;
+
+        switch (target.id) {
+            case 'curriculumGradeSelect':
+            case 'curriculumSubjectSelect':
+
+            break;
         }
     }
 }

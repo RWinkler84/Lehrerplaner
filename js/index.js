@@ -84,11 +84,12 @@ async function startApp() {
     //handlers for settings
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
-    
-    //school year info
-    document.querySelector('#schoolYearInfoContainer').addEventListener('change', SchoolYearController.changeEventHandler);
 
-    //curriculum 
+    //school year info and curriculum
+    document.querySelector('#curriculumViewContainer').addEventListener('change', (event) => {
+        SchoolYearController.changeEventHandler(event);
+        CurriculumController.changeEventHandler(event);
+    });
     document.querySelector('#curriculumContainer').addEventListener('click', CurriculumController.handleClickEvents);
     document.querySelector('#yearContainer').addEventListener('pointerdown', CurriculumController.handleMouseDownOnDayElements);
 

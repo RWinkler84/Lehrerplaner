@@ -466,9 +466,9 @@
                             </div>
                             <div class="flex justifyEnd alignEnd">
                                 <button id="editSchoolYearDatesButton"
-                                    class="confirmationButton notDisplayed">bearbeiten</button>
+                                    class="confirmationButton notDisplayed">Bearbeiten</button>
                                 <button id="saveSchoolYearDatesButton"
-                                    class="confirmationButton notDisplayed">speichern</button>
+                                    class="confirmationButton notDisplayed">Speichern</button>
                             </div>
                         </div>
 
@@ -476,7 +476,8 @@
                             <label style="margin-bottom: 0.5rem;">unterrichtete Klassenstufen:</label>
                             <div class="flex column spaceBetween growEqually doubleGap">
                                 <div class="flex column halfGap">
-                                    <div class="nothingToSee notDisplayed">Hier gibt es noch nichts zu sehen. Lege zuerst die Rahmendaten des Schuljahres fest.</div>
+                                    <div class="nothingToSee notDisplayed">Hier gibt es noch nichts zu sehen. Lege
+                                        zuerst die Rahmendaten des Schuljahres fest.</div>
                                     <div class="gradeRow">
                                         <label><input type="checkbox" value="1" disabled>1</label>
                                         <label><input type="checkbox" value="2" disabled>2</label>
@@ -498,8 +499,9 @@
                                     </div>
                                 </div>
                                 <div class="flex justifyEnd alignEnd">
-                                    <button id="editTeachedGradesButton" class="confirmationButton">bearbeiten</button>
-                                    <button id="saveTeachedGradesButton" class="confirmationButton notDisplayed">speichern</button>
+                                    <button id="editTeachedGradesButton" class="confirmationButton">Bearbeiten</button>
+                                    <button id="saveTeachedGradesButton"
+                                        class="confirmationButton notDisplayed">Speichern</button>
                                 </div>
                             </div>
                         </div>
@@ -510,9 +512,9 @@
                             </div>
                             <div class="flex justifyEnd alignEnd">
                                 <button id="editHolidayDatesButton"
-                                    class="confirmationButton notDisplayed">bearbeiten</button>
+                                    class="confirmationButton notDisplayed">Bearbeiten</button>
                                 <button id="createHolidayDatesButton"
-                                    class="confirmationButton notDisplayed">anlegen</button>
+                                    class="confirmationButton notDisplayed">Anlegen</button>
                             </div>
                         </div>
                     </div>
@@ -522,58 +524,65 @@
                 <div id="curriculumContainer" data-curriculumid>
                     <div class="marginBottom flex spaceBetween">
                         <label><span id="editorNameSpan">Jahresübersicht</span>:</label>
+                        <button id="createCurriculumButton" class="confirmationButton">Plan anlegen</button>
+                        <div id="saveCancelNewCurriculumButtonContainer" class="notDisplayed">
+                            <button id="saveNewCurriculumButton" class="confirmationButton">Plan speichern</button>
+                            <button id="cancelNewCurriculumButton" class="cancelButton">Abbrechen</button>
+                        </div>
                         <button id="closeHolidayEditorButton" class="cancelButton notDisplayed">schließen</button>
                     </div>
-                    <div id="curriculumSelectionContainer"></div>
-                    <div id="dayNameContainer" style="display: none;">
-                        <div class="dayName">Mo</div>
-                        <div class="dayName">Di</div>
-                        <div class="dayName">Mi</div>
-                        <div class="dayName">Do</div>
-                        <div class="dayName">Fr</div>
-                        <div class="dayName" data-weekdaynumber="6">Sa</div>
-                        <div class="dayName" data-weekdaynumber="0">So</div>
-                    </div>
-                    <div data-span_edit_active="false"></div>
-                    <div id="yearContainer" class="curriculumEditor">
-                    </div>
-                    <div id="addTimespanForm">
-                        <div class="flex column">
-                            <label for="topic">Beschreibung:</label>
-                            <input type="text" name="topic" id="topicInput">
+                    <div>
+                        <div id="curriculumSelectionContainer"></div>
+                        <div id="dayNameContainer" style="display: none;">
+                            <div class="dayName">Mo</div>
+                            <div class="dayName">Di</div>
+                            <div class="dayName">Mi</div>
+                            <div class="dayName">Do</div>
+                            <div class="dayName">Fr</div>
+                            <div class="dayName" data-weekdaynumber="6">Sa</div>
+                            <div class="dayName" data-weekdaynumber="0">So</div>
                         </div>
-                        <div id="cancelSpanCreationButtonContainer" class="flex halfGap justifyEnd">
-                            <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
-                            <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
-                            <button id="deleteSelectedSpanButton" class="cancelButton">Löschen</button>
+                        <div data-span_edit_active="false"></div>
+                        <div id="yearContainer" class="curriculumEditor">
+                        </div>
+                        <div id="addTimespanForm">
+                            <div class="flex column">
+                                <label for="topic">Beschreibung:</label>
+                                <input type="text" name="topic" id="topicInput">
+                            </div>
+                            <div id="cancelSpanCreationButtonContainer" class="flex halfGap justifyEnd">
+                                <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
+                                <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
+                                <button id="deleteSelectedSpanButton" class="cancelButton">Löschen</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- account settings -->
-            <div id="accountSettingsContainer" style="display: none;" class="settingsSubContainer">
-                <div id="deleteAccountContainer">
-                    <label>Konto löschen:</label>
-                    <div id="requestDeletionContainer">
-                        <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt.</p>
-                        <button id="deleteAccountButton" class="cancelButton">Konto löschen</button>
+                <!-- account settings -->
+                <div id="accountSettingsContainer" style="display: none;" class="settingsSubContainer">
+                    <div id="deleteAccountContainer">
+                        <label>Konto löschen:</label>
+                        <div id="requestDeletionContainer">
+                            <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt.</p>
+                            <button id="deleteAccountButton" class="cancelButton">Konto löschen</button>
+                        </div>
+                        <div id="approveAccountDeletionContainer">
+                            <p>Bitte bestätige, dass du dein Konto endgültig löschen möchtest. Dieser Schritt kann nicht
+                                rückgängig gemacht werden!</p>
+                            <button id="approveAccountDeletionButton" class="confirmationButton">Bestätigen</button>
+                            <button id="cancelAccountDeletionButton" class="cancelButton">Abbrechen</button>
+                        </div>
+                        <div id="deletionErrorDisplay">
+                            <p>Etwas ist schief gelaufen. Bitte versuche es später noch einmal.</p>
+                            <button id="cancelFailedAccountDeletionButton" class="cancelButton">zurück</button>
+                        </div>
                     </div>
-                    <div id="approveAccountDeletionContainer">
-                        <p>Bitte bestätige, dass du dein Konto endgültig löschen möchtest. Dieser Schritt kann nicht
-                            rückgängig gemacht werden!</p>
-                        <button id="approveAccountDeletionButton" class="confirmationButton">Bestätigen</button>
-                        <button id="cancelAccountDeletionButton" class="cancelButton">Abbrechen</button>
-                    </div>
-                    <div id="deletionErrorDisplay">
-                        <p>Etwas ist schief gelaufen. Bitte versuche es später noch einmal.</p>
-                        <button id="cancelFailedAccountDeletionButton" class="cancelButton">zurück</button>
-                    </div>
+                    <div id="versionDisplay"></div>
                 </div>
-                <div id="versionDisplay"></div>
-            </div>
 
-        </div>
+            </div>
+        </div>    
     </settings>
 
     <!-- dialogs -->
