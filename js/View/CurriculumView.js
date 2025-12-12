@@ -208,7 +208,7 @@ export default class CurriculumView extends AbstractView {
         document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
     }
 
-    static changeDisplayedCurriculum(schoolYear, curriculumId) {
+    static rerenderDisplayedCurriculum(schoolYear, curriculumId) {
         const yearContainer = document.querySelector('#yearContainer');
 
         document.querySelectorAll('.curriculumSelectionItem').forEach(item => item.classList.remove('selected'));

@@ -16,12 +16,13 @@ export default class CurriculumController {
         View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
     }
 
-    static async changeDisplayedCurriculum(event) {
+    static async rerenderDisplayedCurriculum(event) {
         const curriculumId = event.target.dataset.curriculumid;
         const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
         const schoolYear = await this.getSchoolYearById(schoolYearId);
 
-        View.changeDisplayedCurriculum(schoolYear, curriculumId);
+        View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
+        View.removeAllHandles();
     }
 
     static openHolidayEditor(schoolYear) {
@@ -50,9 +51,9 @@ export default class CurriculumController {
         const spanId = View.getActiveSpanId();
         const spanData = View.saveSpan();
         const editorType = View.getEditorType();
+        const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
 
         if (editorType == 'Holiday Editor') {
-            const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
             await schoolYear.updateHoliday(spanData);
 
             SchoolYearController.renderSchoolYearInfoSection(schoolYear.id, false);
@@ -60,7 +61,9 @@ export default class CurriculumController {
         }
 
         if (editorType == 'Curriculum Editor') {
-
+            const curriculumId = View.getDisplayedCurriculumId();
+            await schoolYear.updateCurriculumSpan(curriculumId, spanData);
+            View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
         }
 
         View.closeSpanForm();
@@ -191,7 +194,7 @@ export default class CurriculumController {
 
         if (classList.contains('curriculumSelectionItem')) {
             if (classList.contains('selected')) return;
-            CurriculumController.changeDisplayedCurriculum(event);
+            CurriculumController.rerenderDisplayedCurriculum(event);
         }
 
         //handle clicks on buttons

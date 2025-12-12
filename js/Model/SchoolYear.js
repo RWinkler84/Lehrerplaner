@@ -54,20 +54,40 @@ export class Curriculum {
         this.#subject = subject;
 
         if (curriculumSpans) {
-            curriculumSpans.forEach(span => {
-                this.addSpan(span);
+            curriculumSpans.forEach(spanData => {
+                const spanInstance = new CurriculumSpan(spanData.id, spanData.name, spanData.startDate, spanData.endDate, spanData.note);
+                this.addCurriculumSpan(spanInstance);
             })
         }
     }
 
-    addSpan(spanInstance) {
+    addCurriculumSpan(spanInstance) {
         if (!spanInstance instanceof CurriculumSpan) throw new TypeError('The given argument is not of type CurriculumSpan!');
 
         this.#curriculumSpans.push(spanInstance);
     }
 
+    updateCurriculumSpan(spanData) {
+        const span = this.getCurriculumSpanById(spanData.id);
+
+        if (!span) throw new Error('Could not find Curriculum Span to update.')
+
+        span.update(spanData);
+    }
+
+    removeCurriculumSpanById(id) {
+        let matchIndex = null;
+
+        this.curriculumSpans.forEach((span, index) => {
+            if (span.id == id) matchIndex = index;
+        });
+
+        if (matchIndex == null) throw new Error('Curriculum span not found!');
+        this.#curriculumSpans.splice(matchIndex, 1);
+    }
+
     getCurriculumSpanById(spanId) {
-        return this.curriculumSpans.find(entry => {return entry.id == spanId});
+        return this.#curriculumSpans.find(entry => { return entry.id == spanId });
     }
 
     serialize() {
@@ -88,15 +108,7 @@ export class Curriculum {
     get id() { return this.#id };
     get grade() { return this.#grade };
     get subject() { return this.#subject };
-    get curriculumSpans() {
-        const spans = [];
-        this.#curriculumSpans.forEach(span => {
-            const spanInstance = new CurriculumSpan(span.id, span.name, span.startDate, span.endDate, span.note);
-            spans.push(spanInstance);
-        });
-
-        return spans;
-    }
+    get curriculumSpans() { return [...this.#curriculumSpans]; }
 
     set curriculumSpans(value) {
         throw new Error('Curriculum span entries can only be added by calling the addSpan method! Add one instance of a span at a time.');
@@ -124,6 +136,12 @@ export class CurriculumSpan {
 
         this.#startDate.setHours(12);
         this.#endDate.setHours(12);
+    }
+    update(spanData) {
+        this.name = spanData.name;
+        this.startDate = spanData.startDate;
+        this.endDate = spanData.endDate;
+        this.note = spanData.note;
     }
 
     serialize() {
@@ -371,9 +389,19 @@ export default class SchoolYear extends AbstractModel {
     // curriculum instance functions //
     ///////////////////////////////////
     async addCurriculum(curriculumData) {
-        const curriculum = new Curriculum(curriculumData.id, curriculumData.name, curriculumData.grade, curriculumData.subject, curriculumData.startDate, curriculumData.endDate, curriculumData.note);
+        const curriculumId = Fn.generateId(this.curricula);
+        const curriculum = new Curriculum(curriculumId, curriculumData.grade, curriculumData.subject);
         this.#curricula.push(curriculum);
 
+        await this.update();
+    }
+
+    async addCurriculumSpan(curriculumId, spanData) {
+        const curriculum = this.getCurriculumById(curriculumId);
+        const spanId = Fn.generateId(curriculum.curriculumSpans)
+        const span = new CurriculumSpan(spanId, spanData.name, spanData.startDate, spanData.endDate, spanData.note);
+
+        curriculum.addCurriculumSpan(span)
         await this.update();
     }
 
@@ -386,12 +414,15 @@ export default class SchoolYear extends AbstractModel {
             return;
         }
 
-        curriculum.name = curriculumData.name;
         curriculum.grade = curriculumData.grade;
         curriculum.subject = curriculumData.subject;
-        curriculum.startDate = curriculumData.startDate;
-        curriculum.endDate = curriculumData.endDate;
-        curriculum.note = curriculumData.note;
+
+        await this.update();
+    }
+
+    async updateCurriculumSpan(curriculumId, spanData) {
+        const curriculum = this.getCurriculumById(curriculumId);
+        curriculum.updateCurriculumSpan(spanData)
 
         await this.update();
     }
@@ -409,8 +440,15 @@ export default class SchoolYear extends AbstractModel {
         await this.update();
     }
 
+    async removeCurriculumSpanById(curriculumId, spanId) {
+        const curriculum = this.getCurriculumById(curriculumId);
+        curriculum.removeCurriculumSpanById(spanId);
+
+        await this.update();
+    }
+
     getCurriculumById(id) {
-        return this.curricula.find(curriculum => { return curriculum.id == id });
+        return this.#curricula.find(curriculum => { return curriculum.id == id });
     }
 
 
