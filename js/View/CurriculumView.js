@@ -7,10 +7,13 @@ export default class CurriculumView extends AbstractView {
         const yearContainer = document.querySelector('#yearContainer');
         const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const editorNameSpan = document.querySelector('#editorNameSpan');
+        const fragment = document.createDocumentFragment();
 
         if (startDate && startDate instanceof Date == false) startDate = new Date(startDate);
         if (endDate && endDate instanceof Date == false) endDate = new Date(endDate);
 
+        editorNameSpan.textContent = 'Stoffverteilungsplan';
+        
         while (yearContainer.firstElementChild) {
             yearContainer.firstElementChild.remove();
         }
@@ -18,8 +21,6 @@ export default class CurriculumView extends AbstractView {
         while (curriculumSelectionContainer.firstElementChild) {
             curriculumSelectionContainer.firstElementChild.remove();
         }
-
-        editorNameSpan.textContent = 'Stoffverteilungsplan';
 
         if (!startDate) {
             const div = document.createElement('div');
@@ -96,7 +97,7 @@ export default class CurriculumView extends AbstractView {
                         new Date(currentWeek.firstElementChild.dataset.date).getMonth() != new Date(currentWeek.lastElementChild.dataset.date).getMonth()) ||
                     currentDay.getDate() == 1
                 ) {
-                    yearContainer.appendChild(currentMonth);
+                    fragment.appendChild(currentMonth);
                     currentMonth = blankMonth.cloneNode(true);
                     currentMonth.querySelector('.monthName').textContent = `${monthNames[currentDay.getMonth()]} ${currentDay.getFullYear()}`;
                     monthIterator++;
@@ -120,13 +121,15 @@ export default class CurriculumView extends AbstractView {
             if (currentDay.setHours(12) == endDate) {
                 isYearCompleted = true;
                 currentMonth.appendChild(currentWeek);
-                yearContainer.appendChild(currentMonth);
+                fragment.appendChild(currentMonth);
             }
 
             currentWeek.dataset.row = rowCounter;
             dateIterator += ONEDAY;
         } while (!isYearCompleted);
 
+        //replace items in the year container
+        yearContainer.append(fragment);
 
         //hide empty day containers
         yearContainer.querySelectorAll('.day').forEach(day => {
@@ -194,7 +197,7 @@ export default class CurriculumView extends AbstractView {
             return;
         }
 
-        const curriculumToRender = schoolYear.curricula.find(entry => { return entry.id == curriculumId });
+        const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
         curriculumToRender.curriculumSpans.forEach(span => {
             this.renderSpan(span.id, span);
@@ -203,6 +206,33 @@ export default class CurriculumView extends AbstractView {
 
         document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
         document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+    }
+
+    static changeDisplayedCurriculum(schoolYear, curriculumId) {
+        const yearContainer = document.querySelector('#yearContainer');
+
+        document.querySelectorAll('.curriculumSelectionItem').forEach(item => item.classList.remove('selected'));
+
+        //clear the old spans
+        yearContainer.querySelectorAll('.day').forEach(day => {
+            day.classList.remove('selected');
+            day.classList.remove('start');
+            day.classList.remove('end');
+            day.removeAttribute('data-spanid');
+        });
+
+        yearContainer.querySelectorAll('.spanContentContainer').forEach(container => container.remove());
+
+        const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
+
+        curriculumToRender.curriculumSpans.forEach(span => {
+            this.renderSpan(span.id, span);
+            this.renderSpanContentContainer(span.id, span);
+        });
+
+        document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
+        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+
     }
 
     static async getSchoolYearCurriculumElements(schoolYear) {

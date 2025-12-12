@@ -76,8 +76,7 @@
 }
 
 @keyframes slideUp {
-    0% {
-    }
+    0% {}
 
     50% {
         transform: translate(0%, -20%)
@@ -85,5 +84,25 @@
 
     100% {
         transform: translate(0%, -100%)
+    }
+}
+
+.contentSwap {
+    animation: contentSwap 0.3s;
+}
+
+@keyframes contentSwap {
+    0% {
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0;
+        visibility: visible;
+    }
+
+    100% {
+        opacity: 1;
     }
 }

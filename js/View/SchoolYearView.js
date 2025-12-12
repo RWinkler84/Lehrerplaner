@@ -12,14 +12,18 @@ export default class SchoolYearView extends AbstractView {
         const holidaysContainer = infoContainer.querySelector('#holidaysContainer');
 
         while (schoolYearSelect.childElementCount != 0) { schoolYearSelect.firstElementChild.remove(); }
-        while (holidaysContainer.childElementCount != 1) { holidaysContainer.lastElementChild.remove(); }
-
         schoolYearSelect.append(await this.getSchoolYearSelectHTML(schoolYear));
+
+        while (holidaysContainer.childElementCount != 1) { holidaysContainer.lastElementChild.remove(); }
         holidaysContainer.append(this.getHolidayDatesHTML(schoolYear));
 
         //selected teached grades
         infoContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            if (schoolYear.grades.includes(checkbox.value)) checkbox.checked = true;
+            if (schoolYear.grades.includes(checkbox.value)) {
+                checkbox.checked = true;
+            } else {
+                checkbox.checked = false;
+            }
         })
 
         if (!schoolYear) return;

@@ -66,6 +66,10 @@ export class Curriculum {
         this.#curriculumSpans.push(spanInstance);
     }
 
+    getCurriculumSpanById(spanId) {
+        return this.curriculumSpans.find(entry => {return entry.id == spanId});
+    }
+
     serialize() {
         const serialized = {
             id: this.id,
@@ -204,7 +208,7 @@ export default class SchoolYear extends AbstractModel {
             ],
             grades: ["7", "9", "10"],
             curricula: [
-                new Curriculum(1, 7, 'Fra', [
+                new Curriculum(1, 7, 'Ge', [
                     new CurriculumSpan(1, 'Napoleon', '2025-08-11', '2025-08-20'),
                     new CurriculumSpan(2, 'Deutscher Bund', '2025-08-21', '2025-08-31'),
                 ]),
@@ -347,13 +351,13 @@ export default class SchoolYear extends AbstractModel {
     }
 
     async removeHolidayById(id) {
-        let matchIndex;
+        let matchIndex = null;
 
         this.holidays.forEach((holiday, index) => {
             if (holiday.id == id) matchIndex = index;
         });
 
-        if (!matchIndex) throw new Error('Holiday not found');
+        if (matchIndex == null) throw new Error('Holiday not found');
         this.#holidays.splice(matchIndex, 1);
 
         await this.update();

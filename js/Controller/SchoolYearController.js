@@ -4,16 +4,18 @@ import CurriculumController from './CurriculumController.js';
 
 export default class SchoolYearController {
 
-    static async renderSchoolYearInfoSection(id = null) {
+    static async renderSchoolYearInfoSection(id = null, rerenderCurriculumView = true) {
         let schoolYear;
 
         if (id) schoolYear = await this.getSchoolYearById(id);
         if (!id) schoolYear = await this.getCurrentSchoolYear();
 
-        if (schoolYear) {
-            CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
-        } else {
-            CurriculumController.renderEmptyCalendar();
+        if (rerenderCurriculumView) {
+            if (schoolYear) {
+                CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
+            } else {
+                CurriculumController.renderEmptyCalendar();
+            }
         }
 
         View.renderSchoolYearInfoSection(schoolYear);
@@ -40,6 +42,14 @@ export default class SchoolYearController {
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
 
         return schoolYear.getHolidayById(id);
+    }
+
+    static async getCurriculumSpanById(id) {
+        const schoolYearId = View.getSelectedYearId();
+        const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
+        const curriculumId = CurriculumController.getDisplayedCurriculumId();
+
+        return schoolYear.getCurriculumById(curriculumId).getCurriculumSpanById(id);
     }
 
     static editSchoolYearDates() {
@@ -71,9 +81,9 @@ export default class SchoolYearController {
 
             View.setDisplayedSchoolYearId(schoolYear.id);
             View.removeHiddenFromCreateHolidaysButton();
-            
+
             CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
-            
+
             return;
         }
 
@@ -90,7 +100,7 @@ export default class SchoolYearController {
         CurriculumController.openHolidayEditor(schoolYear);
     }
 
-    static editTeachedGrades(){
+    static editTeachedGrades() {
         View.hideEditTeachedGradesButton();
         View.showSaveTeachedGradesButton();
 
@@ -105,7 +115,7 @@ export default class SchoolYearController {
         await schoolYear.updateGrades(teachedGrades);
 
         if (CurriculumController.getEditorType() == 'Curriculum Editor') CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
-        
+
         View.hideSaveTeachedGradesButton();
         View.showEditTeachedGradesButton();
     }
@@ -164,7 +174,7 @@ export default class SchoolYearController {
                 this.saveSchoolYearDates();
                 break;
 
-            case 'editTeachedGradesButton': 
+            case 'editTeachedGradesButton':
                 this.editTeachedGrades();
                 break;
             case 'saveTeachedGradesButton':

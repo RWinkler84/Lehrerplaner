@@ -21,7 +21,7 @@ export default class CurriculumController {
         const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
         const schoolYear = await this.getSchoolYearById(schoolYearId);
 
-        this.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
+        View.changeDisplayedCurriculum(schoolYear, curriculumId);
     }
 
     static openHolidayEditor(schoolYear) {
@@ -55,7 +55,7 @@ export default class CurriculumController {
             const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
             await schoolYear.updateHoliday(spanData);
 
-            SchoolYearController.renderSchoolYearInfoSection(schoolYear.id);
+            SchoolYearController.renderSchoolYearInfoSection(schoolYear.id, false);
             View.openHolidayEditor(schoolYear);
         }
 
@@ -96,6 +96,7 @@ export default class CurriculumController {
             await schoolYear.removeHolidayById(spanId);
 
             CurriculumController.openHolidayEditor(schoolYear);
+            SchoolYearController.renderSchoolYearInfoSection(schoolYear.id, false);
         }
 
         if (editorType == 'Curriculum Editor') {
@@ -138,18 +139,20 @@ export default class CurriculumController {
         const editorType = View.getEditorType();
 
         if (editorType == 'Holiday Editor') {
-            return await SchoolYearController.getHolidayById(spanId)
+            return await SchoolYearController.getHolidayById(spanId);
         }
 
         if (editorType == 'Curriculum Editor') {
-            // still work in progress
-            //getCurriculumById()
+            return await SchoolYearController.getCurriculumSpanById(spanId);
         }
-
     }
 
     static getEditorType() {
         return View.getEditorType();
+    }
+
+    static getDisplayedCurriculumId() {
+        return View.getDisplayedCurriculumId();
     }
 
     static async getAllSubjects() {
