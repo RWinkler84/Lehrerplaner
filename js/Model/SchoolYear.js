@@ -70,7 +70,12 @@ export class Curriculum {
     updateCurriculumSpan(spanData) {
         const span = this.getCurriculumSpanById(spanData.id);
 
-        if (!span) throw new Error('Could not find Curriculum Span to update.')
+        if (!span) {
+            const newSpan = new CurriculumSpan(spanData.id, spanData.name, spanData.startDate, spanData.endDate, spanData.note);
+            this.addCurriculumSpan(newSpan); 
+            
+            return; 
+        }
 
         span.update(spanData);
     }
@@ -398,8 +403,7 @@ export default class SchoolYear extends AbstractModel {
 
     async addCurriculumSpan(curriculumId, spanData) {
         const curriculum = this.getCurriculumById(curriculumId);
-        const spanId = Fn.generateId(curriculum.curriculumSpans)
-        const span = new CurriculumSpan(spanId, spanData.name, spanData.startDate, spanData.endDate, spanData.note);
+        const span = new CurriculumSpan(spanData.id, spanData.name, spanData.startDate, spanData.endDate, spanData.note);
 
         curriculum.addCurriculumSpan(span)
         await this.update();

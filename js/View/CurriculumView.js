@@ -13,7 +13,7 @@ export default class CurriculumView extends AbstractView {
         if (endDate && endDate instanceof Date == false) endDate = new Date(endDate);
 
         editorNameSpan.textContent = 'Stoffverteilungsplan';
-        
+
         while (yearContainer.firstElementChild) {
             yearContainer.firstElementChild.remove();
         }
@@ -208,6 +208,7 @@ export default class CurriculumView extends AbstractView {
         document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
     }
 
+    /** This function rerenders the displayed curriculum without rerendering the whole calendar. Although it adds complexity it is necessary for performance reasons as it makes switching and editing curricula way smoother. */
     static rerenderDisplayedCurriculum(schoolYear, curriculumId) {
         const yearContainer = document.querySelector('#yearContainer');
 
