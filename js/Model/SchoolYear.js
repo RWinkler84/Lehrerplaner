@@ -72,9 +72,9 @@ export class Curriculum {
 
         if (!span) {
             const newSpan = new CurriculumSpan(spanData.id, spanData.name, spanData.startDate, spanData.endDate, spanData.note);
-            this.addCurriculumSpan(newSpan); 
-            
-            return; 
+            this.addCurriculumSpan(newSpan);
+
+            return;
         }
 
         span.update(spanData);
@@ -118,6 +118,8 @@ export class Curriculum {
     set curriculumSpans(value) {
         throw new Error('Curriculum span entries can only be added by calling the addSpan method! Add one instance of a span at a time.');
     }
+    set grade(value) {this.#grade = value};
+    set subject(value) {this.#subject = value};
 }
 
 export class CurriculumSpan {
@@ -235,10 +237,10 @@ export default class SchoolYear extends AbstractModel {
                     new CurriculumSpan(1, 'Napoleon', '2025-08-11', '2025-08-20'),
                     new CurriculumSpan(2, 'Deutscher Bund', '2025-08-21', '2025-08-31'),
                 ]),
-                new Curriculum(2, 9, 'De', [
+                new Curriculum(2, 7, 'De', [
                     new CurriculumSpan(1, 'Satzglieder', '2025-08-11', '2025-08-20'),
                     new CurriculumSpan(2, 'Substantive', '2025-08-21', '2025-08-31'),
-                ]),
+                ])
             ],
             created: '2024-11-08',
             lastEdited: '2024-11-08',
@@ -394,8 +396,8 @@ export default class SchoolYear extends AbstractModel {
     // curriculum instance functions //
     ///////////////////////////////////
     async addCurriculum(curriculumData) {
-        const curriculumId = Fn.generateId(this.curricula);
-        const curriculum = new Curriculum(curriculumId, curriculumData.grade, curriculumData.subject);
+        if (!curriculumData.id) curriculumData.id = Fn.generateId(this.curricula);
+        const curriculum = new Curriculum(curriculumData.id, curriculumData.grade, curriculumData.subject);
         this.#curricula.push(curriculum);
 
         await this.update();

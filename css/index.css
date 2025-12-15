@@ -207,7 +207,8 @@ dialog input {
     width: 100%;
 }
 
-dialog .errorMessageDisplay {
+dialog .errorMessageDisplay,
+.errorMessageDisplay {
     width: 100% !important;
     margin-top: 0.5rem;
     color: var(--matteRed);
@@ -1079,17 +1080,17 @@ h4 {
 
 .subjectColorFive {
     background-color: var(--mint);
-    color: black;
+    color: black !important;
 }
 
 .subjectColorSix {
     background-color: var(--robinBlue);
-    color: black;
+    color: black !important;
 }
 
 .subjectColorSeven {
     background-color: var(--champagne);
-    color: black;
+    color: black !important;
 }
 
 .subjectColorEight {

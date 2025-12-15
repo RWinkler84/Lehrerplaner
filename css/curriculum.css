@@ -60,6 +60,13 @@
 
 }
 
+#curriculumSelectionContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0 0 1rem;
+}
+
 .curriculumSelectionItem {
     display: flex;
     justify-content: space-between;
@@ -81,10 +88,9 @@
     pointer-events: none;
 }
 
-#curriculumSelectionContainer {
-    display: flex;
-    gap: 1rem;
-    padding: 0 0 1rem;
+.curriculumSelectionItem.undefined {
+    border: solid 1px var(--bodyBackground);
+    color: var(--bodyBackground);
 }
 
 .week,

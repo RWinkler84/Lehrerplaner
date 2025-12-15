@@ -162,13 +162,15 @@ export default class CurriculumView extends AbstractView {
         const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const yearContainer = document.querySelector('#yearContainer');
         const allDays = yearContainer.querySelectorAll('.day');
-        const curriculumElements = await this.getSchoolYearCurriculumElements(schoolYear);
+        const curriculumElements = await this.getSchoolYearCurriculumElementsHTML(schoolYear);
         const dayNameContainer = document.querySelector('#dayNameContainer');
 
         yearContainer.classList.remove('holidayEditor');
         yearContainer.classList.add('curriculumEditor');
 
-        document.querySelector('#editorNameSpan').textContent = `Stoffverteilungsplan ${schoolYear.name}`;
+        document.querySelector('#editorNameSpan').textContent = `Stoffverteilungspläne ${schoolYear.name}`;
+
+        while (curriculumSelectionContainer.firstChild) { curriculumSelectionContainer.firstChild.remove() };
 
         if (!curriculumElements) {
             const div = document.createElement('div');
@@ -232,23 +234,74 @@ export default class CurriculumView extends AbstractView {
                 this.renderSpanContentContainer(span.id, span);
             });
 
-            document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+            const selectedCurriculumItem = document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`);
+
+            if (selectedCurriculumItem) selectedCurriculumItem.classList.add('selected');
         }
 
         document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
     }
 
     static async renderCurriculumSubjectAndGradeSelect(schoolYear) {
+        const subjectGradeSelect = await this.getSubjectAndGradeSelectHTML(schoolYear);
         const selectContainer = document.querySelector('#curriculumSelectionContainer');
+        const errorMessageDisplay = document.createElement('div');
+
+        let errorText = 'Für diese Klassenstufen- und Fachkombination gibt es bereits einen Stoffverteilungsplan. Willst du diesen bearbeiten, brich die Erstellung eines neuen Plans ab und wähle den gewünschten Plan aus.';
+
+        //preselect a subject/grade combination without a corresponding curriculum
+        const subjectSelectOptions = subjectGradeSelect.querySelector('#curriculumSubjectSelect').querySelectorAll('option');
+        const gradeSelectOptions = subjectGradeSelect.querySelector('#curriculumGradeSelect').querySelectorAll('option');
+        let freeCombinationFound = false;
+
+        gradeSelectOptions.forEach(option => {
+            if (freeCombinationFound) return;
+
+            let i = 0;
+            let subjectToSetSelected = subjectSelectOptions[i];
+            let matchingCurriculum = false;
+
+            do {
+                matchingCurriculum = schoolYear.curricula.find(entry => { return entry.grade == option.value && entry.subject == subjectToSetSelected.value });
+
+                if (matchingCurriculum) {
+                    i++
+                    subjectToSetSelected = subjectSelectOptions[i];
+                }
+            } while (matchingCurriculum && subjectToSetSelected)
+
+            if (!matchingCurriculum) {
+                freeCombinationFound = true;
+                option.setAttribute('selected', 'true');
+                subjectToSetSelected.setAttribute('selected', 'true');
+            }
+        });
+
+        //add the errorMessageDisplay
+        errorMessageDisplay.classList.add('hidden');
+        errorMessageDisplay.classList.add('errorMessageDisplay');
+        errorMessageDisplay.classList.add('alertRing');
+        errorMessageDisplay.id = 'curriculumExistErrorDisplay';
+
+        if (!freeCombinationFound) {
+            errorMessageDisplay.classList.remove('hidden');
+            errorText = 'Es existieren bereits Jahrespläne für jede mögliche Kombination von Klassenstufen und Fächern, die du angelegt hast.';
+
+            this.disableSaveCurriculumButton();
+        }
+
+        errorMessageDisplay.textContent = errorText;
 
         while (selectContainer.firstElementChild) {
             selectContainer.firstElementChild.remove();
         }
 
-        selectContainer.append(await this.getSubjectAndGradSelectHTML(schoolYear));
+        //and stick it all together
+         selectContainer.append(subjectGradeSelect);
+        selectContainer.append(errorMessageDisplay);
     }
 
-    static async getSchoolYearCurriculumElements(schoolYear) {
+    static async getSchoolYearCurriculumElementsHTML(schoolYear) {
         if (schoolYear.curricula.length == 0) return false;
 
         const subjects = await Controller.getAllSubjects();
@@ -262,7 +315,11 @@ export default class CurriculumView extends AbstractView {
 
             container.dataset.curriculumid = item.id;
             container.classList.add('curriculumSelectionItem');
-            container.classList.add(subject.colorCssClass);
+            if (subject) {
+                container.classList.add(subject.colorCssClass);
+            } else {
+                container.classList.add('undefined');
+            }
 
             curriculumName.textContent = `Klasse ${item.grade} ${item.subject}`;
 
@@ -273,7 +330,7 @@ export default class CurriculumView extends AbstractView {
         return fragment;
     }
 
-    static async getSubjectAndGradSelectHTML(schoolYear) {
+    static async getSubjectAndGradeSelectHTML(schoolYear) {
         const subjects = await Controller.getAllSubjects();
 
         if (schoolYear.grades.length == 0 || subjects.length == 0) return false;
@@ -731,20 +788,48 @@ export default class CurriculumView extends AbstractView {
         } while (i <= endWeekNumber)
     }
 
-    //show buttons
+    //show or enable buttons
     static showCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').classList.remove('notDisplayed');
     }
     static showSaveCancelNewCurriculumButtonContainer() {
         document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.remove('notDisplayed')
     }
+    static enableSaveCurriculumButton() {
+        document.querySelector('#saveNewCurriculumButton').disabled = false;
+    }
 
-    //hide buttons
+    //hide or disable buttons
     static hideCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').classList.add('notDisplayed');
     }
-    static hidSaveCancelNewCurriculumButtonContainer() {
+    static hideSaveCancelNewCurriculumButtonContainer() {
         document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.add('notDisplayed')
+    }
+    static disableSaveCurriculumButton() {
+        document.querySelector('#saveNewCurriculumButton').disabled = true;
+    }
+
+    //validation alerts
+    static alertCurriculumAlreadyExists() {
+        const alertRing = document.querySelector('#curriculumExistErrorDisplay');
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    //error messages
+
+    static showCurriculumAlreadyExistsError() {
+        const messageContainer = document.querySelector('#curriculumExistErrorDisplay');
+        messageContainer.classList.remove('hidden');
+    }
+
+    static hideCurriculumAlreadyExistsError() {
+        const messageContainer = document.querySelector('#curriculumExistErrorDisplay');
+        messageContainer.classList.add('hidden');
     }
 
     //helper function
@@ -804,5 +889,15 @@ export default class CurriculumView extends AbstractView {
 
     static getDisplayedCurriculumId() {
         return document.querySelector('#curriculumContainer').dataset.curriculumid;
+    }
+
+    static getSelectedSubjectAndGrade() {
+        const gradeSelect = document.querySelector('#curriculumGradeSelect');
+        const subjectSelect = document.querySelector('#curriculumSubjectSelect');
+
+        return {
+            subject: subjectSelect.value,
+            grade: gradeSelect.value
+        }
     }
 }

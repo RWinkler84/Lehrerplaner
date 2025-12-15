@@ -2,6 +2,7 @@ import View from "../View/CurriculumView.js";
 import LessonController from "./LessonController.js";
 import SchoolYearController from "./SchoolYearController.js";
 import Fn from "../inc/utils.js";
+import SchoolYear from "../Model/SchoolYear.js";
 
 export default class CurriculumController {
     static renderEmptyCalendar(startDate, endDate) {
@@ -48,15 +49,25 @@ export default class CurriculumController {
         const newCurriculumId = Fn.generateId(schoolYear.curricula);
 
         View.hideCreateCurriculumButton();
-        
+
         View.showSaveCancelNewCurriculumButtonContainer();
         View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
-        View.renderCurriculumSubjectAndGradeSelect(schoolYear);
+        await View.renderCurriculumSubjectAndGradeSelect(schoolYear);
+
+        //the renderCurriculumSubjectAndGradeSelect function preselects the first free grade/subject combination
+        //which should be used for the mockup curriculum, which gets update whenever the user selects something else
+        const selectedSubjectGrade = View.getSelectedSubjectAndGrade();
+
+        await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject });
     }
 
     static async saveNewCurriculum() {
-        // saving is not necessary because all changes are already saved
-        // just rerender the view
+        const schoolYear = await SchoolYear.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
+        const curriculumId = View.getDisplayedCurriculumId();
+
+        View.hideSaveCancelNewCurriculumButtonContainer();
+        View.showCreateCurriculumButton();
+        View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
     }
 
     static async cancelCurriculumCreation() {
@@ -64,10 +75,31 @@ export default class CurriculumController {
         const schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId);
         const curriculumId = View.getDisplayedCurriculumId();
 
-        //remove Curriculum by id
+        await schoolYear.removeCurriculumById(curriculumId);
 
-        View.hidSaveCancelNewCurriculumButtonContainer();
+        View.hideSaveCancelNewCurriculumButtonContainer();
         this.renderSchoolYearCurriculumEditor(schoolYear);
+    }
+
+    static async preventDuplicateCurricula() {
+        const schoolYear = await SchoolYear.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
+        const subjectAndGradeSelection = View.getSelectedSubjectAndGrade();
+        const curriculumId = View.getDisplayedCurriculumId();
+
+        const match = schoolYear.curricula.find(curriculum => {
+            return curriculum.grade == subjectAndGradeSelection.grade && curriculum.subject == subjectAndGradeSelection.subject;
+        });
+
+        if (match) {
+            View.showCurriculumAlreadyExistsError();
+            View.alertCurriculumAlreadyExists();
+            View.disableSaveCurriculumButton();
+        } else {
+            View.hideCurriculumAlreadyExistsError();
+            View.enableSaveCurriculumButton();
+            schoolYear.updateCurriculum({id: curriculumId, grade: subjectAndGradeSelection.grade, subject: subjectAndGradeSelection.subject});
+        }
+
     }
 
     ///////////////////////
@@ -250,12 +282,12 @@ export default class CurriculumController {
             case 'cancelNewCurriculumButton':
                 CurriculumController.cancelCurriculumCreation();
                 break;
-            
+
             //holiday editor
             case 'closeHolidayEditorButton':
                 CurriculumController.closeHolidayEditor();
                 break;
-            
+
             //span form buttons
             case 'saveSpanCreationButton':
                 CurriculumController.saveSpan();
@@ -285,8 +317,8 @@ export default class CurriculumController {
         switch (target.id) {
             case 'curriculumGradeSelect':
             case 'curriculumSubjectSelect':
-
-            break;
+                CurriculumController.preventDuplicateCurricula();
+                break;
         }
     }
 }
