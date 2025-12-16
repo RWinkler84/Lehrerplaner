@@ -1054,7 +1054,7 @@ h4 {
 }
 
 .notDisplayed {
-    display: none;
+    display: none !important;
 }
 
 .hidden {

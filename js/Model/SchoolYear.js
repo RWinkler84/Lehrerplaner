@@ -97,7 +97,7 @@ export class Curriculum {
 
     serialize() {
         const serialized = {
-            id: this.id,
+            id: Number(this.id),
             grade: this.grade,
             subject: this.subject,
             curriculumSpans: []
@@ -153,7 +153,7 @@ export class CurriculumSpan {
 
     serialize() {
         return {
-            id: this.id,
+            id: Number(this.id),
             name: this.name,
             startDate: this.startDate,
             endDate: this.endDate,

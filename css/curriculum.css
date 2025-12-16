@@ -62,8 +62,8 @@
 
 #curriculumSelectionContainer {
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
-    gap: 1rem;
     padding: 0 0 1rem;
 }
 
@@ -71,6 +71,7 @@
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    min-width: 5rem;
     padding: 0.5rem 0.5rem;
     border: 2px solid var(--contentContainerBackground);
     border-radius: var(--standardRadius);
@@ -91,6 +92,12 @@
 .curriculumSelectionItem.undefined {
     border: solid 1px var(--bodyBackground);
     color: var(--bodyBackground);
+}
+
+#curriculumCreationSelectContainer {
+    display: flex;
+    padding: 0 0 1rem;
+    gap: 1rem;
 }
 
 .week,

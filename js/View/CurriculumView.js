@@ -244,7 +244,7 @@ export default class CurriculumView extends AbstractView {
 
     static async renderCurriculumSubjectAndGradeSelect(schoolYear) {
         const subjectGradeSelect = await this.getSubjectAndGradeSelectHTML(schoolYear);
-        const selectContainer = document.querySelector('#curriculumSelectionContainer');
+        const selectContainer = document.querySelector('#curriculumCreationSelectContainer');
         const errorMessageDisplay = document.createElement('div');
 
         let errorText = 'Für diese Klassenstufen- und Fachkombination gibt es bereits einen Stoffverteilungsplan. Willst du diesen bearbeiten, brich die Erstellung eines neuen Plans ab und wähle den gewünschten Plan aus.';
@@ -297,7 +297,7 @@ export default class CurriculumView extends AbstractView {
         }
 
         //and stick it all together
-         selectContainer.append(subjectGradeSelect);
+        selectContainer.append(subjectGradeSelect);
         selectContainer.append(errorMessageDisplay);
     }
 
@@ -307,6 +307,20 @@ export default class CurriculumView extends AbstractView {
         const subjects = await Controller.getAllSubjects();
         const blankDiv = document.createElement('div');
         const fragment = document.createDocumentFragment();
+
+        schoolYear.grades.forEach(grade => {
+            const gradeContainer = blankDiv.cloneNode();
+            const gradeLabel = document.createElement('label');
+
+            gradeContainer.dataset.grade = grade;
+            gradeContainer.classList.add('flex');
+            gradeContainer.classList.add('halfGap');
+            gradeContainer.classList.add('marginBottom');
+            gradeLabel.textContent = `Klasse ${grade}:`;
+
+            fragment.append(gradeLabel);
+            fragment.append(gradeContainer);
+        });
 
         schoolYear.curricula.forEach(item => {
             const container = blankDiv.cloneNode();
@@ -321,10 +335,12 @@ export default class CurriculumView extends AbstractView {
                 container.classList.add('undefined');
             }
 
-            curriculumName.textContent = `Klasse ${item.grade} ${item.subject}`;
+            curriculumName.textContent = `${item.subject}`;
 
             container.append(curriculumName);
-            fragment.append(container);
+            Array.from(fragment.children).forEach(child => {
+                if (child.dataset.grade == item.grade) child.append(container);
+            })
         });
 
         return fragment;
@@ -788,7 +804,7 @@ export default class CurriculumView extends AbstractView {
         } while (i <= endWeekNumber)
     }
 
-    //show or enable buttons
+    //show or enable elements
     static showCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').classList.remove('notDisplayed');
     }
@@ -798,8 +814,14 @@ export default class CurriculumView extends AbstractView {
     static enableSaveCurriculumButton() {
         document.querySelector('#saveNewCurriculumButton').disabled = false;
     }
+    static showCurriculumSelectionContainer() {
+        document.querySelector('#curriculumSelectionContainer').classList.remove('notDisplayed');
+    }
+    static showCurriculumCreationSelectContainer() {
+        document.querySelector('#curriculumCreationSelectContainer').classList.remove('notDisplayed');
+    }
 
-    //hide or disable buttons
+    //hide or disable elements
     static hideCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').classList.add('notDisplayed');
     }
@@ -808,6 +830,12 @@ export default class CurriculumView extends AbstractView {
     }
     static disableSaveCurriculumButton() {
         document.querySelector('#saveNewCurriculumButton').disabled = true;
+    }
+    static hideCurriculumSelectionContainer() {
+        document.querySelector('#curriculumSelectionContainer').classList.add('notDisplayed');
+    }
+    static hideCurriculumCreationSelectContainer() {
+        document.querySelector('#curriculumCreationSelectContainer').classList.add('notDisplayed');
     }
 
     //validation alerts

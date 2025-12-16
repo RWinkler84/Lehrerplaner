@@ -49,8 +49,10 @@ export default class CurriculumController {
         const newCurriculumId = Fn.generateId(schoolYear.curricula);
 
         View.hideCreateCurriculumButton();
+        View.hideCurriculumSelectionContainer();
 
         View.showSaveCancelNewCurriculumButtonContainer();
+        View.showCurriculumCreationSelectContainer();
         View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
         await View.renderCurriculumSubjectAndGradeSelect(schoolYear);
 
@@ -66,6 +68,9 @@ export default class CurriculumController {
         const curriculumId = View.getDisplayedCurriculumId();
 
         View.hideSaveCancelNewCurriculumButtonContainer();
+        View.hideCurriculumCreationSelectContainer();
+
+        View.showCurriculumSelectionContainer();
         View.showCreateCurriculumButton();
         View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
     }
@@ -77,7 +82,10 @@ export default class CurriculumController {
 
         await schoolYear.removeCurriculumById(curriculumId);
 
+        View.hideCurriculumCreationSelectContainer();
         View.hideSaveCancelNewCurriculumButtonContainer();
+
+        View.showCurriculumSelectionContainer();
         this.renderSchoolYearCurriculumEditor(schoolYear);
     }
 
@@ -94,6 +102,8 @@ export default class CurriculumController {
             View.showCurriculumAlreadyExistsError();
             View.alertCurriculumAlreadyExists();
             View.disableSaveCurriculumButton();
+            //still update the currriculum, otherwise the program will falsely claim, that a possible grade/subject combination is already taken
+            schoolYear.updateCurriculum({id: curriculumId, grade: subjectAndGradeSelection.grade, subject: subjectAndGradeSelection.subject});
         } else {
             View.hideCurriculumAlreadyExistsError();
             View.enableSaveCurriculumButton();
