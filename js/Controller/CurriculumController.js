@@ -331,4 +331,11 @@ export default class CurriculumController {
                 break;
         }
     }
+
+    static enableCreateCurriculumButton() {
+        View.enableCreateCurriculumButton();
+    }
+    static disableCreateCurriculumButton() {
+        View.disableCreateCurriculumButton();
+    }
 }

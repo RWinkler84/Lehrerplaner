@@ -4,6 +4,12 @@
 
 /* school year info section */
 
+#schoolYearDatesGradesContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: max(2rem, 10vw);
+}
+
 .gradeRow {
     display: grid;
     grid-auto-columns: max-content;

@@ -42,11 +42,11 @@ export default class SchoolYearView extends AbstractView {
         }
 
         this.showEditHolidayDatesButton();
-        this.showEditSchoolYearDatesButton();
+        this.showEditSchoolYearDatesGradesButton();
         this.showCreateNewSchoolYearButton();
 
         this.hideCreateHolidayDatesButton();
-        this.hideSaveSchoolYearDatesButton();
+        this.hideSaveSchoolYearDatesGradesButton();
         this.hideSchoolYearCreationButtonsContainer();
     }
 
@@ -209,42 +209,47 @@ export default class SchoolYearView extends AbstractView {
         infoContainer.querySelector('#createHolidayDatesButton').classList.add('hidden');
 
         this.editSchoolYearDates(true);
+        this.editTaughtGrades(true);
 
         while (holidaysContainer.childElementCount != 1) { holidaysContainer.lastElementChild.remove() };
         div.textContent = 'Hier gibt es noch nichts zu sehen...';
         holidaysContainer.append(div);
     }
 
-    static editTeachedGrades() {
+    static editTaughtGrades(newYearForm = false) {
         const form = document.querySelector('#gradeSelectionContainer');
-
-        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.removeAttribute('disabled'));
-    }
-
-    static saveTeachedGrades() {
-        const form = document.querySelector('#gradeSelectionContainer');
-        const teachedGrades = [];
 
         form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            if (checkbox.checked == true) teachedGrades.push(checkbox.value);
+            if (newYearForm) checkbox.checked = false;
+            checkbox.removeAttribute('disabled');
+            });
+
+    }
+
+    static saveTaughtGrades() {
+        const form = document.querySelector('#gradeSelectionContainer');
+        const taughtGrades = [];
+
+        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.checked == true) taughtGrades.push(checkbox.value);
             checkbox.setAttribute('disabled', '');
         });
 
-        return teachedGrades;
+        return taughtGrades;
     }
 
-    //show and hide buttons
+    //show/enable and hide/disable buttons
     static showEditHolidayDatesButton() {
         document.querySelector('#editHolidayDatesButton').classList.remove('notDisplayed');
     }
     static showCreateHolidayDatesButton() {
         document.querySelector('#createHolidayDatesButton').classList.remove('notDisplayed');
     }
-    static showEditSchoolYearDatesButton() {
-        document.querySelector('#editSchoolYearDatesButton').classList.remove('notDisplayed');
+    static showEditSchoolYearDatesGradesButton() {
+        document.querySelector('#editSchoolYearDatesGradesButton').classList.remove('notDisplayed');
     }
-    static showSaveSchoolYearDatesButton() {
-        document.querySelector('#saveSchoolYearDatesButton').classList.remove('notDisplayed');
+    static showSaveSchoolYearDatesGradesButton() {
+        document.querySelector('#saveSchoolYearDatesGradesButton').classList.remove('notDisplayed');
     }
     static showCreateNewSchoolYearButton() {
         document.querySelector('#createNewSchoolYearButton').classList.remove('notDisplayed');
@@ -252,11 +257,8 @@ export default class SchoolYearView extends AbstractView {
     static showSchoolYearCreationButtonsContainer() {
         document.querySelector('#schoolYearCreationButtonsContainer').classList.remove('notDisplayed');
     }
-    static showEditTeachedGradesButton() {
-        document.querySelector('#editTeachedGradesButton').classList.remove('notDisplayed');
-    }
-    static showSaveTeachedGradesButton() {
-        document.querySelector('#saveTeachedGradesButton').classList.remove('notDisplayed');
+        static enableSaveNewSchoolYearButton() {
+        document.querySelector('#saveNewSchoolYearButton').disabled = false;
     }
 
     //hide
@@ -266,11 +268,11 @@ export default class SchoolYearView extends AbstractView {
     static hideCreateHolidayDatesButton() {
         document.querySelector('#createHolidayDatesButton').classList.add('notDisplayed');
     }
-    static hideEditSchoolYearDatesButton() {
-        document.querySelector('#editSchoolYearDatesButton').classList.add('notDisplayed');
+    static hideEditSchoolYearDatesGradesButton() {
+        document.querySelector('#editSchoolYearDatesGradesButton').classList.add('notDisplayed');
     }
-    static hideSaveSchoolYearDatesButton() {
-        document.querySelector('#saveSchoolYearDatesButton').classList.add('notDisplayed');
+    static hideSaveSchoolYearDatesGradesButton() {
+        document.querySelector('#saveSchoolYearDatesGradesButton').classList.add('notDisplayed');
     }
     static hideCreateNewSchoolYearButton() {
         document.querySelector('#createNewSchoolYearButton').classList.add('notDisplayed');
@@ -278,18 +280,15 @@ export default class SchoolYearView extends AbstractView {
     static hideSchoolYearCreationButtonsContainer() {
         document.querySelector('#schoolYearCreationButtonsContainer').classList.add('notDisplayed');
     }
-    static hideEditTeachedGradesButton() {
-        document.querySelector('#editTeachedGradesButton').classList.add('notDisplayed');
-    }
-    static hideSaveTeachedGradesButton() {
-        document.querySelector('#saveTeachedGradesButton').classList.add('notDisplayed');
+    static disableSaveNewSchoolYearButton() {
+        document.querySelector('#saveNewSchoolYearButton').disabled = true;
     }
 
     //displayed, but hidden
-    static removeHiddenFromCreateHolidaysButton() {
+    static showCreateHolidaysButton() {
         document.querySelector('#createHolidayDatesButton').classList.remove('hidden');
     }
-    static removeHiddenFromSchoolYearSelect() {
+    static showSchoolYearSelect() {
         document.querySelector('#schoolYearNameSelect').parentElement.classList.remove('hidden');
     }
 

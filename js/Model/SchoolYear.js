@@ -440,7 +440,7 @@ export default class SchoolYear extends AbstractModel {
             if (curriculum.id == id) matchIndex = index;
         });
 
-        if (!matchIndex) throw new Error('Curriculum not found');
+        if (matchIndex == null) throw new Error('Curriculum not found');
         this.#curricula.splice(matchIndex, 1);
 
         await this.update();

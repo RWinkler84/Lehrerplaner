@@ -808,6 +808,9 @@ export default class CurriculumView extends AbstractView {
     static showCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').classList.remove('notDisplayed');
     }
+    static enableCreateCurriculumButton() {
+        document.querySelector('#createCurriculumButton').disabled = false;
+    }
     static showSaveCancelNewCurriculumButtonContainer() {
         document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.remove('notDisplayed')
     }
@@ -824,6 +827,9 @@ export default class CurriculumView extends AbstractView {
     //hide or disable elements
     static hideCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').classList.add('notDisplayed');
+    }
+    static disableCreateCurriculumButton() {
+        document.querySelector('#createCurriculumButton').disabled = true;
     }
     static hideSaveCancelNewCurriculumButtonContainer() {
         document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.add('notDisplayed')
@@ -849,7 +855,6 @@ export default class CurriculumView extends AbstractView {
     }
 
     //error messages
-
     static showCurriculumAlreadyExistsError() {
         const messageContainer = document.querySelector('#curriculumExistErrorDisplay');
         messageContainer.classList.remove('hidden');
