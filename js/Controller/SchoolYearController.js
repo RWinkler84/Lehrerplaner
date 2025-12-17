@@ -97,7 +97,7 @@ export default class SchoolYearController {
         await schoolYear.updateStartAndEndDate(yearData);
         await schoolYear.updateGrades(taughtGrades);
 
-        View.renderSchoolYearInfoSection(schoolYear);
+        if (!View.isNewSchoolYear()) View.renderSchoolYearInfoSection(schoolYear);
 
         if (CurriculumController.getEditorType() == 'Curriculum Editor') CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
     }
@@ -124,9 +124,12 @@ export default class SchoolYearController {
         CurriculumController.renderEmptyCalendar();
     }
 
-    static saveNewSchoolYear() {
-        console.log('hier')
+    static async saveNewSchoolYear() {
+        const schoolYearId = View.getDisplayedSchoolYearId();
+        const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
+        
         CurriculumController.enableCreateCurriculumButton();
+        View.renderSchoolYearInfoSection(schoolYear);
     }
 
     static async cancelSchoolYearCreation() {
@@ -136,7 +139,7 @@ export default class SchoolYearController {
             const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
             schoolYear.delete();
         }
-        
+
         CurriculumController.enableCreateCurriculumButton();
 
         View.showSchoolYearSelect();

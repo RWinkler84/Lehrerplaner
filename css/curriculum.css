@@ -77,7 +77,7 @@
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    min-width: 5rem;
+    min-width: 115px;
     padding: 0.5rem 0.5rem;
     border: 2px solid var(--contentContainerBackground);
     border-radius: var(--standardRadius);
@@ -173,13 +173,14 @@
 
 .spanContentContainer {
     position: absolute;
-    background-color: var(--matteRed);
+    background-color: var(--fadedgrey);
     padding: 0.5rem 0.5rem;
     height: calc(100% - 2.5rem);
     left: 0;
     right: 0;
-    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-    color: var(--lighterText);
+    border-top : solid 2px var(--topMenuBackgound);
+    /* box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16); */
+    /* color: var(--lighterText); */
     z-index: 1;
     pointer-events: none;
     overflow: hidden;
@@ -187,6 +188,7 @@
 }
 
 .spanContentContainer.start {
+    border-left: solid 0.75rem var(--topMenuBackgound);
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     left: 1rem;

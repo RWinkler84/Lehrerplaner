@@ -20,11 +20,13 @@ export default class CurriculumController {
         View.showCreateCurriculumButton();
     }
 
-    static async rerenderDisplayedCurriculum(event) {
-        const curriculumId = event.target.dataset.curriculumid;
-        const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
-        const schoolYear = await this.getSchoolYearById(schoolYearId);
+    static async rerenderDisplayedCurriculum(curriculumId, schoolYear = null) {
+        if (!schoolYear) {
+            const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+            schoolYear = await this.getSchoolYearById(schoolYearId);
+        }
 
+        if (View.getNewSpan()) await this.cancelSpanCreation();
         View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
         View.removeAllHandles();
     }
@@ -103,11 +105,11 @@ export default class CurriculumController {
             View.alertCurriculumAlreadyExists();
             View.disableSaveCurriculumButton();
             //still update the currriculum, otherwise the program will falsely claim, that a possible grade/subject combination is already taken
-            schoolYear.updateCurriculum({id: curriculumId, grade: subjectAndGradeSelection.grade, subject: subjectAndGradeSelection.subject});
+            schoolYear.updateCurriculum({ id: curriculumId, grade: subjectAndGradeSelection.grade, subject: subjectAndGradeSelection.subject });
         } else {
             View.hideCurriculumAlreadyExistsError();
             View.enableSaveCurriculumButton();
-            schoolYear.updateCurriculum({id: curriculumId, grade: subjectAndGradeSelection.grade, subject: subjectAndGradeSelection.subject});
+            schoolYear.updateCurriculum({ id: curriculumId, grade: subjectAndGradeSelection.grade, subject: subjectAndGradeSelection.subject });
         }
 
     }
@@ -120,11 +122,6 @@ export default class CurriculumController {
         let spanId = View.createNewSpan(event);
         View.addHandlesToSpan(spanId);
         View.openSpanForm();
-    }
-
-    static createNewSubSpan() {
-        View.openSpanForm();
-        View.createNewSubSpan(event);
     }
 
     static async saveSpan() {
@@ -176,16 +173,18 @@ export default class CurriculumController {
         const schoolYear = await SchoolYearController.getSchoolYearById(yearId);
 
         if (editorType == 'Holiday Editor') {
-            await schoolYear.removeHolidayById(spanId);
+            schoolYear.removeHolidayById(spanId);
 
             CurriculumController.openHolidayEditor(schoolYear);
             SchoolYearController.renderSchoolYearInfoSection(schoolYear.id, false);
         }
 
         if (editorType == 'Curriculum Editor') {
-            // do something different
+            const curriculumId = View.getDisplayedCurriculumId();
 
-            CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
+            schoolYear.removeCurriculumSpanById(curriculumId, spanId)
+            await CurriculumController.rerenderDisplayedCurriculum(curriculumId, schoolYear);
+            View.closeSpanForm();
         }
     }
 
@@ -258,17 +257,7 @@ export default class CurriculumController {
                     break;
 
                 case classList.contains('selected'):
-                    if (spanEditOngoing == 'true') {
-                        const clickedSpanId = View.getSpanId(event);
-                        const activeSpanId = View.getActiveSpanId();
-                        if (clickedSpanId == activeSpanId) {
-                            CurriculumController.createNewSubSpan(event);
-                        } else {
-                            CurriculumController.selectSpan(event);
-                        }
-                    };
-
-                    if (spanEditOngoing == 'false') CurriculumController.selectSpan(event);
+                    CurriculumController.selectSpan(event);
                     break;
             }
         }
@@ -277,7 +266,9 @@ export default class CurriculumController {
 
         if (classList.contains('curriculumSelectionItem')) {
             if (classList.contains('selected')) return;
-            CurriculumController.rerenderDisplayedCurriculum(event);
+
+            const curriculumId = event.target.dataset.curriculumid;
+            CurriculumController.rerenderDisplayedCurriculum(curriculumId);
         }
 
         //handle clicks on buttons

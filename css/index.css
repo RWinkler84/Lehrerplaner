@@ -28,6 +28,7 @@
     --lightgrey: rgb(184, 184, 184);
     --lightergrey: rgb(227, 227, 227);
     --labelgrey: rgb(106, 106, 106);
+    --fadedgrey: rgb(240, 240, 240);
 
     --standardRadius: 5px;
     --smallRadius: 3px;
@@ -1063,47 +1064,47 @@ h4 {
 
 /* Lesson Colors */
 .subjectColorOne {
-    background-color: var(--matteGreen);
+    background-color: var(--matteGreen) !important;
 }
 
 .subjectColorTwo {
-    background-color: var(--topMenuBackgound);
+    background-color: var(--topMenuBackgound) !important;
 }
 
 .subjectColorThree {
-    background-color: var(--matteRed);
+    background-color: var(--matteRed) !important;
 }
 
 .subjectColorFour {
-    background-color: var(--bodyBackground);
+    background-color: var(--bodyBackground) !important;
 }
 
 .subjectColorFive {
-    background-color: var(--mint);
+    background-color: var(--mint) !important;
     color: black !important;
 }
 
 .subjectColorSix {
-    background-color: var(--robinBlue);
+    background-color: var(--robinBlue) !important;
     color: black !important;
 }
 
 .subjectColorSeven {
-    background-color: var(--champagne);
+    background-color: var(--champagne) !important;
     color: black !important;
 }
 
 .subjectColorEight {
-    background-color: var(--rose);
+    background-color: var(--rose) !important;
     /* color: black; */
 }
 
 .subjectColorNine {
-    background-color: var(--purple);
+    background-color: var(--purple) !important;
 }
 
 .subjectColorTen {
-    background-color: var(--pumpkin);
+    background-color: var(--pumpkin) !important;
     /* color: black; */
 }
 

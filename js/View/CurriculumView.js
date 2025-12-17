@@ -142,13 +142,13 @@ export default class CurriculumView extends AbstractView {
     static openHolidayEditor(schoolYear) {
         const yearContainer = document.querySelector('#yearContainer');
 
+        yearContainer.classList.remove('curriculumEditor');
+        yearContainer.classList.add('holidayEditor');
+
         schoolYear.holidays.forEach((holiday) => {
             this.renderSpan(holiday.id, holiday);
             this.renderSpanContentContainer(holiday.id, holiday);
         });
-
-        yearContainer.classList.remove('curriculumEditor');
-        yearContainer.classList.add('holidayEditor');
 
         document.querySelector('#closeHolidayEditorButton').classList.remove('notDisplayed');
         document.querySelector('#editorNameSpan').textContent = `Ferien und freie Tage ${schoolYear.name}`;
@@ -162,14 +162,16 @@ export default class CurriculumView extends AbstractView {
         const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const yearContainer = document.querySelector('#yearContainer');
         const allDays = yearContainer.querySelectorAll('.day');
-        const curriculumElements = await this.getSchoolYearCurriculumElementsHTML(schoolYear);
         const dayNameContainer = document.querySelector('#dayNameContainer');
+
+        const curriculumElements = await this.getSchoolYearCurriculumElementsHTML(schoolYear);
 
         yearContainer.classList.remove('holidayEditor');
         yearContainer.classList.add('curriculumEditor');
 
         document.querySelector('#editorNameSpan').textContent = `Stoffverteilungspläne ${schoolYear.name}`;
 
+        //render the curricula selection
         while (curriculumSelectionContainer.firstChild) { curriculumSelectionContainer.firstChild.remove() };
 
         if (!curriculumElements) {
@@ -187,27 +189,28 @@ export default class CurriculumView extends AbstractView {
 
         this.markHolidays(schoolYear, allDays);
 
+        //render the curriculum spans
         if (!curriculumId) {
+            document.querySelector('#curriculumContainer').dataset.curriculumid = schoolYear.curricula[0].id;
+            document.querySelector(`.curriculumSelectionItem[data-curriculumid="${schoolYear.curricula[0].id}"]`).classList.add('selected');
+
             schoolYear.curricula[0].curriculumSpans.forEach(span => {
                 this.renderSpan(span.id, span);
                 this.renderSpanContentContainer(span.id, span);
             });
-
-            document.querySelector('#curriculumContainer').dataset.curriculumid = schoolYear.curricula[0].id;
-            document.querySelector(`.curriculumSelectionItem[data-curriculumid="${schoolYear.curricula[0].id}"]`).classList.add('selected');
 
             return;
         }
 
         const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
+        document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
+        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+
         curriculumToRender.curriculumSpans.forEach(span => {
             this.renderSpan(span.id, span);
             this.renderSpanContentContainer(span.id, span);
         });
-
-        document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
-        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
     }
 
     /** This function rerenders the displayed curriculum without rerendering the whole calendar. Although it adds complexity it is necessary for performance reasons as it makes switching and editing curricula way smoother. */
@@ -229,14 +232,14 @@ export default class CurriculumView extends AbstractView {
         const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
         if (curriculumToRender) {
+            const selectedCurriculumItem = document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`);
+            if (selectedCurriculumItem) selectedCurriculumItem.classList.add('selected');
+
             curriculumToRender.curriculumSpans.forEach(span => {
                 this.renderSpan(span.id, span);
                 this.renderSpanContentContainer(span.id, span);
             });
 
-            const selectedCurriculumItem = document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`);
-
-            if (selectedCurriculumItem) selectedCurriculumItem.classList.add('selected');
         }
 
         document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
@@ -445,7 +448,7 @@ export default class CurriculumView extends AbstractView {
         if (spanData) form.querySelector('input').value = spanData.name;
 
         form.style.display = 'flex';
-        document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
+        this.setSpanEditActive();
     }
 
     static closeSpanForm() {
@@ -454,7 +457,7 @@ export default class CurriculumView extends AbstractView {
         form.removeAttribute('style');
         form.querySelector('input').value = '';
 
-        document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
+        this.setSpanEditInactive();
     }
 
     static createNewSpan(event) {
@@ -741,9 +744,13 @@ export default class CurriculumView extends AbstractView {
         const startWeekNumber = startElement.closest('.week').dataset.row;
         const endWeekNumber = endElement.closest('.week').dataset.row;
 
+        let borderColor = 'var(--topMenuBackgound)'
+
+        if (this.getEditorType() == 'Curriculum Editor') borderColor = this.#getColorOfSelectedCurriculum();
+
         let textContent;
         document.querySelectorAll(`.spanContentContainer[data-spanid="${spanId}"]`).forEach(container => {
-            textContent = container.textContent;
+            if (!textContent) textContent = container.textContent;
             container.remove()
         });
 
@@ -782,6 +789,8 @@ export default class CurriculumView extends AbstractView {
             if (i == startWeekNumber) {
                 firstElement = startElement;
                 currentContainer.classList.add('start');
+                if (spanData) currentContainer.textContent = spanData.name;
+                if (textContent) currentContainer.textContent = textContent; //if the span is not a new one and edited, reinsert the old text
             }
 
             if (i == endWeekNumber) {
@@ -794,10 +803,12 @@ export default class CurriculumView extends AbstractView {
 
             currentContainer.style.width = `${rightRect.right - leftRect.left - offset}px`;
             currentContainer.style.top = `${getComputedStyle(firstElement).paddingTop}`;
+            if (borderColor) {
+                currentContainer.style.borderColor = borderColor;
+                currentContainer.style.backgroundColor = `color-mix(in srgb, ${borderColor} 10%, var(--fadedgrey) 90%)`;
+            }
 
             //append the container
-            if (textContent) currentContainer.textContent = textContent; //if the span is not a new one and edited, reinsert the old text
-            if (spanData) currentContainer.textContent = spanData.name;
             firstElement.append(currentContainer);
 
             i++
@@ -842,6 +853,14 @@ export default class CurriculumView extends AbstractView {
     }
     static hideCurriculumCreationSelectContainer() {
         document.querySelector('#curriculumCreationSelectContainer').classList.add('notDisplayed');
+    }
+
+    //set span edit status active/inactive
+    static setSpanEditActive() {
+        document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
+    }
+    static setSpanEditInactive() {
+        document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
     }
 
     //validation alerts
@@ -932,5 +951,12 @@ export default class CurriculumView extends AbstractView {
             subject: subjectSelect.value,
             grade: gradeSelect.value
         }
+    }
+
+    static #getColorOfSelectedCurriculum() {
+        const selectedCurriculum = document.querySelector('.curriculumSelectionItem.selected');
+        const props = getComputedStyle(selectedCurriculum);
+
+        return props.backgroundColor;
     }
 }

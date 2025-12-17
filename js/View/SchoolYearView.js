@@ -238,6 +238,12 @@ export default class SchoolYearView extends AbstractView {
         return taughtGrades;
     }
 
+    static isNewSchoolYear() {
+        if (document.querySelector('#createNewSchoolYearButton').classList.contains('notDisplayed')) return true;
+
+        return false;
+    }
+
     //show/enable and hide/disable buttons
     static showEditHolidayDatesButton() {
         document.querySelector('#editHolidayDatesButton').classList.remove('notDisplayed');
