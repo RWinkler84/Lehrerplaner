@@ -1,6 +1,6 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js";
-import { lessonNoteChangesArray, ONEDAY } from "../index.js";
+import { ONEDAY } from "../index.js";
 import LessonNoteController from "../Controller/LessonNoteController.js";
 
 export default class LessonNote extends AbstractModel {
@@ -212,29 +212,6 @@ export default class LessonNote extends AbstractModel {
                 }
             }
         }
-    }
-
-    static trackLessonNoteChanges(currentContent) {
-        let noteVersion = lessonNoteChangesArray.length;
-        lessonNoteChangesArray.push({ version: noteVersion, content: currentContent });
-
-        return noteVersion;
-    }
-
-    static clearLessonNoteChanges() {
-        do {
-            lessonNoteChangesArray.pop();
-        } while (lessonNoteChangesArray.length != 0);
-    }
-
-    static getPreviousChange(displayedVersion) {
-        if (displayedVersion == 0) return;
-        return lessonNoteChangesArray[displayedVersion - 1];
-    }
-
-    static getNextChange(displayedVersion) {
-        if (displayedVersion == lessonNoteChangesArray.length) return;
-        return lessonNoteChangesArray[displayedVersion + 1];
     }
 
     serialize() {

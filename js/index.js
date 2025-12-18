@@ -12,19 +12,20 @@ import LessonController from './Controller/LessonController.js';
 import CurriculumController from './Controller/CurriculumController.js';
 import SchoolYearController from './Controller/SchoolYearController.js';
 import SchoolYear from './Model/SchoolYear.js';
+import Editor from './inc/editor.js';
 
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
-export const ALLOWEDTAGS = ['div', 'ul', 'ol', 'li', 'b', 'p', 'br']
+export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
 export let unsyncedDeletedTimetableChanges = [];
 
 //track lessonNote inputs
-export let lessonNoteChangesArray = [];
+export let editorChangesArray = [];
 
 export let mailStatus = {
     authMailAlreadySend: false,
@@ -98,10 +99,16 @@ async function startApp() {
 
     //lesson note handler
     document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents);
-    document.querySelector('#lessonNoteDialog').addEventListener('keydown', LessonNoteController.handleKeyDownEvents);
-    document.querySelector('#editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
-    document.querySelector('#lessonNoteDialog').addEventListener('input', LessonNoteController.normalizeInput);
-    document.addEventListener('selectionchange', LessonNoteController.updateButtonStatus);
+
+    //text editor
+    document.querySelector('.editorContainer').addEventListener('click', Editor.handleClickEvents);
+    document.querySelector('.editorContainer').addEventListener('keydown', Editor.handleKeyDownEvents);
+    document.querySelector('.editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
+    document.addEventListener('input', (event) => {
+        Editor.normalizeInput(event);
+        LessonNoteController.toggleSaveLessonNoteButton(event);
+    });
+    document.addEventListener('selectionchange', Editor.updateButtonStatus);
 
     AbstractController.renderTopMenu();
 

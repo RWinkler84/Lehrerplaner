@@ -61,6 +61,7 @@ export class Curriculum {
         }
     }
 
+    //CurriculumSpans
     addCurriculumSpan(spanInstance) {
         if (!spanInstance instanceof CurriculumSpan) throw new TypeError('The given argument is not of type CurriculumSpan!');
 
@@ -94,6 +95,7 @@ export class Curriculum {
     getCurriculumSpanById(spanId) {
         return this.#curriculumSpans.find(entry => { return entry.id == spanId });
     }
+
 
     serialize() {
         const serialized = {

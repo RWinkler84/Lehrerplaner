@@ -27,6 +27,8 @@ export default class CurriculumController {
         }
 
         if (View.getNewSpan()) await this.cancelSpanCreation();
+        if (View.getActiveSpanId()) await this.saveSpan();
+        
         View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
         View.removeAllHandles();
     }
@@ -194,13 +196,7 @@ export default class CurriculumController {
         const spanData = await this.getSpanDataById(spanId);
 
         if (previouslyActiveSpanId) {
-            if (View.getNewSpan()) {
-                View.cancelSpanCreation(previouslyActiveSpanId);
-            } else {
-                const spanData = await this.getSpanDataById(previouslyActiveSpanId);
-                View.renderSpan(previouslyActiveSpanId, spanData);
-                View.renderSpanContentContainer(previouslyActiveSpanId, spanData);
-            }
+            await this.saveSpan()
         }
 
         View.openSpanForm(spanData);
@@ -245,7 +241,7 @@ export default class CurriculumController {
     }
 
     // event handlers
-    static handleClickEvents(event) {
+    static async handleClickEvents(event) {
         const spanEditOngoing = document.querySelector('div[data-span_edit_active]').dataset.span_edit_active;
         const classList = event.target.classList;
 
@@ -254,6 +250,10 @@ export default class CurriculumController {
             switch (true) {
                 case !classList.contains('selected'):
                     if (spanEditOngoing == 'false') CurriculumController.createNewSpan(event);
+                    if (spanEditOngoing == 'true') {
+                        await CurriculumController.saveSpan();
+                        CurriculumController.createNewSpan(event);
+                    }
                     break;
 
                 case classList.contains('selected'):
@@ -262,8 +262,7 @@ export default class CurriculumController {
             }
         }
 
-        //handle clicks on curriculum selection elements
-
+        //handle clicks on curriculum selection elements 
         if (classList.contains('curriculumSelectionItem')) {
             if (classList.contains('selected')) return;
 
