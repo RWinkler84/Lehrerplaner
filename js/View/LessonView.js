@@ -318,7 +318,7 @@ export default class LessonView {
         Controller.saveNewLesson(lessonData);
     }
 
-    /* The lesson update function doesn't really update the lesson, but stores a new on end sets the old one canceled.
+    /** The lesson update function doesn't really update the lesson, but stores a new on end sets the old one canceled.
    Both is necessary to ensure, tasks are correctly assigned and shown in the right order. */
     static prepareLessonUpdate(event) {
 
@@ -472,8 +472,7 @@ export default class LessonView {
             created: lesson.dataset.created
         }
     }
-
-        
+ 
     static getLessonNoteIdFromLessonElement(event) {
         return event.target.closest('.lesson').querySelector('.lessonNoteIndicator').dataset.noteid;
     }
@@ -526,7 +525,6 @@ export default class LessonView {
     }
 
     // input validation
-
     static alertSubjectSelect() {
         let alertRing = document.querySelector('#subject').parentElement;
 

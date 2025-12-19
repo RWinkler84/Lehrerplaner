@@ -101,9 +101,9 @@ async function startApp() {
     document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents);
 
     //text editor
-    document.querySelector('.editorContainer').addEventListener('click', Editor.handleClickEvents);
-    document.querySelector('.editorContainer').addEventListener('keydown', Editor.handleKeyDownEvents);
-    document.querySelector('.editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
+    document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('click', Editor.handleClickEvents));
+    document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
+    document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
         Editor.normalizeInput(event);
         LessonNoteController.toggleSaveLessonNoteButton(event);

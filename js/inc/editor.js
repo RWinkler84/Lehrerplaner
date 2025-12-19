@@ -44,7 +44,7 @@ export default class Editor {
             const range = document.createRange();
 
             const p = document.createElement('p');
-            p.textContent = editor.textContent;
+            p.textContent = editor.textContent.trim();
             if (p.textContent.trim() == '') {
                 const br = document.createElement('br');
                 p.append(br);
@@ -52,6 +52,9 @@ export default class Editor {
 
             this.clearEditor(editor);
             editor.append(p);
+
+            console.log(p);
+            console.log(p.textContent.length);
 
             range.setStart(p, p.textContent.length);
             range.collapse(true);
@@ -701,11 +704,8 @@ export default class Editor {
         return order;
     }
 
-    static clearEditor(editor, childNode = null) {
-        if (!childNode && editor.childNodes.length != 0) { childNode = editor.childNodes[0]; } else { return; }
-        if (childNode.childNodes.length != 0) this.clearEditor(editor, childNode.childNodes[0]);
-
-        editor.removeChild(childNode);
+    static clearEditor(editor) {
+        while (editor.childNodes.length != 0) {editor.firstChild.remove()};
     }
 
     //////////////////////

@@ -22,7 +22,7 @@
             <div class="dayName">So</div>
         </div>
     </div>
-    <div id="addTimespanForm">
+    <div id="timeSpanForm">
         <input type="text" name="topic" id="topicInput">
         <div id="cancelSpanCreationButtonContainer">
             <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
@@ -137,12 +137,12 @@
 
         function openSpanForm() {
             document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
-            document.querySelector('#addTimespanForm').style.display = 'block';
+            document.querySelector('#timeSpanForm').style.display = 'block';
         }
 
         function closeSpanForm() {
             document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
-            document.querySelector('#addTimespanForm').removeAttribute('style');
+            document.querySelector('#timeSpanForm').removeAttribute('style');
         }
 
         function createNewSpan(event) {
@@ -497,7 +497,7 @@
             }
         }
 
-        function timespanFormHandler(event) {
+        function timeSpanFormHandler(event) {
             switch (event.target.id) {
                 case 'saveSpanCreationButton':
                     con_saveSpan();
@@ -591,7 +591,7 @@
 
         createContainer();
 
-        document.querySelector('#addTimespanForm').addEventListener('click', timespanFormHandler);
+        document.querySelector('#timeSpanForm').addEventListener('click', timeSpanFormHandler);
         document.querySelector('#yearContainer').addEventListener('click', handleClicksOnDayElements);
         document.querySelector('#yearContainer').addEventListener('pointerdown', handleMouseDownOnDayElements);
     </script>

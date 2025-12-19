@@ -1,35 +1,3 @@
-#lessonNoteDialog {
-    width: 50vw;
-    max-width: 50vw;
-    height: 50vh;
-    overflow: hidden;
-}
-
-#lessonNoteDialog[open] {
-    display: flex;
-    flex-direction: column;
-}
-
-#lessonNoteDialog .dialogBody {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 100%;
-    min-height: 0;
-}
-
-#lessonNoteDialog input[type="checkbox"] {
-    height: unset;
-    width: unset;
-}
-
-#noteEditorContainer {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 100%;
-    min-height: 0;
-
-}
-
 .textEditor {
     border: solid 1px var(--bodyBackground);
     padding: 0.5rem;
@@ -85,11 +53,6 @@
     animation-timing-function: ease-out;
 }
 
-.olIcon,
-.ulIcon {
-    pointer-events: none;
-}
-
 @keyframes showSavedMessage {
     0% {opacity: 100}
     50% {opacity: 100}
@@ -105,4 +68,45 @@
         max-height: 100%;
         margin: 0;
     }
+}
+
+/* lessonNote editor styles */
+
+#lessonNoteDialog {
+    width: 50vw;
+    max-width: 50vw;
+    height: 50vh;
+    overflow: hidden;
+}
+
+#lessonNoteDialog[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+#lessonNoteDialog .dialogBody {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
+    min-height: 0;
+}
+
+#lessonNoteDialog input[type="checkbox"] {
+    height: unset;
+    width: unset;
+}
+
+#noteEditorContainer {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
+    min-height: 0;
+
+}
+
+/* curriculum span note editor */
+
+#curriculumSpanNoteEditor {
+    min-height: 10rem;
+    max-height: 10rem;
 }

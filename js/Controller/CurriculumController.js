@@ -27,7 +27,6 @@ export default class CurriculumController {
         }
 
         if (View.getNewSpan()) await this.cancelSpanCreation();
-        if (View.getActiveSpanId()) await this.saveSpan();
         
         View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
         View.removeAllHandles();
@@ -42,6 +41,10 @@ export default class CurriculumController {
     static closeHolidayEditor() {
         View.closeHolidayEditor();
         this.renderSchoolYearCurriculumEditor()
+    }
+
+    static resizeTimeSpanForm() {
+        View.resizeTimeSpanForm();
     }
 
     /////////////////////////
@@ -131,6 +134,8 @@ export default class CurriculumController {
         const spanData = View.saveSpan();
         const editorType = View.getEditorType();
         const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
+
+        console.log(spanData);
 
         if (editorType == 'Holiday Editor') {
             await schoolYear.updateHoliday(spanData);
@@ -242,6 +247,8 @@ export default class CurriculumController {
 
     // event handlers
     static async handleClickEvents(event) {
+
+        console.log(event.target)
         const spanEditOngoing = document.querySelector('div[data-span_edit_active]').dataset.span_edit_active;
         const classList = event.target.classList;
 
@@ -293,11 +300,15 @@ export default class CurriculumController {
                 CurriculumController.saveSpan();
                 break;
             case 'cancelSpanCreationButton':
+            case 'closeTimeSpanFormButton':
                 CurriculumController.cancelSpanCreation();
                 break;
             case 'deleteSelectedSpanButton':
                 CurriculumController.deleteSelectedSpan();
                 break;
+            case 'resizeTimeSpanFormButton':
+                CurriculumController.resizeTimeSpanForm();
+            break;
         }
     }
 

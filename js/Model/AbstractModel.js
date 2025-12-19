@@ -267,7 +267,6 @@ export default class AbstractModel {
     }
 
     async markLocalDBUpdated(store, date = null) {
-        console.log(store);
         if (date == null) date = new Date();
         let db = await this.openIndexedDB();
 

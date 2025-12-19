@@ -1,6 +1,7 @@
 import { ONEDAY } from "../index.js";
 import AbstractView from "./AbstractView.js";
 import Controller from '../Controller/CurriculumController.js';
+import Editor from "../inc/editor.js";
 
 export default class CurriculumView extends AbstractView {
     static renderEmptyCalendar(startDate = null, endDate = null) {
@@ -434,8 +435,9 @@ export default class CurriculumView extends AbstractView {
         });
     }
 
-    static openSpanForm(spanData) {
-        const form = document.querySelector('#addTimespanForm');
+    static openSpanForm(spanData = null) {
+        const form = document.querySelector('#timeSpanForm');
+        const editor = form.querySelector('.textEditor');
         const cancelButton = form.querySelector('#cancelSpanCreationButton');
         const deleteButton = form.querySelector('#deleteSelectedSpanButton');
         const isNewSpan = this.getNewSpan();
@@ -445,17 +447,40 @@ export default class CurriculumView extends AbstractView {
 
         if (isNewSpan) deleteButton.style.display = 'none';
         if (!isNewSpan) cancelButton.style.display = 'none';
-        if (spanData) form.querySelector('input').value = spanData.name;
+        if (spanData) {
+            form.querySelector('input').value = spanData.name;
+            editor.innerHTML = spanData.note;
+        }
 
         form.style.display = 'flex';
         this.setSpanEditActive();
     }
 
+    static resizeTimeSpanForm() {
+        const buttonContainer = document.querySelector('#curriculumNoteEditorButtonContainer');
+        const textEditor = document.querySelector('#curriculumSpanNoteEditor');
+        const resizeButton = document.querySelector('#resizeTimeSpanFormButton');
+
+        if (buttonContainer.classList.contains('notDisplayed')) {
+            buttonContainer.classList.remove('notDisplayed');
+            textEditor.classList.remove('notDisplayed');
+            resizeButton.style.transform = '';
+        } else {
+            buttonContainer.classList.add('notDisplayed');
+            textEditor.classList.add('notDisplayed');
+            resizeButton.style.transform = 'rotate(180deg)';
+
+        }
+    }
+
     static closeSpanForm() {
-        const form = document.querySelector('#addTimespanForm');
+        const form = document.querySelector('#timeSpanForm');
+        const editor = form.querySelector('.textEditor');
 
         form.removeAttribute('style');
         form.querySelector('input').value = '';
+
+        Editor.clearEditor(editor);
 
         this.setSpanEditInactive();
     }
@@ -586,9 +611,11 @@ export default class CurriculumView extends AbstractView {
     static saveSpan() {
         const topicInput = document.querySelector('#topicInput');
         const firstSpanDay = document.querySelector('.day:has(.startHandle)');
-        const lastSpanDay = document.querySelector('.day:has(.endHandle)')
+        const lastSpanDay = document.querySelector('.day:has(.endHandle)');
         const spanId = firstSpanDay.dataset.spanid;
-        let isNewSpan = this.getNewSpan()
+        const editor = document.querySelector('#curriculumSpanNoteEditor');
+        const editorContent = Editor.serializeNodeContent(editor, true);
+        let isNewSpan = this.getNewSpan();
 
         if (isNewSpan) {
             isNewSpan.removeAttribute('new');
@@ -599,6 +626,7 @@ export default class CurriculumView extends AbstractView {
             name: topicInput.value,
             startDate: new Date(firstSpanDay.dataset.date),
             endDate: new Date(lastSpanDay.dataset.date),
+            note: editorContent
         }
     }
 
