@@ -774,23 +774,6 @@ export default class Editor {
         const editorContainer = clickedElement.closest('.editorContainer');
         const editor = editorContainer.querySelector('.textEditor');
 
-        switch (clickedElement.id) {
-            // editor styling buttons
-            // case 'boldButton':
-            //     Editor.toggleBoldText(event);
-            //     Editor.trackLessonNoteChanges(editor);
-            //     break;
-            // case 'unorderedListButton':
-            //     Editor.toggleList('ul');
-            //     Editor.trackLessonNoteChanges(editor);
-            //     break;
-            // case 'orderedListButton':
-            //     Editor.toggleList('ol');
-            //     Editor.trackLessonNoteChanges(editor);
-            //     break;
-
-        }
-
         switch (true) {
             case clickedElement.classList.contains('boldButton'):
                 Editor.toggleBoldText(event);
