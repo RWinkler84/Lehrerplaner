@@ -245,10 +245,14 @@ export default class CurriculumController {
         return await LessonController.getAllSubjects();
     }
 
+    static async getCurriculaSelectionItems(referenceDate, forMainView) {
+        const schoolYear = await SchoolYearController.getSchoolYearByDate(referenceDate);
+        
+        return await View.getCurriculaSelectionItems(schoolYear, forMainView);
+    }
+
     // event handlers
     static async handleClickEvents(event) {
-
-        console.log(event.target)
         const spanEditOngoing = document.querySelector('div[data-span_edit_active]').dataset.span_edit_active;
         const classList = event.target.classList;
 

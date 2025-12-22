@@ -55,7 +55,36 @@
                     <button id="weekForwardButton">&#9654</button>
                 </div>
             </div>
+
+            <div id="weekCurriculumContainer" class="marginBottom">
+                <div class="flex gap marginBottom">
+                    <label>Stoffverteilungspläne</label>
+                    <button id="resizeCurriculumSectionButton" class="closeDialogButton" style="width: 1.5rem;">&#9660;</button>
+                </div>
+                <div id="weekCurriculaSelectionContainer" class="notDisplayed">
+                    <div class="flex gap" style="margin-bottom: 0.5rem;">
+                        <label>Auswahl:</label>
+                        <button id="resizeCurriculumSelectionButton" class="closeDialogButton" style="width: 1.5rem;">&#9650;</button>
+                    </div>
+                    <div id="weekCurriculaSelectionDisplay" style="padding-left: 1rem"></div>
+                </div>
+            </div>
+
             <div id="weekOverviewContainer">
+
+                <div id="weekCurriculaDisplay" class="notDisplayed">
+                    <div class="curriculaWeekOverview">
+                        <div id="curriculaTimeslotPlaceholder"></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="1" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="2" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="3" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="4" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="5" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="6" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="0" data-date=""></div>
+                    </div>
+                </div>
+
                 <div class="weekOverview">
                     <div id="timeslots">
                         <div></div>
@@ -552,7 +581,7 @@
                                     style="width: 1.5rem">×</button>
                             </div>
                             <div class="flex column">
-                                <input type="text" name="topic" id="topicInput" placeholder="Thema eingeben">
+                                <input type="text" name="topic" id="topicInput" placeholder="Namen eingeben">
                                 <div id="curriculumNoteEditorContainer"
                                     class="flex column halfGap marginTop editorContainer">
                                     <div id="curriculumNoteEditorButtonContainer"

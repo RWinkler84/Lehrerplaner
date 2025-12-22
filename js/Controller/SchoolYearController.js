@@ -25,6 +25,10 @@ export default class SchoolYearController {
         return await SchoolYear.getSchoolYearById(id)
     }
 
+    static async getSchoolYearByDate(date) {
+        return await SchoolYear.getSchoolYearByDate(date);
+    }
+
     static async getCurrentSchoolYear() {
         return await SchoolYear.getCurrentSchoolYear();
     }

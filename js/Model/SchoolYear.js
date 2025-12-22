@@ -120,8 +120,8 @@ export class Curriculum {
     set curriculumSpans(value) {
         throw new Error('Curriculum span entries can only be added by calling the addSpan method! Add one instance of a span at a time.');
     }
-    set grade(value) {this.#grade = value};
-    set subject(value) {this.#subject = value};
+    set grade(value) { this.#grade = value };
+    set subject(value) { this.#subject = value };
 }
 
 export class CurriculumSpan {
@@ -459,7 +459,27 @@ export default class SchoolYear extends AbstractModel {
         return this.#curricula.find(curriculum => { return curriculum.id == id });
     }
 
+    getCurriculumSpansInDateRange(curriculumId, startDate, endDate) {
+        if (startDate instanceof Date == false) startDate = new Date(startDate);
+        if (endDate instanceof Date == false) endDate = new Date(endDate);
 
+        const curriculum = this.getCurriculumById(curriculumId);
+        const matchingSpans = [];
+
+        const startTimestamp = startDate.setHours(12, 0, 0, 0);
+        const endTimestamp = endDate.setHours(12, 0, 0, 0);
+
+        curriculum.curriculumSpans.forEach(span => {
+            const spanStartDate = new Date(span.startDate).setHours(12, 0, 0, 0);
+            const spanEndDate = new Date(span.endDate).setHours(12, 0, 0, 0);
+
+            if (spanStartDate <= endTimestamp && spanEndDate >= startTimestamp) {
+                matchingSpans.push(span);
+            }
+        });
+
+        return matchingSpans;
+    }
     //class helper functions
     serialize() {
         const serialized = {

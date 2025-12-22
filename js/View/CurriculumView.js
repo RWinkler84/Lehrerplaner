@@ -165,7 +165,7 @@ export default class CurriculumView extends AbstractView {
         const allDays = yearContainer.querySelectorAll('.day');
         const dayNameContainer = document.querySelector('#dayNameContainer');
 
-        const curriculumElements = await this.getSchoolYearCurriculumElementsHTML(schoolYear);
+        const curriculumElements = await this.getCurriculaSelectionItems(schoolYear);
 
         yearContainer.classList.remove('holidayEditor');
         yearContainer.classList.add('curriculumEditor');
@@ -193,7 +193,7 @@ export default class CurriculumView extends AbstractView {
         //render the curriculum spans
         if (!curriculumId) {
             document.querySelector('#curriculumContainer').dataset.curriculumid = schoolYear.curricula[0].id;
-            document.querySelector(`.curriculumSelectionItem[data-curriculumid="${schoolYear.curricula[0].id}"]`).classList.add('selected');
+            document.querySelector(`.curriculumSelectionItem[data-curriculumid="${schoolYear.curricula[0].id}"].settingsView`).classList.add('selected');
 
             schoolYear.curricula[0].curriculumSpans.forEach(span => {
                 this.renderSpan(span.id, span);
@@ -206,7 +206,7 @@ export default class CurriculumView extends AbstractView {
         const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
         document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
-        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`).classList.add('selected');
+        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"].settingsView`).classList.add('selected');
 
         curriculumToRender.curriculumSpans.forEach(span => {
             this.renderSpan(span.id, span);
@@ -218,7 +218,7 @@ export default class CurriculumView extends AbstractView {
     static rerenderDisplayedCurriculum(schoolYear, curriculumId) {
         const yearContainer = document.querySelector('#yearContainer');
 
-        document.querySelectorAll('.curriculumSelectionItem').forEach(item => item.classList.remove('selected'));
+        document.querySelectorAll('.curriculumSelectionItem.settingsView').forEach(item => item.classList.remove('selected'));
 
         //clear the old spans
         yearContainer.querySelectorAll('.day').forEach(day => {
@@ -233,7 +233,7 @@ export default class CurriculumView extends AbstractView {
         const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
         if (curriculumToRender) {
-            const selectedCurriculumItem = document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"]`);
+            const selectedCurriculumItem = document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"].settingsView`);
             if (selectedCurriculumItem) selectedCurriculumItem.classList.add('selected');
 
             curriculumToRender.curriculumSpans.forEach(span => {
@@ -305,7 +305,7 @@ export default class CurriculumView extends AbstractView {
         selectContainer.append(errorMessageDisplay);
     }
 
-    static async getSchoolYearCurriculumElementsHTML(schoolYear) {
+    static async getCurriculaSelectionItems(schoolYear, forMainView = false) {
         if (schoolYear.curricula.length == 0) return false;
 
         const subjects = await Controller.getAllSubjects();
@@ -318,6 +318,7 @@ export default class CurriculumView extends AbstractView {
 
             gradeContainer.dataset.grade = grade;
             gradeContainer.classList.add('flex');
+            gradeContainer.classList.add('wrap');
             gradeContainer.classList.add('halfGap');
             gradeContainer.classList.add('marginBottom');
             gradeLabel.textContent = `Klasse ${grade}:`;
@@ -333,11 +334,9 @@ export default class CurriculumView extends AbstractView {
 
             container.dataset.curriculumid = item.id;
             container.classList.add('curriculumSelectionItem');
-            if (subject) {
-                container.classList.add(subject.colorCssClass);
-            } else {
-                container.classList.add('undefined');
-            }
+
+            if (forMainView) { container.classList.add('mainView'); } else { container.classList.add('settingsView'); }
+            if (subject) { container.classList.add(subject.colorCssClass); } else { container.classList.add('undefined'); }
 
             curriculumName.textContent = `${item.subject}`;
 
@@ -444,6 +443,16 @@ export default class CurriculumView extends AbstractView {
 
         form.querySelector('#cancelSpanCreationButton').removeAttribute('style');
         form.querySelector('#deleteSelectedSpanButton').removeAttribute('style');
+
+        if (this.getEditorType() == 'Holiday Editor') {
+            form.querySelector('.editorButtonContainer').classList.add('notDisplayed');
+            editor.classList.add('notDisplayed');
+            form.querySelector('#resizeTimeSpanFormButton').classList.add('hidden');
+        }
+
+        if (this.getEditorType() == 'Curriculum Editor') {
+            form.querySelector('#resizeTimeSpanFormButton').classList.remove('hidden');
+        }
 
         if (isNewSpan) deleteButton.style.display = 'none';
         if (!isNewSpan) cancelButton.style.display = 'none';

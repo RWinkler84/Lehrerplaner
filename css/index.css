@@ -57,6 +57,12 @@ input[type="checkbox"] {
     margin: 0 0.25rem;
 }
 
+label {
+    display: block;
+    font-weight: bold;
+    color: var(--labelgrey);
+}
+
 textarea {
     width: 100%;
     height: 7rem;
@@ -282,6 +288,7 @@ dialog .errorMessageDisplay,
 }
 
 .weekOverview,
+.curriculaWeekOverview,
 .settingsWeekOverview {
     width: 100%;
     display: grid;
@@ -294,6 +301,7 @@ dialog .errorMessageDisplay,
 }
 
 #timeslots,
+#curriculaTimeslotPlaceholder,
 #settingsTimeslots {
     display: grid;
     grid-template-rows: 3rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -332,6 +340,7 @@ dialog .errorMessageDisplay,
 }
 
 .weekday,
+.curriculaDisplayWeekday,
 .settingsWeekday {
     display: grid;
     border-left: solid 1px var(--lightgrey);
@@ -340,8 +349,40 @@ dialog .errorMessageDisplay,
 }
 
 .weekday[data-weekday_number="1"],
+.curriculaDisplayWeekday[data-weekday_number="1"],
 .settingsWeekday[data-weekday_number="1"] {
     border-left: none;
+}
+
+.curriculaDisplayWeekday {
+    grid-template-rows: unset;
+}
+
+.curriculumSpanContainer {
+    height: 2.5rem;
+}
+
+.spanItem {
+    position: absolute;
+    padding: 0.25rem 0.5rem;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    border-top: solid 2px var(--topMenuBackgound);
+}
+
+.spanItem.start {
+    border-left: solid 0.75rem var(--topMenuBackgound);
+    border-top-left-radius: var(--standardRadius);
+    border-bottom-left-radius: var(--standardRadius);
+}
+
+.spanItem.end {
+    border-top-right-radius: var(--standardRadius);
+    border-bottom-right-radius: var(--standardRadius);
+}
+
+.spanName {
+    position: sticky;
+    left: 2rem;
 }
 
 .weekday.passed {
@@ -593,12 +634,6 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 /* Settings Container */
-#settingsContainer label {
-    display: block;
-    font-weight: bold;
-    color: var(--labelgrey);
-}
-
 #settingsMenu {
     display: flex;
     gap: 0.5rem;
@@ -1516,11 +1551,6 @@ h4 {
 
     #validFromPickerContainer {
         width: 100%;
-    }
-
-    /* generic classes */
-    .wrap {
-        justify-content: end;
     }
 }
 

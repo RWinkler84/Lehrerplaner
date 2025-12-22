@@ -115,6 +115,8 @@ async function startApp() {
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
+    await LessonController.renderCurriculaSelection();
+    await LessonController.renderSelectedCurricula();
     await LessonView.renderLesson();
 
     await TaskView.renderTasks();
@@ -153,24 +155,26 @@ async function startApp() {
     }
 
     function setDateForWeekdays() {
+        const curriculaDisplayWeekdays = document.querySelectorAll('.curriculaDisplayWeekday');
+        const weekdays = document.querySelectorAll('.weekday');
+
         let todayUnix = new Date().setHours(12, 0, 0, 0);
 
         //go back to monday of given week
         while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;
 
-        document.querySelectorAll('.weekday').forEach((weekday) => {
-
-            weekday.dataset.date = new Date(todayUnix).toString();
+        for (let i = 0; i < weekdays.length; i++) {
+            curriculaDisplayWeekdays[i].dataset.date = new Date(todayUnix).toString();
+            weekdays[i].dataset.date = new Date(todayUnix).toString();
 
             todayUnix += ONEDAY;
-        })
+        }
 
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
         AbstractView.setIsTodayDot();
         AbstractView.scrollToCurrentDay();
     }
-
 
     function setWeekStartAndEndDate() {
         let startDateSpan = document.querySelector('#weekStartDate');
@@ -198,6 +202,13 @@ async function startApp() {
             weekday.dataset.date = new Date(newDate).toString();
         });
 
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate - ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
         AbstractView.setDateOnWeekdayLabel();
         AbstractView.greyOutPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
@@ -216,6 +227,13 @@ async function startApp() {
         document.querySelectorAll('.weekday').forEach((weekday) => {
             let currentDate = new Date(weekday.dataset.date).getTime();
             let newDate = currentDate + ONEDAY * 7; // +7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate + ONEDAY * 7; // -7 days
 
             weekday.dataset.date = new Date(newDate).toString();
         });
@@ -260,6 +278,7 @@ async function startApp() {
         if (nextWeek == false) verticalOffset = window.innerWidth * -1;
 
         LessonView.removeAllLessons(blankWeekTable);
+        LessonController.removeAllCurriculumSpans(blankWeekTable);
 
         //setup for the animation
         weekOverview.style.left = '0px';
@@ -281,12 +300,14 @@ async function startApp() {
         setTimeout(() => {
             blankWeekTable.remove()
             weekOverview.style.left = 'auto';
-            LessonView.removeAllLessons(weekOverview);
+            timetableContainer.style.height = '';
+
             LessonView.renderLesson();
+            LessonController.renderSelectedCurricula();
 
             weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
                 lesson.style.opacity = '0';
-                lesson.style.transition = 'all 0.2s ease-out';
+                lesson.style.transition = 'all 1s ease-out';
             });
         }, 350);
 

@@ -472,7 +472,7 @@ export default class LessonView {
             created: lesson.dataset.created
         }
     }
- 
+
     static getLessonNoteIdFromLessonElement(event) {
         return event.target.closest('.lesson').querySelector('.lessonNoteIndicator').dataset.noteid;
     }
@@ -522,6 +522,149 @@ export default class LessonView {
             'type': isSubstitute,
             'created': lessonElement.dataset.created
         }
+    }
+
+    static getCurrentlyDisplayedWeekDates() {
+        const weekOverview = document.querySelector('#weekOverviewContainer');
+        return {
+            monday: weekOverview.querySelector('.weekday[data-weekday_number="1"]').dataset.date,
+            tuesday: weekOverview.querySelector('.weekday[data-weekday_number="2"]').dataset.date,
+            wednesday: weekOverview.querySelector('.weekday[data-weekday_number="3"]').dataset.date,
+            thursday: weekOverview.querySelector('.weekday[data-weekday_number="4"]').dataset.date,
+            friday: weekOverview.querySelector('.weekday[data-weekday_number="5"]').dataset.date,
+            saturday: weekOverview.querySelector('.weekday[data-weekday_number="6"]').dataset.date,
+            sunday: weekOverview.querySelector('.weekday[data-weekday_number="0"]').dataset.date,
+        }
+    }
+    //////////////////////////
+    // week curriculum view //
+    //////////////////////////
+    static renderCurriculaSelection(curriculaSelection) {
+        const container = document.querySelector('#weekCurriculaSelectionDisplay');
+
+        container.append(curriculaSelection);
+    }
+
+    static renderCurriculumSpans(spans, colorCssClass) {
+        const body = document.querySelector('body');
+        const timetableContainer = document.querySelector('#timetableContainer');
+        const weekCurriculaDisplay = document.querySelector('#weekCurriculaDisplay');
+        const weekdays = Array.from(weekCurriculaDisplay.querySelectorAll('.curriculaDisplayWeekday'));
+
+        const remSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const offset = parseFloat(getComputedStyle(timetableContainer).paddingLeft) + parseFloat(getComputedStyle(body).marginLeft);
+        const padding = remSize * 0.2;
+
+        const blankDiv = document.createElement('div');
+        const spanContainer = blankDiv.cloneNode();
+
+        spanContainer.classList.add('curriculumSpanContainer');
+
+        spans.forEach(span => {
+            const currentContainer = blankDiv.cloneNode();
+            let startDayElement = weekdays.find(weekday => { return new Date(weekday.dataset.date).setHours(12, 0, 0, 0) == new Date(span.startDate).setHours(12, 0, 0, 0) });
+            let endDayElement = weekdays.find(weekday => { return new Date(weekday.dataset.date).setHours(12, 0, 0, 0) == new Date(span.endDate).setHours(12, 0, 0, 0) });
+
+            currentContainer.dataset.spanid = span.id;
+            currentContainer.classList.add('spanItem');
+            if (startDayElement) currentContainer.classList.add('start');
+            if (endDayElement) currentContainer.classList.add('end');
+
+            //positioning
+            // if the start or end of the span lies outside of the displayed week, the start/end must be set to monday/sunday
+            if (!startDayElement) {
+                startDayElement = weekdays[0];
+            }
+            if (!endDayElement) {
+                endDayElement = weekdays[6];
+            }
+
+            const scrolledContainer = document.querySelector('#weekOverviewContainer');
+            const startElementProps = startDayElement.getBoundingClientRect();
+            const endElementProps = endDayElement.getBoundingClientRect();
+
+            currentContainer.style.left = `${startElementProps.left + scrolledContainer.scrollLeft - offset + padding}px`;
+            currentContainer.style.width = `${endElementProps.right - startElementProps.left - padding * 2}px`;
+
+            //color 
+            const colorPeeker = document.querySelector(`.${colorCssClass}`);
+            let backgroundColor;
+
+            if (colorPeeker) {
+                backgroundColor = getComputedStyle(colorPeeker).backgroundColor;
+            } else {
+                backgroundColor = 'var(--topMenuBackgound)';
+            }
+
+            currentContainer.style.borderColor = backgroundColor;
+            currentContainer.style.backgroundColor = `color-mix(in srgb, ${backgroundColor} 10%, var(--fadedgrey) 90%)`;
+
+            const blankSpan = document.createElement('span');
+            blankSpan.classList.add('spanName');
+            blankSpan.textContent = span.name;
+
+            currentContainer.append(blankSpan);
+            spanContainer.append(currentContainer);
+        });
+
+        if (spanContainer.childElementCount != 0) weekdays[0].append(spanContainer);
+    }
+
+    static removeAllCurriculumSpans(element = null) {
+        if (!element) element = document.querySelector('.curriculaDisplayWeekday[data-weekday_number="1"]') // all spanContainer are appended to monday
+
+        element.querySelectorAll('.curriculumSpanContainer').forEach(item => item.remove());
+    }
+
+    static toggleCurriculumSelectionItem(event) {
+        const item = event.target;
+
+        if (item.classList.contains('selected')) {
+            item.classList.remove('selected');
+        } else {
+            item.classList.add('selected');
+        }
+    }
+
+    static resizeCurriculaSection() {
+        const curriculaSelection = document.querySelector('#weekCurriculaSelectionContainer');
+        const curriculaSelectionDisplay = document.querySelector('#weekCurriculaSelectionDisplay');
+        const curriculaDisplay = document.querySelector('#weekCurriculaDisplay');
+        const resizeButton = document.querySelector('#resizeCurriculumSectionButton');
+
+        if (curriculaDisplay.classList.contains('notDisplayed')) {
+            curriculaSelection.classList.remove('notDisplayed');
+            curriculaSelectionDisplay.classList.remove('notDisplayed');
+            curriculaDisplay.classList.remove('notDisplayed');
+
+            resizeButton.style.transform = 'rotate(180deg)';
+        } else {
+            curriculaSelection.classList.add('notDisplayed');
+            curriculaDisplay.classList.add('notDisplayed');
+
+            resizeButton.style.transform = '';
+        }
+    }
+
+    static resizeCurriculaSelection() {
+        const curriculaSelection = document.querySelector('#weekCurriculaSelectionDisplay');
+        const resizeButton = document.querySelector('#resizeCurriculumSelectionButton');
+
+        if (curriculaSelection.classList.contains('notDisplayed')) {
+            curriculaSelection.classList.remove('notDisplayed');
+            resizeButton.style.transform = '';
+        } else {
+            curriculaSelection.classList.add('notDisplayed');
+            resizeButton.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    static getSelectedCurriculaIds() {
+        const ids = [];
+
+        document.querySelectorAll('.curriculumSelectionItem.mainView.selected').forEach(item => ids.push(item.dataset.curriculumid));
+
+        return ids;
     }
 
     // input validation
