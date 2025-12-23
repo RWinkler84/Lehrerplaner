@@ -348,10 +348,24 @@ dialog .errorMessageDisplay,
     min-width: 0;
 }
 
+.weekday {
+    position: relative;
+}
+
 .weekday[data-weekday_number="1"],
 .curriculaDisplayWeekday[data-weekday_number="1"],
 .settingsWeekday[data-weekday_number="1"] {
     border-left: none;
+}
+
+.weekday .holidayNameMask {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(-70deg);
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--lightgrey);
 }
 
 .curriculaDisplayWeekday {
@@ -382,10 +396,12 @@ dialog .errorMessageDisplay,
 
 .spanName {
     position: sticky;
+    overflow-y: scroll;
     left: 2rem;
 }
 
-.weekday.passed {
+.weekday.passed,
+.weekday.holiday {
     background-color: var(--lightergrey);
 }
 
@@ -1551,6 +1567,11 @@ h4 {
 
     #validFromPickerContainer {
         width: 100%;
+    }
+
+    /* generic classes */
+    .responsiveSpaceBetween {
+        justify-content: space-between;
     }
 }
 

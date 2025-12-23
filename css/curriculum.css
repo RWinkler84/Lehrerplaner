@@ -44,7 +44,7 @@
     border: solid 1px var(--bodyBackground);
     padding: 1rem 2rem;
     position: sticky;
-    width: 40%;
+    width: max(50%, 450px);
     bottom: 1rem;
     margin-top: 0.5rem;
     left: 100%;
@@ -204,6 +204,7 @@
     pointer-events: none;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-wrap: nowrap;
 }
 
 .spanContentContainer.start {
@@ -288,7 +289,7 @@
     }
 
     #timeSpanForm {
-        width: 60%;
+        bottom: 0;
     }
 
 }

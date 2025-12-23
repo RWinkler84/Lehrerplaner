@@ -394,6 +394,27 @@ export default class SchoolYear extends AbstractModel {
         return this.#holidays.find(holiday => { return holiday.id == id });
     }
 
+    getHolidaysInDateRange(startDate, endDate) {
+        if (startDate instanceof Date == false) startDate = new Date(startDate);
+        if (endDate instanceof Date == false) endDate = new Date(endDate);
+
+        const matchingHolidays = [];
+
+        const startTimestamp = startDate.setHours(12, 0, 0, 0);
+        const endTimestamp = endDate.setHours(12, 0, 0, 0);
+
+        this.holidays.forEach(holiday => {
+            const spanStartDate = new Date(holiday.startDate).setHours(12, 0, 0, 0);
+            const spanEndDate = new Date(holiday.endDate).setHours(12, 0, 0, 0);
+
+            if (spanStartDate <= endTimestamp && spanEndDate >= startTimestamp) {
+                matchingHolidays.push(holiday);
+            }
+        });
+
+        return matchingHolidays;
+    }
+
     ///////////////////////////////////
     // curriculum instance functions //
     ///////////////////////////////////

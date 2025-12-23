@@ -32,9 +32,10 @@ export let mailStatus = {
     resetMailAlreadySend: false
 };
 
-let abstCtrl = new AbstractController();
-
 export let taskBackupArray = [];
+
+let abstCtrl = new AbstractController();
+let timeout = false //for resize debouncing
 
 async function startApp() {
     AbstractController.setVersion('0.9.42');
@@ -110,6 +111,26 @@ async function startApp() {
     });
     document.addEventListener('selectionchange', Editor.updateButtonStatus);
 
+    //rerender on resize
+    window.addEventListener('resize', () => {
+        const curriculumSectionMainView = document.querySelector('#weekCurriculaDisplay');
+        const curriculumSettingsView = document.querySelector('#curriculumViewContainer');
+
+        if (!curriculumSectionMainView.classList.contains('notDisplayed')) {
+            clearTimeout(timeout)
+            timeout = setTimeout(() => {
+                LessonController.renderSelectedCurricula();
+            }, 100);
+        }
+
+        if (curriculumSettingsView.style.display == 'block') {
+            const curriculumId = CurriculumController.getDisplayedCurriculumId();
+            CurriculumController.rerenderDisplayedCurriculum(curriculumId);
+
+        }
+    });
+
+
     AbstractController.renderTopMenu();
 
     setDateForWeekdays();
@@ -171,7 +192,7 @@ async function startApp() {
         }
 
         AbstractView.setDateOnWeekdayLabel();
-        AbstractView.greyOutPassedDays();
+        AbstractView.greyOutHolidaysAndPassedDays();
         AbstractView.setIsTodayDot();
         AbstractView.scrollToCurrentDay();
     }
@@ -210,7 +231,7 @@ async function startApp() {
         });
 
         AbstractView.setDateOnWeekdayLabel();
-        AbstractView.greyOutPassedDays();
+        AbstractView.greyOutHolidaysAndPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(false);
@@ -239,7 +260,7 @@ async function startApp() {
         });
 
         AbstractView.setDateOnWeekdayLabel();
-        AbstractView.greyOutPassedDays();
+        AbstractView.greyOutHolidaysAndPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(true);

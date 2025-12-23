@@ -178,7 +178,7 @@ export default class LessonController {
 
     static async renderSelectedCurricula() {
         View.removeAllCurriculumSpans();
-        
+
         const selectedCurriculaIds = View.getSelectedCurriculaIds();
         const weekdayDates = View.getCurrentlyDisplayedWeekDates();
         const schoolYear = await SchoolYearController.getSchoolYearByDate(weekdayDates.monday);
@@ -206,8 +206,6 @@ export default class LessonController {
     // event handler //
     static timetableClickHandler(event) {
         const target = event.target;
-
-        console.log(event.target)
 
         switch (target.id) {
             case 'resizeCurriculumSectionButton':

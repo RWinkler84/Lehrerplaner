@@ -5,6 +5,7 @@ import LessonController from "./LessonController.js";
 import TaskController from "./TaskController.js";
 import LoginController from "./LoginController.js";
 import AbstractModel from "../Model/AbstractModel.js";
+import SchoolYearController from "./SchoolYearController.js";
 
 export default class AbstractController {
 
@@ -28,6 +29,10 @@ export default class AbstractController {
 
     static async getAllTimetableChanges() {
         return await LessonController.getAllTimetableChanges();
+    }
+
+    static async getSchoolYearByDate(date) {
+        return await SchoolYearController.getSchoolYearByDate(date);
     }
 
     static openLoginDialog() {

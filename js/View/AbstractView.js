@@ -83,10 +83,45 @@ export default class AbstractView {
             taskRow.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
         });
     }
-    static greyOutPassedDays() {
+    static async greyOutHolidaysAndPassedDays() {
+        const mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
+        const sundayDate = document.querySelector('.weekday[data-weekday_number="6"]').dataset.date;
+        const schoolYear = await AbstractController.getSchoolYearByDate(mondayDate);
+
+        const holidays = schoolYear?.getHolidaysInDateRange(mondayDate, sundayDate);
+
+        //passed days
         document.querySelectorAll('.weekday').forEach(weekday => {
             weekday.classList.remove('passed');
+            weekday.classList.remove('holiday');
+
+            weekday.querySelector('.holidayNameMask')?.remove();
+
             if (new Date(weekday.dataset.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) weekday.classList.add('passed');
+        })
+
+        //holidays and weekends
+        document.querySelectorAll('.weekday').forEach(weekday => {
+            if (weekday.dataset.weekday_number == '6' || weekday.dataset.weekday_number == '0') weekday.classList.add('holiday');
+
+            holidays?.forEach(holiday => {
+                const weekdayTimestamp = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+                const holidayStartTstmp = new Date(holiday.startDate).setHours(12, 0, 0, 0);
+                const holidayEndTstmp = new Date(holiday.endDate).setHours(12, 0, 0, 0);
+
+                if (weekdayTimestamp >= holidayStartTstmp && weekdayTimestamp <= holidayEndTstmp) {
+                    const holidayNameContainer = document.createElement('div');
+
+                    holidayNameContainer.classList.add('holidayNameMask');
+                    holidayNameContainer.textContent = holiday.name;
+
+                    weekday.classList.add('holiday');
+
+                    if (weekday.dataset.weekday_number != '0' && weekday.dataset.weekday_number != '6') {
+                        weekday.insertBefore(holidayNameContainer, weekday.firstElementChild);
+                    }
+                }
+            })
         })
     }
 
