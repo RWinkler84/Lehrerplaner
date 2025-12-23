@@ -542,6 +542,8 @@ export default class LessonView {
     static renderCurriculaSelection(curriculaSelection) {
         const container = document.querySelector('#weekCurriculaSelectionDisplay');
 
+        while (container.firstChild) container.firstChild.remove();
+
         container.append(curriculaSelection);
     }
 

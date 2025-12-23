@@ -1,6 +1,7 @@
 import View from '../View/SchoolYearView.js';
 import SchoolYear from "../Model/SchoolYear.js";
 import CurriculumController from './CurriculumController.js';
+import LessonController from './LessonController.js';
 
 export default class SchoolYearController {
 
@@ -92,6 +93,7 @@ export default class SchoolYearController {
             View.enableSaveNewSchoolYearButton();
 
             CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
+            await LessonController.renderCurriculaSelection();
 
             return;
         }
@@ -104,6 +106,8 @@ export default class SchoolYearController {
         if (!View.isNewSchoolYear()) View.renderSchoolYearInfoSection(schoolYear);
 
         if (CurriculumController.getEditorType() == 'Curriculum Editor') CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
+
+        await LessonController.renderCurriculaSelection();
     }
 
     static async editHolidayDates() {
@@ -131,7 +135,7 @@ export default class SchoolYearController {
     static async saveNewSchoolYear() {
         const schoolYearId = View.getDisplayedSchoolYearId();
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
-        
+
         CurriculumController.enableCreateCurriculumButton();
         View.renderSchoolYearInfoSection(schoolYear);
     }

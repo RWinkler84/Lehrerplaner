@@ -33,6 +33,12 @@ export default class AbstractController {
 
     static async getSchoolYearByDate(date) {
         return await SchoolYearController.getSchoolYearByDate(date);
+
+        View.greyOutHolidaysAndPassedDays()
+    }
+
+    static async greyOutHolidaysAndPassedDays() {
+        await View.greyOutHolidaysAndPassedDays();
     }
 
     static openLoginDialog() {

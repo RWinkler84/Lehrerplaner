@@ -3,6 +3,7 @@ import LessonController from "./LessonController.js";
 import SchoolYearController from "./SchoolYearController.js";
 import Fn from "../inc/utils.js";
 import SchoolYear from "../Model/SchoolYear.js";
+import AbstractController from "./AbstractController.js";
 
 export default class CurriculumController {
     static renderEmptyCalendar(startDate, endDate) {
@@ -142,19 +143,22 @@ export default class CurriculumController {
 
             SchoolYearController.renderSchoolYearInfoSection(schoolYear.id, false);
             View.openHolidayEditor(schoolYear);
+
+            await AbstractController.greyOutHolidaysAndPassedDays();
         }
 
         if (editorType == 'Curriculum Editor') {
             const curriculumId = View.getDisplayedCurriculumId();
             await schoolYear.updateCurriculumSpan(curriculumId, spanData);
             View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
+
+            await LessonController.renderSelectedCurricula();
         }
 
         View.closeSpanForm();
         View.removeAllHandles();
         View.removeAnchorFromSpan(spanId);
         View.enableTouchActionsOnDayElements();
-
     }
 
     static async cancelSpanCreation() {
