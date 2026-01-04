@@ -96,6 +96,8 @@ export default class Utils {
     //find the first thursday of the year, which marks the first calendar week
     static getFirstThirsdayOfTheYear(year) {
         let firstDay = new Date(year + '-01-01');
+        
+        firstDay.setHours(12,0,0,0);
 
         if (firstDay.getDay() != 4) {
             while (firstDay.getDay() != 4) {
