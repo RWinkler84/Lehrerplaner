@@ -664,7 +664,7 @@ export default class LessonView {
     static getSelectedCurriculaIds() {
         const ids = [];
 
-        document.querySelectorAll('.curriculumSelectionItem.mainView.selected').forEach(item => ids.push(item.dataset.curriculumid));
+        document.querySelectorAll('.curriculumSelectionItem.appContainer.selected').forEach(item => ids.push(item.dataset.curriculumid));
 
         return ids;
     }

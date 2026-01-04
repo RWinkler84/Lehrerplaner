@@ -132,7 +132,9 @@ export default class LoginController {
         }
     }
 
-    static async createGuestAccount() {
+    static async createGuestAccount(event) {
+        event.preventDefault();
+
         let db = new Model;
         await db.createGuestAccount();
         AbstractController.renderTopMenu();
@@ -278,7 +280,7 @@ export default class LoginController {
 
             //links
             case 'continueAsGuest':
-                LoginController.createGuestAccount();
+                LoginController.createGuestAccount(event);
                 break;
             case 'createAccount':
                 LoginController.openCreateAccountDialog(event);

@@ -305,7 +305,7 @@ export default class CurriculumView extends AbstractView {
         selectContainer.append(errorMessageDisplay);
     }
 
-    static async getCurriculaSelectionItems(schoolYear, forMainView = false) {
+    static async getCurriculaSelectionItems(schoolYear, forappContainer = false) {
         if (schoolYear.curricula.length == 0) return false;
 
         const subjects = await Controller.getAllSubjects();
@@ -335,7 +335,7 @@ export default class CurriculumView extends AbstractView {
             container.dataset.curriculumid = item.id;
             container.classList.add('curriculumSelectionItem');
 
-            if (forMainView) { container.classList.add('mainView'); } else { container.classList.add('settingsView'); }
+            if (forappContainer) { container.classList.add('appContainer'); } else { container.classList.add('settingsView'); }
             if (subject) { container.classList.add(subject.colorCssClass); } else { container.classList.add('undefined'); }
 
             curriculumName.textContent = `${item.subject}`;

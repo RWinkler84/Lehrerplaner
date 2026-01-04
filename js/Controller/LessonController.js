@@ -222,7 +222,7 @@ export default class LessonController {
                 break;
 
             case target.classList.contains('curriculumSelectionItem'):
-                if (!target.classList.contains('mainView')) return;    
+                if (!target.classList.contains('appContainer')) return;    
                 this.toggleCurriculumSelectionItem(event);
                 this.renderSelectedCurricula();
                 break;

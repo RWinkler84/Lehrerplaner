@@ -249,10 +249,10 @@ export default class CurriculumController {
         return await LessonController.getAllSubjects();
     }
 
-    static async getCurriculaSelectionItems(referenceDate, forMainView) {
+    static async getCurriculaSelectionItems(referenceDate, forappContainer) {
         const schoolYear = await SchoolYearController.getSchoolYearByDate(referenceDate);
         
-        return await View.getCurriculaSelectionItems(schoolYear, forMainView);
+        return await View.getCurriculaSelectionItems(schoolYear, forappContainer);
     }
 
     // event handlers
