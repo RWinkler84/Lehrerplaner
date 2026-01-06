@@ -230,6 +230,7 @@ class AbstractModel
             $query = "SELECT * FROM $tableName WHERE userId = $userId";
 
             $dataFromDb = $this->read($query, []);
+            $dataFromDb = $this->preprocessReadData($dataFromDb);
         }
 
         if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];

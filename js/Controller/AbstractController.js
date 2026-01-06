@@ -70,6 +70,7 @@ export default class AbstractController {
             if (updatedElements.timetable) await SettingsController.renderSettingsLessonChanges();
             if (updatedElements.timetableChanges) await LessonController.renderLesson();
             if (updatedElements.tasks) await TaskController.renderTaskChanges();
+            if (updatedElements.schoolYears) await LessonController.renderCurriculaSelection();
         }
 
         TaskController.renderTaskChanges();

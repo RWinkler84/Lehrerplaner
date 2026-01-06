@@ -334,6 +334,9 @@ export default class SchoolYear extends AbstractModel {
 
         let result = await this.makeAjaxQuery('schoolYear', 'update', this.serialize());
 
+        console.log(this.serialize());
+        console.log(result)
+
         if (result.status == 'failed') this.writeToLocalDB('unsyncedSchoolYears', this.serialize());
     }
 

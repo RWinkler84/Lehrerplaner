@@ -537,8 +537,6 @@ export default class AbstractModel {
             await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true, schoolYears: true });
         }
 
-        /// hier gehts weiter
-
         //send data with differing timestamps
         if (remoteTimestamps[0].subjects != localTimestamps.subjects) {
             dataToSync['subjects'] = await this.readAllFromLocalDB('unsyncedSubjects');
@@ -569,6 +567,12 @@ export default class AbstractModel {
             tablesToUpdate.lessonNotes = true;
         }
 
+        if (remoteTimestamps[0].schoolYears != localTimestamps.schoolYears) {
+            dataToSync['schoolYears'] = await this.readAllFromLocalDB('unsyncedSchoolYears');
+            dataToSync['deletedSchoolYears'] = await this.readAllFromLocalDB('unsyncedDeletedSchoolYears');
+            tablesToUpdate.schoolYears = true;
+        }
+
         let result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
         //check the results and clear data that has been synced
@@ -594,6 +598,11 @@ export default class AbstractModel {
         if (result.lessonNotes.status && result.lessonNotes.status == 'success') {
             this.clearObjectStore('unsyncedLessonNotes');
             this.clearObjectStore('unsyncedDeletedLessonNotes');
+        }
+
+        if (result.schoolYears.status && result.schoolYears.status == 'success') {
+            this.clearObjectStore('unsyncedSchoolYears');
+            this.clearObjectStore('unsyncedDeletedSchoolYears');
         }
 
         this.updateLocalWithRemoteData(tablesToUpdate);
@@ -625,6 +634,20 @@ export default class AbstractModel {
         if (tablesToUpdate.lessonNotes) {
             let lessonNotes = await this.makeAjaxQuery('abstract', 'getAllLessonNotes');
             await this.writeRemoteToLocalDB('lessonNotes', lessonNotes, remoteTimestamps[0].lessonNotes);
+        }
+
+        if (tablesToUpdate.schoolYears) {
+            let schoolYears = await this.makeAjaxQuery('abstract', 'getAllSchoolYears');
+
+            schoolYears.forEach(schoolYear => {
+                schoolYear.grades = JSON.parse(schoolYear.grades);
+                schoolYear.holidays = JSON.parse(schoolYear.holidays);
+                schoolYear.curricula = JSON.parse(schoolYear.curricula);
+            })
+
+            console.log(schoolYears);
+
+            await this.writeRemoteToLocalDB('schoolYears', schoolYears, remoteTimestamps[0].schoolYears);
         }
 
         AbstractController.renderDataChanges(tablesToUpdate);
