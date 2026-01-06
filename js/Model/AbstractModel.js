@@ -194,19 +194,20 @@ export default class AbstractModel {
                         db.createObjectStore('settings', { keyPath: 'id' });
                         store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
-                        db.createObjectStore('curriculum', {keyPath: 'id'});
                         db.createObjectStore('schoolYears', {keyPath: 'id'});
+                        
+                        db.createObjectStore('unsyncedSchoolYears', {keyPath: 'id'});
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
+
+                        db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
-                        db.createObjectStore('unsyncedCurriculum', { keyPath: 'id' });
-                        db.createObjectStore('unsyncedDeletedCurriculum', { keyPath: 'id' });
                         break;
                     //case 1 was skipped
                     case 2:
@@ -216,8 +217,9 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
                         break;
                     case 3:
-                        db.createObjectStore('curriculum', {keyPath: 'id'});
                         db.createObjectStore('schoolYears', {keyPath: 'id'});
+                        db.createObjectStore('unsyncedSchoolYears', {keyPath: 'id'});
+                        db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         break;
                 }
             }
@@ -525,14 +527,17 @@ export default class AbstractModel {
             timetable: false,
             timetableChanges: false,
             tasks: false,
-            lessonNotes: false
+            lessonNotes: false,
+            schoolYears: false
         };
 
         if (remoteTimestamps.status == 'failed') return;
 
         if (!localTimestamps) {
-            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true });
+            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true, schoolYears: true });
         }
+
+        /// hier gehts weiter
 
         //send data with differing timestamps
         if (remoteTimestamps[0].subjects != localTimestamps.subjects) {

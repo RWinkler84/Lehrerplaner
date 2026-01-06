@@ -258,9 +258,13 @@ export default class SchoolYear extends AbstractModel {
             mockupData.push(year);
         })
 
-        mockupData.forEach(item => {
-            db.writeToLocalDB('schoolYears', item.serialize());
-        })
+        // mockupData.forEach(item => {
+        //     db.writeToLocalDB('schoolYears', item.serialize());
+        // })
+
+        for (const item of mockupData) {
+            await item.save();
+        }
     }
 
     static async getSchoolYearById(id) {
@@ -317,16 +321,29 @@ export default class SchoolYear extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.writeToLocalDB('schoolYears', this.serialize());
+
+        let result = await this.makeAjaxQuery('schoolYear', 'save', this.serialize());
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedSchoolYears', this.serialize());
+
     }
 
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.updateOnLocalDB('schoolYears', this.serialize());
+
+        let result = await this.makeAjaxQuery('schoolYear', 'update', this.serialize());
+
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedSchoolYears', this.serialize());
     }
 
     async delete() {
         await this.deleteFromLocalDB('schoolYears', this.id);
+        await this.deleteFromLocalDB('unsyncedSchoolYears', this.id);
+
+        let result = await this.makeAjaxQuery('schoolYear', 'delete', this.serialize());
+
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedSchoolYears', this.serialize());
     }
 
     updateStartAndEndDate(dates) {

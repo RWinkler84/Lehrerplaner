@@ -51,6 +51,12 @@ class AbstractController
         echo json_encode($result);
     }
 
+    public function getAllSchoolYears() {
+        $result = $this->db->getAllSchoolYears();
+
+        echo json_encode($result);
+    }
+
     public function setDbUpdateTimestamp($updatedTableName, $dateTime)
     {
         $this->db->setDbUpdateTimestamp($updatedTableName, $dateTime);
@@ -71,6 +77,7 @@ class AbstractController
         $timetableChangesResults = [];
         $taskResults = [];
         $lessonNotesResults = [];
+        $schoolYearResults = [];
 
         if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
             $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
@@ -92,12 +99,17 @@ class AbstractController
             $lessonNotesResults = LessonNoteController::syncLessonNotes($dataToSync['lessonNotes'], $dataToSync['deletedLessonNotes']);
         }
 
+        if (!empty($dataToSync['schoolYears']) || !empty($dataToSync['deletedSchoolYears'])) {
+            $schoolYearResults = SchoolYearController::syncSchoolYears($dataToSync['schoolYears'], $dataToSync['deletedSchoolYears']);
+        }
+
         $result = [
             'subjects' => $subjectsResults,
             'timetable' => $timetableResults,
             'timetableChanges' => $timetableChangesResults,
             'tasks' => $taskResults,
-            'lessonNotes' => $lessonNotesResults
+            'lessonNotes' => $lessonNotesResults,
+            'schoolYears' => $schoolYearResults
         ];
 
         echo json_encode($result);
