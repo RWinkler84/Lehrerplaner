@@ -138,6 +138,7 @@ export default class SchoolYearController {
 
         CurriculumController.enableCreateCurriculumButton();
         View.renderSchoolYearInfoSection(schoolYear);
+        View.showSchoolYearSelect();
     }
 
     static async cancelSchoolYearCreation() {
