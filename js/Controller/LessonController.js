@@ -170,8 +170,9 @@ export default class LessonController {
 
     static async renderCurriculaSelection() {
         const weekdayDates = View.getCurrentlyDisplayedWeekDates();
+        const currentlySelectedCurricula = View.getSelectedCurriculaIds();
 
-        const selection = await CurriculumController.getCurriculaSelectionItems(weekdayDates.monday, true);
+        const selection = await CurriculumController.getCurriculaSelectionItems(weekdayDates.monday, true, currentlySelectedCurricula);
 
         if (selection) View.renderCurriculaSelection(selection);
     }
@@ -222,7 +223,7 @@ export default class LessonController {
                 break;
 
             case target.classList.contains('curriculumSelectionItem'):
-                if (!target.classList.contains('appContainer')) return;    
+                if (!target.classList.contains('mainView')) return;    
                 this.toggleCurriculumSelectionItem(event);
                 this.renderSelectedCurricula();
                 break;

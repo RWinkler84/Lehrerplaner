@@ -113,10 +113,10 @@ async function startApp() {
 
     //rerender on resize
     window.addEventListener('resize', () => {
-        const curriculumSectionappContainer = document.querySelector('#weekCurriculaDisplay');
+        const curriculumSectionMainViewContainer = document.querySelector('#weekCurriculaDisplay');
         const curriculumSettingsView = document.querySelector('#curriculumViewContainer');
 
-        if (!curriculumSectionappContainer.classList.contains('notDisplayed')) {
+        if (!curriculumSectionMainViewContainer.classList.contains('notDisplayed')) {
             clearTimeout(timeout)
             timeout = setTimeout(() => {
                 LessonController.renderSelectedCurricula();

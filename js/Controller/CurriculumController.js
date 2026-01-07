@@ -15,6 +15,7 @@ export default class CurriculumController {
 
     static async renderSchoolYearCurriculumEditor(schoolYear = null, curriculumId = null) {
         if (!schoolYear) schoolYear = await SchoolYearController.getCurrentSchoolYear()
+        if (!curriculumId) curriculumId = await CurriculumController.getDisplayedCurriculumId()
 
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
         View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
@@ -249,12 +250,12 @@ export default class CurriculumController {
         return await LessonController.getAllSubjects();
     }
 
-    static async getCurriculaSelectionItems(referenceDate, forAppContainer) {
+    static async getCurriculaSelectionItems(referenceDate, forMainView, preselectedIds) {
         const schoolYear = await SchoolYearController.getSchoolYearByDate(referenceDate);
 
         if (!schoolYear) return false;
         
-        return await View.getCurriculaSelectionItems(schoolYear, forAppContainer);
+        return await View.getCurriculaSelectionItems(schoolYear, forMainView, preselectedIds);
     }
 
     // event handlers

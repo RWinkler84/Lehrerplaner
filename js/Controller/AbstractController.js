@@ -6,6 +6,7 @@ import TaskController from "./TaskController.js";
 import LoginController from "./LoginController.js";
 import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
+import CurriculumController from "./CurriculumController.js";
 
 export default class AbstractController {
 
@@ -70,7 +71,11 @@ export default class AbstractController {
             if (updatedElements.timetable) await SettingsController.renderSettingsLessonChanges();
             if (updatedElements.timetableChanges) await LessonController.renderLesson();
             if (updatedElements.tasks) await TaskController.renderTaskChanges();
-            if (updatedElements.schoolYears) await LessonController.renderCurriculaSelection();
+            if (updatedElements.schoolYears) {
+                await LessonController.renderCurriculaSelection();
+                await LessonController.renderSelectedCurricula();
+                await CurriculumController.renderSchoolYearCurriculumEditor();
+                }
         }
 
         TaskController.renderTaskChanges();

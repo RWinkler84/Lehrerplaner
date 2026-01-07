@@ -645,8 +645,6 @@ export default class AbstractModel {
                 schoolYear.curricula = JSON.parse(schoolYear.curricula);
             })
 
-            console.log(schoolYears);
-
             await this.writeRemoteToLocalDB('schoolYears', schoolYears, remoteTimestamps[0].schoolYears);
         }
 
