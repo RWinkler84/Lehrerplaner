@@ -306,7 +306,6 @@ export default class CurriculumView extends AbstractView {
     }
 
     static async getCurriculaSelectionItems(schoolYear, forMainView = false, preselectedIds = null) {
-        console.log(preselectedIds);
         if (schoolYear.curricula.length == 0) return false;
 
         const subjects = await Controller.getAllSubjects();

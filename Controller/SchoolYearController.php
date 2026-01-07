@@ -28,8 +28,6 @@ class SchoolYearController extends AbstractController
         $schoolYearData = json_decode(file_get_contents('php://input'), true);
         $result = $this->model->update($schoolYearData);
 
-        error_log(print_r($schoolYearData, true));
-
         echo json_encode($result);
     }
 

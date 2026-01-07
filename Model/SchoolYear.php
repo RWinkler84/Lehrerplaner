@@ -91,10 +91,6 @@ class SchoolYear extends AbstractModel
         }
 
         foreach ($yearsToSync as $yearToSync) {
-            //prevent array to string conversion warning
-            $yearToSync['holidays'] = json_encode($yearToSync['holidays']);
-            $yearToSync['grades'] = json_encode($yearToSync['grades']);
-            $yearToSync['curricula'] = json_encode($yearToSync['curricula']);
 
             $query = '';
             $matchingYear = $storedYearsLookup[$yearToSync['itemId']] ?? null;
@@ -111,6 +107,11 @@ class SchoolYear extends AbstractModel
             }
 
             if (!is_null($matchingYear)) {
+                //prevent array to string conversion warning
+                $yearToSync['holidays'] = json_encode($yearToSync['holidays']);
+                $yearToSync['grades'] = json_encode($yearToSync['grades']);
+                $yearToSync['curricula'] = json_encode($yearToSync['curricula']);
+
                 if ($yearToSync['created'] == $matchingYear['created'] && $yearToSync['lastEdited'] > $matchingYear['lastEdited']) {
                     $query = "UPDATE $this->tableName SET name = :name, startDate = :startDate, endDate = :endDate, grades = :grades, holidays = :holidays, curricula = :curricula, lastEdited = :lastEdited
                         WHERE userId = :userId AND itemId = :itemId AND created = :created";
