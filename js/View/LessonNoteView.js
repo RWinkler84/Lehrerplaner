@@ -82,7 +82,6 @@ export default class LessonNoteView extends AbstractView {
         let content = '';
 
         content = Editor.serializeNodeContent(editor, true);
-        console.log(content);
 
         return {
             id: dialog.dataset.noteid,

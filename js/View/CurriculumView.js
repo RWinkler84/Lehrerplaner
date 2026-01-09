@@ -209,8 +209,6 @@ export default class CurriculumView extends AbstractView {
             return;
         }
 
-        console.log(curriculumId)
-
         const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
         if (curriculumToRender) {

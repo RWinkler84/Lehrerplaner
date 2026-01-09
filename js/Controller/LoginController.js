@@ -227,7 +227,6 @@ export default class LoginController {
     }
     /** @param offlineStatus boolean: Should the app work temporarily offline or not? */
     static async toggleTemperaryOfflineUsage(offlineStatus, event = null) {
-        console.log('aktiv', event)
         if (event) {
             event.preventDefault();
             View.closeLoginDialog();

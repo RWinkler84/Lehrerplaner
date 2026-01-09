@@ -333,8 +333,6 @@ export default class SchoolYear extends AbstractModel {
             for (const curriculum of schoolYear.#curricula) {
                 if (curriculum.provisional == true) await schoolYear.removeCurriculumById(curriculum.id);
             }
-
-            console.log(schoolYear.curricula)
         }
     }
 
@@ -347,9 +345,6 @@ export default class SchoolYear extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         const dataToSave = this.serialize();
-
-        console.log(dataToSave);
-        console.log(this)
 
         await this.writeToLocalDB('schoolYears', dataToSave);
 

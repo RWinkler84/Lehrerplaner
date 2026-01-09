@@ -53,9 +53,6 @@ export default class Editor {
             this.clearEditor(editor);
             editor.append(p);
 
-            console.log(p);
-            console.log(p.textContent.length);
-
             range.setStart(p, p.textContent.length);
             range.collapse(true);
             selection.removeAllRanges();

@@ -33,7 +33,6 @@ export default class LessonNoteController {
 
     static async saveLessonNote() {
         let noteData = LessonNoteView.getNoteDataFromForm();
-        console.log(noteData);
 
         if (noteData.content.trim() == '<p><br></p>' && noteData.id) {
             LessonNoteController.deleteLessonNote(noteData.id);
