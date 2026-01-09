@@ -105,7 +105,7 @@ export default class TaskController {
 
         this.renderTaskChanges();
         LessonController.renderLesson();
-
+        
         View.removeEditability(event);
         View.showSetDoneOrInProgressButtons(event);
 

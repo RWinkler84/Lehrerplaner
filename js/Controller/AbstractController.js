@@ -5,6 +5,8 @@ import LessonController from "./LessonController.js";
 import TaskController from "./TaskController.js";
 import LoginController from "./LoginController.js";
 import AbstractModel from "../Model/AbstractModel.js";
+import SchoolYearController from "./SchoolYearController.js";
+import CurriculumController from "./CurriculumController.js";
 
 export default class AbstractController {
 
@@ -28,6 +30,16 @@ export default class AbstractController {
 
     static async getAllTimetableChanges() {
         return await LessonController.getAllTimetableChanges();
+    }
+
+    static async getAllSchoolYears() {
+        return await SchoolYearController.getAllSchoolYears();
+    }
+
+    static async greyOutHolidaysAndPassedDays() {
+        const schoolYears = await AbstractController.getAllSchoolYears();
+
+        await View.greyOutHolidaysAndPassedDays(schoolYears);
     }
 
     static openLoginDialog() {
@@ -59,6 +71,11 @@ export default class AbstractController {
             if (updatedElements.timetable) await SettingsController.renderSettingsLessonChanges();
             if (updatedElements.timetableChanges) await LessonController.renderLesson();
             if (updatedElements.tasks) await TaskController.renderTaskChanges();
+            if (updatedElements.schoolYears) {
+                await LessonController.renderCurriculaSelection();
+                await LessonController.renderSelectedCurricula();
+                await CurriculumController.renderSchoolYearCurriculumEditor();
+                }
         }
 
         TaskController.renderTaskChanges();

@@ -137,7 +137,7 @@ export default class AbstractModel {
                 return new Promise(resolve => {
                     let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
                     transaction.onsuccess = () => {
-                        this.markLocalDBUpdated();
+                        this.markLocalDBUpdated(store);
                         resolve();
                     }
                 })
@@ -180,7 +180,7 @@ export default class AbstractModel {
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio', 3);
+            let request = window.indexedDB.open('eduplanio', 4);
             let store;
 
             request.onupgradeneeded = (event) => {
@@ -194,14 +194,19 @@ export default class AbstractModel {
                         db.createObjectStore('settings', { keyPath: 'id' });
                         store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
+                        db.createObjectStore('schoolYears', { keyPath: 'id' });
+
+                        db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
+
+                        db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
-                        db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
                         break;
                     //case 1 was skipped
@@ -210,6 +215,11 @@ export default class AbstractModel {
                         store.createIndex('date', 'date');
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
+                        break;
+                    case 3:
+                        db.createObjectStore('schoolYears', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         break;
                 }
             }
@@ -269,7 +279,8 @@ export default class AbstractModel {
                 timetable: null,
                 timetableChanges: null,
                 tasks: null,
-                lessonNotes: null
+                lessonNotes: null,
+                schoolYears: null
             }
         }
 
@@ -281,6 +292,7 @@ export default class AbstractModel {
             dataToStore.lastUpdated.timetableChanges = timestamps.lastUpdated.timetableChanges ? timestamps.lastUpdated.timetableChanges : 0;
             dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
             dataToStore.lastUpdated.lessonNotes = timestamps.lastUpdated.lessonNotes ? timestamps.lastUpdated.lessonNotes : 0;
+            dataToStore.lastUpdated.schoolYears = timestamps.lastUpdated.schoolYears ? timestamps.lastUpdated.schoolYears : 0;
         }
 
         switch (store) {
@@ -299,6 +311,8 @@ export default class AbstractModel {
             case 'lessonNotes':
                 dataToStore.lastUpdated.lessonNotes = this.formatDateTime(date);
                 break;
+            case 'schoolYears':
+                dataToStore.lastUpdated.schoolYears = this.formatDateTime(date);
         }
 
         db.transaction('settings', 'readwrite').objectStore('settings').put(dataToStore)
@@ -513,13 +527,14 @@ export default class AbstractModel {
             timetable: false,
             timetableChanges: false,
             tasks: false,
-            lessonNotes: false
+            lessonNotes: false,
+            schoolYears: false
         };
 
         if (remoteTimestamps.status == 'failed') return;
 
         if (!localTimestamps) {
-            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true });
+            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true, schoolYears: true });
         }
 
         //send data with differing timestamps
@@ -552,6 +567,12 @@ export default class AbstractModel {
             tablesToUpdate.lessonNotes = true;
         }
 
+        if (remoteTimestamps[0].schoolYears != localTimestamps.schoolYears) {
+            dataToSync['schoolYears'] = await this.readAllFromLocalDB('unsyncedSchoolYears');
+            dataToSync['deletedSchoolYears'] = await this.readAllFromLocalDB('unsyncedDeletedSchoolYears');
+            tablesToUpdate.schoolYears = true;
+        }
+
         let result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
         //check the results and clear data that has been synced
@@ -577,6 +598,11 @@ export default class AbstractModel {
         if (result.lessonNotes.status && result.lessonNotes.status == 'success') {
             this.clearObjectStore('unsyncedLessonNotes');
             this.clearObjectStore('unsyncedDeletedLessonNotes');
+        }
+
+        if (result.schoolYears.status && result.schoolYears.status == 'success') {
+            this.clearObjectStore('unsyncedSchoolYears');
+            this.clearObjectStore('unsyncedDeletedSchoolYears');
         }
 
         this.updateLocalWithRemoteData(tablesToUpdate);
@@ -608,6 +634,20 @@ export default class AbstractModel {
         if (tablesToUpdate.lessonNotes) {
             let lessonNotes = await this.makeAjaxQuery('abstract', 'getAllLessonNotes');
             await this.writeRemoteToLocalDB('lessonNotes', lessonNotes, remoteTimestamps[0].lessonNotes);
+        }
+
+        if (tablesToUpdate.schoolYears) {
+            let schoolYears = await this.makeAjaxQuery('abstract', 'getAllSchoolYears');
+
+            if (!schoolYears.status) {
+                schoolYears.forEach(schoolYear => {
+                    schoolYear.grades = JSON.parse(schoolYear.grades);
+                    schoolYear.holidays = JSON.parse(schoolYear.holidays);
+                    schoolYear.curricula = JSON.parse(schoolYear.curricula);
+                })
+
+                await this.writeRemoteToLocalDB('schoolYears', schoolYears, remoteTimestamps[0].schoolYears);
+            }
         }
 
         AbstractController.renderDataChanges(tablesToUpdate);

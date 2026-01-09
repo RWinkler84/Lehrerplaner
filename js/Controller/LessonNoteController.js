@@ -1,3 +1,4 @@
+import Editor from "../inc/editor.js";
 import LessonNote from "../Model/LessonNote.js";
 import LessonNoteView from "../View/LessonNoteView.js";
 import LessonController from "./LessonController.js";
@@ -10,8 +11,8 @@ export default class LessonNoteController {
 
         if (noteId) note = await this.getLessonNoteById(noteId);
         
-        LessonNoteView.renderLessonNotesModal(note, lessonData);
-        if (note) LessonNote.trackLessonNoteChanges(note.content);
+        await LessonNoteView.renderLessonNotesModal(note, lessonData);
+        if (note) Editor.trackLessonNoteChanges(document.querySelector('#noteContentEditor'));
     }
 
     static async getAllLessonNotes() {
@@ -32,7 +33,6 @@ export default class LessonNoteController {
 
     static async saveLessonNote() {
         let noteData = LessonNoteView.getNoteDataFromForm();
-        console.log(noteData);
 
         if (noteData.content.trim() == '<p><br></p>' && noteData.id) {
             LessonNoteController.deleteLessonNote(noteData.id);
@@ -75,19 +75,6 @@ export default class LessonNoteController {
         await LessonNote.reorderLessonNotes(oldTimetable, oldTimetableChanges);
     }
 
-    static changeNoteVersion(action) {
-        let displayedVersion = LessonNoteView.getDisplayedNoteVersion();
-        let versionToDisplay = null;
-
-        if (action == 'revert') versionToDisplay = LessonNote.getPreviousChange(displayedVersion);
-        if (action == 'redo') versionToDisplay = LessonNote.getNextChange(displayedVersion);
-
-        if (!versionToDisplay) return;
-
-        LessonNoteView.updateEditorContent(versionToDisplay.content);
-        LessonNoteView.setDisplayedNoteVersion(versionToDisplay.version);
-    }
-
     static async getAllRegularLessons() {
         return await LessonController.getAllRegularLessons();
     }
@@ -96,21 +83,9 @@ export default class LessonNoteController {
         return await LessonController.getAllTimetableChanges();
     }
 
-    static normalizeInput() {
-        LessonNoteView.normalizeInput();
+    static toggleSaveLessonNoteButton(event) {
+        if (event.target.id != 'noteContentEditor') return;
         LessonNoteView.toggleSaveLessonNoteButton(true);
-    }
-
-    static trackLessonNoteChanges(forceVersionBackup = false) {
-
-        const editor = document.querySelector('#noteContentEditor');
-        let currentContent = LessonNoteView.serializeNodeContent(editor, true);
-        let version = LessonNote.trackLessonNoteChanges(currentContent);
-        LessonNoteView.setDisplayedNoteVersion(version);
-    }
-
-    static updateButtonStatus() {
-        LessonNoteView.updateButtonStatus();
     }
 
     static handleClickEvents(event) {
@@ -122,80 +97,16 @@ export default class LessonNoteController {
                 break;
             case 'closeLessonNotesButton':
                 LessonNoteView.closeLessonNotesDialog();
-                LessonNote.clearLessonNoteChanges();
+                Editor.clearLessonNoteChanges();
                 break;
             case 'saveLessonNotesButton':
                 LessonNoteController.saveLessonNote();
-                break;
-
-            // editor styling buttons
-            case 'boldButton':
-                LessonNoteView.toggleBoldText(event);
-                LessonNoteController.trackLessonNoteChanges(true);
-                break;
-            case 'unorderedListButton':
-                LessonNoteView.toggleList('ul');
-                LessonNoteController.trackLessonNoteChanges(true);
-                break;
-            case 'orderedListButton':
-                LessonNoteView.toggleList('ol');
-                LessonNoteController.trackLessonNoteChanges(true);
-                break;
-
-            //change edit version forward/backward
-            case 'revertChangeButton':
-                LessonNoteController.changeNoteVersion('revert');
-                break;
-            case 'redoChangeButton':
-                LessonNoteController.changeNoteVersion('redo');
                 break;
         }
 
         switch (true) {
             case clickedElement.classList.contains('placeholder'):
                 LessonNoteView.removePlaceholderText();
-                break;
-            case clickedElement.classList.contains('ulIcon'):
-                LessonNoteView.toggleList('ul');
-                LessonNoteController.trackLessonNoteChanges(true);
-                break;
-            case clickedElement.classList.contains('olIcon'):
-                LessonNoteView.toggleList('ol');
-                LessonNoteController.trackLessonNoteChanges(true);
-                break;
-        }
-    }
-
-    static handleKeyDownEvents(event) {
-        const key = event.code;
-
-        switch (key) {
-            case 'Escape':
-                event.preventDefault();
-
-                break;
-
-            case 'Space':
-            case 'Backspace':
-            case 'Delete':
-            case 'Enter':
-            case 'Period':
-            case 'Digit1': //exclamtion mark
-            case 'Minus': //question mark
-                setTimeout(() => { LessonNoteController.trackLessonNoteChanges(true); }, 100);
-                break;
-
-            case 'KeyY':
-                if (event.getModifierState('Control') || event.getModifierState('Meta')) {
-                    event.preventDefault();
-                    LessonNoteController.changeNoteVersion('revert');
-                }
-                break;
-            case 'KeyZ':
-                if (event.getModifierState('Control') || event.getModifierState('Meta')) {
-                    event.preventDefault();
-                    LessonNoteController.changeNoteVersion('redo');
-                }
                 break;
         }
     }

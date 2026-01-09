@@ -1,0 +1,355 @@
+:root {
+    --borderWidth: 3px;
+}
+
+/* school year info section */
+
+#schoolYearDatesGradesContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: max(2rem, 10vw);
+}
+
+.gradeRow {
+    display: grid;
+    grid-auto-columns: max-content;
+    grid-auto-flow: column;
+    column-gap: 0.5rem;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.gradeRow label {
+    display: inline-block !important;
+    color: black !important;
+    font-weight: normal !important;
+}
+
+.singleHolidayContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.holidayDates {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+
+/* curriculum section */
+#timeSpanForm {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    border: solid 1px var(--bodyBackground);
+    padding: 1rem 2rem;
+    position: sticky;
+    width: max(50%, 450px);
+    bottom: 1rem;
+    margin-top: 0.5rem;
+    left: 100%;
+    background-color: var(--contentContainerBackground);
+    z-index: 3;
+}
+
+#closeTimeSpanFormButton,
+#resizeTimeSpanFormButton {
+    margin-right: -1rem;
+    background-color: var(--lightergrey);
+    color: var(--bodyBackground);
+}
+
+#resizeTimeSpanFormButton {
+    margin-left: -1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#closeTimeSpanFormButton:hover,
+#resizeTimeSpanFormButton:hover {
+    background-color: var(--lightgrey);
+}
+
+#yearContainer {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.month {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+}
+
+#curriculumSelectionContainer {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 0 0 1rem;
+}
+
+.curriculumSelectionItem {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 115px;
+    padding: 0.5rem 0.5rem;
+    border: 2px solid var(--contentContainerBackground);
+    border-radius: var(--standardRadius);
+    color: var(--lighterText);
+    box-sizing: content-box;
+    cursor: default;
+}
+
+.curriculumSelectionItem.selected,
+.curriculumSelectionItem:hover {
+    border: solid 2px var(--lightMatteGreen);
+}
+
+.curriculumSelectionItem div {
+    pointer-events: none;
+}
+
+.curriculumSelectionItem.undefined {
+    border: solid 1px var(--bodyBackground);
+    color: var(--bodyBackground);
+}
+
+#curriculumCreationSelectContainer {
+    display: flex;
+    padding: 0 0 1rem;
+    gap: 1rem;
+}
+
+.week,
+#dayNameContainer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 5rem 5rem;
+}
+
+#dayNameContainer {
+    position: sticky;
+    top: 0;
+    background-color: var(--contentContainerBackground);
+    color: var(--lightgrey);
+    margin-bottom: 0.5rem;
+    gap: 0.2rem;
+    z-index: 3;
+    border-bottom: solid 1px var(--lightgrey);
+}
+
+.monthName {
+    font-size: 1.17rem;
+    font-weight: bold;
+    color: var(--labelgrey);
+}
+
+.dayName {
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+}
+
+.holidayName::after {
+    content: ':';
+}
+
+.day {
+    position: relative;
+    box-sizing: border-box;
+    height: 5rem;
+    padding: 0.5rem 1rem;
+    border: solid 1px var(--lightgrey);
+}
+
+.day[data-weekdaynumber="6"],
+.day[data-weekdaynumber="0"],
+.day.holiday {
+    background-color: var(--lightergrey);
+}
+
+.day .dateContainer {
+    display: flex;
+    height: 100%;
+    align-items: end;
+    gap: 0.5rem;
+    pointer-events: none;
+    font-size: 0.75rem;
+    overflow: hidden;
+}
+
+.dateContainer {
+    justify-content: space-between;
+}
+
+.holidayNameWrapper {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spanContentContainer {
+    position: absolute;
+    background-color: var(--fadedgrey);
+    padding: 0.5rem 0.5rem;
+    height: calc(100% - 2.5rem);
+    left: 0;
+    right: 0;
+    border-top: solid 2px var(--topMenuBackgound);
+    /* box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16); */
+    /* color: var(--lighterText); */
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
+}
+
+.spanContentContainer.start {
+    border-left: solid 0.75rem var(--topMenuBackgound);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    left: 1rem;
+}
+
+.spanContentContainer.end {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    right: 1rem;
+}
+
+.handleContainer {
+    position: absolute;
+    width: 1.25rem;
+    height: 100%;
+    z-index: 2;
+}
+
+.handleContainer:has(.startHandle) {
+    left: 1rem;
+    top: 0.5rem;
+    transform: translateX(-50%)
+}
+
+.handleContainer:has(.endHandle) {
+    right: 1rem;
+    top: 0.5rem;
+    transform: translateX(50%);
+}
+
+.startHandle,
+.endHandle {
+    position: absolute;
+    border: 3px solid var(--bodyBackground);
+    background-color: var(--lightergrey);
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: grab;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.startHandle {
+    top: 0.25rem;
+}
+
+.endHandle {
+    top: 0.25rem;
+}
+
+.dayName,
+.dayDate {
+    pointer-events: none;
+}
+
+
+@media screen and (max-width: 850px) {
+
+    .day,
+    .dayName {
+        padding: 0.5rem 0.5rem;
+    }
+
+    .spanContentContainer.start {
+        left: 0.5rem;
+    }
+
+    .spanContentContainer.end {
+        right: 0.5rem;
+    }
+
+    .handleContainer:has(.startHandle) {
+        left: 0.5rem;
+    }
+
+    .handleContainer:has(.endHandle) {
+        right: 0.5rem;
+    }
+
+    #timeSpanForm {
+        bottom: 0;
+    }
+
+}
+
+@media screen and (max-width: 620px) {
+
+    /* school year info */
+    #holidaysInfoContainer {
+        flex-direction: column;
+    }
+
+    #schoolYearCreationButtonsContainer {
+        flex-direction: column;
+    }
+
+    #holidaysContainer {
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .singleHolidayContainer {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .holidayDates {
+        margin-left: 1rem;
+    }
+
+    /* curriculum */
+    .week,
+    #dayNameContainer {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 2rem 2rem;
+    }
+
+    .day,
+    .dayName {
+        padding: 0.5rem 0.5rem;
+    }
+
+    .day .dateContainer {
+        flex-direction: column-reverse;
+        align-items: start;
+        justify-content: end;
+        font-size: 0.5rem;
+    }
+
+    .holidayNameWrapper {
+        width: 100%;
+    }
+
+    #timeSpanForm {
+        transform: translateX(-0.5rem);
+        bottom: 0;
+        width: calc(100% + 1rem);
+    }
+}
+
+/* generics */
+.noTouchActions {
+    touch-action: none;
+}

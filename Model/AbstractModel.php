@@ -218,6 +218,26 @@ class AbstractModel
         return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
     }
 
+    public function getAllSchoolYears(): array
+    {
+        global $user;
+        $dataFromDb = null;
+
+        if (!is_null($user)) $userId = $user->getId();
+        if (!is_null($userId)) {
+            $tableName = TABLEPREFIX . 'schoolYears';
+
+            $query = "SELECT * FROM $tableName WHERE userId = $userId";
+
+            $dataFromDb = $this->read($query, []);
+            $dataFromDb = $this->preprocessReadData($dataFromDb);
+        }
+
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+
+        return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
+    }
+
     public function getDbUpdateTimestamps()
     {
         global $user;

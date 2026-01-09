@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="../css/index.css">
-    <link rel="stylesheet" href="../css/test.css">
+    <link rel="stylesheet" href="../css/curriculum.css">
 </head>
 
 <body>
@@ -22,7 +22,7 @@
             <div class="dayName">So</div>
         </div>
     </div>
-    <div id="addTimespanForm">
+    <div id="timeSpanForm">
         <input type="text" name="topic" id="topicInput">
         <div id="cancelSpanCreationButtonContainer">
             <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
@@ -135,14 +135,14 @@
             });
         }
 
-        function activateSpanEditing() {
+        function openSpanForm() {
             document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
-            document.querySelector('#addTimespanForm').style.display = 'block';
+            document.querySelector('#timeSpanForm').style.display = 'block';
         }
 
-        function deactivateSpanEditing() {
+        function closeSpanForm() {
             document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
-            document.querySelector('#addTimespanForm').removeAttribute('style');
+            document.querySelector('#timeSpanForm').removeAttribute('style');
         }
 
         function createNewSpan(event) {
@@ -497,7 +497,7 @@
             }
         }
 
-        function timespanFormHandler(event) {
+        function timeSpanFormHandler(event) {
             switch (event.target.id) {
                 case 'saveSpanCreationButton':
                     con_saveSpan();
@@ -522,20 +522,20 @@
 
         function con_createNewSpan() {
             disableTouchActionsOnDayElements();
-            activateSpanEditing();
+            openSpanForm();
             let spanId = createNewSpan(event);
             addHandlesToSpan(spanId);
         }
 
         function con_createNewSubSpan() {
-            activateSpanEditing();
+            openSpanForm();
             createNewSubSpan(event);
         }
 
         function con_saveSpan() {
             const spanId = getActiveSpanId();
             saveSpan();
-            deactivateSpanEditing();
+            closeSpanForm();
             removeAllHandles();
             removeAnchorFromSpan(spanId);
             enableTouchActionsOnDayElements();
@@ -543,7 +543,7 @@
 
         function con_cancelSpanCreation() {
             cancelSpanCreation();
-            deactivateSpanEditing();
+            closeSpanForm();
             removeAllHandles();
             enableTouchActionsOnDayElements();
 
@@ -561,7 +561,7 @@
                 }
             }
 
-            activateSpanEditing();
+            openSpanForm();
             disableTouchActionsOnDayElements();
             removeAllHandles();
             addHandlesToSpan(spanId);
@@ -591,7 +591,7 @@
 
         createContainer();
 
-        document.querySelector('#addTimespanForm').addEventListener('click', timespanFormHandler);
+        document.querySelector('#timeSpanForm').addEventListener('click', timeSpanFormHandler);
         document.querySelector('#yearContainer').addEventListener('click', handleClicksOnDayElements);
         document.querySelector('#yearContainer').addEventListener('pointerdown', handleMouseDownOnDayElements);
     </script>

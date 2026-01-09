@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/index.css">
     <link rel="stylesheet" href="./css/editor.css">
+    <link rel="stylesheet" href="./css/curriculum.css">
     <link rel="stylesheet" href="./css/animations.css">
     <link rel="icon" type="image/png" href="../favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
@@ -54,7 +55,36 @@
                     <button id="weekForwardButton">&#9654</button>
                 </div>
             </div>
+
+            <div id="weekCurriculumContainer" class="marginBottom">
+                <div class="flex responsiveSpaceBetween gap marginBottom">
+                    <label>Stoffverteilungspläne</label>
+                    <button id="resizeCurriculumSectionButton" class="closeDialogButton" style="width: 1.5rem;">&#9660;</button>
+                </div>
+                <div id="weekCurriculaSelectionContainer" class="notDisplayed">
+                    <div class="flex responsiveSpaceBetween gap" style="margin-bottom: 0.5rem;">
+                        <label>Auswahl:</label>
+                        <button id="resizeCurriculumSelectionButton" class="closeDialogButton" style="width: 1.5rem;">&#9650;</button>
+                    </div>
+                    <div id="weekCurriculaSelectionDisplay" style="padding-left: 1rem"></div>
+                </div>
+            </div>
+
             <div id="weekOverviewContainer">
+
+                <div id="weekCurriculaDisplay" class="notDisplayed">
+                    <div class="curriculaWeekOverview">
+                        <div id="curriculaTimeslotPlaceholder"></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="1" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="2" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="3" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="4" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="5" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="6" data-date=""></div>
+                        <div class="curriculaDisplayWeekday" data-weekday_number="0" data-date=""></div>
+                    </div>
+                </div>
+
                 <div class="weekOverview">
                     <div id="timeslots">
                         <div></div>
@@ -249,15 +279,17 @@
                 <h3>Einstellungen</h3>
                 <div style="position: relative;"><button id="openSettingsMenuButton">&#x2630;</button>
                     <div id="settingsMenu">
-                        <button id="openTimetableSettingsButton" class="selected">Stundenplan</button>
-                        <button id="openAccountSettingsButton">Konto</button>
-                        <button id="closeSettingsButton">&#215;</button>
-                        <button id="closeSettingsButtonResponsive">schließen</button>
+                        <button id="openTimetableSettingsButton"
+                            class="selected settingsMenuButton">Stundenplan</button>
+                        <button id="openSchoolYearSettingsButton" class="settingsMenuButton">Schuljahr</button>
+                        <button id="openAccountSettingsButton" class="settingsMenuButton">Konto</button>
+                        <button id="closeSettingsButton" class="settingsMenuButton">&#215;</button>
+                        <button id="closeSettingsButtonResponsive" class="settingsMenuButton">schließen</button>
                     </div>
                 </div>
             </div>
 
-            <div id="timetableSettingsContainer">
+            <div id="timetableSettingsContainer" class="settingsSubContainer">
                 <div id="settingsSubjectsContainer" class="flex doubleGap">
                     <div id="subjectsInfoTooltip" class="tooltip">?
                         <span class="tooltipTextLeft">Hier kannst du die von dir unterrichteten Fächer anlegen
@@ -432,8 +464,158 @@
                 </div>
             </div>
 
+            <!-- curriculum editor -->
+            <div id="curriculumViewContainer" class="settingsSubContainer" style="display: none">
+
+                <!-- school year info -->
+                <div id="schoolYearInfoContainer" class="flex column gap" data-school_year_id>
+                    <div class="flex spaceBetween alignCenter">
+                        <div>
+                            <label>Schuljahr auswählen:</label>
+                            <select name="schoolYearNameSelect" id="schoolYearNameSelect"></select>
+                        </div>
+                        <button id="createNewSchoolYearButton" class="confirmationButton">Schuljahr anlegen</button>
+                        <div id="schoolYearCreationButtonsContainer" class="flex halfGap notDisplayed">
+                            <button id="saveNewSchoolYearButton" class="confirmationButton">Schuljahr speichern</button>
+                            <button id="cancelSchoolYearCreationButton" class="cancelButton">Abbrechen</button>
+                        </div>
+                    </div>
+
+                    <div id="schoolYearDatesGradesContainer" class="flex doubleGap spaceBetween">
+
+                        <div id="schoolYearStartEndDateInfoContainer" class="flex column gap spaceBetween growEqually">
+                            <div class="flex column gap">
+                                <div>
+                                    <label>Schuljahresbeginn:</label>
+                                    <div id="schoolYearStartDateDisplay">Leg ein Schuljahr an,...</div>
+                                </div>
+                                <div>
+                                    <label>Schuljahresende:</label>
+                                    <div id="schoolYearEndDateDisplay">...damit hier etwas stehen kann.</div>
+                                </div>
+                            </div>
+
+                            <div id="gradeSelectionContainer" class="flex column">
+                                <label style="margin-bottom: 0.5rem;">unterrichtete Klassenstufen:</label>
+                                <div class="flex column spaceBetween growEqually doubleGap">
+                                    <div class="flex column halfGap">
+                                        <div class="nothingToSee notDisplayed">Hier gibt es noch nichts zu sehen. Lege
+                                            zuerst die Rahmendaten des Schuljahres fest.</div>
+                                        <div class="gradeRow">
+                                            <label><input type="checkbox" value="1" disabled>1</label>
+                                            <label><input type="checkbox" value="2" disabled>2</label>
+                                            <label><input type="checkbox" value="3" disabled>3</label>
+                                            <label><input type="checkbox" value="4" disabled>4</label>
+                                        </div>
+                                        <div class="gradeRow">
+                                            <label><input type="checkbox" value="5" disabled>5</label>
+                                            <label><input type="checkbox" value="6" disabled>6</label>
+                                            <label><input type="checkbox" value="7" disabled>7</label>
+                                            <label><input type="checkbox" value="8" disabled>8</label>
+                                            <label><input type="checkbox" value="9" disabled>9</label>
+                                            <label><input type="checkbox" value="10" disabled>10</label>
+                                        </div>
+                                        <div class="gradeRow">
+                                            <label><input type="checkbox" value="11" disabled>11</label>
+                                            <label><input type="checkbox" value="12" disabled>12</label>
+                                            <label><input type="checkbox" value="13" disabled>13</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justifyEnd alignEnd">
+                                <button id="editSchoolYearDatesGradesButton"
+                                    class="confirmationButton notDisplayed">Bearbeiten</button>
+                                <button id="saveSchoolYearDatesGradesButton"
+                                    class="confirmationButton notDisplayed">Speichern</button>
+                            </div>
+                        </div>
+
+
+                        <div id="holidaysInfoContainer" class="flex column doubleGap spaceBetween growEqually">
+                            <div id="holidaysContainer" class="flex column halfGap">
+                                <div><label>Ferien und freie Tage:</label></div>
+                            </div>
+                            <div class="flex justifyEnd alignEnd">
+                                <button id="editHolidayDatesButton"
+                                    class="confirmationButton notDisplayed">Bearbeiten</button>
+                                <button id="createHolidayDatesButton"
+                                    class="confirmationButton notDisplayed">Anlegen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- curriculum -->
+                <div id="curriculumContainer" data-curriculumid>
+                    <div class="marginBottom flex spaceBetween">
+                        <label><span id="editorNameSpan">Jahresübersicht</span>:</label>
+                        <button id="createCurriculumButton" class="confirmationButton">Plan anlegen</button>
+                        <div id="saveCancelNewCurriculumButtonContainer" class="notDisplayed">
+                            <button id="saveNewCurriculumButton" class="confirmationButton">Plan speichern</button>
+                            <button id="cancelNewCurriculumButton" class="cancelButton">Abbrechen</button>
+                        </div>
+                        <button id="closeHolidayEditorButton" class="cancelButton notDisplayed">schließen</button>
+                    </div>
+                    <div>
+                        <div id="curriculumSelectionContainer"></div>
+                        <div id="curriculumCreationSelectContainer" class="notDisplayed"></div>
+                        <div id="dayNameContainer" style="display: none;">
+                            <div class="dayName">Mo</div>
+                            <div class="dayName">Di</div>
+                            <div class="dayName">Mi</div>
+                            <div class="dayName">Do</div>
+                            <div class="dayName">Fr</div>
+                            <div class="dayName" data-weekdaynumber="6">Sa</div>
+                            <div class="dayName" data-weekdaynumber="0">So</div>
+                        </div>
+                        <div data-span_edit_active="false"></div>
+                        <div id="yearContainer" class="curriculumEditor">
+                        </div>
+                        <div id="timeSpanForm">
+                            <div class="flex spaceBetween">
+                                <button id="resizeTimeSpanFormButton" class="closeDialogButton" style="width: 1.5rem">
+                                    <div class="icon minimizeIcon"></div>
+                                </button>
+                                <button id="closeTimeSpanFormButton" class="closeDialogButton"
+                                    style="width: 1.5rem">×</button>
+                            </div>
+                            <div class="flex column">
+                                <input type="text" name="topic" id="topicInput" placeholder="Namen eingeben">
+                                <div id="curriculumNoteEditorContainer"
+                                    class="flex column halfGap marginTop editorContainer">
+                                    <div id="curriculumNoteEditorButtonContainer"
+                                        class="flex spaceBetween editorButtonContainer">
+                                        <div class="flex halfGap">
+                                            <button class="boldButton" style="font-weight: bold;">b</button>
+                                            <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                                            <button class="unorderedListButton"><span
+                                                    class="icon ulIcon"></span></button>
+                                        </div>
+                                        <div class="flex halfGap">
+                                            <button class="revertChangeButton">&#8617;</button>
+                                            <button class="redoChangeButton">&#8618;</button>
+                                        </div>
+                                    </div>
+                                    <div id="curriculumSpanNoteEditor" class="textEditor" contenteditable="true"
+                                        data-noteversion>
+                                    </div>
+                                    <div id="cancelSpanCreationButtonContainer" class="flex halfGap justifyEnd">
+                                        <button id="saveSpanCreationButton"
+                                            class="confirmationButton">Speichern</button>
+                                        <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
+                                        <button id="deleteSelectedSpanButton" class="cancelButton">Löschen</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <!-- account settings -->
-            <div id="accountSettingsContainer" style="display: none;">
+            <div id="accountSettingsContainer" style="display: none;" class="settingsSubContainer">
                 <div id="deleteAccountContainer">
                     <label>Konto löschen:</label>
                     <div id="requestDeletionContainer">
@@ -441,7 +623,8 @@
                         <button id="deleteAccountButton" class="cancelButton">Konto löschen</button>
                     </div>
                     <div id="approveAccountDeletionContainer">
-                        <p>Bitte bestätige, dass du dein Konto endgültig löschen möchtest. Dieser Schritt kann nicht
+                        <p>Bitte bestätige, dass du dein Konto endgültig löschen möchtest. Dieser Schritt kann
+                            nicht
                             rückgängig gemacht werden!</p>
                         <button id="approveAccountDeletionButton" class="confirmationButton">Bestätigen</button>
                         <button id="cancelAccountDeletionButton" class="cancelButton">Abbrechen</button>
@@ -453,7 +636,6 @@
                 </div>
                 <div id="versionDisplay"></div>
             </div>
-
         </div>
     </settings>
 
@@ -461,7 +643,7 @@
     <dialog id="loginDialog">
         <div class="headline flex spaceBetween">
             <h3>Login</h3>
-            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
+            <button class="useTemporarilyOfflineButton closeDialogButton" style="width: 1.5rem">×</button>
         </div>
         <form id="loginForm" method="post">
             <div class="flex column halfGap marginTop" class="formBody">
@@ -490,7 +672,7 @@
     <dialog id="createAccountDialog">
         <div class="headline flex spaceBetween">
             <h3>Konto anlegen</h3>
-            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
+            <button class="useTemporarilyOfflineButton closeDialogButton" style="width: 1.5rem">×</button>
         </div>
         <form id="createAccountForm" method="post">
             <div class="flex column halfGap marginTop" class="formBody">
@@ -520,7 +702,7 @@
     <dialog id="sendResetPasswordMailDialog">
         <div class="headline flex spaceBetween">
             <h3>Passwort-Reset-Mail anfordern</h3>
-            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
+            <button class="useTemporarilyOfflineButton closeDialogButton" style="width: 1.5rem">×</button>
         </div>
         <form id="sendResetPasswordMailForm" method="post">
             <div class="flex column halfGap marginTop" class="formBody">
@@ -540,7 +722,7 @@
     <dialog id="resetPasswordDialog">
         <div class="headline flex spaceBetween">
             <h3>Passwort zurücksetzen</h3>
-            <button class="useTemporarilyOfflineButton deleteItemButton" style="width: 1.5rem">×</button>
+            <button class="useTemporarilyOfflineButton closeDialogButton" style="width: 1.5rem">×</button>
         </div>
         <form id="resetPasswordForm" method="post">
             <div class="flex halfGap marginTop" class="formBody">
@@ -616,7 +798,7 @@
 
     <dialog id="supportDialog">
         <div class="headline flex spaceBetween">
-            <h3>Support</h3><button class="deleteItemButton closeSupportDialogButton" style="width: 1.5rem">×</button>
+            <h3>Support</h3><button class="closeDialogButton closeSupportDialogButton" style="width: 1.5rem">×</button>
         </div>
         <div class="dialogBody">
             <p>
@@ -663,35 +845,29 @@
     <dialog id="lessonNoteDialog" data-noteid data-class data-subject data-date data-timeslot data-weekday data-created>
         <div class="headline flex spaceBetween">
             <h3>Stundennotiz <span id="lessonNoteInfo"></span></h3><button id="closeLessonNotesButton"
-                class="deleteItemButton" style="width: 1.5rem">×</button>
+                class="closeDialogButton" style="width: 1.5rem">×</button>
         </div>
         <div class="dialogBody">
-            <div id="noteEditorContainer" class="flex column halfGap marginTop">
-                <div id="editorButtonContainer" class="flex spaceBetween">
+            <div id="noteEditorContainer" class="flex column halfGap marginTop editorContainer">
+                <div id="lessonNoteEditorButtonContainer" class="flex spaceBetween editorButtonContainer">
                     <div class="flex halfGap">
-                        <button id="boldButton" style="font-weight: bold;">b</button>
-                        <button id="orderedListButton"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
-                                class="olIcon"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                                <path class="olIcon"
-                                    d="M64 136C64 122.8 74.7 112 88 112L136 112C149.3 112 160 122.7 160 136L160 240L184 240C197.3 240 208 250.7 208 264C208 277.3 197.3 288 184 288L88 288C74.7 288 64 277.3 64 264C64 250.7 74.7 240 88 240L112 240L112 160L88 160C74.7 160 64 149.3 64 136zM94.4 365.2C105.8 356.6 119.7 352 134 352L138.9 352C172.6 352 200 379.4 200 413.1C200 432.7 190.6 451 174.8 462.5L150.8 480L184 480C197.3 480 208 490.7 208 504C208 517.3 197.3 528 184 528L93.3 528C77.1 528 64 514.9 64 498.7C64 489.3 68.5 480.5 76.1 475L146.6 423.7C150 421.2 152 417.3 152 413.1C152 405.9 146.1 400 138.9 400L134 400C130.1 400 126.3 401.3 123.2 403.6L102.4 419.2C91.8 427.2 76.8 425 68.8 414.4C60.8 403.8 63 388.8 73.6 380.8L94.4 365.2zM288 128L544 128C561.7 128 576 142.3 576 160C576 177.7 561.7 192 544 192L288 192C270.3 192 256 177.7 256 160C256 142.3 270.3 128 288 128zM288 288L544 288C561.7 288 576 302.3 576 320C576 337.7 561.7 352 544 352L288 352C270.3 352 256 337.7 256 320C256 302.3 270.3 288 288 288zM288 448L544 448C561.7 448 576 462.3 576 480C576 497.7 561.7 512 544 512L288 512C270.3 512 256 497.7 256 480C256 462.3 270.3 448 288 448z" />
-                            </svg></button>
-                        <button id="unorderedListButton"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
-                                class="ulIcon"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                                <path class="ulIcon"
-                                    d="M104 112C90.7 112 80 122.7 80 136L80 184C80 197.3 90.7 208 104 208L152 208C165.3 208 176 197.3 176 184L176 136C176 122.7 165.3 112 152 112L104 112zM256 128C238.3 128 224 142.3 224 160C224 177.7 238.3 192 256 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L256 128zM256 288C238.3 288 224 302.3 224 320C224 337.7 238.3 352 256 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L256 288zM256 448C238.3 448 224 462.3 224 480C224 497.7 238.3 512 256 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L256 448zM80 296L80 344C80 357.3 90.7 368 104 368L152 368C165.3 368 176 357.3 176 344L176 296C176 282.7 165.3 272 152 272L104 272C90.7 272 80 282.7 80 296zM104 432C90.7 432 80 442.7 80 456L80 504C80 517.3 90.7 528 104 528L152 528C165.3 528 176 517.3 176 504L176 456C176 442.7 165.3 432 152 432L104 432z" />
-                            </svg></button>
+                        <button class="boldButton" style="font-weight: bold;">b</button>
+                        <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                        <button class="unorderedListButton"><span class="icon ulIcon"></span></button>
                     </div>
                     <div class="flex halfGap">
-                        <button id="revertChangeButton">&#8617;</button>
-                        <button id="redoChangeButton">&#8618;</button>
+                        <button class="revertChangeButton">&#8617;</button>
+                        <button class="redoChangeButton">&#8618;</button>
                     </div>
                 </div>
-                <div id="noteContentEditor" contenteditable="true" data-noteversion>
+                <div id="noteContentEditor" class="textEditor" contenteditable="true" data-noteversion>
                 </div>
                 <div class="flex alignCenter">
                     <label><input type="checkbox" id="noteFixedDateCheckbox">festes Datum</label>
                     <div id="noteFixedDateTooltip" class="tooltip">?
-                        <span class="tooltipTextTop">Notizen zu zukünftigen Stunden verschieben sich bei Änderungen am Stundenplan mit der Stunde, der sie zugewiesen wurden. Soll eine Notiz sich nicht verschieben, muss 'festes Datum' angehakt sein.</span>
+                        <span class="tooltipTextTop">Notizen zu zukünftigen Stunden verschieben sich bei Änderungen am
+                            Stundenplan mit der Stunde, der sie zugewiesen wurden. Soll eine Notiz sich nicht
+                            verschieben, muss 'festes Datum' angehakt sein.</span>
                     </div>
                 </div>
                 <div class="flex halfGap spaceBetween">

@@ -62,18 +62,15 @@ export default class Utils {
     }
 
     static formatDateWithFullYear(date) {
-        // date = new Date(date);
-        let formatter = new Intl.DateTimeFormat('de-DE', {
-            month: '2-digit',
-            day: '2-digit',
-            year: 'numeric'
-        });
+        date = new Date(date);
+        if  (isNaN(date)) throw new TypeError('The given data could not be converted to a day object.');
 
-        return formatter.format(date);
+        return `${(date.getDate().toString().padStart(2, '0'))}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
     }
 
     static formatDateSqlCompatible(date) {
         let dateObject = new Date(date);
+        if  (isNaN(dateObject)) throw new TypeError('The given data could not be converted to a day object.');
 
         let timeString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
 
@@ -99,6 +96,8 @@ export default class Utils {
     //find the first thursday of the year, which marks the first calendar week
     static getFirstThirsdayOfTheYear(year) {
         let firstDay = new Date(year + '-01-01');
+        
+        firstDay.setHours(12,0,0,0);
 
         firstDay.setHours(12,0,0,0);
 

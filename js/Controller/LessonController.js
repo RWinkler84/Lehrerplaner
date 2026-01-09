@@ -4,6 +4,8 @@ import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
 import LessonNoteController from './LessonNoteController.js';
 import LessonView from '../View/LessonView.js';
+import CurriculumController from './CurriculumController.js';
+import SchoolYearController from './SchoolYearController.js';
 
 export default class LessonController {
 
@@ -77,6 +79,16 @@ export default class LessonController {
         this.renderLesson();
 
         return lesson.id;
+    }
+
+    static async setLessonsInHolidaysCanceled(schoolYear = null) {
+        let schoolYears = [schoolYear];
+        if (!schoolYear) schoolYears = await SchoolYearController.getAllSchoolYears();  
+        if (schoolYears.length == 0) return;
+
+        await Lesson.setLessonsInHolidaysCanceled(schoolYears);
+
+        await this.renderLesson();
     }
 
     static async setLessonNotCanceled(lessonData) {
@@ -162,12 +174,68 @@ export default class LessonController {
         LessonNoteController.renderLessonNote(event);
     }
 
+    ///////////////
+    // curricula //
+    ///////////////
+
+    static async renderCurriculaSelection() {
+        const weekdayDates = View.getCurrentlyDisplayedWeekDates();
+        const currentlySelectedCurricula = View.getSelectedCurriculaIds();
+
+        const selection = await CurriculumController.getCurriculaSelectionItems(weekdayDates.monday, true, currentlySelectedCurricula);
+
+        View.renderCurriculaSelection(selection);
+    }
+
+    static async renderSelectedCurricula() {
+        View.removeAllCurriculumSpans();
+
+        const selectedCurriculaIds = View.getSelectedCurriculaIds();
+        const weekdayDates = View.getCurrentlyDisplayedWeekDates();
+        const schoolYear = await SchoolYearController.getSchoolYearByDate(weekdayDates.monday);
+        const allSubjects = await this.getAllSubjects();
+
+
+        selectedCurriculaIds.forEach(id => {
+            const curriculum = schoolYear.getCurriculumById(id);
+            const matchingSpans = schoolYear.getCurriculumSpansInDateRange(id, weekdayDates.monday, weekdayDates.sunday);
+            const subject = allSubjects.find((subject) => {return subject.subject == curriculum.subject});
+            const colorCssClass = subject ? subject.colorCssClass : null;
+
+            View.renderCurriculumSpans(matchingSpans, colorCssClass);
+        })
+    }
+
+    static removeAllCurriculumSpans(element = null) {
+        View.removeAllCurriculumSpans(element);
+    }
+
+    static toggleCurriculumSelectionItem(event) {
+        View.toggleCurriculumSelectionItem(event);
+    }
+
+    // event handler //
     static timetableClickHandler(event) {
         const target = event.target;
+
+        switch (target.id) {
+            case 'resizeCurriculumSectionButton':
+                View.resizeCurriculaSection();
+                break;
+            case 'resizeCurriculumSelectionButton':
+                View.resizeCurriculaSelection();
+                break;
+        }
 
         switch (true) {
             case target.classList.contains('noteIcon'):
                 this.renderLessonNote(event);
+                break;
+
+            case target.classList.contains('curriculumSelectionItem'):
+                if (!target.classList.contains('mainView')) return;    
+                this.toggleCurriculumSelectionItem(event);
+                this.renderSelectedCurricula();
                 break;
         }
     }

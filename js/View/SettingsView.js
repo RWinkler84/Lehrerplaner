@@ -5,7 +5,7 @@ import Fn from "../inc/utils.js";
 export default class SettingsView {
 
     static openSettings() {
-        document.querySelector('#settingsContainer').style.display = 'block';
+        document.querySelector('#settingsContainer').style.display = 'flex';
         document.querySelector('main').style.filter = 'blur(3px)';
         document.querySelector('nav').style.filter = 'blur(3px)';
     }
@@ -37,7 +37,10 @@ export default class SettingsView {
         }
     }
 
-    //timetable settings functions
+    //////////////////////////////////
+    // timetable settings functions //
+    //////////////////////////////////
+    
     static async renderSelectableLessonColors() {
         let allSubjects = await Controller.getAllSubjects();
         let allColorsArray = [
@@ -89,7 +92,7 @@ export default class SettingsView {
 
         allSubjects.forEach(entry => {
             subjectsHTML += `
-                <div class="subjectListItem ${entry.colorCssClass} flex spaceBetween" data-id="${entry.id}">
+                <div class="subjectListItem ${entry.colorCssClass} flex spaceBetween" data-id="${entry.id}" data-subject="${entry.subject}">
                 ${entry.subject}
                 <button class="deleteSubjectButton deleteItemButton" style="width: 1.5rem">&#215;</button>
                 </div>
@@ -492,7 +495,7 @@ export default class SettingsView {
     static closeLessonChangesAndTasksToKeepDialog() {
         let remainingLessonIds = [];
         let timetableValidFromDate = document.querySelector('#LessonChangesAndTasksToKeepDialog').dataset.timetablevalidfrom;
-        
+
         document.querySelectorAll('#lessonChangesConflictsTable tbody>tr').forEach(tr => remainingLessonIds.push(tr.dataset.id));
         document.querySelector('#LessonChangesAndTasksToKeepDialog').close();
 
@@ -591,28 +594,48 @@ export default class SettingsView {
         return timeslot;
     }
 
-    //account settings functions
+    ////////////////////////////////
+    // account settings functions //
+    ////////////////////////////////
+    
     static openTimetableSettings() {
         document.querySelector('#openAccountSettingsButton').classList.remove('selected');
-        document.querySelector('#accountSettingsContainer').style.display = 'none';
-
+        document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
         document.querySelector('#openTimetableSettingsButton').classList.add('selected');
+
+        document.querySelector('#curriculumViewContainer').style.display = 'none';
+        document.querySelector('#accountSettingsContainer').style.display = 'none';
         document.querySelector('#timetableSettingsContainer').style.display = 'block';
+    }
+
+    static openSchoolYearSettings() {
+        document.querySelector('#openAccountSettingsButton').classList.remove('selected');
+        document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearSettingsButton').classList.add('selected');
+
+        document.querySelector('#accountSettingsContainer').style.display = 'none';
+        document.querySelector('#timetableSettingsContainer').style.display = 'none';
+        document.querySelector('#curriculumViewContainer').style.display = 'block';
     }
 
     static openAccountSettings() {
         let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
         let timetableSettingsContainer = document.querySelector('#timetableSettingsContainer');
+        let curriculumEditor = document.querySelector('#curriculumViewContainer');
+
         let containerHeight = timetableSettingsContainer.clientHeight;
 
-        accountSettingsContainer.style.height = containerHeight + 'px';
+        document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
         document.querySelector('#openAccountSettingsButton').classList.add('selected');
+
+        accountSettingsContainer.style.height = containerHeight + 'px';
         accountSettingsContainer.style.display = 'block';
 
-        document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
         timetableSettingsContainer.style.display = 'none';
-    }
+        curriculumEditor.style.display = 'none';
 
+    }
 
     static toogleAccountDeletionMenu(event) {
         let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
@@ -654,7 +677,9 @@ export default class SettingsView {
         document.querySelector('#versionDisplay').textContent = version;
     }
 
-    //validation functions
+    //////////////////////////
+    // validation functions //
+    //////////////////////////
     static alertColorSelection() {
         let colorSelection = document.querySelector('#colourSelection');
 
