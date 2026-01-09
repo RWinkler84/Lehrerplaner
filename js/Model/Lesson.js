@@ -110,7 +110,7 @@ export default class Lesson extends AbstractModel {
             lesson.created = entry.created;
             lesson.lastEdited = entry.lastEdited;
 
-            lesson.date.setHours(12,0,0,0);
+            lesson.date.setHours(12, 0, 0, 0);
 
             changes.push(lesson);
         });
@@ -256,6 +256,56 @@ export default class Lesson extends AbstractModel {
                 }
             });
 
+        }
+    }
+
+    static async setLessonsInHolidaysCanceled(schoolYears) {
+        const today = new Date().setHours(12, 0, 0, 0);
+        const allLessons = await this.getAllRegularLessons();
+        const timetableChanges = await this.getAllTimetableChanges();
+
+        const filteredSchoolYears = schoolYears.filter(schoolYear => {
+            return new Date(schoolYear.startDate).setHours(12, 0, 0, 0) <= today && new Date(schoolYear.endDate).setHours(12, 0, 0, 0) >= today
+        });
+        const filteredLessons = allLessons.filter(lesson => lesson.validUntil == null || new Date(lesson.validUntil).setHours(12, 0, 0, 0) >= today)
+        const subjectsByClassName = {};
+
+        filteredLessons.forEach(lesson => {
+            if (!subjectsByClassName[lesson.class]) subjectsByClassName[lesson.class] = [];
+            if (!subjectsByClassName[lesson.class].includes(lesson.subject)) subjectsByClassName[lesson.class].push(lesson.subject);
+        })
+
+        //delete all canceled lessons of type holiday before creating new ones
+        for (let canceledLesson of timetableChanges) {
+            if (canceledLesson.type == 'holiday') canceledLesson.delete();
+        }
+
+        //get all holidays of all filteredSchoolYears, calculate the lessons that would take place in the timespan of said holidays and cancel them
+        const allHolidays = [];
+
+        filteredSchoolYears.forEach(schoolYear => allHolidays.push(...schoolYear.holidays));
+
+        for (let holiday of allHolidays) {
+            if (new Date(holiday.endDate).setHours(12,0,0,0) < today) continue;
+
+            for (let className of Object.keys(subjectsByClassName)) {
+                for (let subject of subjectsByClassName[className]) {
+                    const lessonsToCancel = await this.calculateAllLessonDates(className, subject, holiday.endDate);
+
+                    // filter out dates before the holiday starts
+                    const filteredLessonsToCancel = lessonsToCancel.filter(lesson => new Date(lesson.date).setHours(12,0,0,0) >= new Date(holiday.startDate).setHours(12,0,0,0))
+                    for (let lessonToCancel of filteredLessonsToCancel) {
+                        const lesson = new Lesson(className, subject);
+                        lesson.date = lessonToCancel.date;
+                        lesson.weekday = lessonToCancel.date.getDay();
+                        lesson.timeslot = lessonToCancel.timeslot;
+                        lesson.type = 'holiday';
+                        lesson.canceled = 'true';
+
+                        await lesson.save();
+                    }
+                }
+            }
         }
     }
 

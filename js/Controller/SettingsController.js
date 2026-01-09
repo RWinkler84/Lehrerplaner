@@ -79,6 +79,8 @@ export default class SettingsController {
         //triggers reordering of tasks for each lesson
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
+        await LessonController.setLessonsInHolidaysCanceled();
+        
         LessonController.renderLesson();
 
 
@@ -114,8 +116,9 @@ export default class SettingsController {
             View.renderLessonChangesAndTasksToKeepDialog(filteredLessonChanges, affectedTasks, validFrom);
         }
 
-        LessonController.renderLesson();
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonController.renderLesson();
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonController.setLessonsInHolidaysCanceled();
 
         View.discardNewTimetable();
     }

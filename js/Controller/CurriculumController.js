@@ -137,8 +137,6 @@ export default class CurriculumController {
         const editorType = View.getEditorType();
         const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
 
-        console.log(spanData);
-
         if (editorType == 'Holiday Editor') {
             await schoolYear.updateHoliday(spanData);
 
@@ -146,6 +144,7 @@ export default class CurriculumController {
             View.openHolidayEditor(schoolYear);
 
             await AbstractController.greyOutHolidaysAndPassedDays();
+            await LessonController.setLessonsInHolidaysCanceled(schoolYear);
         }
 
         if (editorType == 'Curriculum Editor') {

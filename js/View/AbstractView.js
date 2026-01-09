@@ -83,12 +83,13 @@ export default class AbstractView {
             taskRow.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
         });
     }
-    static async greyOutHolidaysAndPassedDays() {
+    static async greyOutHolidaysAndPassedDays(schoolYears) {
         const mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         const sundayDate = document.querySelector('.weekday[data-weekday_number="6"]').dataset.date;
-        const schoolYear = await AbstractController.getSchoolYearByDate(mondayDate);
 
-        const holidays = schoolYear?.getHolidaysInDateRange(mondayDate, sundayDate);
+        const holidays = [];
+        
+        schoolYears.forEach(schoolYear => holidays.push(...schoolYear.getHolidaysInDateRange(mondayDate, sundayDate)));
 
         //passed days
         document.querySelectorAll('.weekday').forEach(weekday => {
@@ -104,7 +105,7 @@ export default class AbstractView {
         document.querySelectorAll('.weekday').forEach(weekday => {
             if (weekday.dataset.weekday_number == '6' || weekday.dataset.weekday_number == '0') weekday.classList.add('holiday');
 
-            holidays?.forEach(holiday => {
+            holidays.forEach(holiday => {
                 const weekdayTimestamp = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
                 const holidayStartTstmp = new Date(holiday.startDate).setHours(12, 0, 0, 0);
                 const holidayEndTstmp = new Date(holiday.endDate).setHours(12, 0, 0, 0);

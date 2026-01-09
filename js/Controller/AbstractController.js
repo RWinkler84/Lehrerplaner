@@ -32,14 +32,14 @@ export default class AbstractController {
         return await LessonController.getAllTimetableChanges();
     }
 
-    static async getSchoolYearByDate(date) {
-        return await SchoolYearController.getSchoolYearByDate(date);
-
-        View.greyOutHolidaysAndPassedDays()
+    static async getAllSchoolYears() {
+        return await SchoolYearController.getAllSchoolYears();
     }
 
     static async greyOutHolidaysAndPassedDays() {
-        await View.greyOutHolidaysAndPassedDays();
+        const schoolYears = await AbstractController.getAllSchoolYears();
+
+        await View.greyOutHolidaysAndPassedDays(schoolYears);
     }
 
     static openLoginDialog() {

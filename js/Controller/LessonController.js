@@ -81,6 +81,16 @@ export default class LessonController {
         return lesson.id;
     }
 
+    static async setLessonsInHolidaysCanceled(schoolYear = null) {
+        let schoolYears = [schoolYear];
+        if (!schoolYear) schoolYears = await SchoolYearController.getAllSchoolYears();  
+        if (schoolYears.length == 0) return;
+
+        await Lesson.setLessonsInHolidaysCanceled(schoolYears);
+
+        await this.renderLesson();
+    }
+
     static async setLessonNotCanceled(lessonData) {
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
         let oldTimetable = await Lesson.getOldTimetableCopy();
