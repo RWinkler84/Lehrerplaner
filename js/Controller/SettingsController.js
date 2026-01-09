@@ -211,7 +211,9 @@ export default class SettingsController {
                 break;
             
             case 'openSchoolYearSettingsButton':
-                await SchoolYearController.renderSchoolYearInfoSection();
+                const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+
+                if (displayedSchoolYearId == "") await SchoolYearController.renderSchoolYearInfoSection();
                 View.openSchoolYearSettings();
                 break
 
@@ -219,7 +221,7 @@ export default class SettingsController {
                 View.openAccountSettings();
                 break;
 
-            case 'closeSettingsButton': //fall through
+            case 'closeSettingsButton':
             case 'closeSettingsButtonResponsive':
                 View.closeSettings();
                 break;

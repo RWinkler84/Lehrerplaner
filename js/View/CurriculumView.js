@@ -145,6 +145,7 @@ export default class CurriculumView extends AbstractView {
 
         yearContainer.classList.remove('curriculumEditor');
         yearContainer.classList.add('holidayEditor');
+        yearContainer.classList.remove('notDisplayed');
 
         schoolYear.holidays.forEach((holiday) => {
             this.renderSpan(holiday.id, holiday);
@@ -166,6 +167,7 @@ export default class CurriculumView extends AbstractView {
         const dayNameContainer = document.querySelector('#dayNameContainer');
 
         const curriculumElements = await this.getCurriculaSelectionItems(schoolYear);
+        const curriculumSelectionItem = curriculumElements?.querySelector('.curriculumSelectionItem')
 
         yearContainer.classList.remove('holidayEditor');
         yearContainer.classList.add('curriculumEditor');
@@ -175,13 +177,14 @@ export default class CurriculumView extends AbstractView {
         //render the curricula selection
         while (curriculumSelectionContainer.firstChild) { curriculumSelectionContainer.firstChild.remove() };
 
-        if (!curriculumElements) {
+        if (!curriculumSelectionItem) {
             const div = document.createElement('div');
             div.classList.add('marginTop');
             div.textContent = 'Du hast für dieses Schuljahr noch keine Stoffverteilungspläne angelegt.';
 
             curriculumSelectionContainer.append(div);
-            dayNameContainer.setAttribute('style', 'display: none');
+            dayNameContainer.classList.add('notDisplayed');
+            yearContainer.classList.add('notDisplayed');
 
             return;
         }
@@ -195,6 +198,9 @@ export default class CurriculumView extends AbstractView {
             document.querySelector('#curriculumContainer').dataset.curriculumid = schoolYear.curricula[0].id;
             document.querySelector(`.curriculumSelectionItem[data-curriculumid="${schoolYear.curricula[0].id}"].settingsView`).classList.add('selected');
 
+            yearContainer.classList.remove('notDisplayed');
+            dayNameContainer.classList.remove('notDisplayed');
+
             schoolYear.curricula[0].curriculumSpans.forEach(span => {
                 this.renderSpan(span.id, span);
                 this.renderSpanContentContainer(span.id, span);
@@ -203,20 +209,28 @@ export default class CurriculumView extends AbstractView {
             return;
         }
 
+        console.log(curriculumId)
+
         const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
 
-        document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
-        document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"].settingsView`).classList.add('selected');
+        if (curriculumToRender) {
+            yearContainer.classList.remove('notDisplayed');
+            dayNameContainer.classList.remove('notDisplayed');
 
-        curriculumToRender.curriculumSpans.forEach(span => {
-            this.renderSpan(span.id, span);
-            this.renderSpanContentContainer(span.id, span);
-        });
+            document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
+            document.querySelector(`.curriculumSelectionItem.settingsView[data-curriculumid="${curriculumId}"]`)?.classList.add('selected');
+
+            curriculumToRender.curriculumSpans.forEach(span => {
+                this.renderSpan(span.id, span);
+                this.renderSpanContentContainer(span.id, span);
+            });
+        }
     }
 
     /** This function rerenders the displayed curriculum without rerendering the whole calendar. Although it adds complexity it is necessary for performance reasons as it makes switching and editing curricula way smoother. */
     static rerenderDisplayedCurriculum(schoolYear, curriculumId) {
         const yearContainer = document.querySelector('#yearContainer');
+        const dayNameContainer = document.querySelector('#dayNameContainer');
 
         document.querySelectorAll('.curriculumSelectionItem.settingsView').forEach(item => item.classList.remove('selected'));
 
@@ -244,6 +258,9 @@ export default class CurriculumView extends AbstractView {
         }
 
         document.querySelector('#curriculumContainer').dataset.curriculumid = curriculumId;
+
+        if (yearContainer.classList.contains('notDisplayed')) yearContainer.classList.remove('notDisplayed');
+        if (dayNameContainer.classList.contains('notDisplayed')) dayNameContainer.classList.remove('notDisplayed');
     }
 
     static async renderCurriculumSubjectAndGradeSelect(schoolYear) {
@@ -254,32 +271,35 @@ export default class CurriculumView extends AbstractView {
         let errorText = 'Für diese Klassenstufen- und Fachkombination gibt es bereits einen Stoffverteilungsplan. Willst du diesen bearbeiten, brich die Erstellung eines neuen Plans ab und wähle den gewünschten Plan aus.';
 
         //preselect a subject/grade combination without a corresponding curriculum
-        const subjectSelectOptions = subjectGradeSelect.querySelector('#curriculumSubjectSelect').querySelectorAll('option');
-        const gradeSelectOptions = subjectGradeSelect.querySelector('#curriculumGradeSelect').querySelectorAll('option');
         let freeCombinationFound = false;
 
-        gradeSelectOptions.forEach(option => {
-            if (freeCombinationFound) return;
+        if (subjectGradeSelect) {
+            const subjectSelectOptions = subjectGradeSelect.querySelector('#curriculumSubjectSelect').querySelectorAll('option');
+            const gradeSelectOptions = subjectGradeSelect.querySelector('#curriculumGradeSelect').querySelectorAll('option');
 
-            let i = 0;
-            let subjectToSetSelected = subjectSelectOptions[i];
-            let matchingCurriculum = false;
+            gradeSelectOptions.forEach(option => {
+                if (freeCombinationFound) return;
 
-            do {
-                matchingCurriculum = schoolYear.curricula.find(entry => { return entry.grade == option.value && entry.subject == subjectToSetSelected.value });
+                let i = 0;
+                let subjectToSetSelected = subjectSelectOptions[i];
+                let matchingCurriculum = false;
 
-                if (matchingCurriculum) {
-                    i++
-                    subjectToSetSelected = subjectSelectOptions[i];
+                do {
+                    matchingCurriculum = schoolYear.curricula.find(entry => { return entry.grade == option.value && entry.subject == subjectToSetSelected.value });
+
+                    if (matchingCurriculum) {
+                        i++
+                        subjectToSetSelected = subjectSelectOptions[i];
+                    }
+                } while (matchingCurriculum && subjectToSetSelected)
+
+                if (!matchingCurriculum) {
+                    freeCombinationFound = true;
+                    option.setAttribute('selected', 'true');
+                    subjectToSetSelected.setAttribute('selected', 'true');
                 }
-            } while (matchingCurriculum && subjectToSetSelected)
-
-            if (!matchingCurriculum) {
-                freeCombinationFound = true;
-                option.setAttribute('selected', 'true');
-                subjectToSetSelected.setAttribute('selected', 'true');
-            }
-        });
+            });
+        }
 
         //add the errorMessageDisplay
         errorMessageDisplay.classList.add('hidden');
@@ -292,6 +312,16 @@ export default class CurriculumView extends AbstractView {
             errorText = 'Es existieren bereits Jahrespläne für jede mögliche Kombination von Klassenstufen und Fächern, die du angelegt hast.';
 
             this.disableSaveCurriculumButton();
+            document.querySelector('#yearContainer').classList.add('notDisplayed');
+            document.querySelector('#dayNameContainer').classList.add('notDisplayed');
+        }
+
+        if (!subjectGradeSelect) {
+            errorMessageDisplay.classList.remove('hidden');
+            errorText = 'Um einen Stoffverteilungsplan anlegen zu können, musst du sowohl deine unterrichteten Klassenstufen als auch die unterrichteten Fächer angelegt haben. Letzteres ist in den Einstellungen unter "Stundenplan" möglich.';
+
+            this.disableSaveCurriculumButton();
+            document.querySelector('#yearContainer').classList.add('notDisplayed');
         }
 
         errorMessageDisplay.textContent = errorText;
@@ -301,12 +331,18 @@ export default class CurriculumView extends AbstractView {
         }
 
         //and stick it all together
-        selectContainer.append(subjectGradeSelect);
+        if (subjectGradeSelect && freeCombinationFound) {
+            selectContainer.append(subjectGradeSelect);
+            this.enableSaveCurriculumButton();
+            document.querySelector('#yearContainer').classList.remove('notDisplayed');
+
+        }
+
         selectContainer.append(errorMessageDisplay);
     }
 
     static async getCurriculaSelectionItems(schoolYear, forMainView = false, preselectedIds = null) {
-        if (schoolYear.curricula.length == 0) return false;
+        if (schoolYear.curricula.length == 0) return null;
 
         const subjects = await Controller.getAllSubjects();
         const blankDiv = document.createElement('div');
@@ -321,6 +357,8 @@ export default class CurriculumView extends AbstractView {
             gradeContainer.classList.add('wrap');
             gradeContainer.classList.add('halfGap');
             gradeContainer.classList.add('marginBottom');
+
+            gradeLabel.dataset.grade = grade;
             gradeLabel.textContent = `Klasse ${grade}:`;
 
             fragment.append(gradeLabel);
@@ -337,14 +375,38 @@ export default class CurriculumView extends AbstractView {
 
             if (forMainView) { container.classList.add('mainView'); } else { container.classList.add('settingsView'); }
             if (subject) { container.classList.add(subject.colorCssClass); } else { container.classList.add('undefined'); }
-            if (preselectedIds && preselectedIds.includes(item.id)) container.classList.add('selected'); 
+            if (preselectedIds && preselectedIds.includes(item.id)) container.classList.add('selected');
 
             curriculumName.textContent = `${item.subject}`;
 
             container.append(curriculumName);
+
+            let itemAppended = false;
+
             Array.from(fragment.children).forEach(child => {
-                if (child.dataset.grade == item.grade) child.append(container);
+                if (child.dataset.grade == item.grade) {
+                    child.append(container);
+                    itemAppended = true;
+                }
             })
+
+            //if the user created a curriculum, but later unselected the grade, it is set for, it will not be appended.
+            //To still list it, the missing gradeContainer must be added.
+            if (!itemAppended) {
+                const gradeContainer = blankDiv.cloneNode();
+                const gradeLabel = document.createElement('label');
+
+                gradeContainer.dataset.grade = item.grade;
+                gradeContainer.classList.add('flex');
+                gradeContainer.classList.add('wrap');
+                gradeContainer.classList.add('halfGap');
+                gradeContainer.classList.add('marginBottom');
+                gradeLabel.textContent = `Klasse ${item.grade}:`;
+
+                gradeContainer.append(container);
+                fragment.insertBefore(gradeLabel, fragment.querySelector(`label[data-grade="${Number(item.grade) + 1}"]`));
+                fragment.insertBefore(gradeContainer, fragment.querySelector(`[data-grade="${Number(item.grade) + 1}"]`));
+            }
         });
 
         return fragment;
@@ -853,6 +915,10 @@ export default class CurriculumView extends AbstractView {
         } while (i <= endWeekNumber)
     }
 
+    static setDisplayedCurriculumId(id) {
+        document.querySelector('#curriculumContainer').dataset.curriculumid = id;
+    }
+
     //show or enable elements
     static showCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').classList.remove('notDisplayed');
@@ -985,14 +1051,28 @@ export default class CurriculumView extends AbstractView {
         const gradeSelect = document.querySelector('#curriculumGradeSelect');
         const subjectSelect = document.querySelector('#curriculumSubjectSelect');
 
-        return {
-            subject: subjectSelect.value,
-            grade: gradeSelect.value
+        if (gradeSelect && subjectSelect) {
+            return {
+                subject: subjectSelect.value,
+                grade: gradeSelect.value
+            }
         }
+
+        return false;
     }
 
     static #getColorOfSelectedCurriculum() {
-        const selectedCurriculum = document.querySelector('.curriculumSelectionItem.selected');
+        let selectedCurriculum = document.querySelector('.curriculumSelectionItem.selected');
+        if (!selectedCurriculum) {
+            const subjectSelect = document.querySelector('#curriculumSubjectSelect');
+            const selectedSubject = subjectSelect.value;
+
+            selectedCurriculum = document.querySelector(`.subjectListItem[data-subject="${selectedSubject}"]`)
+        }
+
+        // still nothing found? return a fallback color
+        if (!selectedCurriculum) return 'var(--labelgrey)'
+
         const props = getComputedStyle(selectedCurriculum);
 
         return props.backgroundColor;

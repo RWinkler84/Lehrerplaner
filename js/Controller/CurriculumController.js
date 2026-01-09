@@ -62,19 +62,28 @@ export default class CurriculumController {
 
         View.showSaveCancelNewCurriculumButtonContainer();
         View.showCurriculumCreationSelectContainer();
-        View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
         await View.renderCurriculumSubjectAndGradeSelect(schoolYear);
 
         //the renderCurriculumSubjectAndGradeSelect function preselects the first free grade/subject combination
         //which should be used for the mockup curriculum, which gets update whenever the user selects something else
         const selectedSubjectGrade = View.getSelectedSubjectAndGrade();
 
-        await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject });
+        //if there is no selectedSubjectGrade the user did not create teached grades or subjects or there wasn't a free combination of grade and subject
+        //so no subject/grad select was created. It this case there must not be an empty curriculum or an id set on the curriculum container
+        if (!selectedSubjectGrade) {
+            View.setDisplayedCurriculumId('');
+            return;
+        }
+        
+        await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject, curriculumSpans: [], provisional: true });
+        View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
     }
 
     static async saveNewCurriculum() {
         const schoolYear = await SchoolYear.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
         const curriculumId = View.getDisplayedCurriculumId();
+
+        await schoolYear.removeProvisionalStatusFromCurriculum(curriculumId);
 
         View.hideSaveCancelNewCurriculumButtonContainer();
         View.hideCurriculumCreationSelectContainer();
@@ -89,8 +98,9 @@ export default class CurriculumController {
         const schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId);
         const curriculumId = View.getDisplayedCurriculumId();
 
-        await schoolYear.removeCurriculumById(curriculumId);
+        if (curriculumId != '') await schoolYear.removeCurriculumById(curriculumId);
 
+        View.setDisplayedCurriculumId('');
         View.hideCurriculumCreationSelectContainer();
         View.hideSaveCancelNewCurriculumButtonContainer();
 
@@ -292,17 +302,21 @@ export default class CurriculumController {
             //curriculum creation
             case 'createCurriculumButton':
                 CurriculumController.createNewCurriculum();
+                SchoolYearController.disableSchoolYearButtons();
                 break;
             case 'saveNewCurriculumButton':
                 CurriculumController.saveNewCurriculum();
+                SchoolYearController.enableSchoolYearButtons();
                 break;
             case 'cancelNewCurriculumButton':
                 CurriculumController.cancelCurriculumCreation();
+                SchoolYearController.enableSchoolYearButtons();
                 break;
 
             //holiday editor
             case 'closeHolidayEditorButton':
                 CurriculumController.closeHolidayEditor();
+                SchoolYearController.enableSchoolYearButtons();
                 break;
 
             //span form buttons

@@ -19,14 +19,27 @@ export default class SchoolYearView extends AbstractView {
 
         //selected teached grades
         infoContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            if (schoolYear.grades.includes(checkbox.value)) {
+            if (schoolYear && schoolYear.grades.includes(checkbox.value)) {
                 checkbox.checked = true;
             } else {
                 checkbox.checked = false;
             }
         })
 
-        if (!schoolYear) return;
+        //reset to default, if there is no schoolYear and no schoolYear creation ongoing
+        const schoolYearCreationButtons = infoContainer.querySelector('#schoolYearCreationButtonsContainer');
+        if (!schoolYear && schoolYearCreationButtons.classList.contains('notDisplayed')) {
+            startDateDisplay.textContent = 'Leg ein Schuljahr an,...';
+            endDateDisplay.textContent = '...damit hier etwas stehen kann.';
+
+            infoContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {checkbox.disabled = true;})
+            this.hideEditSchoolYearDatesGradesButton();
+            this.hideSaveSchoolYearDatesGradesButton();
+            this.hideCreateHolidayDatesButton();
+
+            return;
+        }
+
         infoContainer.dataset.school_year_id = schoolYear.id;
 
         startDateDisplay.setAttribute('data-date', schoolYear.startDate);
@@ -42,7 +55,9 @@ export default class SchoolYearView extends AbstractView {
         }
 
         this.showEditHolidayDatesButton();
+        this.enableEditHolidayDatesButton();
         this.showEditSchoolYearDatesGradesButton();
+        this.enableEditSchoolYearDatesGradesButton();
         this.showCreateNewSchoolYearButton();
 
         this.hideCreateHolidayDatesButton();
@@ -222,7 +237,7 @@ export default class SchoolYearView extends AbstractView {
         form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
             if (newYearForm) checkbox.checked = false;
             checkbox.removeAttribute('disabled');
-            });
+        });
 
     }
 
@@ -263,9 +278,27 @@ export default class SchoolYearView extends AbstractView {
     static showSchoolYearCreationButtonsContainer() {
         document.querySelector('#schoolYearCreationButtonsContainer').classList.remove('notDisplayed');
     }
-        static enableSaveNewSchoolYearButton() {
+    static showSchoolYearSelect() {
+        document.querySelector('#schoolYearNameSelect').parentElement.classList.remove('hidden');
+    }
+
+    //enable
+    static enableSaveNewSchoolYearButton() {
         document.querySelector('#saveNewSchoolYearButton').disabled = false;
     }
+    static enableCreateNewSchoolYearButton() {
+        document.querySelector('#createNewSchoolYearButton').disabled = false;
+    }
+    static enableEditSchoolYearDatesGradesButton() {
+        document.querySelector('#editSchoolYearDatesGradesButton').disabled = false;
+    }
+    static enableEditHolidayDatesButton() {
+        document.querySelector('#editHolidayDatesButton').disabled = false;
+    }
+    static enableCreateHolidayDatesButton() {
+        document.querySelector('#createHolidayDatesButton').disabled = false;
+    }
+
 
     //hide
     static hideEditHolidayDatesButton() {
@@ -286,8 +319,22 @@ export default class SchoolYearView extends AbstractView {
     static hideSchoolYearCreationButtonsContainer() {
         document.querySelector('#schoolYearCreationButtonsContainer').classList.add('notDisplayed');
     }
+
+    //disable
     static disableSaveNewSchoolYearButton() {
         document.querySelector('#saveNewSchoolYearButton').disabled = true;
+    }
+    static disableCreateNewSchoolYearButton() {
+        document.querySelector('#createNewSchoolYearButton').disabled = true;
+    }
+    static disableEditSchoolYearDatesGradesButton() {
+        document.querySelector('#editSchoolYearDatesGradesButton').disabled = true;
+    }
+    static disableEditHolidayDatesButton() {
+        document.querySelector('#editHolidayDatesButton').disabled = true;
+    }
+    static disableCreateHolidayDatesButton() {
+        document.querySelector('#createHolidayDatesButton').disabled = true;
     }
 
     //displayed, but hidden
@@ -296,6 +343,9 @@ export default class SchoolYearView extends AbstractView {
     }
     static showSchoolYearSelect() {
         document.querySelector('#schoolYearNameSelect').parentElement.classList.remove('hidden');
+    }
+    static hideSchoolYearSelect() {
+        document.querySelector('#schoolYearNameSelect').parentElement.classList.add('hidden');
     }
 
     //validation error

@@ -92,7 +92,7 @@ export default class SettingsView {
 
         allSubjects.forEach(entry => {
             subjectsHTML += `
-                <div class="subjectListItem ${entry.colorCssClass} flex spaceBetween" data-id="${entry.id}">
+                <div class="subjectListItem ${entry.colorCssClass} flex spaceBetween" data-id="${entry.id}" data-subject="${entry.subject}">
                 ${entry.subject}
                 <button class="deleteSubjectButton deleteItemButton" style="width: 1.5rem">&#215;</button>
                 </div>

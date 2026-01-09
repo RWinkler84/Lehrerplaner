@@ -136,6 +136,9 @@ async function startApp() {
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
+    
+    await SchoolYearController.removeProvisionalData();
+
     await LessonController.renderCurriculaSelection();
     await LessonController.renderSelectedCurricula();
     await LessonView.renderLesson();
@@ -324,6 +327,7 @@ async function startApp() {
             timetableContainer.style.height = '';
 
             LessonView.renderLesson();
+            LessonController.renderCurriculaSelection();
             LessonController.renderSelectedCurricula();
 
             weekOverview.querySelectorAll('.lesson').forEach((lesson) => {

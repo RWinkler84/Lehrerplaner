@@ -184,7 +184,7 @@ export default class LessonController {
 
         const selection = await CurriculumController.getCurriculaSelectionItems(weekdayDates.monday, true, currentlySelectedCurricula);
 
-        if (selection) View.renderCurriculaSelection(selection);
+        View.renderCurriculaSelection(selection);
     }
 
     static async renderSelectedCurricula() {
