@@ -145,6 +145,8 @@ export default class SchoolYearController {
     }
 
     static createNewSchoolYear() {
+        View.setEditOngoingStatus(true);
+
         View.hideEditSchoolYearDatesGradesButton();
         View.hideEditHolidayDatesButton();
         View.hideCreateNewSchoolYearButton();
@@ -162,6 +164,8 @@ export default class SchoolYearController {
         const schoolYearId = View.getDisplayedSchoolYearId();
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
 
+        View.setEditOngoingStatus(false);
+
         CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
 
         View.renderSchoolYearInfoSection(schoolYear);
@@ -175,9 +179,11 @@ export default class SchoolYearController {
             const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
             schoolYear.delete();
         }
+        View.setEditOngoingStatus(false);
 
         CurriculumController.enableCreateCurriculumButton();
         CurriculumController.hideCloseHolidayEditorButton();
+
 
         View.showSchoolYearSelect();
         View.hideSchoolYearCreationButtonsContainer();

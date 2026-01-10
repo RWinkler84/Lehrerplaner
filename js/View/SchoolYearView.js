@@ -26,9 +26,11 @@ export default class SchoolYearView extends AbstractView {
             }
         })
 
+        const isEditOngoing = this.isEditOngoing();
+
         //reset to default, if there is no schoolYear and no schoolYear creation ongoing
         const schoolYearCreationButtons = infoContainer.querySelector('#schoolYearCreationButtonsContainer');
-        if (!schoolYear && schoolYearCreationButtons.classList.contains('notDisplayed')) {
+        if (!schoolYear && !isEditOngoing) {
             startDateDisplay.textContent = 'Leg ein Schuljahr an,...';
             endDateDisplay.textContent = '...damit hier etwas stehen kann.';
 
@@ -55,7 +57,7 @@ export default class SchoolYearView extends AbstractView {
         }
 
         //schoolYear edit ongoing
-        if (!schoolYearCreationButtons.classList.contains('notDisplayed')) {
+        if (isEditOngoing) {
             this.showEditHolidayDatesButton();
             this.enableEditHolidayDatesButton();
 
@@ -277,6 +279,15 @@ export default class SchoolYearView extends AbstractView {
         if (document.querySelector('#createNewSchoolYearButton').classList.contains('notDisplayed')) return true;
 
         return false;
+    }
+
+    static isEditOngoing() {
+        if (document.querySelector('#schoolYearInfoContainer').dataset.editongoing == 'true') return true;
+        return false;
+    }
+
+    static setEditOngoingStatus(bool) {
+        document.querySelector('#schoolYearInfoContainer').dataset.editongoing = `${bool}`;
     }
 
     //show/enable and hide/disable buttons
