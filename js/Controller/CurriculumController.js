@@ -77,15 +77,13 @@ export default class CurriculumController {
             return;
         }
         
-        await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject, curriculumSpans: [], provisional: true });
+        await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject });
         View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
     }
 
     static async saveNewCurriculum() {
         const schoolYear = await SchoolYear.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
         const curriculumId = View.getDisplayedCurriculumId();
-
-        await schoolYear.removeProvisionalStatusFromCurriculum(curriculumId);
 
         View.hideSaveCancelNewCurriculumButtonContainer();
         View.hideCurriculumCreationSelectContainer();

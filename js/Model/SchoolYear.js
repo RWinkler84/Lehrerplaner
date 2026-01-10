@@ -47,14 +47,11 @@ export class Curriculum {
     #grade;
     #subject;
     #curriculumSpans = [];
-    #provisional;
 
-    constructor(id, grade, subject, curriculumSpans = null, provisional = false) {
+    constructor(id, grade, subject, curriculumSpans = null) {
         this.#id = Number(id);
         this.#grade = grade;
         this.#subject = subject;
-
-        if (provisional) this.#provisional = true;
 
         if (curriculumSpans) {
             curriculumSpans.forEach(spanData => {
@@ -108,8 +105,6 @@ export class Curriculum {
             curriculumSpans: []
         }
 
-        if (this.#provisional) serialized.provisional = true;
-
         this.curriculumSpans.forEach(span => {
             serialized.curriculumSpans.push(span.serialize());
         })
@@ -121,14 +116,12 @@ export class Curriculum {
     get grade() { return this.#grade };
     get subject() { return this.#subject };
     get curriculumSpans() { return [...this.#curriculumSpans]; }
-    get provisional() {return this.#provisional};
 
     set curriculumSpans(value) {
         throw new Error('Curriculum span entries can only be added by calling the addSpan method! Add one instance of a span at a time.');
     }
     set grade(value) { this.#grade = value };
     set subject(value) { this.#subject = value };
-    set provisional(value) { this.#provisional = value; }
 }
 
 export class CurriculumSpan {
@@ -194,8 +187,6 @@ export default class SchoolYear extends AbstractModel {
     #created;
     #lastEdited;
 
-    #provisional = false;
-
     static async getSchoolYearById(id) {
         const db = new AbstractModel();
         const yearData = await db.readFromLocalDB('schoolYears', id);
@@ -241,21 +232,6 @@ export default class SchoolYear extends AbstractModel {
         return instanceArray;
     }
 
-    static async removeProvisionalData() {
-        const allSchoolYears = await this.getAllSchoolYears();
-
-        for (const schoolYear of allSchoolYears) {
-            if (schoolYear.provisional == true) {
-                await schoolYear.delete();
-                continue;
-            }
-
-            for (const curriculum of schoolYear.#curricula) {
-                if (curriculum.provisional == true) await schoolYear.removeCurriculumById(curriculum.id);
-            }
-        }
-    }
-
     ///////////////////////////////////
     // schoolYear instance functions //
     ///////////////////////////////////
@@ -267,8 +243,6 @@ export default class SchoolYear extends AbstractModel {
         const dataToSave = this.serialize();
 
         await this.writeToLocalDB('schoolYears', dataToSave);
-
-        delete dataToSave.provisional;
 
         let result = await this.makeAjaxQuery('schoolYear', 'save', dataToSave);
         if (result.status == 'failed') this.writeToLocalDB('unsyncedSchoolYears', dataToSave);
@@ -313,12 +287,6 @@ export default class SchoolYear extends AbstractModel {
         if (!Array.isArray(value)) throw new TypeError('The given value must be of type array!');
 
         this.#grades = value;
-        await this.update();
-    }
-
-    async removeProvisionalStatusFromSchoolYear() {
-        this.provisional = false;
-
         await this.update();
     }
 
@@ -391,7 +359,7 @@ export default class SchoolYear extends AbstractModel {
     ///////////////////////////////////
     async addCurriculum(curriculumData) {
         if (!curriculumData.id) curriculumData.id = Fn.generateId(this.curricula);
-        const curriculum = new Curriculum(curriculumData.id, curriculumData.grade, curriculumData.subject, curriculumData.curriculumSpans, curriculumData.provisional);
+        const curriculum = new Curriculum(curriculumData.id, curriculumData.grade, curriculumData.subject, curriculumData.curriculumSpans);
         this.#curricula.push(curriculum);
 
         await this.update();
@@ -473,14 +441,6 @@ export default class SchoolYear extends AbstractModel {
         return matchingSpans;
     }
 
-    async removeProvisionalStatusFromCurriculum(curriculumId) {
-        const curriculum = this.getCurriculumById(curriculumId);
-
-        curriculum.provisional = false;
-
-        await this.update();
-    }
-
     //class helper functions
     serialize() {
         const serialized = {
@@ -505,8 +465,6 @@ export default class SchoolYear extends AbstractModel {
             serialized.curricula.push(item);
         });
 
-        if (this.provisional) serialized.provisional = true;
-
         return serialized;
     }
 
@@ -530,11 +488,10 @@ export default class SchoolYear extends AbstractModel {
         }
         if (yearData.curricula) {
             yearData.curricula.forEach(curriculum => {
-                let curriculumInstance = new Curriculum(curriculum.id, curriculum.grade, curriculum.subject, curriculum.curriculumSpans, curriculum.provisional);
+                let curriculumInstance = new Curriculum(curriculum.id, curriculum.grade, curriculum.subject, curriculum.curriculumSpans);
                 instance.#curricula.push(curriculumInstance);
             });
         }
-        if (yearData.provisional) instance.provisional = true;
 
         return instance;
     }
@@ -552,7 +509,6 @@ export default class SchoolYear extends AbstractModel {
         return [...this.#holidays];
     }
     get curricula() { return [...this.#curricula]; }
-    get provisional() { return this.#provisional; }
 
     //setter
     set id(value) { this.#id = value; }
@@ -562,7 +518,6 @@ export default class SchoolYear extends AbstractModel {
     set grades(value) {
         throw new Error('Teached grade entries can only be added by calling the updateGrades method! Provide an array with the grades as an argument.');
     }
-    set provisional(value) { this.#provisional = value };
 
     set startDate(value) {
         let date = new Date(value);

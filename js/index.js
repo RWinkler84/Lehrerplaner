@@ -134,8 +134,6 @@ async function startApp() {
     setCalendarWeek();
     setWeekStartAndEndDate();
     
-    await SchoolYearController.removeProvisionalData();
-
     await LessonController.renderCurriculaSelection();
     await LessonController.renderSelectedCurricula();
     await LessonView.renderLesson();

@@ -87,8 +87,6 @@ export default class SchoolYearController {
         View.showEditSchoolYearDatesGradesButton();
 
         if (yearData.id == '') {
-            yearData.provisional = true;
-
             yearData.grades = View.saveTaughtGrades();
             const schoolYear = SchoolYear.writeDataToInstance(yearData);
 
@@ -163,8 +161,6 @@ export default class SchoolYearController {
         const schoolYearId = View.getDisplayedSchoolYearId();
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
 
-        await schoolYear.removeProvisionalStatusFromSchoolYear();
-
         CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
 
         View.renderSchoolYearInfoSection(schoolYear);
@@ -190,10 +186,6 @@ export default class SchoolYearController {
 
     static changeDisplayedSchoolYear() {
         this.renderSchoolYearInfoSection(View.getSelectedYearId());
-    }
-
-    static async removeProvisionalData() {
-        await SchoolYear.removeProvisionalData();
     }
 
     //event handler
