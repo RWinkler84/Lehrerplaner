@@ -32,7 +32,7 @@ export default class SchoolYearView extends AbstractView {
             startDateDisplay.textContent = 'Leg ein Schuljahr an,...';
             endDateDisplay.textContent = '...damit hier etwas stehen kann.';
 
-            infoContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {checkbox.disabled = true;})
+            infoContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => { checkbox.disabled = true; })
             this.hideEditSchoolYearDatesGradesButton();
             this.hideSaveSchoolYearDatesGradesButton();
             this.hideCreateHolidayDatesButton();
@@ -54,11 +54,31 @@ export default class SchoolYearView extends AbstractView {
             return;
         }
 
+        //schoolYear edit ongoing
+        if (!schoolYearCreationButtons.classList.contains('notDisplayed')) {
+            this.showEditHolidayDatesButton();
+            this.enableEditHolidayDatesButton();
+
+            this.showEditSchoolYearDatesGradesButton();
+            this.enableEditSchoolYearDatesGradesButton();
+
+            this.showSchoolYearCreationButtonsContainer();
+            
+            this.disableCreateNewSchoolYearButton();
+            this.hideCreateNewSchoolYearButton();
+            this.hideCreateHolidayDatesButton();
+
+            return;
+        }
+
         this.showEditHolidayDatesButton();
         this.enableEditHolidayDatesButton();
+        
         this.showEditSchoolYearDatesGradesButton();
         this.enableEditSchoolYearDatesGradesButton();
+        
         this.showCreateNewSchoolYearButton();
+        this.enableCreateNewSchoolYearButton()
 
         this.hideCreateHolidayDatesButton();
         this.hideSaveSchoolYearDatesGradesButton();

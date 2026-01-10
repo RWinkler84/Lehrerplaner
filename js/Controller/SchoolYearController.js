@@ -94,6 +94,7 @@ export default class SchoolYearController {
 
             View.setDisplayedSchoolYearId(schoolYear.id);
             View.showCreateHolidaysButton();
+            View.enableCreateHolidayDatesButton();
             View.enableSaveNewSchoolYearButton();
 
             await LessonController.renderCurriculaSelection();
@@ -176,6 +177,7 @@ export default class SchoolYearController {
         }
 
         CurriculumController.enableCreateCurriculumButton();
+        CurriculumController.hideCloseHolidayEditorButton();
 
         View.showSchoolYearSelect();
         View.hideSchoolYearCreationButtonsContainer();

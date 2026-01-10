@@ -161,6 +161,8 @@ export default class CurriculumView extends AbstractView {
     }
 
     static async renderSchoolYearCurriculumEditor(schoolYear, curriculumId = null) {
+console.log(schoolYear, curriculumId)
+
         const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const yearContainer = document.querySelector('#yearContainer');
         const allDays = yearContainer.querySelectorAll('.day');
@@ -955,6 +957,9 @@ export default class CurriculumView extends AbstractView {
     }
     static hideCurriculumCreationSelectContainer() {
         document.querySelector('#curriculumCreationSelectContainer').classList.add('notDisplayed');
+    }
+    static hideCloseHolidayEditorButton() {
+        document.querySelector('#closeHolidayEditorButton').classList.add('notDisplayed');
     }
 
     //set span edit status active/inactive

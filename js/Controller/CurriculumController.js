@@ -14,13 +14,17 @@ export default class CurriculumController {
     }
 
     static async renderSchoolYearCurriculumEditor(schoolYear = null, curriculumId = null) {
-        if (!schoolYear) schoolYear = await SchoolYearController.getCurrentSchoolYear()
-        if (!curriculumId) curriculumId = await CurriculumController.getDisplayedCurriculumId()
+        if (!schoolYear) {
+            const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+            schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId) || await SchoolYearController.getCurrentSchoolYear();
+        }
+
+        if (!curriculumId) curriculumId = await CurriculumController.getDisplayedCurriculumId();
 
         if (schoolYear) {
-        this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
-        View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
-        View.showCreateCurriculumButton();
+            this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate)
+            View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
+            View.showCreateCurriculumButton();
         }
     }
 
@@ -31,7 +35,7 @@ export default class CurriculumController {
         }
 
         if (View.getNewSpan()) await this.cancelSpanCreation();
-        
+
         View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
         View.removeAllHandles();
     }
@@ -44,7 +48,7 @@ export default class CurriculumController {
 
     static closeHolidayEditor() {
         View.closeHolidayEditor();
-        this.renderSchoolYearCurriculumEditor()
+        this.renderSchoolYearCurriculumEditor();
     }
 
     static resizeTimeSpanForm() {
@@ -76,9 +80,9 @@ export default class CurriculumController {
             View.setDisplayedCurriculumId('');
             return;
         }
-        
+
         await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject });
-        View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
+        View.renderSchoolYearCurriculumEditor(schoolYear, newCurriculumId);
     }
 
     static async saveNewCurriculum() {
@@ -263,7 +267,7 @@ export default class CurriculumController {
         const schoolYear = await SchoolYearController.getSchoolYearByDate(referenceDate);
 
         if (!schoolYear) return false;
-        
+
         return await View.getCurriculaSelectionItems(schoolYear, forMainView, preselectedIds);
     }
 
@@ -332,7 +336,7 @@ export default class CurriculumController {
                 break;
             case 'resizeTimeSpanFormButton':
                 CurriculumController.resizeTimeSpanForm();
-            break;
+                break;
         }
     }
 
@@ -362,5 +366,8 @@ export default class CurriculumController {
     }
     static disableCreateCurriculumButton() {
         View.disableCreateCurriculumButton();
+    }
+    static hideCloseHolidayEditorButton() {
+        View.hideCloseHolidayEditorButton();
     }
 }
