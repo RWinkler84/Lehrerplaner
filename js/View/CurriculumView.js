@@ -161,7 +161,7 @@ export default class CurriculumView extends AbstractView {
     }
 
     static async renderSchoolYearCurriculumEditor(schoolYear, curriculumId = null) {
-console.log(schoolYear, curriculumId)
+        console.log(schoolYear, curriculumId)
 
         const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const yearContainer = document.querySelector('#yearContainer');
@@ -523,6 +523,7 @@ console.log(schoolYear, curriculumId)
             form.querySelector('input').value = spanData.name;
             editor.innerHTML = spanData.note;
         }
+        if (editor.textContent.trim() == '') editor.innerHTML = '<p><br></p>';
 
         form.style.display = 'flex';
         this.setSpanEditActive();
