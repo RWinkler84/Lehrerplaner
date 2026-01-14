@@ -114,9 +114,15 @@ export default class CurriculumView extends AbstractView {
                 day.setAttribute('data-date', currentDay);
                 day.innerHTML = `
                         <div class="dateContainer">
-                            <div class="dayDate">${currentDay.getDate()}.</div>
+                            <div class="dayDate">${currentDay.getDate()}. </div>
                         </div>
                     `;
+
+                if (currentDay.getDate() == 1) {
+                    day.classList.add('firstOfMonth');
+                    day.querySelector('.dayDate').innerText += monthNames[currentDay.getMonth()];
+                    }
+
             });
 
             if (currentDay.setHours(12) == endDate) {

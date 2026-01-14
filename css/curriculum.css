@@ -179,7 +179,18 @@
     gap: 0.5rem;
     pointer-events: none;
     font-size: 0.75rem;
+
+}
+
+.day.firstOfMonth .dateContainer {
+    font-weight: bold;
+}
+
+.dayDate {
+    min-width: 1rem;
+    text-wrap: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dateContainer {
