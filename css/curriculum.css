@@ -37,6 +37,10 @@
 
 
 /* curriculum section */
+#curriculumContainer {
+    margin: 0;
+}
+
 #timeSpanForm {
     display: none;
     flex-direction: column;

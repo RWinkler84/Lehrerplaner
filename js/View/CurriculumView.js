@@ -363,6 +363,7 @@ export default class CurriculumView extends AbstractView {
             gradeContainer.classList.add('wrap');
             gradeContainer.classList.add('halfGap');
             gradeContainer.classList.add('marginBottom');
+            gradeContainer.classList.add('curriculumItemContainer');
 
             gradeLabel.dataset.grade = grade;
             gradeLabel.textContent = `Klasse ${grade}:`;
@@ -412,6 +413,15 @@ export default class CurriculumView extends AbstractView {
                 gradeContainer.append(container);
                 fragment.insertBefore(gradeLabel, fragment.querySelector(`label[data-grade="${Number(item.grade) + 1}"]`));
                 fragment.insertBefore(gradeContainer, fragment.querySelector(`[data-grade="${Number(item.grade) + 1}"]`));
+            }
+        });
+
+        //remove empty gradeContainer and their label
+        Array.from(fragment.querySelectorAll('.curriculumItemContainer')).forEach(container => {
+            if (container.childElementCount == 0) {
+                const grade = container.dataset.grade;
+                fragment.querySelector(`label[data-grade="${grade}"]`)?.remove();
+                container.remove();
             }
         });
 
