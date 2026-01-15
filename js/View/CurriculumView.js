@@ -1081,7 +1081,10 @@ export default class CurriculumView extends AbstractView {
     }
 
     static #getColorOfSelectedCurriculum() {
-        let selectedCurriculum = document.querySelector('.curriculumSelectionItem.selected');
+        const curriculumContainer = document.querySelector('#curriculumContainer');
+        let selectedCurriculum = curriculumContainer.querySelector('.curriculumSelectionItem.selected');
+        
+        //is there a plan in creation? get the color of the selected subject from the timetable/subjects view
         if (!selectedCurriculum) {
             const subjectSelect = document.querySelector('#curriculumSubjectSelect');
             const selectedSubject = subjectSelect.value;

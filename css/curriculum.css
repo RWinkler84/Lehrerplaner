@@ -363,6 +363,15 @@
         bottom: 0;
         width: calc(100% + 1rem);
     }
+
+    .curriculumSelectionItem:hover {
+        border: 2px solid var(--contentContainerBackground);
+
+        &.curriculumSelectionItem.selected {
+            border: solid 2px var(--lightMatteGreen);
+        }
+    }
+
 }
 
 /* generics */
