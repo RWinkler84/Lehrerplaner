@@ -41,7 +41,7 @@ export default class LessonView {
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lessonDate}" data-created="${lesson.created}">
                     <div class="lessonContentContainer" style="width: 100%;">
-                        <div class="flex column spaceBetween" style="width: 1rem; height: 100%;">
+                        <div class="flex column spaceBetween lessonIndicatorContainer" style="width: 1rem; height: 100%;">
                             <div class="lessonHasTaskIndicator"></div>
                             <div class="lessonNoteIndicator"><div class="noteIcon"></div></div>
                         </div>
@@ -96,7 +96,7 @@ export default class LessonView {
             timeslot.innerHTML = `
                 <div class="lesson ${lesson.cssColorClass} ${canceled}" data-id="${lesson.id}" data-class="${lesson.class}" data-subject="${lesson.subject}" data-timeslot="${lesson.timeslot}" data-date="${lesson.date}" data-created="${lesson.created}">
                     <div class="lessonContentContainer" style="width: 100%;">
-                        <div class="flex column spaceBetween" style="width: 1rem; height: 100%;">
+                        <div class="flex column spaceBetween lessonIndicatorContainer" style="width: 1rem; height: 100%;">
                             <div class="lessonHasTaskIndicator"></div>
                             <div class="lessonNoteIndicator"><div class="noteIcon"></div></div>
                         </div>
@@ -672,6 +672,14 @@ export default class LessonView {
         document.querySelectorAll('.curriculumSelectionItem.mainView.selected').forEach(item => ids.push(Number(item.dataset.curriculumid)));
 
         return ids;
+    }
+
+    static hasLessonNoteIndicator(element) {
+        const noteIndicator = element.querySelector('.lessonNoteIndicator');
+
+        if (noteIndicator && getComputedStyle(noteIndicator).visibility != 'hidden') return true;
+        
+        return false
     }
 
     // input validation

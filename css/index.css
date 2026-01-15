@@ -439,6 +439,10 @@ dialog .errorMessageDisplay,
     align-items: center;
 }
 
+.lessonIndicatorContainer {
+    padding-right: 0.5rem;
+}
+
 .lessonHasTaskIndicator {
     visibility: hidden;
     width: 0.3rem;

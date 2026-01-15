@@ -228,6 +228,9 @@ export default class LessonController {
         }
 
         switch (true) {
+            case target.classList.contains('lessonIndicatorContainer'):
+                if (View.hasLessonNoteIndicator(target)) this.renderLessonNote(event);
+                break;
             case target.classList.contains('noteIcon'):
                 this.renderLessonNote(event);
                 break;
