@@ -624,6 +624,10 @@ dialog .errorMessageDisplay,
     max-width: 0px;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &[contenteditable] {
+        background-color: white;
+    }
 }
 
 .taskDone {
@@ -1035,10 +1039,19 @@ h4 {
 }
 
 #subjectsInfoTooltip,
-#timetableInfoTooltip {
+#timetableInfoTooltip,
+#taskViewInfoTooltip {
     position: absolute;
     top: 2rem;
     right: 2rem;
+}
+
+#subjectsInfoTooltip .tooltipTextLeft {
+    transform: translateY(3.5rem);
+
+    &::after {
+        top: calc(50% - 3.5rem);
+    }
 }
 
 #validFromPickerAlertTooltip {
@@ -1568,7 +1581,8 @@ h4 {
     }
 
     #subjectsInfoTooltip,
-    #timetableInfoTooltip {
+    #timetableInfoTooltip,
+    #taskViewInfoTooltip {
         position: absolute;
         top: 1rem;
         right: 0.5rem;

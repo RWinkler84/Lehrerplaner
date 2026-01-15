@@ -59,12 +59,14 @@
             <div id="weekCurriculumContainer" class="marginBottom">
                 <div class="flex responsiveSpaceBetween gap marginBottom">
                     <label>Stoffverteilungspläne</label>
-                    <button id="resizeCurriculumSectionButton" class="closeDialogButton" style="width: 1.5rem;">&#9660;</button>
+                    <button id="resizeCurriculumSectionButton" class="closeDialogButton"
+                        style="width: 1.5rem;">&#9660;</button>
                 </div>
                 <div id="weekCurriculaSelectionContainer" class="notDisplayed">
                     <div class="flex responsiveSpaceBetween gap" style="margin-bottom: 0.5rem;">
                         <label>Auswahl:</label>
-                        <button id="resizeCurriculumSelectionButton" class="closeDialogButton" style="width: 1.5rem;">&#9650;</button>
+                        <button id="resizeCurriculumSelectionButton" class="closeDialogButton"
+                            style="width: 1.5rem;">&#9650;</button>
                     </div>
                     <div id="weekCurriculaSelectionDisplay" style="padding-left: 1rem"></div>
                 </div>
@@ -210,6 +212,12 @@
         </div>
 
         <div id="taskContainer" class="flex doubleGap">
+            <div id="taskViewInfoTooltip" class="tooltip">?
+                <span class="tooltipTextLeft">
+                Hier kannst du deine Aufgaben verwalten. Um sie zu bearbeiten, wähle sie mit einem Doppelklick aus.
+                Mit <button class="confirmationButton" style="padding: 0 0.5rem"><span class="icon checkIcon"></span></button> setzt du sie auf erledigt. Mit <button class="orangeButton" style="padding: 0 0.5rem"><span class="icon inProgressIcon"></span></button> kannst du ihren Status auf "in Arbeit" ändern.
+                </span>
+            </div>
 
             <div id="upcomingTasksContainer">
                 <div style="margin-bottom: 1rem;">
@@ -598,7 +606,8 @@
                                         </div>
                                     </div>
                                     <div id="curriculumSpanNoteEditor" class="textEditor" contenteditable="true"
-                                        data-noteversion><p></p>
+                                        data-noteversion>
+                                        <p></p>
                                     </div>
                                     <div id="cancelSpanCreationButtonContainer" class="flex halfGap justifyEnd">
                                         <button id="saveSpanCreationButton"
