@@ -19,10 +19,19 @@ class LessonController extends AbstractController
     public function save()
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
+        $finalResult = ['status' => 'success'];
 
-        $result = $this->model->save($lessonData);
+        error_log(print_r($lessonData, true));
 
-        echo json_encode($result);
+        foreach ($lessonData as $lesson) {
+        $result = $this->model->save($lesson);
+
+        if ($result['status'] == 'failed') {
+            $finalResult = $result;
+            }
+        }
+
+        echo json_encode($finalResult);
     }
 
     public function update()
@@ -66,6 +75,8 @@ class LessonController extends AbstractController
     {
         $lessonData = json_decode(file_get_contents('php://input'), true);
         $finalResult = ['status' => 'success'];
+
+        error_log(print_r($lessonData, true));
 
         foreach ($lessonData as $lesson) {
             $result = $this->model->deleteLesson($lesson);
