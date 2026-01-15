@@ -212,13 +212,10 @@ export default class SettingsController {
             
             case 'openSchoolYearSettingsButton':
                 const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
-                const displayedCurriculumId = CurriculumController.getDisplayedCurriculumId();
-
+                //only render, if nothing has been rendered yet, else keep the state
                 if (displayedSchoolYearId == "") await SchoolYearController.renderSchoolYearInfoSection();
                 
                 View.openSchoolYearSettings();
-                if (displayedCurriculumId) await CurriculumController.rerenderDisplayedCurriculum(displayedCurriculumId);
-
                 break
 
             case 'openAccountSettingsButton':

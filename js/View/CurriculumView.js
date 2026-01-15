@@ -167,7 +167,6 @@ export default class CurriculumView extends AbstractView {
     }
 
     static async renderSchoolYearCurriculumEditor(schoolYear, curriculumId = null) {
-        console.log(schoolYear, curriculumId)
 
         const curriculumSelectionContainer = document.querySelector('#curriculumSelectionContainer');
         const yearContainer = document.querySelector('#yearContainer');
