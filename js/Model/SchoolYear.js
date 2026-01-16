@@ -147,10 +147,10 @@ export class CurriculumSpan {
         this.#endDate.setHours(12);
     }
     update(spanData) {
-        this.name = spanData.name;
-        this.startDate = spanData.startDate;
-        this.endDate = spanData.endDate;
-        this.note = spanData.note;
+        if (spanData.name) this.name = spanData.name;
+        if (spanData.startDate) this.startDate = spanData.startDate;
+        if (spanData.endDate) this.endDate = spanData.endDate;
+        if (spanData.note) this.note = spanData.note;
     }
 
     serialize() {

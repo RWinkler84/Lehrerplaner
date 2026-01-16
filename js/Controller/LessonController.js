@@ -6,6 +6,7 @@ import LessonNoteController from './LessonNoteController.js';
 import LessonView from '../View/LessonView.js';
 import CurriculumController from './CurriculumController.js';
 import SchoolYearController from './SchoolYearController.js';
+import Editor from '../inc/editor.js';
 
 export default class LessonController {
 
@@ -83,7 +84,7 @@ export default class LessonController {
 
     static async setLessonsInHolidaysCanceled(schoolYear = null) {
         let schoolYears = [schoolYear];
-        if (!schoolYear) schoolYears = await SchoolYearController.getAllSchoolYears();  
+        if (!schoolYear) schoolYears = await SchoolYearController.getAllSchoolYears();
         if (schoolYears.length == 0) return;
 
         await Lesson.setLessonsInHolidaysCanceled(schoolYears);
@@ -199,11 +200,42 @@ export default class LessonController {
         selectedCurriculaIds.forEach(id => {
             const curriculum = schoolYear.getCurriculumById(id);
             const matchingSpans = schoolYear.getCurriculumSpansInDateRange(id, weekdayDates.monday, weekdayDates.sunday);
-            const subject = allSubjects.find((subject) => {return subject.subject == curriculum.subject});
+            const subject = allSubjects.find((subject) => { return subject.subject == curriculum.subject });
             const colorCssClass = subject ? subject.colorCssClass : null;
 
-            View.renderCurriculumSpans(matchingSpans, colorCssClass);
+            View.renderCurriculumSpans(matchingSpans, colorCssClass, curriculum.id, schoolYear.id);
         })
+    }
+
+    static async openCurriculumSpanDialog(clickedElement) {
+        const spanData = View.getClickedCurriculumSpanData(clickedElement);
+        const schoolYear = await SchoolYearController.getSchoolYearById(spanData.schoolYearId);
+        const curriculum = schoolYear.getCurriculumById(spanData.curriculumId);
+        const span = curriculum.getCurriculumSpanById(spanData.spanId);
+
+        View.openCurriculumSpanDialog(span, curriculum, schoolYear);
+    }
+
+    static async closeCurriculumSpanDialog() {
+        View.closeCurriculumSpanDialog();
+    }
+
+    static async saveCurriculumSpanNote() {
+        const formData = View.getCurriculumSpanNoteDataFromForm();
+        const schoolYear = await SchoolYearController.getSchoolYearById(formData.schoolYearId);
+        const spanData = { id: formData.spanId, name: formData.spanName, note: formData.spanNote };
+
+        schoolYear.updateCurriculumSpan(formData.curriclumId, spanData)
+
+        this.renderSelectedCurricula();
+
+        View.toggleSaveCurriculumSpanNoteButton(false);
+    }
+
+    static toggleSaveCurriculumSpanNoteButton(event) {
+        console.log(event)
+        if (event.target.id != 'curriculumNoteContentEditor' && event.target.id != 'spanTitle') return;
+        View.toggleSaveCurriculumSpanNoteButton(true);
     }
 
     static removeAllCurriculumSpans(element = null) {
@@ -225,20 +257,32 @@ export default class LessonController {
             case 'resizeCurriculumSelectionButton':
                 View.resizeCurriculaSelection();
                 break;
+
+
+            case 'saveCurriculumNotesButton':
+                this.saveCurriculumSpanNote();
+                break;
+            case 'closeCurriculumNotesButton':
+                this.closeCurriculumSpanDialog();
+                break;
         }
 
         switch (true) {
             case target.classList.contains('lessonIndicatorContainer'):
                 if (View.hasLessonNoteIndicator(target)) this.renderLessonNote(event);
                 break;
-            case target.classList.contains('noteIcon'):
+            case target.classList.contains('lessonNoteIcon'):
                 this.renderLessonNote(event);
                 break;
 
             case target.classList.contains('curriculumSelectionItem'):
-                if (!target.classList.contains('mainView')) return;    
+                if (!target.classList.contains('mainView')) return;
                 this.toggleCurriculumSelectionItem(event);
                 this.renderSelectedCurricula();
+                break;
+
+            case target.classList.contains('curriculaSpanNoteIcon'):
+                this.openCurriculumSpanDialog(target);
                 break;
         }
     }

@@ -64,7 +64,8 @@ label {
 }
 
 [data-checkboxtr] label,
-#lessonNoteDialog label {
+#lessonNoteDialog label,
+#curriculumNoteDialog label {
     font-weight: normal;
 }
 
@@ -371,38 +372,6 @@ dialog .errorMessageDisplay,
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--lightgrey);
-}
-
-.curriculaDisplayWeekday {
-    grid-template-rows: unset;
-}
-
-.curriculumSpanContainer {
-    height: 2.5rem;
-}
-
-.spanItem {
-    position: absolute;
-    padding: 0.25rem 0.5rem;
-    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-    border-top: solid 2px var(--topMenuBackgound);
-}
-
-.spanItem.start {
-    border-left: solid 0.75rem var(--topMenuBackgound);
-    border-top-left-radius: var(--standardRadius);
-    border-bottom-left-radius: var(--standardRadius);
-}
-
-.spanItem.end {
-    border-top-right-radius: var(--standardRadius);
-    border-bottom-right-radius: var(--standardRadius);
-}
-
-.spanName {
-    position: sticky;
-    overflow-y: scroll;
-    left: 2rem;
 }
 
 .weekday.passed,

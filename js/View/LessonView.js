@@ -1,6 +1,7 @@
 import Controller from "../Controller/LessonController.js";
 import AbstractView from "./AbstractView.js";
 import Fn from '../inc/utils.js'
+import Editor from "../inc/editor.js";
 
 export default class LessonView {
 
@@ -43,7 +44,7 @@ export default class LessonView {
                     <div class="lessonContentContainer" style="width: 100%;">
                         <div class="flex column spaceBetween lessonIndicatorContainer" style="width: 1rem; height: 100%;">
                             <div class="lessonHasTaskIndicator"></div>
-                            <div class="lessonNoteIndicator"><div class="noteIcon"></div></div>
+                            <div class="lessonNoteIndicator"><div class="noteIcon lessonNoteIcon"></div></div>
                         </div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
@@ -98,7 +99,7 @@ export default class LessonView {
                     <div class="lessonContentContainer" style="width: 100%;">
                         <div class="flex column spaceBetween lessonIndicatorContainer" style="width: 1rem; height: 100%;">
                             <div class="lessonHasTaskIndicator"></div>
-                            <div class="lessonNoteIndicator"><div class="noteIcon"></div></div>
+                            <div class="lessonNoteIndicator"><div class="noteIcon lessonNoteIcon"></div></div>
                         </div>
                         <div class="lessonClassSubjectField">${lesson.class} ${lesson.subject}</div>
                         <div class="lessonMenuWrapper">
@@ -552,7 +553,7 @@ export default class LessonView {
         container.append(curriculaSelection);
     }
 
-    static renderCurriculumSpans(spans, colorCssClass) {
+    static renderCurriculumSpans(spans, colorCssClass, curriclumId, schoolYearId) {
         const body = document.querySelector('body');
         const timetableContainer = document.querySelector('#timetableContainer');
         const weekCurriculaDisplay = document.querySelector('#weekCurriculaDisplay');
@@ -573,7 +574,14 @@ export default class LessonView {
             let endDayElement = weekdays.find(weekday => { return new Date(weekday.dataset.date).setHours(12, 0, 0, 0) == new Date(span.endDate).setHours(12, 0, 0, 0) });
 
             currentContainer.dataset.spanid = span.id;
+            currentContainer.dataset.curriculumid = curriclumId;
+            currentContainer.dataset.schoolyearid = schoolYearId;
+
             currentContainer.classList.add('spanItem');
+            currentContainer.classList.add('flex');
+            currentContainer.classList.add('spaceBetween');
+            currentContainer.classList.add('alignCenter');
+
             if (startDayElement) currentContainer.classList.add('start');
             if (endDayElement) currentContainer.classList.add('end');
 
@@ -606,11 +614,21 @@ export default class LessonView {
             currentContainer.style.borderColor = backgroundColor;
             currentContainer.style.backgroundColor = `color-mix(in srgb, ${backgroundColor} 10%, var(--fadedgrey) 90%)`;
 
-            const blankSpan = document.createElement('span');
-            blankSpan.classList.add('spanName');
-            blankSpan.textContent = span.name;
+            // topic / span name
+            const spanName = blankDiv.cloneNode();
+            spanName.classList.add('spanName');
+            spanName.textContent = span.name;
 
-            currentContainer.append(blankSpan);
+            // span note
+            let noteIcon;
+            if (span.note.trim() != '') {
+                noteIcon = blankDiv.cloneNode();
+                noteIcon.classList.add('curriculaSpanNoteIcon');
+                noteIcon.classList.add('noteIcon');
+            }
+
+            currentContainer.append(spanName);
+            if (noteIcon) currentContainer.append(noteIcon)
             spanContainer.append(currentContainer);
         });
 
@@ -674,11 +692,81 @@ export default class LessonView {
         return ids;
     }
 
+    static openCurriculumSpanDialog(span, curriculum, schoolYear) {
+        const dialog = document.querySelector('#curriculumNoteDialog');
+        const titleInput = dialog.querySelector('#spanTitle');
+        const noteInput = dialog.querySelector('#curriculumNoteContentEditor');
+
+        dialog.dataset.spanid = span.id;
+        dialog.dataset.schoolyearid = schoolYear.id;
+        dialog.dataset.curriclumid = curriculum.id;
+
+        titleInput.value = span.name;
+        noteInput.innerHTML = span.note;
+        
+        Editor.init(noteInput);
+        dialog.showModal();
+    }
+
+    static closeCurriculumSpanDialog() {
+        const dialog = document.querySelector('#curriculumNoteDialog');
+        const titleInput = dialog.querySelector('#spanTitle');
+        const noteInput = dialog.querySelector('#curriculumNoteContentEditor');
+
+        dialog.dataset.spanid = '';
+        dialog.dataset.schoolyearid = '';
+        dialog.dataset.curriclumId = '';
+
+        titleInput.value = '';
+        while (noteInput.firstElementChild) noteInput.firstElementChild.remove();
+
+        dialog.close();
+    }
+
+    static getCurriculumSpanNoteDataFromForm() {
+        const dialog = document.querySelector('#curriculumNoteDialog');
+        const titleInput = dialog.querySelector('#spanTitle');
+        const noteInput = dialog.querySelector('#curriculumNoteContentEditor');
+
+        return {
+            curriclumId: dialog.dataset.curriclumid,
+            schoolYearId: dialog.dataset.schoolyearid,
+            spanId: dialog.dataset.spanid,
+            spanName: titleInput.value,
+            spanNote: Editor.getContent(noteInput)
+        } 
+    }
+
+    static toggleSaveCurriculumSpanNoteButton(activate = false) {
+        if (activate) {
+            document.querySelector('#saveCurriculumNotesButton').removeAttribute('disabled');
+            return;
+        }
+
+        document.querySelector('#saveCurriculumNotesButton').setAttribute('disabled', '');
+    }
+
+    static getClickedCurriculumSpanData(clickedElement) {
+        if (clickedElement.classList.contains('spanItem')) {
+            return {
+                spanId: clickedElement.dataset.spanid,
+                curriculumId: clickedElement.dataset.curriculumid,
+                schoolYearId: clickedElement.dataset.schoolyearid
+            };
+        }
+
+        return {
+            spanId: clickedElement.closest('.spanItem').dataset.spanid,
+            curriculumId: clickedElement.closest('.spanItem').dataset.curriculumid,
+            schoolYearId: clickedElement.closest('.spanItem').dataset.schoolyearid
+        };
+    }
+
     static hasLessonNoteIndicator(element) {
         const noteIndicator = element.querySelector('.lessonNoteIndicator');
 
         if (noteIndicator && getComputedStyle(noteIndicator).visibility != 'hidden') return true;
-        
+
         return false
     }
 

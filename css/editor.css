@@ -61,19 +61,22 @@
 
 /* lessonNote editor styles */
 
-#lessonNoteDialog {
+#lessonNoteDialog,
+#curriculumNoteDialog {
     width: 50vw;
     max-width: 50vw;
     height: 50vh;
     overflow: hidden;
 }
 
-#lessonNoteDialog[open] {
+#lessonNoteDialog[open],
+#curriculumNoteDialog[open] {
     display: flex;
     flex-direction: column;
 }
 
-#lessonNoteDialog .dialogBody {
+#lessonNoteDialog .dialogBody,
+#curriculumNoteDialog .dialogBody {
     display: flex;
     flex-direction: column;
     flex: 1 1 100%;
@@ -85,7 +88,8 @@
     width: unset;
 }
 
-#noteEditorContainer {
+#noteEditorContainer,
+#curriculumNoteEditorContainer {
     display: flex;
     flex-direction: column;
     flex: 1 1 100%;
@@ -102,7 +106,8 @@
  
 @media screen and (max-width: 620px) {
     
-    #lessonNoteDialog {
+    #lessonNoteDialog,
+    #curriculumNoteDialog {
         min-width: 100%;
         max-width: 100%;
         height: 100vh;

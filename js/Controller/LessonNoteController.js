@@ -12,7 +12,7 @@ export default class LessonNoteController {
         if (noteId) note = await this.getLessonNoteById(noteId);
         
         await LessonNoteView.renderLessonNotesModal(note, lessonData);
-        if (note) Editor.trackLessonNoteChanges(document.querySelector('#noteContentEditor'));
+        if (note) Editor.init(document.querySelector('#noteContentEditor'));
     }
 
     static async getAllLessonNotes() {
@@ -97,7 +97,6 @@ export default class LessonNoteController {
                 break;
             case 'closeLessonNotesButton':
                 LessonNoteView.closeLessonNotesDialog();
-                Editor.clearLessonNoteChanges();
                 break;
             case 'saveLessonNotesButton':
                 LessonNoteController.saveLessonNote();

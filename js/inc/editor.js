@@ -11,6 +11,16 @@ The class is reusable and mostly standalone. To use it set up an editor element 
 To access the written contents as a serialized string call the serializeNodeContent method and pass the textEditor element as the 'node' argument and set 'ignoreParent' to true.
 */
 export default class Editor {
+
+    static init(editorElement) {
+        this.clearNoteChanges();
+        this.trackNoteChanges(editorElement);
+    }
+
+    static getContent(editorElement) {
+        return this.serializeNodeContent(editorElement, true);
+    }
+
     /**@param node Returns the elements inner structure as a string. If the parent element should not be included, ignoreParent must be set to true */
     static serializeNodeContent(node, ignoreParent = false) {
         if (node.nodeType == Node.TEXT_NODE && node.textContent.includes('\n')) return node.textContent.replace(/</g, '&lt;').replace(/>/g, '&gt;').trim();
@@ -709,7 +719,7 @@ export default class Editor {
     // version tracking //
     //////////////////////
 
-    static trackLessonNoteChanges(editor) {
+    static trackNoteChanges(editor) {
         let currentContent = Editor.serializeNodeContent(editor, true);
         let noteVersion = editorChangesArray.length;
 
@@ -733,7 +743,7 @@ export default class Editor {
         return Number(displayedVersion);
     }
 
-    static clearLessonNoteChanges() {
+    static clearNoteChanges() {
         do {
             editorChangesArray.pop();
         } while (editorChangesArray.length != 0);
@@ -774,15 +784,15 @@ export default class Editor {
         switch (true) {
             case clickedElement.classList.contains('boldButton'):
                 Editor.toggleBoldText(event);
-                Editor.trackLessonNoteChanges(editor);
+                Editor.trackNoteChanges(editor);
                 break;
             case clickedElement.classList.contains('unorderedListButton'):
                 Editor.toggleList('ul');
-                Editor.trackLessonNoteChanges(editor);
+                Editor.trackNoteChanges(editor);
                 break;
             case clickedElement.classList.contains('orderedListButton'):
                 Editor.toggleList('ol');
-                Editor.trackLessonNoteChanges(editor);
+                Editor.trackNoteChanges(editor);
                 break;
 
             //change edit version forward/backward
@@ -800,6 +810,8 @@ export default class Editor {
         const editorContainer = event.target.closest('.editorContainer');
         const editor = editorContainer.querySelector('.textEditor');
 
+        console.log(event);
+
         switch (key) {
             case 'Escape':
                 event.preventDefault();
@@ -813,7 +825,7 @@ export default class Editor {
             case 'Period':
             case 'Digit1': //exclamtion mark
             case 'Minus': //question mark
-                setTimeout(() => { Editor.trackLessonNoteChanges(editor); }, 100);
+                setTimeout(() => { Editor.trackNoteChanges(editor); }, 100);
                 break;
 
             case 'KeyY':

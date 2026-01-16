@@ -121,7 +121,7 @@ export default class CurriculumView extends AbstractView {
                 if (currentDay.getDate() == 1) {
                     day.classList.add('firstOfMonth');
                     day.querySelector('.dayDate').innerText += monthNames[currentDay.getMonth()];
-                    }
+                }
 
             });
 
@@ -233,7 +233,7 @@ export default class CurriculumView extends AbstractView {
     }
 
     /** This function rerenders the displayed curriculum without rerendering the whole calendar. Although it adds complexity it is necessary for performance reasons as it makes switching and editing curricula way smoother. */
-    static rerenderDisplayedCurriculum(schoolYear, curriculumId) {
+    static rerenderDisplayedCurriculum(schoolYear, curriculumId, hiddenRerender = false) {
         const yearContainer = document.querySelector('#yearContainer');
         const dayNameContainer = document.querySelector('#dayNameContainer');
 
@@ -249,7 +249,8 @@ export default class CurriculumView extends AbstractView {
 
         yearContainer.querySelectorAll('.spanContentContainer').forEach(container => container.remove());
 
-        const curriculumToRender = schoolYear.getCurriculumById(curriculumId);
+        let curriculumToRender = schoolYear.getCurriculumById(curriculumId);
+        if (this.getEditorType() == 'Holiday Editor') curriculumToRender = {curriculumSpans: schoolYear.holidays};
 
         if (curriculumToRender) {
             const selectedCurriculumItem = document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"].settingsView`);
@@ -542,6 +543,7 @@ export default class CurriculumView extends AbstractView {
 
         form.style.display = 'flex';
         this.setSpanEditActive();
+        Editor.init(editor);
     }
 
     static resizeTimeSpanForm() {
@@ -1083,7 +1085,7 @@ export default class CurriculumView extends AbstractView {
     static #getColorOfSelectedCurriculum() {
         const curriculumContainer = document.querySelector('#curriculumContainer');
         let selectedCurriculum = curriculumContainer.querySelector('.curriculumSelectionItem.selected');
-        
+
         //is there a plan in creation? get the color of the selected subject from the timetable/subjects view
         if (!selectedCurriculum) {
             const subjectSelect = document.querySelector('#curriculumSubjectSelect');

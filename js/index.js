@@ -105,6 +105,7 @@ async function startApp() {
     document.addEventListener('input', (event) => {
         Editor.normalizeInput(event);
         LessonNoteController.toggleSaveLessonNoteButton(event);
+        LessonController.toggleSaveCurriculumSpanNoteButton(event);
     });
     document.addEventListener('selectionchange', Editor.updateButtonStatus);
 

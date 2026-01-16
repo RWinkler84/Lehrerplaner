@@ -887,6 +887,37 @@
         </div>
     </dialog>
 
+        <dialog id="curriculumNoteDialog" data-spanid data-schoolyearid data-curriculumid>
+        <div class="headline flex spaceBetween">
+            <h3>Stoffverteilungsplan <span id="curriclumNoteInfo"></span></h3><button id="closeCurriculumNotesButton"
+                class="closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <div class="marginTop">
+                <input type="text" id="spanTitle">
+            </div>
+            <div id="curriculumNoteEditorContainer" class="flex column halfGap marginTop editorContainer">
+                <div id="curriculumNoteEditorButtonContainer" class="flex spaceBetween editorButtonContainer">
+                    <div class="flex halfGap">
+                        <button class="boldButton" style="font-weight: bold;">b</button>
+                        <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                        <button class="unorderedListButton"><span class="icon ulIcon"></span></button>
+                    </div>
+                    <div class="flex halfGap">
+                        <button class="revertChangeButton">&#8617;</button>
+                        <button class="redoChangeButton">&#8618;</button>
+                    </div>
+                </div>
+                <div id="curriculumNoteContentEditor" class="textEditor" contenteditable="true" data-noteversion>
+                </div>
+                <div class="flex halfGap spaceBetween">
+                    <div id="curriculumNoteSavedMessage">gespeichert</div><button id="saveCurriculumNotesButton"
+                        class="confirmationButton" disabled>Speichern</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
     <script src="./js/index.js" type="module"></script>
 </body>
 

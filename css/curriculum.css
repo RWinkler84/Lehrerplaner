@@ -374,6 +374,48 @@
 
 }
 
+/* curricula on mainView */
+
+.curriculaDisplayWeekday {
+    grid-template-rows: unset;
+}
+
+.curriculumSpanContainer {
+    height: 2.5rem;
+}
+
+.spanItem {
+    position: absolute;
+    padding: 0.25rem 0.5rem;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    border-top: solid 2px var(--topMenuBackgound);
+}
+
+.spanItem.start {
+    border-left: solid 0.75rem var(--topMenuBackgound);
+    border-top-left-radius: var(--standardRadius);
+    border-bottom-left-radius: var(--standardRadius);
+}
+
+.spanItem.end {
+    border-top-right-radius: var(--standardRadius);
+    border-bottom-right-radius: var(--standardRadius);
+}
+
+.spanName {
+    position: sticky;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    left: 2rem;
+}
+
+.curriculaSpanNoteIcon {
+    width: 0.75rem;
+    height: 0.75rem;
+    position: sticky;
+    right: 0.5rem;
+}
+
 /* generics */
 .noTouchActions {
     touch-action: none;

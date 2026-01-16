@@ -4,6 +4,7 @@ import SchoolYearController from "./SchoolYearController.js";
 import Fn from "../inc/utils.js";
 import SchoolYear from "../Model/SchoolYear.js";
 import AbstractController from "./AbstractController.js";
+import Editor from "../inc/editor.js";
 
 export default class CurriculumController {
     static renderEmptyCalendar(startDate, endDate) {
@@ -145,11 +146,11 @@ export default class CurriculumController {
         View.openSpanForm();
     }
 
-    static async saveSpan() {
-        const spanId = View.getActiveSpanId();
-        const spanData = View.saveSpan();
-        const editorType = View.getEditorType();
-        const schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
+    static async saveSpan(spanId = null, spanData = null, editorType = null, schoolYear = null) {
+        if (!spanId) spanId = View.getActiveSpanId();
+        if (!spanData) spanData = View.saveSpan();
+        if (!editorType) editorType = View.getEditorType();
+        if (!schoolYear) schoolYear = await SchoolYearController.getSchoolYearById(SchoolYearController.getDisplayedSchoolYearId());
 
         if (editorType == 'Holiday Editor') {
             await schoolYear.updateHoliday(spanData);
@@ -161,7 +162,7 @@ export default class CurriculumController {
             await LessonController.setLessonsInHolidaysCanceled(schoolYear);
         }
 
-        if (editorType == 'Curriculum Editor') {
+        if (editorType == 'Curriculum Editor' || editorType == 'Main View Span Form') {
             const curriculumId = View.getDisplayedCurriculumId();
             await schoolYear.updateCurriculumSpan(curriculumId, spanData);
             View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
@@ -209,6 +210,7 @@ export default class CurriculumController {
 
             schoolYear.removeCurriculumSpanById(curriculumId, spanId)
             await CurriculumController.rerenderDisplayedCurriculum(curriculumId, schoolYear);
+
             View.closeSpanForm();
         }
     }
@@ -222,7 +224,7 @@ export default class CurriculumController {
             await this.saveSpan()
         }
 
-        View.openSpanForm(spanData);
+        View.openSpanForm(spanData);      
         View.disableTouchActionsOnDayElements();
         View.removeAllHandles();
         View.addHandlesToSpan(spanId);
@@ -369,5 +371,9 @@ export default class CurriculumController {
     }
     static hideCloseHolidayEditorButton() {
         View.hideCloseHolidayEditorButton();
+    }
+    static openCurriculumSpanForm(spanData) {
+
+        View.openSpanForm(spanData);
     }
 }
