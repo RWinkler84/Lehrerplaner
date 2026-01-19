@@ -128,6 +128,11 @@
     gap: 1rem;
 }
 
+#curriculumCreationSelectWrapper {
+    display: flex;
+    gap: 1rem;
+}
+
 .week,
 #dayNameContainer {
     display: grid;
@@ -192,6 +197,7 @@
 
 .dayDate {
     min-width: 1rem;
+    max-width: 100%;
     text-wrap: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -214,8 +220,6 @@
     left: 0;
     right: 0;
     border-top: solid 2px var(--topMenuBackgound);
-    /* box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16); */
-    /* color: var(--lighterText); */
     z-index: 1;
     pointer-events: none;
     overflow: hidden;
@@ -336,6 +340,20 @@
     }
 
     /* curriculum */
+    #curriculumLabelAndButtonContainer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #createCurriculumButtonContainer,
+    #saveCancelNewCurriculumButtonContainer {
+        align-self: flex-end;
+    }
+
+    #curriculumCreationSelectContainer {
+        flex-direction: column;
+    }
+
     .week,
     #dayNameContainer {
         display: grid;

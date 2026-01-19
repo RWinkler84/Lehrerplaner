@@ -122,12 +122,9 @@ async function startApp() {
         }
 
         if (curriculumSettingsView.style.display == 'block') {
-            const curriculumId = CurriculumController.getDisplayedCurriculumId();
-            CurriculumController.rerenderDisplayedCurriculum(curriculumId);
-
+            CurriculumController.resizeSpanContentContainers();
         }
     });
-
 
     AbstractController.renderTopMenu();
 

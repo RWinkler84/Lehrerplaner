@@ -17,7 +17,11 @@ export default class CurriculumController {
     static async renderSchoolYearCurriculumEditor(schoolYear = null, curriculumId = null) {
         if (!schoolYear) {
             const schoolYearId = SchoolYearController.getDisplayedSchoolYearId();
-            schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId) || await SchoolYearController.getCurrentSchoolYear();
+            if (schoolYearId != '') {
+                schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId)
+            } else {
+                await SchoolYearController.getCurrentSchoolYear();
+            }
         }
 
         if (!curriculumId) curriculumId = await CurriculumController.getDisplayedCurriculumId();
@@ -39,6 +43,10 @@ export default class CurriculumController {
 
         View.rerenderDisplayedCurriculum(schoolYear, curriculumId);
         View.removeAllHandles();
+    }
+
+    static resizeSpanContentContainers(){
+        View.resizeSpanContentContainers();
     }
 
     static openHolidayEditor(schoolYear) {
@@ -83,7 +91,7 @@ export default class CurriculumController {
         }
 
         await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject });
-        View.renderSchoolYearCurriculumEditor(schoolYear, newCurriculumId);
+        View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
     }
 
     static async saveNewCurriculum() {
@@ -96,6 +104,8 @@ export default class CurriculumController {
         View.showCurriculumSelectionContainer();
         View.showCreateCurriculumButton();
         View.renderSchoolYearCurriculumEditor(schoolYear, curriculumId);
+
+        LessonController.renderCurriculaSelection();
     }
 
     static async cancelCurriculumCreation() {
@@ -224,7 +234,7 @@ export default class CurriculumController {
             await this.saveSpan()
         }
 
-        View.openSpanForm(spanData);      
+        View.openSpanForm(spanData);
         View.disableTouchActionsOnDayElements();
         View.removeAllHandles();
         View.addHandlesToSpan(spanId);

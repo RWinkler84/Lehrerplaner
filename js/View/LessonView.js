@@ -701,23 +701,23 @@ export default class LessonView {
         dialog.dataset.schoolyearid = schoolYear.id;
         dialog.dataset.curriclumid = curriculum.id;
 
-        titleInput.value = span.name;
+        titleInput.textContent = span.name;
         noteInput.innerHTML = span.note;
-        
+
         Editor.init(noteInput);
         dialog.showModal();
     }
 
     static closeCurriculumSpanDialog() {
         const dialog = document.querySelector('#curriculumNoteDialog');
-        const titleInput = dialog.querySelector('#spanTitle');
+        const titleLabel = dialog.querySelector('#spanTitle');
         const noteInput = dialog.querySelector('#curriculumNoteContentEditor');
 
         dialog.dataset.spanid = '';
         dialog.dataset.schoolyearid = '';
         dialog.dataset.curriclumId = '';
 
-        titleInput.value = '';
+        titleLabel.textContent = '';
         while (noteInput.firstElementChild) noteInput.firstElementChild.remove();
 
         dialog.close();
@@ -725,16 +725,14 @@ export default class LessonView {
 
     static getCurriculumSpanNoteDataFromForm() {
         const dialog = document.querySelector('#curriculumNoteDialog');
-        const titleInput = dialog.querySelector('#spanTitle');
         const noteInput = dialog.querySelector('#curriculumNoteContentEditor');
 
         return {
             curriclumId: dialog.dataset.curriclumid,
             schoolYearId: dialog.dataset.schoolyearid,
             spanId: dialog.dataset.spanid,
-            spanName: titleInput.value,
             spanNote: Editor.getContent(noteInput)
-        } 
+        }
     }
 
     static toggleSaveCurriculumSpanNoteButton(activate = false) {
@@ -744,6 +742,14 @@ export default class LessonView {
         }
 
         document.querySelector('#saveCurriculumNotesButton').setAttribute('disabled', '');
+    }
+
+    static showCurriculumNoteSavedMessage() {
+        const message = document.querySelector('#curriculumNoteSavedMessage');
+        message.classList.add('active');
+        setTimeout(() => {
+            message.classList.remove('active');
+        }, 2000);
     }
 
     static getClickedCurriculumSpanData(clickedElement) {

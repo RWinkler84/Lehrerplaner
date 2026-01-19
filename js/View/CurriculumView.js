@@ -233,7 +233,7 @@ export default class CurriculumView extends AbstractView {
     }
 
     /** This function rerenders the displayed curriculum without rerendering the whole calendar. Although it adds complexity it is necessary for performance reasons as it makes switching and editing curricula way smoother. */
-    static rerenderDisplayedCurriculum(schoolYear, curriculumId, hiddenRerender = false) {
+    static rerenderDisplayedCurriculum(schoolYear, curriculumId) {
         const yearContainer = document.querySelector('#yearContainer');
         const dayNameContainer = document.querySelector('#dayNameContainer');
 
@@ -250,7 +250,7 @@ export default class CurriculumView extends AbstractView {
         yearContainer.querySelectorAll('.spanContentContainer').forEach(container => container.remove());
 
         let curriculumToRender = schoolYear.getCurriculumById(curriculumId);
-        if (this.getEditorType() == 'Holiday Editor') curriculumToRender = {curriculumSpans: schoolYear.holidays};
+        if (this.getEditorType() == 'Holiday Editor') curriculumToRender = { curriculumSpans: schoolYear.holidays };
 
         if (curriculumToRender) {
             const selectedCurriculumItem = document.querySelector(`.curriculumSelectionItem[data-curriculumid="${curriculumId}"].settingsView`);
@@ -271,10 +271,11 @@ export default class CurriculumView extends AbstractView {
 
     static async renderCurriculumSubjectAndGradeSelect(schoolYear) {
         const subjectGradeSelect = await this.getSubjectAndGradeSelectHTML(schoolYear);
-        const selectContainer = document.querySelector('#curriculumCreationSelectContainer');
-        const errorMessageDisplay = document.createElement('div');
+        const container = document.querySelector('#curriculumCreationSelectContainer');
+        const selectContainer = container.querySelector('#curriculumCreationSelectWrapper');
+        const errorMessageDisplay = container.querySelector('#curriculumCreationSelectErrorDisplay');
 
-        let errorText = 'Für diese Klassenstufen- und Fachkombination gibt es bereits einen Stoffverteilungsplan. Willst du diesen bearbeiten, brich die Erstellung eines neuen Plans ab und wähle den gewünschten Plan aus.';
+        let errorText = 'Für diese Klassenstufen- und Fachkombination gibt es bereits einen Stoffverteilungsplan.';
 
         //preselect a subject/grade combination without a corresponding curriculum
         let freeCombinationFound = false;
@@ -308,13 +309,12 @@ export default class CurriculumView extends AbstractView {
         }
 
         //add the errorMessageDisplay
-        errorMessageDisplay.classList.add('hidden');
+        errorMessageDisplay.classList.add('notDisplayed');
         errorMessageDisplay.classList.add('errorMessageDisplay');
         errorMessageDisplay.classList.add('alertRing');
-        errorMessageDisplay.id = 'curriculumExistErrorDisplay';
 
         if (!freeCombinationFound) {
-            errorMessageDisplay.classList.remove('hidden');
+            errorMessageDisplay.classList.remove('notDisplayed');
             errorText = 'Es existieren bereits Jahrespläne für jede mögliche Kombination von Klassenstufen und Fächern, die du angelegt hast.';
 
             this.disableSaveCurriculumButton();
@@ -323,7 +323,7 @@ export default class CurriculumView extends AbstractView {
         }
 
         if (!subjectGradeSelect) {
-            errorMessageDisplay.classList.remove('hidden');
+            errorMessageDisplay.classList.remove('notDisplayed');
             errorText = 'Um einen Stoffverteilungsplan anlegen zu können, musst du sowohl deine unterrichteten Klassenstufen als auch die unterrichteten Fächer angelegt haben. Letzteres ist in den Einstellungen unter "Stundenplan" möglich.';
 
             this.disableSaveCurriculumButton();
@@ -341,10 +341,7 @@ export default class CurriculumView extends AbstractView {
             selectContainer.append(subjectGradeSelect);
             this.enableSaveCurriculumButton();
             document.querySelector('#yearContainer').classList.remove('notDisplayed');
-
         }
-
-        selectContainer.append(errorMessageDisplay);
     }
 
     static async getCurriculaSelectionItems(schoolYear, forMainView = false, preselectedIds = null) {
@@ -933,19 +930,87 @@ export default class CurriculumView extends AbstractView {
         } while (i <= endWeekNumber)
     }
 
+    /** If the screen size changes, content containers may have the wrong length. But a full rerender is not necessary or wanted. For example pulling up the android 
+    software keyboard triggers an resize event. A full rerender would then remove the curriculum span that was selected beforehand for editing, resulting in the edit to fail.*/
+    static resizeSpanContentContainers() {
+        const allSpanContainers = document.querySelectorAll('.spanContentContainer');
+        const spanContainerById = {};
+
+        allSpanContainers.forEach(container => {
+            const id = container.dataset.spanid
+            spanContainerById[id] ? spanContainerById[id].push(container) : spanContainerById[id] = [container];
+        })
+
+        Object.keys(spanContainerById).forEach(id => {
+            spanContainerById[id].forEach(spanContainer => {
+
+                //container spans only one week (start and end in the same week)
+                if (spanContainer.classList.contains('start') && spanContainer.classList.contains('end')) {
+                    const startElement = document.querySelector(`.day.start[data-spanid="${id}"]`);
+                    const endElement = document.querySelector(`.day.end[data-spanid="${id}"]`);
+
+                    let offset = (parseFloat(getComputedStyle(startElement).paddingLeft) + parseFloat(getComputedStyle(startElement).borderLeftWidth));
+                    const leftRect = startElement.getBoundingClientRect();
+                    const rightRect = endElement.getBoundingClientRect();
+
+                    spanContainer.style.width = `${rightRect.right - leftRect.left - offset * 2}px`;
+
+                    return;
+                }
+
+                //container spans the whole week without start and end
+                if (!spanContainer.classList.contains('start') && !spanContainer.classList.contains('end')) {
+                    const startElement = spanContainer.closest('.day');
+                    const endElement = document.querySelector('.day[data-weekdaynumber="0"]');
+
+                    const leftRect = startElement.getBoundingClientRect();
+                    const rightRect = endElement.getBoundingClientRect();
+
+                    spanContainer.style.width = `${rightRect.right - leftRect.left}px`;
+
+                    return;
+                }
+
+                //container is only start
+                if (spanContainer.classList.contains('start')) {
+                    const startElement = document.querySelector(`.day.start[data-spanid="${id}"]`);
+                    const endElement = document.querySelector('.day[data-weekdaynumber="0"]');
+
+                    let offset = (parseFloat(getComputedStyle(startElement).paddingLeft) + parseFloat(getComputedStyle(startElement).borderLeftWidth));
+                    const leftRect = startElement.getBoundingClientRect();
+                    const rightRect = endElement.getBoundingClientRect();
+
+                    spanContainer.style.width = `${rightRect.right - leftRect.left - offset}px`;
+                }
+
+                //container is only end
+                if (spanContainer.classList.contains('end')) {
+                    const startElement = document.querySelector('.day[data-weekdaynumber="1"]');
+                    const endElement = document.querySelector(`.day.end[data-spanid="${id}"]`);
+
+                    let offset = (parseFloat(getComputedStyle(startElement).paddingLeft) + parseFloat(getComputedStyle(startElement).borderLeftWidth));
+                    const leftRect = startElement.getBoundingClientRect();
+                    const rightRect = endElement.getBoundingClientRect();
+
+                    spanContainer.style.width = `${rightRect.right - leftRect.left - offset}px`;
+                }
+            });
+        });
+    }
+
     static setDisplayedCurriculumId(id) {
         document.querySelector('#curriculumContainer').dataset.curriculumid = id;
     }
 
     //show or enable elements
     static showCreateCurriculumButton() {
-        document.querySelector('#createCurriculumButton').classList.remove('notDisplayed');
+        document.querySelector('#createCurriculumButton').parentElement.classList.remove('notDisplayed');
     }
     static enableCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').disabled = false;
     }
     static showSaveCancelNewCurriculumButtonContainer() {
-        document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.remove('notDisplayed')
+        document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.remove('notDisplayed');
     }
     static enableSaveCurriculumButton() {
         document.querySelector('#saveNewCurriculumButton').disabled = false;
@@ -959,13 +1024,13 @@ export default class CurriculumView extends AbstractView {
 
     //hide or disable elements
     static hideCreateCurriculumButton() {
-        document.querySelector('#createCurriculumButton').classList.add('notDisplayed');
+        document.querySelector('#createCurriculumButton').parentElement.classList.add('notDisplayed');
     }
     static disableCreateCurriculumButton() {
         document.querySelector('#createCurriculumButton').disabled = true;
     }
     static hideSaveCancelNewCurriculumButtonContainer() {
-        document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.add('notDisplayed')
+        document.querySelector('#saveCancelNewCurriculumButtonContainer').classList.add('notDisplayed');
     }
     static disableSaveCurriculumButton() {
         document.querySelector('#saveNewCurriculumButton').disabled = true;
@@ -990,7 +1055,7 @@ export default class CurriculumView extends AbstractView {
 
     //validation alerts
     static alertCurriculumAlreadyExists() {
-        const alertRing = document.querySelector('#curriculumExistErrorDisplay');
+        const alertRing = document.querySelector('#curriculumCreationSelectErrorDisplay');
 
         alertRing.classList.add('validationError');
         setTimeout(() => {
@@ -1000,13 +1065,13 @@ export default class CurriculumView extends AbstractView {
 
     //error messages
     static showCurriculumAlreadyExistsError() {
-        const messageContainer = document.querySelector('#curriculumExistErrorDisplay');
-        messageContainer.classList.remove('hidden');
+        const messageContainer = document.querySelector('#curriculumCreationSelectErrorDisplay');
+        messageContainer.classList.remove('notDisplayed');
     }
 
     static hideCurriculumAlreadyExistsError() {
-        const messageContainer = document.querySelector('#curriculumExistErrorDisplay');
-        messageContainer.classList.add('hidden');
+        const messageContainer = document.querySelector('#curriculumCreationSelectErrorDisplay');
+        messageContainer.classList.add('notDisplayed');
     }
 
     //helper function

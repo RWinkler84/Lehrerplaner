@@ -223,17 +223,17 @@ export default class LessonController {
     static async saveCurriculumSpanNote() {
         const formData = View.getCurriculumSpanNoteDataFromForm();
         const schoolYear = await SchoolYearController.getSchoolYearById(formData.schoolYearId);
-        const spanData = { id: formData.spanId, name: formData.spanName, note: formData.spanNote };
+        const spanData = { id: formData.spanId, note: formData.spanNote };
 
         schoolYear.updateCurriculumSpan(formData.curriclumId, spanData)
 
         this.renderSelectedCurricula();
 
         View.toggleSaveCurriculumSpanNoteButton(false);
+        View.showCurriculumNoteSavedMessage();
     }
 
     static toggleSaveCurriculumSpanNoteButton(event) {
-        console.log(event)
         if (event.target.id != 'curriculumNoteContentEditor' && event.target.id != 'spanTitle') return;
         View.toggleSaveCurriculumSpanNoteButton(true);
     }

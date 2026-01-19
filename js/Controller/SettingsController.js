@@ -212,8 +212,11 @@ export default class SettingsController {
             
             case 'openSchoolYearSettingsButton':
                 const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
-                //only render, if nothing has been rendered yet, else keep the state
-                if (displayedSchoolYearId == "") await SchoolYearController.renderSchoolYearInfoSection();
+                //only render, if nothing has been rendered yet, else keep the state, but resize the spanContentContainers in case of a screen resize
+                if (displayedSchoolYearId == "") {
+                    await SchoolYearController.renderSchoolYearInfoSection();
+                    CurriculumController.resizeSpanContentContainers();
+                    }
                 
                 View.openSchoolYearSettings();
                 break

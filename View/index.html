@@ -214,8 +214,11 @@
         <div id="taskContainer" class="flex doubleGap">
             <div id="taskViewInfoTooltip" class="tooltip">?
                 <span class="tooltipTextLeft">
-                Hier kannst du deine Aufgaben verwalten. Um sie zu bearbeiten, wähle sie mit einem Doppelklick aus.
-                Mit <button class="confirmationButton" style="padding: 0 0.5rem"><span class="icon checkIcon"></span></button> setzt du sie auf erledigt. Mit <button class="orangeButton" style="padding: 0 0.5rem"><span class="icon inProgressIcon"></span></button> kannst du ihren Status auf "in Arbeit" ändern.
+                    Hier kannst du deine Aufgaben verwalten. Um sie zu bearbeiten, wähle sie mit einem Doppelklick aus.
+                    Mit <button class="confirmationButton" style="padding: 0 0.5rem"><span
+                            class="icon checkIcon"></span></button> setzt du sie auf erledigt. Mit <button
+                        class="orangeButton" style="padding: 0 0.5rem"><span
+                            class="icon inProgressIcon"></span></button> kannst du ihren Status auf "in Arbeit" ändern.
                 </span>
             </div>
 
@@ -556,10 +559,12 @@
 
                 <!-- curriculum -->
                 <div id="curriculumContainer" data-curriculumid>
-                    <div class="marginBottom flex spaceBetween">
+                    <div id="curriculumLabelAndButtonContainer" class="marginBottom flex spaceBetween">
                         <label><span id="editorNameSpan">Jahresübersicht</span>:</label>
-                        <button id="createCurriculumButton" class="confirmationButton">Plan anlegen</button>
-                        <div id="saveCancelNewCurriculumButtonContainer" class="notDisplayed">
+                        <div id="createCurriculumButtonContainer">
+                            <button id="createCurriculumButton" class="confirmationButton">Plan anlegen</button>
+                        </div>
+                        <div id="saveCancelNewCurriculumButtonContainer" class="notDisplayed flex halfGap">
                             <button id="saveNewCurriculumButton" class="confirmationButton">Plan speichern</button>
                             <button id="cancelNewCurriculumButton" class="cancelButton">Abbrechen</button>
                         </div>
@@ -567,7 +572,10 @@
                     </div>
                     <div>
                         <div id="curriculumSelectionContainer"></div>
-                        <div id="curriculumCreationSelectContainer" class="notDisplayed"></div>
+                        <div id="curriculumCreationSelectContainer" class="notDisplayed">
+                            <div id="curriculumCreationSelectWrapper"></div>
+                            <div id="curriculumCreationSelectErrorDisplay"></div>
+                        </div>
                         <div id="dayNameContainer" style="display: none;">
                             <div class="dayName">Mo</div>
                             <div class="dayName">Di</div>
@@ -887,15 +895,13 @@
         </div>
     </dialog>
 
-        <dialog id="curriculumNoteDialog" data-spanid data-schoolyearid data-curriculumid>
+    <dialog id="curriculumNoteDialog" data-spanid data-schoolyearid data-curriculumid>
         <div class="headline flex spaceBetween">
             <h3>Stoffverteilungsplan <span id="curriclumNoteInfo"></span></h3><button id="closeCurriculumNotesButton"
                 class="closeDialogButton" style="width: 1.5rem">×</button>
         </div>
         <div class="dialogBody">
-            <div class="marginTop">
-                <input type="text" id="spanTitle">
-            </div>
+            <div class="marginTop"><label id="spanTitle" class="bold"></label></div>
             <div id="curriculumNoteEditorContainer" class="flex column halfGap marginTop editorContainer">
                 <div id="curriculumNoteEditorButtonContainer" class="flex spaceBetween editorButtonContainer">
                     <div class="flex halfGap">

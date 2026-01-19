@@ -810,8 +810,6 @@ export default class Editor {
         const editorContainer = event.target.closest('.editorContainer');
         const editor = editorContainer.querySelector('.textEditor');
 
-        console.log(event);
-
         switch (key) {
             case 'Escape':
                 event.preventDefault();

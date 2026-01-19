@@ -41,12 +41,14 @@
     fill: black;
 }
 
-#noteSavedMessage {
+#noteSavedMessage,
+#curriculumNoteSavedMessage {
     visibility: hidden;
     color: var(--matteGreen);
 }
 
-#noteSavedMessage.active {
+#noteSavedMessage.active,
+#curriculumNoteSavedMessage.active {
     visibility: visible;
     animation-name: showSavedMessage;
     animation-duration: 2s;
