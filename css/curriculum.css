@@ -420,18 +420,21 @@
     border-bottom-right-radius: var(--standardRadius);
 }
 
-.spanName {
+.spanItemContent {
+    width:fit-content;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
     position: sticky;
     overflow-y: scroll;
     scrollbar-width: none;
     left: 2rem;
+    text-wrap: nowrap;
 }
 
 .curriculaSpanNoteIcon {
     width: 0.75rem;
     height: 0.75rem;
-    position: sticky;
-    right: 0.5rem;
 }
 
 /* generics */

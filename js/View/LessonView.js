@@ -578,9 +578,6 @@ export default class LessonView {
             currentContainer.dataset.schoolyearid = schoolYearId;
 
             currentContainer.classList.add('spanItem');
-            currentContainer.classList.add('flex');
-            currentContainer.classList.add('spaceBetween');
-            currentContainer.classList.add('alignCenter');
 
             if (startDayElement) currentContainer.classList.add('start');
             if (endDayElement) currentContainer.classList.add('end');
@@ -615,8 +612,11 @@ export default class LessonView {
             currentContainer.style.backgroundColor = `color-mix(in srgb, ${backgroundColor} 10%, var(--fadedgrey) 90%)`;
 
             // topic / span name
+            const spanItemContent = blankDiv.cloneNode();
             const spanName = blankDiv.cloneNode();
+            spanItemContent.classList.add('spanItemContent');
             spanName.classList.add('spanName');
+            
             spanName.textContent = span.name;
 
             // span note
@@ -627,8 +627,10 @@ export default class LessonView {
                 noteIcon.classList.add('noteIcon');
             }
 
-            currentContainer.append(spanName);
-            if (noteIcon) currentContainer.append(noteIcon)
+            if (noteIcon) spanItemContent.append(noteIcon)
+
+            spanItemContent.append(spanName);
+            currentContainer.append(spanItemContent);
             spanContainer.append(currentContainer);
         });
 
