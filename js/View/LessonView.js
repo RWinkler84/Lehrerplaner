@@ -632,7 +632,6 @@ export default class LessonView {
             }
 
             spanItemContent.append(noteIcon)
-
             spanItemContent.append(spanName);
             currentContainer.append(spanItemContent);
             spanContainer.append(currentContainer);
