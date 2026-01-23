@@ -57,6 +57,7 @@ export default class CurriculumController {
 
     static closeHolidayEditor() {
         View.closeHolidayEditor();
+        
         this.renderSchoolYearCurriculumEditor();
     }
 
