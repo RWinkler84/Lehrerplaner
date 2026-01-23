@@ -19,6 +19,8 @@ export default class SchoolYearView extends AbstractView {
 
         //selected teached grades
         infoContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.disabled = true;
+
             if (schoolYear && schoolYear.grades.includes(checkbox.value)) {
                 checkbox.checked = true;
             } else {
