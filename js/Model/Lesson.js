@@ -1,5 +1,5 @@
 import AbstractModel from "./AbstractModel.js";
-import { ONEDAY } from "../index.js";
+import { ONEDAY, TODAY } from "../index.js";
 import Fn from '../inc/utils.js';
 import LessonController from "../Controller/LessonController.js";
 
@@ -95,6 +95,8 @@ export default class Lesson extends AbstractModel {
         let db = new AbstractModel;
         let dbData = await db.readAllFromLocalDB('timetableChanges');
         let changes = [];
+
+        console.log(JSON.stringify(dbData));
 
         dbData.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
@@ -260,7 +262,7 @@ export default class Lesson extends AbstractModel {
     }
 
     static async setLessonsInHolidaysCanceled(schoolYears) {
-        const today = new Date().setHours(12, 0, 0, 0);
+        const today = new Date(TODAY).setHours(12, 0, 0, 0);
         const allLessons = await this.getAllRegularLessons();
         let timetableChanges = await this.getAllTimetableChanges();
 

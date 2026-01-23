@@ -38,7 +38,7 @@ let abstCtrl = new AbstractController();
 let timeout = false //for resize debouncing
 
 async function startApp() {
-    LoginController.createGuestAccount();
+    await LoginController.createGuestAccount(); //creates user data
     AbstractController.setVersion('0.9.1');
     await abstCtrl.syncData();
 

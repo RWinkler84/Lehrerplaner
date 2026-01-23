@@ -104,6 +104,8 @@ export default class Task extends AbstractModel {
 
         openTasks = Fn.sortByDateAndTimeslot(openTasks);
 
+        
+
         return openTasks;
     }
 
