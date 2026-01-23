@@ -9,29 +9,33 @@ import LessonView from './View/LessonView.js';
 import Fn from './inc/utils.js';
 import LessonNoteController from './Controller/LessonNoteController.js';
 import LessonController from './Controller/LessonController.js';
+import CurriculumController from './Controller/CurriculumController.js';
+import SchoolYearController from './Controller/SchoolYearController.js';
+import Editor from './inc/editor.js';
 
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const TODAY = '2025-06-24';
 export const ANIMATIONRUNTIME = 300;
-export const ALLOWEDTAGS = ['div', 'ul', 'ol', 'li', 'b', 'p', 'br']
+export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
 export let unsyncedDeletedTimetableChanges = [];
 
 //track lessonNote inputs
-export let lessonNoteChangesArray = [];
+export let editorChangesArray = [];
 
 export let mailStatus = {
     authMailAlreadySend: false,
     resetMailAlreadySend: false
 };
 
-let abstCtrl = new AbstractController();
-
 export let taskBackupArray = [];
+
+let abstCtrl = new AbstractController();
+let timeout = false //for resize debouncing
 
 async function startApp() {
     LoginController.createGuestAccount();
@@ -50,7 +54,7 @@ async function startApp() {
     });
 
     //checking for unsynced changes
-    setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 5);
+    setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 15);
 
     document.addEventListener('click', (event) => {
         LoginController.dialogEventHandler(event);
@@ -90,21 +94,56 @@ async function startApp() {
     document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
 
+    //school year info and curriculum
+    document.querySelector('#curriculumViewContainer').addEventListener('change', (event) => {
+        SchoolYearController.changeEventHandler(event);
+        CurriculumController.changeEventHandler(event);
+    });
+    document.querySelector('#curriculumContainer').addEventListener('click', CurriculumController.handleClickEvents);
+    document.querySelector('#yearContainer').addEventListener('pointerdown', CurriculumController.handleMouseDownOnDayElements);
+
     //on site login
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
 
     //lesson note handler
     document.querySelector('#lessonNoteDialog').addEventListener('click', LessonNoteController.handleClickEvents);
-    document.querySelector('#lessonNoteDialog').addEventListener('keydown', LessonNoteController.handleKeyDownEvents);
-    document.querySelector('#editorButtonContainer').addEventListener('mousedown', event => event.preventDefault());
-    document.querySelector('#lessonNoteDialog').addEventListener('input', LessonNoteController.normalizeInput);
-    document.addEventListener('selectionchange', LessonNoteController.updateButtonStatus);
+
+    //text editor
+    document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('click', Editor.handleClickEvents));
+    document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
+    document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
+    document.addEventListener('input', (event) => {
+        Editor.normalizeInput(event);
+        LessonNoteController.toggleSaveLessonNoteButton(event);
+        LessonController.toggleSaveCurriculumSpanNoteButton(event);
+    });
+    document.addEventListener('selectionchange', Editor.updateButtonStatus);
+
+    //rerender on resize
+    window.addEventListener('resize', () => {
+        const curriculumSectionMainViewContainer = document.querySelector('#weekCurriculaDisplay');
+        const curriculumSettingsView = document.querySelector('#curriculumViewContainer');
+
+        if (!curriculumSectionMainViewContainer.classList.contains('notDisplayed')) {
+            clearTimeout(timeout)
+            timeout = setTimeout(() => {
+                LessonController.renderSelectedCurricula();
+            }, 100);
+        }
+
+        if (curriculumSettingsView.style.display == 'block') {
+            CurriculumController.resizeSpanContentContainers();
+        }
+    });
 
     AbstractController.renderTopMenu();
 
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
+    
+    await LessonController.renderCurriculaSelection();
+    await LessonController.renderSelectedCurricula();
     await LessonView.renderLesson();
 
     await TaskView.renderTasks();
@@ -143,24 +182,26 @@ async function startApp() {
     }
 
     function setDateForWeekdays() {
-        let todayUnix = new Date('2025-06-24').setHours(12, 0, 0, 0);
+        const curriculaDisplayWeekdays = document.querySelectorAll('.curriculaDisplayWeekday');
+        const weekdays = document.querySelectorAll('.weekday');
+
+        let todayUnix = new Date(TODAY).setHours(12, 0, 0, 0);
 
         //go back to monday of given week
         while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;
 
-        document.querySelectorAll('.weekday').forEach((weekday) => {
-
-            weekday.dataset.date = new Date(todayUnix).toString();
+        for (let i = 0; i < weekdays.length; i++) {
+            curriculaDisplayWeekdays[i].dataset.date = new Date(todayUnix).toString();
+            weekdays[i].dataset.date = new Date(todayUnix).toString();
 
             todayUnix += ONEDAY;
-        })
+        }
 
         AbstractView.setDateOnWeekdayLabel();
-        AbstractView.greyOutPassedDays();
+        AbstractController.greyOutHolidaysAndPassedDays();
         AbstractView.setIsTodayDot();
         AbstractView.scrollToCurrentDay();
     }
-
 
     function setWeekStartAndEndDate() {
         let startDateSpan = document.querySelector('#weekStartDate');
@@ -188,8 +229,15 @@ async function startApp() {
             weekday.dataset.date = new Date(newDate).toString();
         });
 
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate - ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
         AbstractView.setDateOnWeekdayLabel();
-        AbstractView.greyOutPassedDays();
+        AbstractController.greyOutHolidaysAndPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(false);
@@ -210,8 +258,15 @@ async function startApp() {
             weekday.dataset.date = new Date(newDate).toString();
         });
 
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate + ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
         AbstractView.setDateOnWeekdayLabel();
-        AbstractView.greyOutPassedDays();
+        AbstractController.greyOutHolidaysAndPassedDays();
         AbstractView.toogleIsCurrentWeekDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(true);
@@ -250,6 +305,7 @@ async function startApp() {
         if (nextWeek == false) verticalOffset = window.innerWidth * -1;
 
         LessonView.removeAllLessons(blankWeekTable);
+        LessonController.removeAllCurriculumSpans(blankWeekTable);
 
         //setup for the animation
         weekOverview.style.left = '0px';
@@ -271,12 +327,15 @@ async function startApp() {
         setTimeout(() => {
             blankWeekTable.remove()
             weekOverview.style.left = 'auto';
-            LessonView.removeAllLessons(weekOverview);
+            timetableContainer.style.height = '';
+
             LessonView.renderLesson();
+            LessonController.renderCurriculaSelection();
+            LessonController.renderSelectedCurricula();
 
             weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
                 lesson.style.opacity = '0';
-                lesson.style.transition = 'all 0.2s ease-out';
+                lesson.style.transition = 'all 1s ease-out';
             });
         }, 350);
 

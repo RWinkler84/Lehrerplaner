@@ -1,6 +1,7 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js";
-import { lessonNoteChangesArray } from "../index.js";
+import { ONEDAY } from "../index.js";
+import LessonNoteController from "../Controller/LessonNoteController.js";
 
 export default class LessonNote extends AbstractModel {
     #id;
@@ -10,6 +11,7 @@ export default class LessonNote extends AbstractModel {
     #class;
     #subject;
     #content;
+    #fixedDate;
     #created;
     #lastEdited;
 
@@ -135,33 +137,81 @@ export default class LessonNote extends AbstractModel {
         await this.deleteFromLocalDB('lessonNotes', this.id);
         await this.deleteFromLocalDB('unsyncedLessonNotes', this.id);
         let result = await this.makeAjaxQuery('lessonNote', 'delete', this.serialize());
-        console.log(result);
+
         if (result.status == 'failed') {
             await this.writeToLocalDB('unsyncedDeletedLessonNotes', this.serialize());
         }
     }
 
-    static trackLessonNoteChanges(currentContent) {
-        let noteVersion = lessonNoteChangesArray.length;
-        lessonNoteChangesArray.push({ version: noteVersion, content: currentContent });
+    static async reorderLessonNotes(oldTimetable, oldTimetableChanges) {
+        const allLessonNotes = await this.getAllLessonNotes();
+        const allAffectedNotes = [];
 
-        return noteVersion;
-    }
+        allLessonNotes.forEach(note => {
+            if (new Date(note.date).setHours(12) < new Date().setHours(12)) return;
+            if (note.fixedDate) return;
+            
+            allAffectedNotes.push(note);
+        });
 
-    static clearLessonNoteChanges() {
-        do {
-            lessonNoteChangesArray.pop();
-        } while (lessonNoteChangesArray.length != 0); 
-    }
+        if (allAffectedNotes.length > 0) {
+            const currentTimetable = await LessonNoteController.getAllRegularLessons();
+            const currentChanges = await LessonNoteController.getAllTimetableChanges();
+            const endDate = new Date(allAffectedNotes[allAffectedNotes.length - 1].date).setHours(12) + ONEDAY * 30;
 
-    static getPreviousChange(displayedVersion) {
-        if (displayedVersion == 0) return;
-        return lessonNoteChangesArray[displayedVersion - 1];
-    }
+            const subjectsByClass = {};
 
-    static getNextChange(displayedVersion) {
-        if (displayedVersion == lessonNoteChangesArray.length) return;
-        return lessonNoteChangesArray[displayedVersion + 1];
+            allAffectedNotes.forEach(note => {
+                subjectsByClass[note.class] ? '' : subjectsByClass[note.class] = [];
+                if (!subjectsByClass[note.class].includes(note.subject)) subjectsByClass[note.class].push(note.subject);
+            });
+
+            for (let key of Object.keys(subjectsByClass)) {
+                let className = key;
+                let subjectsArray = subjectsByClass[key];
+
+                for (let subject of subjectsArray) {
+                    let allOldLessonDates = await this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
+                    let allNewLessonDates = await this.calculateAllLessonDates(className, subject, endDate, currentTimetable, currentChanges);
+
+                    //in the unlikely case, a lesson note exists without a corresponding lesson, jump to the next subject
+                    if (allOldLessonDates.length == 0) continue;
+                    if (allNewLessonDates.length == 0) continue;
+
+                    //find the index of the note.date for this class/subject combination on the old dates and then pick the
+                    //date with the corresponding index on the new dates and asign it as the new note.date
+                    allAffectedNotes.forEach(note => {
+                        if (note.class != className) return;
+                        if (note.subject != subject) return;
+
+                        let noteDate = new Date(note.date).setHours(12)
+                        let match = false;
+                        let indexInOldDates = 0;
+
+                        //search for the note.date and get its index
+                        while (!match) {
+                            if (
+                                noteDate == new Date(allOldLessonDates[indexInOldDates].date).setHours(12) &&
+                                note.timeslot == allOldLessonDates[indexInOldDates].timeslot
+                            ) {
+                                match = true;
+                            } else {
+                                indexInOldDates++
+                            }
+
+                            if (!allOldLessonDates[indexInOldDates]) break;
+                            if (indexInOldDates > 1000) break;
+                        }
+
+                        if (allNewLessonDates[indexInOldDates]) {
+                            note.date = allNewLessonDates[indexInOldDates].date;
+                            note.timeslot = allNewLessonDates[indexInOldDates].timeslot;
+                            note.update();
+                        }
+                    });
+                }
+            }
+        }
     }
 
     serialize() {
@@ -173,6 +223,7 @@ export default class LessonNote extends AbstractModel {
             class: this.class,
             subject: this.subject,
             content: this.content,
+            fixedDate: this.fixedDate,
             created: this.created,
             lastEdited: this.lastEdited
         }
@@ -189,6 +240,7 @@ export default class LessonNote extends AbstractModel {
         if (noteData.class) instance.class = noteData.class;
         if (noteData.subject) instance.subject = noteData.subject;
         if (noteData.content) instance.content = noteData.content;
+        if (noteData.fixedDate) { instance.fixedDate = noteData.fixedDate } else { instance.fixedDate = false };
         if (noteData.created) { instance.created = noteData.created } else { instance.created = model.formatDateTime(new Date()) };
         if (noteData.lastEdited) { instance.lastEdited = noteData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
 
@@ -203,6 +255,7 @@ export default class LessonNote extends AbstractModel {
     get class() { return this.#class; }
     get subject() { return this.#subject; }
     get content() { return this.#content; }
+    get fixedDate() { return this.#fixedDate; }
     get created() { return this.#created; }
     get lastEdited() { return this.#lastEdited; }
 
@@ -214,6 +267,7 @@ export default class LessonNote extends AbstractModel {
     set class(value) { this.#class = value; }
     set subject(value) { this.#subject = value; }
     set content(value) { this.#content = value; }
+    set fixedDate(value) { this.#fixedDate = value; }
     set created(value) { this.#created = value; }
     set lastEdited(value) { this.#lastEdited = value; }
 }

@@ -1,7 +1,10 @@
 import { ONEDAY,TODAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
+import CurriculumController from "./CurriculumController.js";
 import LessonController from "./LessonController.js";
+import LessonNoteController from "./LessonNoteController.js";
+import SchoolYearController from "./SchoolYearController.js";
 import TaskController from "./TaskController.js";
 
 export default class SettingsController {
@@ -74,8 +77,12 @@ export default class SettingsController {
         }
 
         //triggers reordering of tasks for each lesson
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
+        await LessonController.setLessonsInHolidaysCanceled();
+        
         LessonController.renderLesson();
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+
 
         View.discardNewTimetable();
     }
@@ -109,8 +116,9 @@ export default class SettingsController {
             View.renderLessonChangesAndTasksToKeepDialog(filteredLessonChanges, affectedTasks, validFrom);
         }
 
-        LessonController.renderLesson();
-        TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonController.renderLesson();
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonController.setLessonsInHolidaysCanceled();
 
         View.discardNewTimetable();
     }
@@ -187,8 +195,10 @@ export default class SettingsController {
         View.openSettings();
     }
 
-    static settingsClickEventHandler(event) {
+    static async settingsClickEventHandler(event) {
         let target = event.target.id;
+
+        if (event.target.closest('#schoolYearInfoContainer')) SchoolYearController.clickEventHandler(event);
 
         switch (target) {
             //top menu
@@ -199,12 +209,23 @@ export default class SettingsController {
             case 'openTimetableSettingsButton':
                 View.openTimetableSettings();
                 break;
+            
+            case 'openSchoolYearSettingsButton':
+                const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+                //only render, if nothing has been rendered yet, else keep the state, but resize the spanContentContainers in case of a screen resize
+                if (displayedSchoolYearId == "") {
+                    await SchoolYearController.renderSchoolYearInfoSection();
+                    CurriculumController.resizeSpanContentContainers();
+                    }
+                
+                View.openSchoolYearSettings();
+                break
 
             case 'openAccountSettingsButton':
                 View.openAccountSettings();
                 break;
 
-            case 'closeSettingsButton': //fall through
+            case 'closeSettingsButton':
             case 'closeSettingsButtonResponsive':
                 View.closeSettings();
                 break;

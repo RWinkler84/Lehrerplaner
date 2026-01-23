@@ -132,10 +132,10 @@ export default class LoginController extends AbstractController{
         }
     }
 
-    static async createGuestAccount() {
+    static async createGuestAccount(event) {
         let db = new Model;
         await db.createGuestAccount();
-        this.renderTopMenu();
+        AbstractController.renderTopMenu();
     }
 
     static async sendResetPasswordMail(event) {
@@ -227,7 +227,6 @@ export default class LoginController extends AbstractController{
     }
     /** @param offlineStatus boolean: Should the app work temporarily offline or not? */
     static async toggleTemperaryOfflineUsage(offlineStatus, event = null) {
-        console.log('aktiv', event)
         if (event) {
             event.preventDefault();
             View.closeLoginDialog();

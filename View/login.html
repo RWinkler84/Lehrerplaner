@@ -5,18 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="./css/index.css">
-    <link rel="stylesheet" href="../css/test.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/curriculum.css">
 </head>
 
 <body>
+    <div data-span_edit_active="false"></div>
     <div id="yearContainer">
-    </div>
-    <div id="addTimespanForm">
-        <input type="text" name="topic" id="topicInput">
-        <div id="createSpanButtonContainer">
-            <button id="startSpanCreationButton" class="confirmationButton">Anlegen</button>
+        <div id="dayNameContainer">
+            <div class="dayName">Mo</div>
+            <div class="dayName">Di</div>
+            <div class="dayName">Mi</div>
+            <div class="dayName">Do</div>
+            <div class="dayName">Fr</div>
+            <div class="dayName">Sa</div>
+            <div class="dayName">So</div>
         </div>
+    </div>
+    <div id="timeSpanForm">
+        <input type="text" name="topic" id="topicInput">
         <div id="cancelSpanCreationButtonContainer">
             <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
             <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
@@ -53,6 +60,8 @@
             }
 
             let today = new Date();
+            let monthIterator = 0;
+            let weekIterator = 1;
             let dateIterator = new Date(`${today.getFullYear()}-01-01`).setHours(12, 0, 0, 0);
             let oneday = 86400000;
 
@@ -63,7 +72,9 @@
             blankMonth.innerHTML = `
                 <div class="monthName">Januar</div>
             `;
+
             blankWeek.classList.add('week');
+            blankWeek.setAttribute('data-weeknumber', weekIterator);
             blankWeek.innerHTML = `
                 <div class="day" data-weekdayNumber="1"></div>
                 <div class="day" data-weekdayNumber="2"></div>
@@ -73,11 +84,9 @@
                 <div class="day" data-weekdayNumber="6"></div>
                 <div class="day" data-weekdayNumber="0"></div>
             `
-
             let isYearCompleted = false;
             let currentMonth = blankMonth.cloneNode(true);
             let currentWeek = blankWeek.cloneNode(true);
-            let monthIterator = 0;
 
             do {
                 let currentDay = new Date(dateIterator);
@@ -91,20 +100,25 @@
                     currentMonth.querySelector('.monthName').textContent = monthNames[currentDay.getMonth()];
                     monthIterator++;
                 }
-                if (currentDay.getDay() == 1) {
+
+                if (currentDay.getDay() == 1 && currentWeek.querySelector('.dateContainer')) {
                     currentMonth.appendChild(currentWeek);
+
                     currentWeek = blankWeek.cloneNode(true);
+                    weekIterator++;
                 }
+
+                currentWeek.dataset.weeknumber = weekIterator;
 
                 currentWeek.querySelectorAll('.day').forEach(day => {
                     if (day.dataset.weekdaynumber != currentDay.getDay()) return;
 
                     day.setAttribute('data-date', currentDay);
                     day.innerHTML = `
-                        <div class="dayName">${dayNames[currentDay.getDay()]}</div>
-                        <div class="dayDate">${currentDay.getDate()}.${currentDay.getMonth() + 1}.</div>
+                        <div class="dateContainer">
+                            <div class="dayDate">${currentDay.getDate()}.${currentDay.getMonth() + 1}.</div>
+                        </div>
                     `;
-
                 });
 
                 if (currentDay.getDate() == 31 && currentDay.getMonth() == 11) {
@@ -117,198 +131,469 @@
             } while (!isYearCompleted);
 
             yearContainer.querySelectorAll('.day').forEach(day => {
-                if (day.children.length == 0) day.style.visibility = 'hidden';
+                if (day.children.length == 0) day.classList.add('hidden');
             });
         }
 
-        function startSpanCreation() {
-            document.querySelector('#yearContainer').addEventListener('click', createSpan);
-            document.querySelector('#createSpanButtonContainer').style.display = 'none';
-            document.querySelector('#cancelSpanCreationButtonContainer').style.display = 'block';
+        function openSpanForm() {
+            document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'true';
+            document.querySelector('#timeSpanForm').style.display = 'block';
         }
 
-        function saveNewSpan() {
-            let allSpanDays = document.querySelectorAll('div[new]');
+        function closeSpanForm() {
+            document.querySelector('div[data-span_edit_active]').dataset.span_edit_active = 'false';
+            document.querySelector('#timeSpanForm').removeAttribute('style');
+        }
 
-            allSpanDays.forEach(day => {
-                day.removeAttribute('new');
+        function createNewSpan(event) {
+            const target = event.target;
+            const allSpanIds = [];
+
+            document.querySelectorAll('.day[data-spanid]').forEach(day => {
+                if (!allSpanIds.includes(day.dataset.spanid)) allSpanIds.push(day.dataset.spanid);
             });
 
-            let firstDay = allSpanDays[0].dataset.date;
-            let lastDay = allSpanDays[allSpanDays.length - 1].dataset.date;
+            const newSpanId = Math.max(0, ...allSpanIds) + 1;
 
-            let topicInput = document.querySelector('#topicInput');
-            let topicDisplay = document.createElement('div');
+            target.classList.add('selected');
+            target.classList.add('start');
+            target.classList.add('end');
+            target.setAttribute('data-spanid', newSpanId);
+            target.setAttribute('new', '');
 
-            topicDisplay.classList.add('topicDisplay');
-            topicDisplay.textContent = topicInput.value;
+            setAnchor(target);
+            drawSpanContentContainer(newSpanId);
 
-            allSpanDays[0].appendChild(topicDisplay);
-
-            topicInput.value = ''
-            document.querySelector('#createSpanButtonContainer').style.display = 'block';
-            document.querySelector('#cancelSpanCreationButtonContainer').style.display = 'none';
-            document.querySelector('#yearContainer').removeEventListener('click', createSpan);
-
-            console.log(firstDay, lastDay);
+            return newSpanId;
         }
 
         function cancelSpanCreation() {
-            let allSpanDays = document.querySelectorAll('div[new]');
+            const spanElement = document.querySelector('.day:has(.handleContainer)');
+            const isNewSpan = getNewSpan();
 
-            allSpanDays.forEach(day => {
-                day.classList.remove('active');
-                day.removeAttribute('new');
-                day.removeAttribute('data-span');
+            const spanId = spanElement.dataset.spanid
+            const allSpanElements = document.querySelectorAll(`.day[data-spanid="${spanId}"]`);
+
+            allSpanElements.forEach(day => {
+                day.classList.remove('selected');
+                // day.classList.remove('active');
+                day.classList.remove('start');
+                day.classList.remove('end');
+                day.classList.remove('anchor');
+                day.removeAttribute('data-spanid')
             });
 
-            document.querySelector('#yearContainer').removeEventListener('click', createSpan);
-            document.querySelector('#createSpanButtonContainer').style.display = 'block';
-            document.querySelector('#cancelSpanCreationButtonContainer').style.display = 'none';
-        }
+            document.querySelector('#topicInput').value = '';
 
-        function createSpan(event) {
-            if (event.target.classList.contains('active')) return;
+            if (isNewSpan) {
+                isNewSpan.removeAttribute('new');
 
-            let target = event.target;
-            let alldays = document.querySelectorAll('.day');
-            let allSpanIds = [];
-            let spanId;
-            let isFirstSpanElement = true;
-
-            alldays.forEach(day => {
-                if (day.dataset.span != '' && !allSpanIds.includes(day.dataset.span)) allSpanIds.push(day.dataset.span);
-                if (day.hasAttribute('new')) {
-                    isFirstSpanElement = false;
-                    spanId = day.dataset.span;
-                }
-            });
-
-            if (isFirstSpanElement) {
-                target.setAttribute('data-span', Math.max(allSpanIds) + 1)
-                target.setAttribute('new', '');
+                return;
             }
 
-            if (!isFirstSpanElement) {
-                target.setAttribute('data-span', spanId)
-                target.setAttribute('new', '');
-            }
-
-            drawNewSpan();
+            drawSpan(spanId);
         }
 
-        function drawNewSpan() {
-            let alldays = document.querySelectorAll('.day');
-            let allNewSpanDays = document.querySelectorAll('div[new]');
+        function drawSpan(spanId) {
+            console.log('i will get the span data by its id and redraw it the way it was saved. But this is not ready yet');
+            //first remove all spanId elements
+            //then add them newly based on the saved data
+        }
 
-            alldays = Array.from(alldays);
+        function addHandlesToSpan(spanId) {
+            const startElement = document.querySelector(`.day.start[data-spanid="${spanId}"]`);
+            const endElement = document.querySelector(`.day.end[data-spanid="${spanId}"]`);
 
-            if (allNewSpanDays.length == 1) {
-                allNewSpanDays[0].classList.add('active', 'solo');
+            const startHandleContainer = document.createElement('div');
+            const handle = document.createElement('div');
+
+            startHandleContainer.classList.add('handleContainer');
+            handle.classList.add('handle');
+            startHandleContainer.append(handle);
+
+            const endHandleContainer = startHandleContainer.cloneNode(true);
+
+            startHandleContainer.firstElementChild.classList.add('startHandle');
+            endHandleContainer.firstElementChild.classList.add('endHandle');
+
+            if (startElement == endElement) {
+                startElement.append(startHandleContainer);
+                startElement.append(endHandleContainer);
+
+                return;
+            }
+
+            startElement.append(startHandleContainer);
+            endElement.append(endHandleContainer);
+        }
+
+        function removeAllHandles() {
+            document.querySelectorAll('.handleContainer').forEach(container => container.remove());
+        }
+
+        function saveSpan() {
+            const topicInput = document.querySelector('#topicInput');
+            const firstSpanDay = document.querySelector('.day:has(.handleContainer)');
+            const spanId = firstSpanDay.dataset.spanid;
+            const allSpanElements = document.querySelectorAll(`.day[data-spanid="${spanId}"]`);
+            let isNewSpan = getNewSpan()
+
+            if (isNewSpan) {
+                isNewSpan.removeAttribute('new');
+            }
+
+            firstSpanDay.querySelector('.spanContentContainer').textContent = topicInput.value;
+
+        }
+
+        function getSpanId(event) {
+            return event.target.closest('.day').dataset.spanid;
+        }
+
+        function getActiveSpanId() {
+            const activeSpan = document.querySelector('.day:has(.handleContainer)');
+            let activeSpanId;
+
+            if (activeSpan) activeSpanId = activeSpan.dataset.spanid;
+
+            if (activeSpanId) return activeSpanId;
+
+            return false
+        }
+
+        function getNewSpan() {
+            const spanElementWithNewTag = document.querySelector('.day[new]');
+
+            if (spanElementWithNewTag) return spanElementWithNewTag;
+
+            return false;
+        }
+
+        function modifySpanRange(event) {
+            event.preventDefault();
+
+            if (event.target.hasPointerCapture(event.pointerId))
+                event.target.releasePointerCapture(event.pointerId);
+
+            const activeHandle = event.target.querySelector('.handle');
+            const spanId = activeHandle.closest('.day').dataset.spanid;
+            let oldMouseX, currentMouseX, oldMouseY, currentMouseY;
+
+            oldMouseX = event.x;
+            oldMouseY = event.y;
+
+            //set anchor to the other handles parent.
+            if (activeHandle.classList.contains('startHandle')) {
+                setAnchor(document.querySelector('.endHandle').closest('.day'));
             } else {
-                let nextElement = allNewSpanDays[0];
-                let lastElement = allNewSpanDays[allNewSpanDays.length - 1];
+                setAnchor(document.querySelector('.startHandle').closest('.day'));
+            }
 
-                nextElement.classList.remove('solo');
-                if (document.querySelector('.start[new]')) document.querySelector('.start[new]').classList.remove('start');
-                nextElement.classList.add('start');
+            function moveActiveHandle(event) {
+                event.preventDefault();
 
-                do {
-                    nextElement.classList.add('active');
-                    nextElement.setAttribute('data-span', allNewSpanDays[0].dataset.span);
-                    nextElement.setAttribute('new', '');
-                    nextElement = alldays[alldays.indexOf(nextElement) + 1]
-                    //switch
-                } while (nextElement != lastElement);
 
-                nextElement.classList.remove('solo');
-                if (document.querySelector('.end[new]')) document.querySelector('.end[new]').classList.remove('end');
-                nextElement.classList.add('active');
-                nextElement.classList.add('end');
+                let mouseOffsetX = oldMouseX - event.clientX;
+                let mouseOffsetY = oldMouseY - event.clientY;
+                oldMouseX = event.clientX;
+                oldMouseY = event.clientY;
+
+                activeHandle.style.top = `${activeHandle.offsetTop - mouseOffsetY}px`;
+                activeHandle.style.left = `${activeHandle.offsetLeft - mouseOffsetX}px`;
+            }
+
+            function adjustSpanLength(event) {
+                event.preventDefault();
+
+                if (!event.target.classList.contains('day')) return;
+
+                const focusElement = event.target;
+                const anchorElement = document.querySelector('.anchor');
+                let [startElement, endElement] = [focusElement, anchorElement];
+
+                if (comparePosition(anchorElement, focusElement) == "A before B") [startElement, endElement] = [anchorElement, focusElement];
+
+                const allDays = Array.from(document.querySelectorAll('.day:not(.hidden)'));
+                let startIndex = allDays.indexOf(startElement);
+                let endIndex = allDays.indexOf(endElement);
+                const anchorIndex = allDays.indexOf(anchorElement);
+
+                const spanDays = [];
+
+                //prevent the span from expanding into another span 
+                let neighboringStart;
+                let neighboringEnd;
+                let neighboringStartIndex;
+                let neighboringEndIndex;
+
+                //find next neighboring start
+                for (let i = anchorIndex + 1; i < allDays.length; i++) {
+                    if (allDays[i].classList.contains('start')) {
+                        neighboringStart = allDays[i];
+                        neighboringStartIndex = i;
+                        break;
+                    }
+                }
+
+                //find next neighboring end
+                for (let i = anchorIndex - 1; i > 0; i--) {
+                    if (allDays[i].classList.contains('end')) {
+                        neighboringEnd = allDays[i];
+                        neighboringEndIndex = i;
+                        break;
+                    }
+                }
+
+                //if the spans start/end index expands into the neighbors, reset them
+                if (endIndex >= neighboringStartIndex) endIndex = neighboringStartIndex - 1;
+                if (startIndex <= neighboringEndIndex) startIndex = neighboringEndIndex + 1;
+
+                //get all span days and style them
+                for (let i = startIndex; i <= endIndex; i++) {
+                    spanDays.push(allDays[i]);
+                }
+
+                allDays.forEach(day => {
+                    if (day.dataset.spanid == spanId) {
+                        day.classList.remove('selected');
+                        day.classList.remove('start');
+                        day.classList.remove('end');
+                        day.removeAttribute('data-spanid');
+                    }
+                });
+
+                spanDays.forEach((day, index) => {
+                    day.classList.add('selected');
+                    day.setAttribute('data-spanid', spanId);
+
+                    if (index == 0) day.classList.add('start');
+                    if (index == spanDays.length - 1) day.classList.add('end');
+                });
+
+                drawSpanContentContainer(spanId);
+
+            }
+
+            function endHandleMovement() {
+                removeAllHandles();
+                removeAnchorFromSpan(spanId);
+                addHandlesToSpan(spanId);
+
+                document.removeEventListener('pointermove', moveActiveHandle);
+                document.removeEventListener('pointerover', adjustSpanLength);
+                document.removeEventListener('pointerup', endHandleMovement);
+            }
+
+            document.addEventListener('pointermove', moveActiveHandle);
+            document.addEventListener('pointerover', adjustSpanLength);
+            document.addEventListener('pointerup', endHandleMovement);
+        }
+
+        function setAnchor(element) {
+            element.classList.add('anchor');
+        }
+
+        function removeAnchorFromSpan(spanId) {
+            document.querySelectorAll(`*[data-spanid="${spanId}"]`).forEach(element => element.classList.remove('anchor'));
+        }
+
+        function disableTouchActionsOnDayElements() {
+            document.querySelectorAll('.day').forEach(day => disableTouchActions(day));
+        }
+
+        function enableTouchActionsOnDayElements() {
+            document.querySelectorAll('.day').forEach(day => enableTouchActions(day));
+        }
+
+        function drawSpanContentContainer(spanId) {
+            const startElement = document.querySelector(`.day.start[data-spanid="${spanId}"]`);
+            const endElement = document.querySelector(`.day.end[data-spanid="${spanId}"]`);
+            const startWeekNumber = startElement.closest('.week').dataset.weeknumber;
+            const endWeekNumber = endElement.closest('.week').dataset.weeknumber;
+            const startElementRect = startElement.getBoundingClientRect();
+            const endElementRect = endElement.getBoundingClientRect();
+            const elementStyle = getComputedStyle(startElement);
+
+            document.querySelectorAll(`.spanContentContainer[data-spanid="${spanId}"]`).forEach(container => container.remove());
+
+            const contentContainer = document.createElement('div');
+            contentContainer.classList.add('spanContentContainer');
+            contentContainer.setAttribute('data-spanid', spanId);
+
+            let i = startWeekNumber;
+
+            do {
+                const weekElement = document.querySelector(`.week[data-weeknumber="${i}"]`);
+                const currentContainer = contentContainer.cloneNode();
+
+                let firstElement = weekElement.firstElementChild;
+                let lastElement = weekElement.lastElementChild;
+                let offset = (parseFloat(getComputedStyle(startElement).paddingLeft) + parseFloat(getComputedStyle(startElement).borderLeftWidth));
+
+                if (startWeekNumber == endWeekNumber) offset *= 2;
+                if (i != startWeekNumber && i != endWeekNumber) offset = 2;
+
+                if (i == startWeekNumber) {
+                    firstElement = startElement;
+                    currentContainer.classList.add('start');
+                }
+
+                if (i == endWeekNumber) {
+                    lastElement = endElement;
+                    currentContainer.classList.add('end');
+                }
+
+                const leftRect = firstElement.getBoundingClientRect();
+                const rightRect = lastElement.getBoundingClientRect();
+
+                currentContainer.style.width = `${rightRect.right - leftRect.left - offset}px`;
+                currentContainer.style.top = `${getComputedStyle(firstElement).paddingTop}`;
+
+                firstElement.append(currentContainer);
+
+                i++
+            } while (i <= endWeekNumber)
+        }
+
+        function getPaddingPlusBorderWidth(element) {
+            const properties = getComputedStyle(element);
+            const paddingLeft = parseFloat(properties.paddingLeft);
+            const paddingRight = parseFloat(properties.paddingRight);
+            const borderLeft = parseFloat(properties.borderLeft);
+            const borderRight = parseFloat(properties.borderRight);
+
+            return paddingLeft + paddingRight + borderLeft + borderRight;
+        }
+
+        ////////////////
+        // controller //
+        ////////////////
+
+        function handleClicksOnDayElements(event) {
+            const spanEditOngoing = document.querySelector('div[data-span_edit_active]').dataset.span_edit_active;
+            const classList = event.target.classList;
+
+            // handle clicks on day elements
+            if (classList.contains('day')) {
+                switch (true) {
+                    case !classList.contains('selected'):
+                        if (spanEditOngoing == 'false') con_createNewSpan();
+                        break;
+
+                    case classList.contains('selected'):
+                        if (spanEditOngoing == 'true') {
+                            const clickedSpanId = getSpanId(event);
+                            const activeSpanId = getActiveSpanId();
+                            if (clickedSpanId == activeSpanId) {
+                                con_createNewSubSpan(event)
+                            } else {
+                                con_selectSpan(event);
+                            }
+                        };
+
+                        if (spanEditOngoing == 'false') con_selectSpan(event);
+                        break;
+                }
             }
         }
 
-        function drawSpan() {
-            let alldays = document.querySelectorAll('.day');
-            let spanElementsById = {};
-
-            alldays = Array.from(alldays);
-
-            alldays.forEach(day => {
-                if (day.hasAttribute('data-span')) {
-                    !spanElementsById[day.dataset.span] ? spanElementsById[day.dataset.span] = [day] : spanElementsById[day.dataset.span].push(day);
-                }
-            })
-
-            let spanIds = Object.keys(spanElementsById);
-
-            spanIds.forEach(id => {
-                if (spanElementsById[id].length == 1) {
-                    spanElementsById[id][0].classList.add('active', 'solo');
-                } else {
-                    let lastIndex = spanElementsById[id].length - 1
-                    let nextElement = spanElementsById[id][0];
-
-                    nextElement.classList.remove('solo');
-                    nextElement.classList.add('start');
-
-                    do {
-                        nextElement.classList.add('active');
-                        nextElement.setAttribute('data-span', id);
-                        nextElement = alldays[alldays.indexOf(nextElement) + 1]
-                        //switch
-                    } while (nextElement != spanElementsById[id][lastIndex])
-                    nextElement.classList.add('active');
-                    nextElement.classList.add('end');
-
-                }
-            });
-        }
-
-        function timespanFormHandler(event) {
-
+        function timeSpanFormHandler(event) {
             switch (event.target.id) {
-                case 'startSpanCreationButton':
-                    startSpanCreation();
-                    break;
-
                 case 'saveSpanCreationButton':
-                    saveNewSpan();
+                    con_saveSpan();
                     break;
 
                 case 'cancelSpanCreationButton':
-                    cancelSpanCreation();
+                    con_cancelSpanCreation();
                     break;
             }
         }
 
-        document.querySelector('#addTimespanForm').addEventListener('click', timespanFormHandler);
+        function handleMouseDownOnDayElements(event) {
+
+            const classList = event.target.classList;
+
+            switch (true) {
+                case classList.contains('handleContainer'):
+                    con_modifySpanRange(event);
+                    break;
+            }
+        }
+
+        function con_createNewSpan() {
+            disableTouchActionsOnDayElements();
+            openSpanForm();
+            let spanId = createNewSpan(event);
+            addHandlesToSpan(spanId);
+        }
+
+        function con_createNewSubSpan() {
+            openSpanForm();
+            createNewSubSpan(event);
+        }
+
+        function con_saveSpan() {
+            const spanId = getActiveSpanId();
+            saveSpan();
+            closeSpanForm();
+            removeAllHandles();
+            removeAnchorFromSpan(spanId);
+            enableTouchActionsOnDayElements();
+        }
+
+        function con_cancelSpanCreation() {
+            cancelSpanCreation();
+            closeSpanForm();
+            removeAllHandles();
+            enableTouchActionsOnDayElements();
+
+        }
+
+        function con_selectSpan(event) {
+            const currentlyActiveSpanId = getActiveSpanId();
+            const spanId = getSpanId(event);
+
+            if (currentlyActiveSpanId) {
+                if (getNewSpan()) {
+                    cancelSpanCreation();
+                } else {
+                    drawSpan(currentlyActiveSpanId);
+                }
+            }
+
+            openSpanForm();
+            disableTouchActionsOnDayElements();
+            removeAllHandles();
+            addHandlesToSpan(spanId);
+
+        }
+
+        function con_modifySpanRange(event) {
+            modifySpanRange(event)
+        }
+
+        //helper function
+        function comparePosition(elementA, elementB) {
+            let position = elementA.compareDocumentPosition(elementB);
+            if (position == Node.DOCUMENT_POSITION_PRECEDING) return 'A after B';
+            if (position == Node.DOCUMENT_POSITION_FOLLOWING) return 'A before B';
+
+            return 'same element';
+        }
+
+        function disableTouchActions(element) {
+            element.classList.add('noTouchActions');
+        }
+
+        function enableTouchActions(element) {
+            element.classList.remove('noTouchActions');
+        }
 
         createContainer();
 
-        // altlasten
-
-        function dragHandler(event) {
-            let element = event.target;
-
-            if (event.type == 'mousedown' && element.classList.contains('handle')) event.target.setAttribute('draggable', true);
-            if (event.type == 'mouseup' && element.classList.contains('handle')) event.target.removeAttribute('draggable');
-
-            if (event.type == 'dragenter' || event.type == 'dragleave') toggleCellActivation(element, event);
-            if (event.type == 'drop') reasignDragHandler(element);
-        }
-
-        function addHandleElement(element, startElement = true) {
-            let handle = document.createElement('div');
-
-            handle.classList.add('handle');
-            handle.setAttribute('data-spanid', element.dataset.spanid);
-            startElement ? handle.classList.add('start') : handle.classList.add('end');
-            handle.textContent = '|';
-
-            element.appendChild(handle);
-        }
-
+        document.querySelector('#timeSpanForm').addEventListener('click', timeSpanFormHandler);
+        document.querySelector('#yearContainer').addEventListener('click', handleClicksOnDayElements);
+        document.querySelector('#yearContainer').addEventListener('pointerdown', handleMouseDownOnDayElements);
     </script>
 </body>
 
