@@ -72,11 +72,6 @@ export default class CurriculumController {
         const schoolYear = await SchoolYearController.getSchoolYearById(schoolYearId);
         const newCurriculumId = Fn.generateId(schoolYear.curricula);
 
-        View.hideCreateCurriculumButton();
-        View.hideCurriculumSelectionContainer();
-
-        View.showSaveCancelNewCurriculumButtonContainer();
-        View.showCurriculumCreationSelectContainer();
         await View.renderCurriculumSubjectAndGradeSelect(schoolYear);
 
         //the renderCurriculumSubjectAndGradeSelect function preselects the first free grade/subject combination
@@ -91,7 +86,13 @@ export default class CurriculumController {
         }
 
         await schoolYear.addCurriculum({ id: newCurriculumId, grade: selectedSubjectGrade.grade, subject: selectedSubjectGrade.subject });
-        View.rerenderDisplayedCurriculum(schoolYear, newCurriculumId);
+        this.renderSchoolYearCurriculumEditor(schoolYear,newCurriculumId);
+
+        View.hideCreateCurriculumButton();
+        View.hideCurriculumSelectionContainer();
+
+        View.showSaveCancelNewCurriculumButtonContainer();
+        View.showCurriculumCreationSelectContainer();
     }
 
     static async saveNewCurriculum() {

@@ -620,15 +620,15 @@ export default class LessonView {
             spanName.textContent = span.name;
 
             // span note
-            let noteIcon;
-            if (span.note.trim() != '') {
-                noteIcon = blankDiv.cloneNode();
+            let noteIcon = blankDiv.cloneNode();
                 noteIcon.classList.add('curriculaSpanNoteIcon');
                 noteIcon.classList.add('noteIcon');
+            
+            if (span.note == '<p><br></p>') {
+                noteIcon.style.backgroundColor = 'var(--lightgrey)';
             }
 
-            if (noteIcon) spanItemContent.append(noteIcon)
-
+            spanItemContent.append(noteIcon)
             spanItemContent.append(spanName);
             currentContainer.append(spanItemContent);
             spanContainer.append(currentContainer);
