@@ -633,10 +633,89 @@
 
             <!-- account settings -->
             <div id="accountSettingsContainer" style="display: none;" class="settingsSubContainer">
+                <div id="eduplanioPlusContainer">
+                    <label class="marginBottom">Eduplanio Plus:</label>
+                    <div id="eduplanioPlusNotLoggedInMessage">
+                        <p>Um deine Eduplanio Plus-Lizenz verwalten zu können, musst du angemeldet sein.</p>
+                    </div>
+                    <div>Lizenzstatus: <span id="eduplanioPlusStatusSpan">-</span></div>
+                    <div>läuft ab: <span id="eduplanioPlusExpirationDateSpan">-</span></div>
+                    <label class="marginTop marginBottom">aktivieren oder verlängern:</label>
+                    <p>Beim Kauf von Eduplanio Plus stehen dir die Monats- und die
+                        Jahreslizenz zur Wahl. Nach Abschluss des Kaufs sind die Eduplanio Plus-Vorteile sofort
+                        verfügbar. Endet der Lizenzzeitraum kannst du Eduplanio weiterhin in der Gratisversion
+                        ohne Plus-Vorteile nutzen. Eine Verlängerung der Lizenz ist jederzeit möglich.</p>
+
+                    <div class="flex growEqually doubleGap">
+                        <div id="prolongOneMonth" class="eduplanioPlusSalesCard">
+                            <h3>Monatslizenz Eduplanio Plus</h3>
+                            <p>Profitiere für einmalig 5,99 Euro <b>30 Tage</b> von allen Eduplanio Plus-Vorteilen.
+                                Hast du bereits eine aktive Lizenz, wird diese entsprechend verlängert.</p>
+                            <div class="flex justifyEnd alignEnd">einmalig&nbsp;<span class="redText price">5,99
+                                    Euro</span></div>
+                            <div class="buttonContainer">
+                                <div><button class="confirmationButton" id="oneMonthEduplanioPlusButton">jetzt
+                                        kaufen</button></div>
+                            </div>
+                        </div>
+                        <div id="prolongOneYear" class="eduplanioPlusSalesCard">
+                            <h3>Jahreslizenz Eduplanio Plus</h3>
+                            <p>Profitiere für einmalig 49,99 Euro <b>365 Tage</b> von allen Eduplanio
+                                Plus-Vorteilen. Hast du bereits eine aktive Lizenz, wird diese entsprechend verlängert.
+                            </p>
+                            <div class="flex justifyEnd">
+                                <div class="flex column justifyEnd alignEnd">
+                                    <div>einmalig&nbsp;<span class="redText price">49,99 Euro</span></div>
+                                    <div class="greenText savingsNote">30 Prozent Ersparnis auf den Monatspreis</div>
+                                </div>
+                            </div>
+                            <div class="buttonContainer">
+                                <div><button class="confirmationButton" id="oneYearEduplanioPlusButton">jetzt
+                                        kaufen</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="eduplanioPlusAdvantagesList">
+                        <label class="marginBottom">Diese Vorteile bietet dir Eduplanio Plus:</label>
+                        <div class="flex alignCenter">
+                            <div class="iconBackground"><span class="icon checkIcon"></span></div>Nutzung von Eduplanio
+                            auf unbegrenzt vielen Geräten und Browsern:
+                        </div>
+                        <p>In der Gratisversion kannst du Eduplanio nur auf einem Gerät verwenden. Zwar ist es möglich,
+                            unbegrenzt viele Gastkonten zu eröffnen, deine Daten liegen aber immer nur auf dem Gerät und
+                            in dem Browser, in dem du sie erstellt hast.</p>
+                        <div class="flex alignCenter">
+                            <div class="iconBackground"><span class="icon checkIcon"></span></div>Synchronisation deiner
+                            Daten auf all deinen Geräten:
+                        </div>
+                        <p>Mit Eduplanio Plus werden deine Daten synchronisiert, sobald du dich auf einem Gerät
+                            einloggst. Zuhause am Rechner die Planung erarbeiten, unterwegs auf dem Handy eine schnelle
+                            Notiz anlegen und in der Schule auf dem Tablet den Stundenplan anpassen - mit Plus kein
+                            Problem!
+                        </p>
+                        <div class="flex alignCenter">
+                            <div class="iconBackground"><span class="icon checkIcon"></span></div>Schutz vor
+                            Datenverlust durch automatische Backups:
+                        </div>
+                        <p>Deine Daten stehen dir nicht nur überall zur Verfügung, sind sie gleichzeitig optimal vor
+                            Verlust geschützt. So kannst du nahtlos weiterarbeiten, selbst wenn dein Rechner, Tablet
+                            oder Handy unerwartet den Geist aufgibt oder du unabsichtlich den Speicher deines Browsers
+                            löschst.</p>
+                    </div>
+
+
+                </div>
+
                 <div id="deleteAccountContainer">
                     <label>Konto löschen:</label>
                     <div id="requestDeletionContainer">
-                        <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt.</p>
+                        <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt. Das betrifft sowohl die lokal
+                            gespeicherten als auch die Daten in der Eduplanio-Cloud, solltest du zuvor Eduplanio
+                            Plus-Nutzer gewesen sein.</p>
+                        <p>Achtung: Da eine aktive Eduplanio Plus-Lizenz an das Konto gebunden ist, geht auch diese
+                            verloren und kann nach einer Neuanmeldung <strong>nicht</strong>
+                            reaktiviert werden.</p>
                         <button id="deleteAccountButton" class="cancelButton">Konto löschen</button>
                     </div>
                     <div id="approveAccountDeletionContainer">
@@ -923,6 +1002,32 @@
             </div>
         </div>
     </dialog>
+
+    <dialog id="registrationNeededDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Anmeldung erforderlich <span id="curriclumNoteInfo"></span></h3><button
+                class="closeRegistrationNeededDialogButton closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody flex">
+            <p>Es sieht so aus, als hättest du Eduplanio bisher mit einem Gastkonto genutzt. Um Eduplanio Plus nutzen zu
+                können, musst du dich zuerst registrieren.</p>
+            <div class="flex halfGap justifyEnd">
+                <button id="startRegistrationButton" class="confirmationButton">Jetzt registrieren</button>
+                <button class="closeRegistrationNeededDialogButton cancelButton">Abbrechen</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="checkoutDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Kasse <span id="curriclumNoteInfo"></span></h3><button id="closeCheckoutDialogButton"
+                class="closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <iframe style="flex-grow: 1"></iframe>
+        </div>
+    </dialog>
+
     <footer><a id="imprintLink" href="./../impressum.html">Impressum</a></footer>
     <script src="./js/index.js" type="module"></script>
 </body>

@@ -32,10 +32,10 @@ class UserController extends AbstractController
         echo json_encode(['message' => 'Wrong username or password']);
     }
 
-    public function logout() {
+    public function logout()
+    {
         session_destroy();
         echo json_encode(['status' => 'success']);
-
     }
 
     public function createAccount()
@@ -59,7 +59,8 @@ class UserController extends AbstractController
         echo json_encode(['message' => 'Da ist etwas schief gelaufen.']);
     }
 
-    public function deleteAccount() {
+    public function deleteAccount()
+    {
         $result = $this->model->deleteAccount();
 
         echo json_encode($result);
@@ -85,7 +86,7 @@ class UserController extends AbstractController
         echo json_encode([
             'message' => 'Da ist etwas schief gelaufen.',
             'status' => 'failed'
-            ]);
+        ]);
     }
 
 
@@ -137,6 +138,16 @@ class UserController extends AbstractController
             'message' => 'Beim Mail-Versand ist etwas schief gelaufen. Bitte versuche es später noch einmal.',
             'status' => 'failed'
         ]);
+    }
+
+    public function processPurchase() {
+        global $user;
+
+        $purchasedItem = $_GET['product'];
+
+        $result = $user->processPurchase($purchasedItem); 
+
+        echo '<h1>Passt</h1>';
     }
 
     private function validatePassword($password)

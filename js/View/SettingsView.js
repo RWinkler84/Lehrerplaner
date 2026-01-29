@@ -40,7 +40,7 @@ export default class SettingsView {
     //////////////////////////////////
     // timetable settings functions //
     //////////////////////////////////
-    
+
     static async renderSelectableLessonColors() {
         let allSubjects = await Controller.getAllSubjects();
         let allColorsArray = [
@@ -597,7 +597,7 @@ export default class SettingsView {
     ////////////////////////////////
     // account settings functions //
     ////////////////////////////////
-    
+
     static openTimetableSettings() {
         document.querySelector('#openAccountSettingsButton').classList.remove('selected');
         document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
@@ -618,7 +618,7 @@ export default class SettingsView {
         document.querySelector('#curriculumViewContainer').style.display = 'block';
     }
 
-    static openAccountSettings() {
+    static openAccountSettings(userInfo = null) {
         let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
         let timetableSettingsContainer = document.querySelector('#timetableSettingsContainer');
         let curriculumEditor = document.querySelector('#curriculumViewContainer');
@@ -629,6 +629,37 @@ export default class SettingsView {
         document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
         document.querySelector('#openAccountSettingsButton').classList.add('selected');
 
+        console.log(userInfo)
+
+        if (userInfo) {
+            const notLoggedInMessage = accountSettingsContainer.querySelector('#eduplanioPlusNotLoggedInMessage');
+            const eduplanioPlusStatusSpan = document.querySelector('#eduplanioPlusStatusSpan');
+            const eduplanioPlusExpirationDateSpan = document.querySelector('#eduplanioPlusExpirationDateSpan');
+
+            let expirationDateString = '-';
+            let statusString = 'inaktiv';
+            let statusTextClass = 'redText';
+
+            if (userInfo.activeUntil) {
+                const expirationDate = new Date(userInfo.activeUntil);
+                const todayTimestamp = new Date().setHours(12, 0, 0, 0);
+
+                if (expirationDate.setHours(12, 0, 0, 0) >= todayTimestamp) {
+                    statusString = 'aktiv';
+                    statusTextClass = 'greenText';
+                }
+
+                expirationDateString = Fn.formatDateWithFullYear(expirationDate);
+            }
+
+            eduplanioPlusStatusSpan.textContent = statusString;
+            eduplanioPlusExpirationDateSpan.textContent = expirationDateString;
+
+            notLoggedInMessage.classList.add('notDisplayed');
+            eduplanioPlusStatusSpan.classList.add(statusTextClass);
+        }
+
+        //make account settings visible
         accountSettingsContainer.style.height = containerHeight + 'px';
         accountSettingsContainer.style.display = 'block';
 
@@ -677,6 +708,31 @@ export default class SettingsView {
         document.querySelector('#versionDisplay').textContent = version;
     }
 
+    static openRegistrationNeededDialog() {
+        document.querySelector('#registrationNeededDialog').showModal();
+    }
+
+    static closeRegistrationNeededDialog() {
+        document.querySelector('#registrationNeededDialog').close();
+    }
+
+    static openCheckoutDialog(clickedPurchaseButton) {
+        const dialog = document.querySelector('#checkoutDialog');
+        const iframe = dialog.querySelector('iframe');
+        const baselink = './stripe/shop.html';
+
+        let purchaseItem;
+
+        if (clickedPurchaseButton.id == 'oneYearEduplanioPlusButton') purchaseItem = 'oneYear';
+        if (clickedPurchaseButton.id == 'oneMonthEduplanioPlusButton') purchaseItem = 'oneMonth';
+        
+        iframe.src = `${baselink}?item=${purchaseItem}`;
+
+        dialog.showModal();
+    }
+    static closeCheckoutDialog() {
+        document.querySelector('#checkoutDialog').close();
+    }
     //////////////////////////
     // validation functions //
     //////////////////////////

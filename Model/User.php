@@ -280,9 +280,13 @@ class User extends AbstractModel
         return $this->userId;
     }
 
-    public function getEmail()
+    public function getEmail(): ?string
     {
-        return $this->email;
+        if (!is_null($this->userId)) {
+            return $this->email;
+        }
+
+        return null;
     }
 
     private function getPassword()
@@ -293,6 +297,17 @@ class User extends AbstractModel
     public function getActiveUntil()
     {
         return $this->activeUntil;
+    }
+
+    public function getUserInfo() {
+        global $user;
+        $user = $this->getUserById($user->getId());
+
+        return [
+            'email' => $user->email,
+            'emailConfirmed' => $user->emailConfirmed,
+            'activeUntil' => $user->activeUntil
+        ];
     }
 
     public function getAllUsers()
@@ -357,6 +372,16 @@ class User extends AbstractModel
 
             return $user;
         }
+    }
+
+    public function processPurchase($purchasedItem) {
+        // the user activeUntil date
+            //if it is run out, update add the purchased timespan starting today
+            //if it is active, add the purchased timespan to the expiration date
+
+        //update it on the database
+
+        // if something goes wrong, write an automatic email to the support
     }
 
     private function getUserDataByPasswordResetToken($token): array

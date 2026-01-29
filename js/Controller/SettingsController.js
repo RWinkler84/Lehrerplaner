@@ -1,6 +1,7 @@
 import { ONEDAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
+import AbstractController from "./AbstractController.js";
 import CurriculumController from "./CurriculumController.js";
 import LessonController from "./LessonController.js";
 import LessonNoteController from "./LessonNoteController.js";
@@ -145,6 +146,30 @@ export default class SettingsController {
         }
     }
 
+    static async attemptEduplanioPlusPurchase(clickedPurchaseButton) {
+        const userInfo = await AbstractController.getUserInfo();
+
+        if (userInfo.accountType != 'registeredUser') {
+            this.openRegistrationNeededDialog();
+            
+            return;
+        }
+
+        View.openCheckoutDialog(clickedPurchaseButton);
+    }
+
+    static closeCheckoutDialog(){
+        View.closeCheckoutDialog();
+    }
+
+    static openRegistrationNeededDialog(){
+        View.openRegistrationNeededDialog();
+    }
+
+    static closeRegistrationNeededDialog(){
+        View.closeRegistrationNeededDialog();
+    }
+
     static deleteTaskById(id) {
         TaskController.deleteTaskById(id);
     }
@@ -195,12 +220,23 @@ export default class SettingsController {
         View.openSettings();
     }
 
+    static async openAccountSettings() {
+        const userInfo = await AbstractController.getUserInfo();
+
+        if (userInfo.accountType == 'registeredUser' && userInfo.temporarilyOffline == false) {
+            View.openAccountSettings(userInfo);
+            return;
+        }
+
+        View.openAccountSettings();
+    }
+
     static async settingsClickEventHandler(event) {
-        let target = event.target.id;
+        let target = event.target;
 
         if (event.target.closest('#schoolYearInfoContainer')) SchoolYearController.clickEventHandler(event);
 
-        switch (target) {
+        switch (target.id) {
             //top menu
             case 'openSettingsMenuButton':
                 View.toggleSettingsMenu(event);
@@ -222,7 +258,7 @@ export default class SettingsController {
                 break
 
             case 'openAccountSettingsButton':
-                View.openAccountSettings();
+                SettingsController.openAccountSettings();
                 break;
 
             case 'closeSettingsButton':
@@ -268,6 +304,11 @@ export default class SettingsController {
                 break;
 
             //account settings
+            case 'oneMonthEduplanioPlusButton':
+            case 'oneYearEduplanioPlusButton':
+                SettingsController.attemptEduplanioPlusPurchase(target);
+                break;
+
             case 'deleteAccountButton':
                 View.toogleAccountDeletionMenu(event);
                 break;

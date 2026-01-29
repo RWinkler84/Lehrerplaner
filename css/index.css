@@ -41,7 +41,7 @@ body {
 }
 
 footer {
-text-align: center;
+    text-align: center;
 
     #imprintLink {
         text-decoration: none;
@@ -156,6 +156,7 @@ main {
 #settingsTimetableContainer,
 #schoolYearInfoContainer,
 #curriculumContainer,
+#eduplanioPlusContainer,
 #deleteAccountContainer,
 #timetableContainer,
 #taskContainer {
@@ -276,6 +277,32 @@ dialog .errorMessageDisplay,
 #lessonChangesConflictsContainer,
 #taskConflictsContainer {
     padding: 1rem 0;
+}
+
+#checkoutDialog {
+    padding: 0;
+    height: 50vh;
+    width: 50vw;
+    
+    &[open] {
+        display:flex;
+        flex-direction: column;
+    }
+
+    .headline {
+        margin: 0;
+    }
+
+    .dialogBody {
+        display: flex;
+        flex-grow: 1;
+    }
+    
+    iframe {
+        border: none;
+        scrollbar-color: var(--lightgrey) transparent;
+
+    }
 }
 
 /* Time Table */
@@ -720,10 +747,61 @@ tr[data-new]:has(td[data-taskDescription]) td {
 }
 
 #versionDisplay {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+    text-align: right;
     color: var(--lightgrey);
+}
+
+.eduplanioPlusSalesCard {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 2rem;
+    background-color: white;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    border-radius: var(--standardRadius);
+
+    .price {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .savingsNote {
+        font-size: 0.75rem;
+        text-align: end;
+    }
+
+    .buttonContainer {
+        display: flex;
+        justify-content: end;
+        margin-top: 1rem;
+        flex-grow: 1;
+        display: flex;
+        align-items: end;
+    }
+}
+
+#eduplanioPlusAdvantagesList {
+    margin-top: 2rem;
+
+    p {
+        margin-top: 0.5rem;
+        margin-left: 1.8rem;
+    }
+
+    .iconBackground {
+        background-color: var(--matteGreen);
+        border-radius: 50%;
+        padding: 0.15rem;
+        margin-right: 0.5rem;
+    }
+
+    .icon {
+        background-color: var(--lighterText);
+    }
+
+    div {
+        color: var(--matteGreen);
+        font-weight: bold;
+    }
 }
 
 /* Buttons */
@@ -1102,6 +1180,14 @@ h4 {
 
 .centeredText {
     text-align: center;
+}
+
+.redText {
+    color: var(--matteRed);
+}
+
+.greenText {
+    color: var(--matteGreen);
 }
 
 .bold {

@@ -251,15 +251,19 @@ export default class AbstractModel {
         return true;
     }
 
+    /** returns account type, temporarily offline status and if registered user mail, email confirmation status, active until date and login status */
     async getUserInfo() {
         let userInfo = await this.readFromLocalDB('settings', 1);
-        let loginStatus = await this.makeAjaxQuery('abstract', 'getUserLoginStatus');
+        let serverData = await this.makeAjaxQuery('abstract', 'getUserInfo');
 
         if (!userInfo) {
             userInfo = { accountType: 'not set' };
         }
 
-        userInfo.loggedIn = loginStatus.status == 'true' ? true : false;
+        userInfo.email = serverData.email;
+        userInfo.emailConfirmed = serverData.emailConfirmed;
+        userInfo.activeUntil = serverData.activeUntil;
+        userInfo.loggedIn = serverData.loggedIn == 'true' ? true : false;
 
         return userInfo;
     }

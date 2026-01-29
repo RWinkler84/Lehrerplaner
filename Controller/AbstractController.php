@@ -115,16 +115,19 @@ class AbstractController
         echo json_encode($result);
     }
 
-    public function  getUserLoginStatus()
+    public function getUserInfo()
     {
         global $user;
+        $status = $user->getUserInfo();
 
         if (is_null($user)) {
-            echo json_encode(['status' => 'failed']);
+            echo json_encode(['loggedIn' => 'false']);
             exit;
         }
 
-        echo json_encode(['status' => 'true']);
+        $status['loggedIn'] = 'true';
+
+        echo json_encode($status);
     }
 
     public function sendSupportTicket() {
