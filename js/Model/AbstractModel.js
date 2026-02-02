@@ -9,7 +9,7 @@ export default class AbstractModel {
         let isRegisteredUser = await this.isRegisteredUser();
         let allowedActionsUnregisteredUser = [
             'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
-            'sendPasswortResetMail'
+            'sendPasswortResetMail', 'sendSupportTicket'
         ];
 
         if (!allowedActionsUnregisteredUser.includes(action)) {
