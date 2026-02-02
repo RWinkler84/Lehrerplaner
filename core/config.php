@@ -6,8 +6,12 @@ const ALLOWEDACTIONS = ['getSubjects', 'getTimetable', 'getTimetableChanges', 'g
     'deleteSubjects', 'saveSubject', 'saveTimetable', 'saveTimetableUpdates',
     'login', 'logout', 'createAccount', 'deleteAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword', 'sendPasswortResetMail', 'updateValidUntil',
     'sendSupportTicket',
-    'processPurchase'
+    'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate'
     ];
+
+const ALLOWED_FREE_ACTIONS = [
+    
+];
 
 const TABLEPREFIX = '';
 const ROOTURL = 'https://localhost/projects/stundenplaner/index.php';

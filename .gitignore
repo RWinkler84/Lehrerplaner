@@ -1,5 +1,5 @@
 /vendor
 /core/mailconfig.php
-/stripe
+/core/stripeConfig.php
 composer.json
 todo.txt

@@ -716,23 +716,20 @@ export default class SettingsView {
         document.querySelector('#registrationNeededDialog').close();
     }
 
-    static openCheckoutDialog(clickedPurchaseButton) {
+    static openCheckout(clickedPurchaseButton) {
         const dialog = document.querySelector('#checkoutDialog');
-        const iframe = dialog.querySelector('iframe');
-        const baselink = './stripe/shop.html';
+        const baselink = './stripe/checkout.html';
 
         let purchaseItem;
 
         if (clickedPurchaseButton.id == 'oneYearEduplanioPlusButton') purchaseItem = 'oneYear';
         if (clickedPurchaseButton.id == 'oneMonthEduplanioPlusButton') purchaseItem = 'oneMonth';
         
-        iframe.src = `${baselink}?item=${purchaseItem}`;
 
+        window.open(`${baselink}?item=${purchaseItem}`, '_blank').focus();
         dialog.showModal();
     }
-    static closeCheckoutDialog() {
-        document.querySelector('#checkoutDialog').close();
-    }
+    
     //////////////////////////
     // validation functions //
     //////////////////////////

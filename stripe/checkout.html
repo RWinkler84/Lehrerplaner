@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Accept a payment</title>
+    <meta name="description" content="A demo of a payment on Stripe" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../css/index.css" />
+    <script src="https://js.stripe.com/clover/stripe.js"></script>
+    <script src="checkout.js" defer></script>
+</head>
+
+<body style="background-color: var(--bodyBackground); padding: 1rem 2rem;">
+
+
+    <dialog id="checkoutDialog" open>
+        <div class="headline flex spaceBetween">
+            <h3>Kasse <span id="curriclumNoteInfo"></span></h3><button id="closeCheckoutDialogButton"
+                class="closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <!-- Display a payment form -->
+            <form id="payment-form" style="flex-grow: 1;">
+                <div id="payment-element">
+                    <!--Stripe.js injects the Payment Element-->
+                </div>
+                <div class="flex growEqually justifyEnd alignEnd">
+                    <button id="submit" class="marginTop confirmationButton">
+                        <div class="spinner hidden" id="spinner"></div>
+                        <span id="button-text">...</span>
+                    </button>
+                </div>
+                <div id="payment-message" class="hidden"></div>
+                <div id="email-errors"></div>
+            </form>
+        </div>
+    </dialog>
+</body>
+
+</html>

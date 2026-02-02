@@ -299,7 +299,8 @@ class User extends AbstractModel
         return $this->activeUntil;
     }
 
-    public function getUserInfo() {
+    public function getUserInfo()
+    {
         global $user;
         $user = $this->getUserById($user->getId());
 
@@ -374,14 +375,122 @@ class User extends AbstractModel
         }
     }
 
-    public function processPurchase($purchasedItem) {
-        // the user activeUntil date
-            //if it is run out, update add the purchased timespan starting today
-            //if it is active, add the purchased timespan to the expiration date
+    public function storePurchaseAttempt($sessionId, $purchasedItem)
+    {
+        $user = $this->getUserById($this->getId());
 
-        //update it on the database
+        $licencedTimespan = [
+            'oneMonth' => 30,
+            'oneYear' => 365
+        ];
 
-        // if something goes wrong, write an automatic email to the support
+        $query = "INSERT INTO plusTransactions (userId, userEmail, product, oldActiveUntil, newActiveUntil, paymentStatus, fullfillmentStatus, stripeSessionId)
+            VALUES (:userId, :userEmail, :product, :oldActiveUntil, :newActiveUntil, :paymentStatus, :fullfillmentStatus, :stripeSessionId)
+        ";
+        $params = [
+            'userId' => $user->getId(),
+            'userEmail' => $user->getEmail(),
+            'product' => $purchasedItem,
+            'oldActiveUntil' => $user->getActiveUntil(),
+            'newActiveUntil' => (new DateTime($user->getActiveUntil()))->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d'),
+            'paymentStatus' => 0,
+            'fullfillmentStatus' => 0,
+            'stripeSessionId' => $sessionId
+        ];
+
+        $this->write($query, $params);
+    }
+
+    public function processPurchase($stripeSession)
+    {
+        $licencedTimespan = [
+            'oneMonth' => 30,
+            'oneYear' => 365
+        ];
+
+        $user = $this->getUserByEmail($stripeSession['customer_details']['email']);
+        $newActiveUntil = '';
+
+        $isFullfilled = $this->isStripeSessionFullfilled($stripeSession);
+
+        error_log(print_r($stripeSession,true));
+
+        if ($isFullfilled == false) {
+
+            $query = "UPDATE $this->tableName SET activeUntil = :activeUntil WHERE id = :id";
+            $purchasedItem = $stripeSession['metadata']['purchasedItem'];
+
+            if (!is_null($user)) {
+                $today = new DateTime('now');
+                $activeUntil = new DateTime($user->activeUntil);
+
+                // eduplanio plus is expired or about to expire today
+                if ($today->format('Y-m-d') >= $activeUntil->format('Y-m-d')) {
+                    $newActiveUntil = $today->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d');
+                }
+
+                // eduplanio plus expires in the future
+                if ($today->format('Y-m-d') < $activeUntil->format('Y-m-d')) {
+                    $newActiveUntil = $activeUntil->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d');
+                }
+
+                $result = $this->write($query, ['id' => $user->getId(), 'activeUntil' => $newActiveUntil]);
+
+                if ($result['status'] == 'failed') {
+                    $result['message'] = 'Aber keine Sorge. Der Admin wurde benachrichtigt und meldet sich schnellstmöglich per Mail bei dir.';
+
+                    $mailMessage = <<<MAIL
+                        Ein Nutzer hat versucht, seine Eduplanio Plus-Lizenz zu verlängern. Die Transaktion wurde abgeschlossen, das Update in
+                        der Datenbank ist allerdings fehlgeschlagen. Prüfe die Transaktion und setze activeUntil auf den korrekten Wert.
+
+                        User-Id: {$user->getId()}
+                        User-Email: {$user->getEmail()}
+                        Verlängerungszeitraum: {$licencedTimespan[$purchasedItem]}
+                        neues Ablaufdatum: {$newActiveUntil}
+                        Transaktionszeit: {$today->format('d.m.Y H:i:s')}
+                    MAIL;
+
+                    $this->sendMail('winkler.ralf84@hotmail.de', 'Eduplanio - Fehlgeschlagenes Eduplanio Plus-Update', $mailMessage);
+
+                    exit();
+                }
+
+                $this->setPurchaseFullfilled($stripeSession);
+
+                return $result;
+            }
+        }
+    }
+
+    public function removeExpiredCheckoutSessions($stripeSessionId) {
+        $query = "DELETE FROM plusTransactions WHERE stripeSessionId = :stripeSessionId";
+
+        $this->delete($query, ['stripeSessionId' => $stripeSessionId]);
+    }
+
+    private function setPurchaseFullfilled($stripeSession) {
+        $query = "UPDATE plusTransactions SET paymentStatus = :paymentStatus, fullfillmentStatus = :fullfillmentStatus, stripeTransactionId = :stripeTransactionId WHERE stripeSessionId = :stripeSessionId";
+        $params = [
+            'paymentStatus' => true,
+            'fullfillmentStatus' => true,
+            'stripeTransactionId' => $stripeSession['payment_intent'],
+            'stripeSessionId' => $stripeSession->id
+        ];
+
+        $this->write($query, $params);
+    }
+
+    private function isStripeSessionFullfilled($stripeSession): bool
+    {
+        $query = "SELECT * FROM plusTransactions WHERE stripeSessionId = :stripeSessionId";
+
+        $result = $this->read($query, ['stripeSessionId' => $stripeSession->id]);
+
+        if ($result) {
+            if ($result[0]['fullfillmentStatus'] == 1) return true;
+        }
+
+        return false;
     }
 
     private function getUserDataByPasswordResetToken($token): array

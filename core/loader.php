@@ -3,6 +3,7 @@
 require_once 'db.php';
 require_once 'config.php';
 require_once 'mailconfig.php';
+require_once 'stripeConfig.php';
 
 //Controller
 require_once './Controller/AbstractController.php';
@@ -21,3 +22,6 @@ require_once './Model/Settings.php';
 require_once './Model/User.php';
 require_once './Model/LessonNote.php';
 require_once './Model/SchoolYear.php';
+
+//stripe
+require_once './stripe/createCheckoutSession.php';

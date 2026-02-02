@@ -279,29 +279,54 @@ dialog .errorMessageDisplay,
     padding: 1rem 0;
 }
 
+/* stripe html pages*/
 #checkoutDialog {
-    padding: 0;
-    height: 50vh;
-    width: 50vw;
-    
-    &[open] {
-        display:flex;
-        flex-direction: column;
-    }
+    height: 75vh;
+    min-width: 50vw !important;
+    display: flex;
+    flex-direction: column;
 
-    .headline {
-        margin: 0;
-    }
 
     .dialogBody {
+        padding: 1rem 0 1rem 0.5rem;
         display: flex;
         flex-grow: 1;
-    }
-    
-    iframe {
-        border: none;
+        overflow-y: scroll;
+        overflow-x: hidden;
         scrollbar-color: var(--lightgrey) transparent;
+    }
 
+}
+
+#checkoutCompletedDialog {
+    height: 75vh;
+    min-width: 50vw !important;
+    display: flex;
+    flex-direction: column;
+
+    .dialogBody {
+        padding: 1rem 0 1rem 0.5rem;
+    }
+
+    #status-icon {
+        border-radius: 50%;
+        padding: 0.5rem;
+    }
+
+    #status-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--matteRed);
+    }
+
+    .icon {
+        width: 2rem;
+        height: 2rem;
+        background-color: white;
+    }
+
+    td {
+        padding-right: 2rem;
     }
 }
 

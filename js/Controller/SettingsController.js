@@ -155,11 +155,7 @@ export default class SettingsController {
             return;
         }
 
-        View.openCheckoutDialog(clickedPurchaseButton);
-    }
-
-    static closeCheckoutDialog(){
-        View.closeCheckoutDialog();
+        View.openCheckout(clickedPurchaseButton);
     }
 
     static openRegistrationNeededDialog(){

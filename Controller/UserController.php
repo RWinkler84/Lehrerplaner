@@ -140,14 +140,23 @@ class UserController extends AbstractController
         ]);
     }
 
-    public function processPurchase() {
-        global $user;
+    public function processPurchase($stripeSessionId)
+    {
+        $user = new User;
 
-        $purchasedItem = $_GET['product'];
+        require_once './vendor/autoload.php';
+        require_once './core/stripeConfig.php';
 
-        $result = $user->processPurchase($purchasedItem); 
+        $stripe = new \Stripe\StripeClient(STRIPE_SECRET_KEY);
+        $stripeSession = $stripe->checkout->sessions->retrieve($stripeSessionId);
 
-        echo '<h1>Passt</h1>';
+        $result = $user->processPurchase($stripeSession);
+    }
+
+    public function removeExpiredCheckoutSessions($stripeSessionId) {
+        $user = new User;
+
+        $user->removeExpiredCheckoutSessions($stripeSessionId);
     }
 
     private function validatePassword($password)

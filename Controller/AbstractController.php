@@ -6,6 +6,7 @@ use Model\AbstractModel;
 use Controller\LessonController;
 use Controller\SettingsController;
 use Controller\TaskController;
+use Controller\UserController;
 
 class AbstractController
 {
@@ -45,13 +46,15 @@ class AbstractController
         echo json_encode($result);
     }
 
-    public function getAllLessonNotes() {
+    public function getAllLessonNotes()
+    {
         $result = $this->db->getAllLessonNotes();
 
         echo json_encode($result);
     }
 
-    public function getAllSchoolYears() {
+    public function getAllSchoolYears()
+    {
         $result = $this->db->getAllSchoolYears();
 
         echo json_encode($result);
@@ -130,10 +133,75 @@ class AbstractController
         echo json_encode($status);
     }
 
-    public function sendSupportTicket() {
+    public function sendSupportTicket()
+    {
         $ticketData = json_decode(file_get_contents('php://input'), true);
         $result = $this->db->sendSupportTicket($ticketData);
 
         echo json_encode($result);
+    }
+
+    public function createStripeSession()
+    {
+        $checkoutSession = createStripeSession($_GET['item']);
+
+        echo json_encode(array('clientSecret' => $checkoutSession->client_secret));
+    }
+
+    //webhook for Stripe payment status updates
+    public function receivePaymentStatusUpdate()
+    {
+        require_once './vendor/autoload.php';
+
+        \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
+        // Replace this endpoint secret with your endpoint's unique secret
+        // If you are testing with the CLI, find the secret by running 'stripe listen'
+        // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
+        // at https://dashboard.stripe.com/webhooks
+        $endpoint_secret = STRIPE_ENDPOINT_SECRET;
+
+        $payload = file_get_contents('php://input');
+        $event = null;
+
+        try {
+            $event = \Stripe\Event::constructFrom(
+                json_decode($payload, true)
+            );
+        } catch (\UnexpectedValueException $e) {
+            // Invalid payload
+            http_response_code(400);
+            exit();
+        }
+        if ($endpoint_secret) {
+            // Only verify the event if there is an endpoint secret defined
+            // Otherwise use the basic decoded event
+            $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+            try {
+                $event = \Stripe\Webhook::constructEvent(
+                    $payload,
+                    $sig_header,
+                    $endpoint_secret
+                );
+            } catch (\Stripe\Exception\SignatureVerificationException $e) {
+                // Invalid signature
+                http_response_code(400);
+                exit();
+            }
+        }
+
+        $userController = new UserController;
+
+        // Handle the event
+        switch ($event->type) {
+            case 'checkout.session.completed':
+            case 'checkout.session.async_payment_succeeded':
+                $userController->processPurchase($event->data->object->id);
+                break;
+        
+            case 'checkout.session.expired':
+                $userController->removeExpiredCheckoutSessions($event->data->object->id);
+        }
+
+        http_response_code(200);
     }
 }

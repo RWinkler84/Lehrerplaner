@@ -35,7 +35,7 @@ class AbstractModel
         echo json_encode(
             [
                 'status' => 'failed',
-                'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte versuche es später noch einmal.',
+                'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte wende dich an den Eduplanio-Support oder versuche es später noch einmal.',
                 'error' => 'database unreachable'
             ]
         );
@@ -85,7 +85,7 @@ class AbstractModel
         echo json_encode(
             [
                 'status' => 'failed',
-                'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte versuche es später noch einmal.',
+                'message' => 'Scheinbar gibt es gerade ein technisches Problem. Bitte wende dich an den Eduplanio-Support oder versuche es später noch einmal.',
                 'error' => 'database unreachable'
             ]
         );
