@@ -263,7 +263,7 @@ export default class AbstractView {
         }
     }
 
-    static setSyncIndicatorStatus(status) {
+    static setSyncIndicatorStatus(status, errorMessage = null) {
         let syncIndicator = document.querySelector('#syncIndicator');
         let tooltipText = syncIndicator.querySelector('span');
 
@@ -276,7 +276,11 @@ export default class AbstractView {
                 break;
             case 'unsynced':
                 syncIndicator.classList.add('unsynced');
-                tooltipText.textContent = 'Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.'
+                let infoText = 'Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.';
+                
+                if (errorMessage == 'Plus licence expired') infoText = 'Es sieht so aus als wäre deine Plus-Lizenz abgelaufen. Deine Daten werden nur lokal gespeichert. Erneuere die Lizenz, um Datenverlust sicher zu vermeiden.'
+                
+                tooltipText.textContent = infoText;
                 break;
         }
     }

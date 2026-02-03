@@ -20,6 +20,9 @@ class AbstractController
 
     public function getSubjects()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $result = $this->db->getSubjects();
 
         echo json_encode($result);
@@ -27,6 +30,9 @@ class AbstractController
 
     public function getTimetable()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $result = $this->db->getTimetable();
 
         echo json_encode($result);
@@ -34,6 +40,9 @@ class AbstractController
 
     public function getTimetableChanges()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $result = $this->db->getTimetableChanges();
 
         echo json_encode($result);
@@ -41,6 +50,9 @@ class AbstractController
 
     public function getAllTasks()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $result = $this->db->getAllTasks();
 
         echo json_encode($result);
@@ -48,6 +60,9 @@ class AbstractController
 
     public function getAllLessonNotes()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $result = $this->db->getAllLessonNotes();
 
         echo json_encode($result);
@@ -55,6 +70,9 @@ class AbstractController
 
     public function getAllSchoolYears()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $result = $this->db->getAllSchoolYears();
 
         echo json_encode($result);
@@ -62,11 +80,17 @@ class AbstractController
 
     public function setDbUpdateTimestamp($updatedTableName, $dateTime)
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $this->db->setDbUpdateTimestamp($updatedTableName, $dateTime);
     }
 
     public function getDbUpdateTimestamps()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $result = $this->db->getDbUpdateTimestamps();
 
         echo json_encode($result);
@@ -74,6 +98,9 @@ class AbstractController
 
     public function syncDatabase()
     {
+        global $user;
+        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+
         $dataToSync = json_decode(file_get_contents('php://input'), true);
         $subjectsResults = [];
         $timetableResults = [];
@@ -197,11 +224,22 @@ class AbstractController
             case 'checkout.session.async_payment_succeeded':
                 $userController->processPurchase($event->data->object->id);
                 break;
-        
+
             case 'checkout.session.expired':
                 $userController->removeExpiredCheckoutSessions($event->data->object->id);
         }
 
         http_response_code(200);
+    }
+
+    private function returnUserInactiveMessage()
+    {
+        echo json_encode([
+            'status' => 'failed',
+            'error' => 'Plus licence expired',
+            'message' => 'You need an active Eduplanio Plus licence to perform this action.'
+        ]);
+
+        exit;
     }
 }

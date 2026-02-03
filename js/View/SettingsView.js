@@ -717,7 +717,6 @@ export default class SettingsView {
     }
 
     static openCheckout(clickedPurchaseButton) {
-        const dialog = document.querySelector('#checkoutDialog');
         const baselink = './stripe/checkout.html';
 
         let purchaseItem;
@@ -727,9 +726,8 @@ export default class SettingsView {
         
 
         window.open(`${baselink}?item=${purchaseItem}`, '_blank').focus();
-        dialog.showModal();
     }
-    
+
     //////////////////////////
     // validation functions //
     //////////////////////////

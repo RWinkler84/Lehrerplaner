@@ -47,8 +47,8 @@ export default class AbstractController {
     }
 
     /** @param status 'synced', 'unsynced' */
-    static setSyncIndicatorStatus(status) {
-        View.setSyncIndicatorStatus(status);
+    static setSyncIndicatorStatus(status, errorMessage = null) {
+        View.setSyncIndicatorStatus(status, errorMessage);
     }
 
     static setVersion(version) {
@@ -83,15 +83,15 @@ export default class AbstractController {
     }
 
     static async renderTopMenu() {
-        let userInfo = await this.getUserInfo();
+        let userInfo = await this.getUserInfo(true);
 
         View.renderTopMenu(userInfo);
     }
 
-    static async getUserInfo() {
+    static async getUserInfo(onlyLocal) {
         let db = new AbstractModel;
 
-        return await db.getUserInfo();
+        return await db.getUserInfo(onlyLocal);
     }
 
     static openSupportDialog() {

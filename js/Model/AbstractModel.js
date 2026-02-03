@@ -33,7 +33,7 @@ export default class AbstractModel {
             }
         }
         catch (error) {
-            AbstractController.setSyncIndicatorStatus('unsynced');
+            AbstractController.setSyncIndicatorStatus('unsynced', 'no server response');
             return {
                 status: 'failed',
                 error: 'no server response',
@@ -56,7 +56,7 @@ export default class AbstractModel {
             AbstractController.openLoginDialog();
             AbstractController.setSyncIndicatorStatus('unsynced');
         } else if (result.status == 'failed') {
-            AbstractController.setSyncIndicatorStatus('unsynced');
+            AbstractController.setSyncIndicatorStatus('unsynced', result.error);
         } else {
             AbstractController.setSyncIndicatorStatus('synced');
         }
@@ -252,13 +252,17 @@ export default class AbstractModel {
     }
 
     /** returns account type, temporarily offline status and if registered user mail, email confirmation status, active until date and login status */
-    async getUserInfo() {
+    async getUserInfo(onlyLocal = false) {
         let userInfo = await this.readFromLocalDB('settings', 1);
-        let serverData = await this.makeAjaxQuery('abstract', 'getUserInfo');
+
 
         if (!userInfo) {
             userInfo = { accountType: 'not set' };
         }
+        
+        if (onlyLocal) return userInfo;
+
+        let serverData = await this.makeAjaxQuery('abstract', 'getUserInfo');
 
         userInfo.email = serverData.email;
         userInfo.emailConfirmed = serverData.emailConfirmed;

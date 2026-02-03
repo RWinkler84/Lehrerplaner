@@ -9,8 +9,8 @@ const ALLOWEDACTIONS = ['getSubjects', 'getTimetable', 'getTimetableChanges', 'g
     'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate'
     ];
 
-const ALLOWED_FREE_ACTIONS = [
-    
+const ALLOWED_CONTROLLER_FREE_USER = [
+    'user', 'abstract'
 ];
 
 const TABLEPREFIX = '';

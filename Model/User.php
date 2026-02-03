@@ -468,6 +468,14 @@ class User extends AbstractModel
         $this->delete($query, ['stripeSessionId' => $stripeSessionId]);
     }
 
+    public function isActive() {
+        $user = $this->getUserById($this->userId);
+
+        if ($user && $user->activeUntil >= (new DateTime('now'))->format('Y-m-d')) return true;
+
+        return false;
+    }
+
     private function setPurchaseFullfilled($stripeSession) {
         $query = "UPDATE plusTransactions SET paymentStatus = :paymentStatus, fullfillmentStatus = :fullfillmentStatus, stripeTransactionId = :stripeTransactionId WHERE stripeSessionId = :stripeSessionId";
         $params = [

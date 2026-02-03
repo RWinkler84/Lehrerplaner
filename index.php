@@ -32,6 +32,19 @@ if (isset($_GET['c']) && isset($_GET['a'])) {
         die('invalid action');
     }
 
+    //if a user account expires its licence, only user actions and deletions (includes timetable updates) actions are allowed
+    if (isset($user) && $user->isActive() == false) {   
+        if (!in_array($_GET['c'], ALLOWED_CONTROLLER_FREE_USER) && $_GET['a'] != 'delete' && $_GET['a'] != 'saveTimetableUpdates') { 
+            echo json_encode([
+                'status' => 'failed',
+                'error' => 'Plus licence expired',
+                'message' => 'You need an active Eduplanio Plus licence to perform this action.'
+            ]);
+
+            exit;
+        }
+    }
+
     $controllerName = '\Controller\\' . ucfirst($_GET['c']) .  'Controller';
     $action = $_GET['a'];
     $controller = new $controllerName;
