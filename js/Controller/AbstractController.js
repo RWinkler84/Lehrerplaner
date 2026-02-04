@@ -83,15 +83,15 @@ export default class AbstractController {
     }
 
     static async renderTopMenu() {
-        let userInfo = await this.getUserInfo(true);
+        let userInfo = await this.getUserInfo();
 
         View.renderTopMenu(userInfo);
     }
 
-    static async getUserInfo(onlyLocal) {
+    static async getUserInfo() {
         let db = new AbstractModel;
 
-        return await db.getUserInfo(onlyLocal);
+        return await db.getUserInfo();
     }
 
     static openSupportDialog() {

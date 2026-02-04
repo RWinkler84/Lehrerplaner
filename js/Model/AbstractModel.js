@@ -252,15 +252,13 @@ export default class AbstractModel {
     }
 
     /** returns account type, temporarily offline status and if registered user mail, email confirmation status, active until date and login status */
-    async getUserInfo(onlyLocal = false) {
+    async getUserInfo() {
         let userInfo = await this.readFromLocalDB('settings', 1);
 
 
         if (!userInfo) {
             userInfo = { accountType: 'not set' };
         }
-        
-        if (onlyLocal) return userInfo;
 
         let serverData = await this.makeAjaxQuery('abstract', 'getUserInfo');
 
