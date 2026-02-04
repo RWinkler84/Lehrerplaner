@@ -380,15 +380,22 @@ class User extends AbstractModel
             'oneYear' => 365
         ];
 
+        $today = new DateTime('now');
+        $newActiveUntil = '';
+
+        if ($user->activeUntil <= $today->format('Y-m-d')) $newActiveUntil = $today->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d');
+        if ($user->activeUntil > $today->format('Y-m-d')) $newActiveUntil = new DateTime($user->activeUntil)->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d');
+    
         $query = "INSERT INTO plusTransactions (userId, userEmail, product, oldActiveUntil, newActiveUntil, paymentStatus, fullfillmentStatus, stripeSessionId)
             VALUES (:userId, :userEmail, :product, :oldActiveUntil, :newActiveUntil, :paymentStatus, :fullfillmentStatus, :stripeSessionId)
         ";
+
         $params = [
             'userId' => $user->getId(),
             'userEmail' => $user->getEmail(),
             'product' => $purchasedItem,
             'oldActiveUntil' => $user->getActiveUntil(),
-            'newActiveUntil' => (new DateTime($user->getActiveUntil()))->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d'),
+            'newActiveUntil' => $newActiveUntil,
             'paymentStatus' => 0,
             'fullfillmentStatus' => 0,
             'stripeSessionId' => $sessionId
