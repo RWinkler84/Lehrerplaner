@@ -1,7 +1,7 @@
 let params = new URLSearchParams(document.location.search);
 let item = params.get('item');
 
-const stripe = Stripe("pk_test_51SvDUXLpFn8RdIowYge53BQiMwxmZR6uMRpioveD7GepmHOVARNCcqrUHk2ewOwDcvdyZI3SzvPc1H0v72dhcZZb00HrwYy4P1");
+const stripe = Stripe("pk_live_51SvDUILqjrVJ8C9cFOG5oETmEFYb2ii9msjLYceibyEwyqFc1dZWEKkMyj5KcjTvrQl4hL148qoVLEcUB0LvccDM00et9Qq8vz");
 
 let checkout;
 let actions;

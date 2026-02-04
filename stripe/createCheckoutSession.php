@@ -5,8 +5,8 @@ function createStripeSession($purchasedItem)
 {
 
   $priceKeys = [
-    'oneMonth' => 'price_1SvDkKLpFn8RdIowhOQVULIS',
-    'oneYear' => 'price_1SvDnALpFn8RdIowJKqUrDCu'
+    'oneMonth' => 'price_1Sx9UBLqjrVJ8C9cFgRxLKWn',
+    'oneYear' => 'price_1Sx9U7LqjrVJ8C9cXLPFIM4Y'
   ];
 
   $stripe = new \Stripe\StripeClient([

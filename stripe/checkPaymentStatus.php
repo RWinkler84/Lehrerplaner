@@ -13,8 +13,8 @@ try {
 
   $session = $stripe->checkout->sessions->retrieve($jsonObj->session_id, ['expand' => ['payment_intent']]);
 
-  echo json_encode(['status' => $session->status, 'payment_status' => $session->payment_status, 'payment_intent_id' => $session->payment_intent->id, 'payment_intent_status' => $session->payment_intent->status]);
   http_response_code(200);
+  echo json_encode(['status' => $session->status, 'payment_status' => $session->payment_status, 'payment_intent_id' => $session->payment_intent->id, 'payment_intent_status' => $session->payment_intent->status]);
 } catch (Error $e) {
   http_response_code(500);
   echo json_encode(['error' => $e->getMessage()]);
