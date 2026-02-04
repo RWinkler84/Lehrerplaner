@@ -629,8 +629,6 @@ export default class SettingsView {
         document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
         document.querySelector('#openAccountSettingsButton').classList.add('selected');
 
-        console.log(userInfo)
-
         if (userInfo) {
             const notLoggedInMessage = accountSettingsContainer.querySelector('#eduplanioPlusNotLoggedInMessage');
             const eduplanioPlusStatusSpan = document.querySelector('#eduplanioPlusStatusSpan');
@@ -725,6 +723,7 @@ export default class SettingsView {
         if (clickedPurchaseButton.id == 'oneMonthEduplanioPlusButton') purchaseItem = 'oneMonth';
         
         newWindow.location.href = `${baselink}?item=${purchaseItem}`;
+        window.focus();
     }
 
     //////////////////////////

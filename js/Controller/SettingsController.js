@@ -150,6 +150,7 @@ export default class SettingsController {
         const userInfo = await AbstractController.getUserInfo();
 
         if (userInfo.accountType != 'registeredUser') {
+            newWindow.close();
             this.openRegistrationNeededDialog();
             
             return;
