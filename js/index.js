@@ -37,7 +37,7 @@ let abstCtrl = new AbstractController();
 let timeout = false //for resize debouncing
 
 async function startApp() {
-    AbstractController.setVersion('0.9.51');
+    AbstractController.setVersion('0.9.6');
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));

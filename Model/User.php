@@ -57,10 +57,6 @@ class User extends AbstractModel
             ];
         }
 
-        if ((new DateTime())->getTimestamp() > (new DateTime($user->getActiveUntil()))->getTimestamp()) {
-            return ['message' => 'Dein Abonnement ist abgelaufen. Bitte verlängere es, um den Lehrerplaner weiter nutzen zu können.'];
-        }
-
         if (password_verify($loginData['password'], $user->getPassword())) {
             $_SESSION['isLoggedIn'] = true;
             $_SESSION['userId'] = $user->getId();

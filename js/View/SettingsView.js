@@ -716,7 +716,7 @@ export default class SettingsView {
         document.querySelector('#registrationNeededDialog').close();
     }
 
-    static openCheckout(clickedPurchaseButton) {
+    static openCheckout(clickedPurchaseButton, newWindow) {
         const baselink = './stripe/checkout.html';
 
         let purchaseItem;
@@ -724,8 +724,7 @@ export default class SettingsView {
         if (clickedPurchaseButton.id == 'oneYearEduplanioPlusButton') purchaseItem = 'oneYear';
         if (clickedPurchaseButton.id == 'oneMonthEduplanioPlusButton') purchaseItem = 'oneMonth';
         
-
-        window.open(`${baselink}?item=${purchaseItem}`, '_blank').focus();
+        newWindow.location.href = `${baselink}?item=${purchaseItem}`;
     }
 
     //////////////////////////

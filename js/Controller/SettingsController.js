@@ -146,7 +146,7 @@ export default class SettingsController {
         }
     }
 
-    static async attemptEduplanioPlusPurchase(clickedPurchaseButton) {
+    static async attemptEduplanioPlusPurchase(clickedPurchaseButton, newWindow) {
         const userInfo = await AbstractController.getUserInfo();
 
         if (userInfo.accountType != 'registeredUser') {
@@ -155,7 +155,7 @@ export default class SettingsController {
             return;
         }
 
-        View.openCheckout(clickedPurchaseButton);
+        View.openCheckout(clickedPurchaseButton, newWindow);
     }
 
     static openRegistrationNeededDialog(){
@@ -302,7 +302,10 @@ export default class SettingsController {
             //account settings
             case 'oneMonthEduplanioPlusButton':
             case 'oneYearEduplanioPlusButton':
-                SettingsController.attemptEduplanioPlusPurchase(target);
+                //just for Safari open the window instantly and then pass it around
+                const newWindow = window.open('', '_blank');
+
+                SettingsController.attemptEduplanioPlusPurchase(target, newWindow);
                 break;
 
             case 'deleteAccountButton':
