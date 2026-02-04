@@ -159,11 +159,6 @@ export default class AbstractView {
         createAccountButton.style.display = 'none';
         openSupportDialogButton.style.display = 'none';
 
-        //set the syncIndicator to unsynced, if activeUntil is expired
-        console.log(userInfo);
-
-        if (new Date().setHours(12,0,0,0) > new Date(userInfo.activeUntil).setHours(12,0,0,0)) AbstractController.setSyncIndicatorStatus('unsynced');
-
         if ((userInfo.accountType == 'registeredUser' && !userInfo.loggedIn)) {
             loginButton.removeAttribute('style');
             openSupportDialogButton.removeAttribute('style');

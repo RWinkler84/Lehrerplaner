@@ -90,8 +90,12 @@ export default class AbstractController {
 
     static async getUserInfo() {
         let db = new AbstractModel;
+        const userInfo = await db.getUserInfo();
 
-        return await db.getUserInfo();
+        //set the syncIndicator to unsynced, if activeUntil is expired
+        if (new Date().setHours(12,0,0,0) > new Date(userInfo.activeUntil).setHours(12,0,0,0)) AbstractController.setSyncIndicatorStatus('unsynced');
+
+        return userInfo;
     }
 
     static openSupportDialog() {
