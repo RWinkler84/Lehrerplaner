@@ -9,6 +9,36 @@
     <link rel="stylesheet" href="../css/index.css" />
     <script src="https://js.stripe.com/clover/stripe.js"></script>
     <script src="checkout.js" defer></script>
+    <style>
+        .dot {
+            font-weight: normal;
+            animation: loader 1.2s infinite;
+            visibility: hidden;
+        }
+
+        .d2 {
+            animation-delay: 0.2s;
+        }
+
+        .d3 {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loader {
+            0% {
+                visibility: hidden;
+            }
+
+            30% {
+                visibility: visible;
+            }
+
+            60% {
+                visibility: hidden;
+            }
+        }
+    </style>
+
 </head>
 
 <body style="background-color: var(--bodyBackground); padding: 1rem 2rem;">
@@ -25,13 +55,27 @@
                 <div id="payment-element">
                     <!--Stripe.js injects the Payment Element-->
                 </div>
+                <div id="payment-message" class="hidden"></div>
+                <div id="termsContainer" class="flex halfGap marginTop hidden">
+                    <div>
+                        <input type="checkbox" id="terms" required>
+                    </div>
+                    <div>
+                        <label for="terms" style="font-weight: normal;">Hiermit bestätige ich, die <a href="../agb.html"
+                                target="_blank">allgemeinen Geschäftsbedingungen</a> von Eduplanio gelesen zu haben und
+                            diese zu akzeptieren.</label>
+                    </div>
+                </div>
                 <div class="flex growEqually justifyEnd alignEnd">
                     <button id="submit" class="marginTop confirmationButton">
                         <div class="spinner hidden" id="spinner"></div>
-                        <span id="button-text">...</span>
+                        <span id="button-text">
+                            <span class="dot d1">.</span>
+                            <span class="dot d2">.</span>
+                            <span class="dot d3">.</span>
+                        </span>
                     </button>
                 </div>
-                <div id="payment-message" class="hidden"></div>
                 <div id="email-errors"></div>
             </form>
         </div>

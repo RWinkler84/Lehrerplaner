@@ -49,6 +49,8 @@ async function initialize() {
 
     const paymentElement = checkout.createPaymentElement();
     paymentElement.mount("#payment-element");
+
+    document.querySelector('#termsContainer').classList.remove('hidden');
 }
 
 async function handleSubmit(e) {
