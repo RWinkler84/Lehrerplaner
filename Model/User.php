@@ -384,7 +384,7 @@ class User extends AbstractModel
         $newActiveUntil = '';
 
         if ($user->activeUntil <= $today->format('Y-m-d')) $newActiveUntil = $today->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d');
-        if ($user->activeUntil > $today->format('Y-m-d')) $newActiveUntil = new DateTime($user->activeUntil)->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d');
+        if ($user->activeUntil > $today->format('Y-m-d')) $newActiveUntil = (new DateTime($user->activeUntil))->modify("+{$licencedTimespan[$purchasedItem]} days")->format('Y-m-d');
     
         $query = "INSERT INTO plusTransactions (userId, userEmail, product, oldActiveUntil, newActiveUntil, paymentStatus, fullfillmentStatus, stripeSessionId)
             VALUES (:userId, :userEmail, :product, :oldActiveUntil, :newActiveUntil, :paymentStatus, :fullfillmentStatus, :stripeSessionId)

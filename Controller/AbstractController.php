@@ -21,7 +21,7 @@ class AbstractController
     public function getSubjects()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $result = $this->db->getSubjects();
 
@@ -31,7 +31,7 @@ class AbstractController
     public function getTimetable()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $result = $this->db->getTimetable();
 
@@ -41,7 +41,7 @@ class AbstractController
     public function getTimetableChanges()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $result = $this->db->getTimetableChanges();
 
@@ -51,7 +51,7 @@ class AbstractController
     public function getAllTasks()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $result = $this->db->getAllTasks();
 
@@ -61,7 +61,7 @@ class AbstractController
     public function getAllLessonNotes()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $result = $this->db->getAllLessonNotes();
 
@@ -71,7 +71,7 @@ class AbstractController
     public function getAllSchoolYears()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $result = $this->db->getAllSchoolYears();
 
@@ -81,7 +81,7 @@ class AbstractController
     public function setDbUpdateTimestamp($updatedTableName, $dateTime)
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $this->db->setDbUpdateTimestamp($updatedTableName, $dateTime);
     }
@@ -89,7 +89,7 @@ class AbstractController
     public function getDbUpdateTimestamps()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $result = $this->db->getDbUpdateTimestamps();
 
@@ -99,7 +99,7 @@ class AbstractController
     public function syncDatabase()
     {
         global $user;
-        if ($user->isActive() == false) $this->returnUserInactiveMessage();
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $dataToSync = json_decode(file_get_contents('php://input'), true);
         $subjectsResults = [];
@@ -148,13 +148,16 @@ class AbstractController
     public function getUserInfo()
     {
         global $user;
-        $status = $user->getUserInfo();
 
         if (is_null($user)) {
-            echo json_encode(['loggedIn' => 'false']);
+            echo json_encode([
+                'status' => 'failed',
+                'loggedIn' => 'false'
+            ]);
             exit;
         }
 
+        $status = $user->getUserInfo();
         $status['loggedIn'] = 'true';
 
         echo json_encode($status);
@@ -232,8 +235,19 @@ class AbstractController
         http_response_code(200);
     }
 
-    private function returnUserInactiveMessage()
+    private function returnUserInactiveMessage($user)
     {
+        if (is_null($user)) {
+            echo json_encode([
+                'status' => 'failed',
+                'error' => 'User not logged in',
+                'message' => 'You need an active Eduplanio Plus licence to perform this action.'
+            ]);
+
+            exit;
+        }
+
+        if ($user->isActive() == false)
         echo json_encode([
             'status' => 'failed',
             'error' => 'Plus licence expired',

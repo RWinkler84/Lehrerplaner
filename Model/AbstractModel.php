@@ -380,7 +380,7 @@ class AbstractModel
             <p><b>Ticketinhalt: </b>$ticketContent</p>
         ";
 
-        $mailSend = $this->sendMail('winkler.ralf84@hotmail.de', 'Neue Support-Anfrage', $mailContent);
+        $mailSend = $this->sendMail('support@eduplanio.app', 'Neue Support-Anfrage', $mailContent);
 
         if ($mailSend) {
             return [
