@@ -241,7 +241,7 @@ class AbstractController
             echo json_encode([
                 'status' => 'failed',
                 'error' => 'User not logged in',
-                'message' => 'You need an active Eduplanio Plus licence to perform this action.'
+                'message' => 'You need to be logged in to perform this action.'
             ]);
 
             exit;

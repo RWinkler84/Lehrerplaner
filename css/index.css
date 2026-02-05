@@ -5,7 +5,7 @@
     --bodyBackground: #272932;
     --topMenuBackgound: #542344;
     --lightMenuBackground: #81366A;
-    --contentContainerBackground: #F3F5F7;
+    --contentContainerBackground: #f6f6f9;
     --lightText: rgb(164, 164, 164);
     --lighterText: #F3F5F7;
     --matteRed: #F05D5E;
@@ -281,19 +281,25 @@ dialog .errorMessageDisplay,
 
 /* stripe html pages*/
 #checkoutDialog {
-    height: 75vh;
+    position: relative;
     min-width: 50vw !important;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-color: var(--lightgrey) transparent;
 
+    .headline {
+        position: sticky;
+        top: -1rem;
+        z-index: 1;
+
+    }
 
     .dialogBody {
         padding: 1rem 0 1rem 0.5rem;
         display: flex;
         flex-grow: 1;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        scrollbar-color: var(--lightgrey) transparent;
     }
 
 }
@@ -1498,6 +1504,17 @@ h4 {
         top: 0;
         bottom: 0;
     }
+
+    #checkoutDialog,
+    #checkoutCompletedDialog {
+        min-width: 90vw !important;
+    }
+}
+
+@media screen and (max-width: 820px) {
+    #plusSalesCardContainer {
+        flex-direction: column;
+    }
 }
 
 @media screen and (max-width: 620px) {
@@ -1515,7 +1532,9 @@ h4 {
     #settingsSubjectsContainer,
     #settingsTimetableContainer,
     #schoolYearInfoContainer,
-    #curriculumContainer {
+    #curriculumContainer,
+    #eduplanioPlusContainer,
+    #deleteAccountContainer {
         padding: 1.5rem 0.5rem;
     }
 
@@ -1559,6 +1578,16 @@ h4 {
         height: 100vh;
         max-height: 100%;
         margin: 0;
+        padding: 1.5rem 0.5rem;
+
+        .headline {
+            margin: -1.5rem -0.75rem 1.5rem;
+        }
+    }
+
+    #checkoutCompletedDialog {
+        height: 100vh;
+        max-height: 100%;
     }
 
     /* make the task tables wrap */
