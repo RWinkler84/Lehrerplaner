@@ -638,6 +638,9 @@ export default class SettingsView {
             let statusString = 'inaktiv';
             let statusTextClass = 'redText';
 
+            eduplanioPlusStatusSpan.classList.remove('redText');
+            eduplanioPlusStatusSpan.classList.remove('greenText');
+
             if (userInfo.activeUntil) {
                 const expirationDate = new Date(userInfo.activeUntil);
                 const todayTimestamp = new Date().setHours(12, 0, 0, 0);
@@ -665,8 +668,8 @@ export default class SettingsView {
         curriculumEditor.style.display = 'none';
 
     }
-    
-    static isAccountSettingsOpen() { 
+
+    static isAccountSettingsOpen() {
         let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
 
         if (accountSettingsContainer.style.display == 'block') return true;
