@@ -305,6 +305,7 @@ export default class LessonView {
         event.preventDefault();
 
         let timeslotElement = event.target.closest('.timeslot');
+        timeslotElement.querySelector('.saveNewLessonButton').disabled = true;
 
         let lessonData = {
             'date': timeslotElement.closest('.weekday').dataset.date,

@@ -81,7 +81,7 @@ export default class SettingsController {
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
         await LessonController.setLessonsInHolidaysCanceled();
-        
+
         LessonController.renderLesson();
 
 
@@ -152,18 +152,18 @@ export default class SettingsController {
         if (userInfo.accountType != 'registeredUser') {
             newWindow.close();
             this.openRegistrationNeededDialog();
-            
+
             return;
         }
 
         View.openCheckout(clickedPurchaseButton, newWindow);
     }
 
-    static openRegistrationNeededDialog(){
+    static openRegistrationNeededDialog() {
         View.openRegistrationNeededDialog();
     }
 
-    static closeRegistrationNeededDialog(){
+    static closeRegistrationNeededDialog() {
         View.closeRegistrationNeededDialog();
     }
 
@@ -228,6 +228,15 @@ export default class SettingsController {
         View.openAccountSettings();
     }
 
+    static openTimetableSettings() {
+        View.openTimetableSettings();
+    }
+
+    static openSchoolYearSettings() {
+        View.openSchoolYearSettings();
+    }
+
+
     /** If a user purchases is plus licence and returns to the site, the already open account settings window 
         should be rerendered so that the new expiration date is visible without manual reloading. Only executes, if the account window is open. */
     static rerenderAccountSettingsAfterPlusPurchase() {
@@ -246,21 +255,6 @@ export default class SettingsController {
             case 'openSettingsMenuButton':
                 View.toggleSettingsMenu(event);
                 break;
-
-            case 'openTimetableSettingsButton':
-                View.openTimetableSettings();
-                break;
-            
-            case 'openSchoolYearSettingsButton':
-                const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
-                //only render, if nothing has been rendered yet, else keep the state, but resize the spanContentContainers in case of a screen resize
-                if (displayedSchoolYearId == "") {
-                    await SchoolYearController.renderSchoolYearInfoSection();
-                    CurriculumController.resizeSpanContentContainers();
-                    }
-                
-                View.openSchoolYearSettings();
-                break
 
             case 'openAccountSettingsButton':
                 SettingsController.openAccountSettings();

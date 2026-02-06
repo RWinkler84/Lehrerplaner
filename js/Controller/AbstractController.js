@@ -75,7 +75,7 @@ export default class AbstractController {
                 await LessonController.renderCurriculaSelection();
                 await LessonController.renderSelectedCurricula();
                 await CurriculumController.renderSchoolYearCurriculumEditor();
-                }
+            }
         }
 
         TaskController.renderTaskChanges();
@@ -93,7 +93,7 @@ export default class AbstractController {
         const userInfo = await db.getUserInfo();
 
         //set the syncIndicator to unsynced, if activeUntil is expired
-        if (new Date().setHours(12,0,0,0) > new Date(userInfo.activeUntil).setHours(12,0,0,0)) AbstractController.setSyncIndicatorStatus('unsynced');
+        if (new Date().setHours(12, 0, 0, 0) > new Date(userInfo.activeUntil).setHours(12, 0, 0, 0)) AbstractController.setSyncIndicatorStatus('unsynced');
 
         return userInfo;
     }
@@ -139,10 +139,30 @@ export default class AbstractController {
         }
     }
 
-    static topMenuClickEventHandler(event) {
-        let target = event.target.id;
+    static async topMenuClickEventHandler(event) {
+        let target = event.target;
 
-        switch (target) {
+        switch (target.id) {
+            case 'openWeekViewButton':
+                View.openWeekView();
+                break;
+
+
+            case 'openTimetableViewButton':
+                View.openTimetableSettings();
+                break;
+
+            case 'openSchoolYearViewButton':
+                const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+                //only render, if nothing has been rendered yet, else keep the state, but resize the spanContentContainers in case of a screen resize
+                if (displayedSchoolYearId == "") {
+                    await SchoolYearController.renderSchoolYearInfoSection();
+                    CurriculumController.resizeSpanContentContainers();
+                }
+
+                View.openSchoolYearSettings();
+                break
+
             case 'logoutButton':
                 SettingsController.logout();
                 break;
@@ -155,7 +175,7 @@ export default class AbstractController {
                 SettingsController.openSettings();
                 break;
 
-            case 'openMenuButton':
+            case 'openBurgerMenuButton':
                 View.toggleTopMenu(event);
                 break;
 

@@ -98,6 +98,10 @@ nav {
     left: 0;
 }
 
+.buttonText {
+    pointer-events: none;
+}
+
 #topMenuContainer,
 #settingsTitleBar {
     position: relative;
@@ -872,12 +876,18 @@ button:disabled:hover {
     background-color: var(--matteRed);
 }
 
-.menuButton {
+.burgerMenuButton {
     font-size: 1rem;
     padding: 0.5rem 2rem;
     color: var(--lighterText);
     border: none;
     background-color: transparent;
+}
+
+#responsiveOpenWeekViewButton,
+#responsiveOpenTimetableViewButton,
+#responsiveOpenSchoolYearViewButton {
+    display: none;
 }
 
 #createSubjectButton,
@@ -934,9 +944,10 @@ button:disabled:hover {
 .deleteItemButton,
 .closeDialogButton,
 .deleteLessonButton,
-.settingsMenuButton,
+.topMenuButton,
+.responsiveTopMenuButton,
 #closeSettingsButton,
-#openMenuButton,
+#openBurgerMenuButton,
 #openSettingsMenuButton {
     color: var(--lightgrey);
     border: none;
@@ -953,11 +964,13 @@ button:disabled:hover {
 #closeSettingsButton:hover,
 #timetableSettingsButton:hover,
 #accountSettingsButton:hover,
-#openMenuButton:hover,
+#openBurgerMenuButton:hover,
 #openSettingsMenuButton:hover,
-#openTimetableSettingsButton:hover,
+#openTimetableViewButton:hover,
+.topMenuButton:hover,
+.responsiveTopMenuButton:hover,
 .settingsMenuButton:hover,
-.menuButton:hover {
+.burgerMenuButton:hover {
     background-color: rgba(256, 256, 256, 0.1);
 }
 
@@ -965,7 +978,7 @@ button:disabled:hover {
     background-color: var(--matteRed);
 }
 
-#openMenuButton,
+#openBurgerMenuButton,
 #openSettingsMenuButton,
 #closeSettingsButton {
     width: 2rem;
@@ -973,13 +986,20 @@ button:disabled:hover {
     font-size: 1.5rem;
 }
 
+.topMenuButton,
 .settingsMenuButton {
+    height: 2rem;
     font-size: 1rem;
     padding: 0 1rem;
 }
 
+.topMenuButton.selected,
 .settingsMenuButton.selected {
     background-color: rgba(256, 256, 256, 0.1);
+}
+
+.topMenuButton .icon {
+    display: none;
 }
 
 .lessonOption.lessonPastMessage.responsive {
@@ -1172,6 +1192,10 @@ h4 {
 
 .spaceBetween {
     justify-content: space-between;
+}
+
+.spaceEvenly {
+    justify-content: space-evenly;
 }
 
 .justifyStart {
@@ -1498,6 +1522,10 @@ h4 {
 
 
 @media screen and (max-width: 850px) {
+    #pageHeader {
+        display: none;
+    }
+
     #settingsContainer {
         left: 0;
         right: 0;
@@ -1516,6 +1544,8 @@ h4 {
         flex-direction: column;
     }
 }
+
+@media screen and (max-width: 770px) {}
 
 @media screen and (max-width: 620px) {
     body {
@@ -1538,8 +1568,22 @@ h4 {
         padding: 1.5rem 0.5rem;
     }
 
-    h1 {
-        font-size: 1.5rem;
+    /* transform top menu to icons */
+    .topMenuButton .buttonText {
+        display: none;
+    }
+
+    .topMenuButton .icon {
+        display: block;
+    }
+
+    #topMenuButtonContainer {
+        flex-grow: 1;
+
+        #viewsMenuContainer {
+            flex-grow: 1;
+            justify-content: space-evenly;
+        }
     }
 
     #calendarWeekContainer {
@@ -1688,7 +1732,7 @@ h4 {
         padding: 0.5rem 2rem;
         color: var(--lighterText);
         border: none;
-        background-color: transparent;
+        background-color: var(--topMenuBackgound);
     }
 
     #closeSettingsButton {
@@ -1776,4 +1820,22 @@ h4 {
     border-left: solid 0.25rem transparent;
     border-right: solid 0.25rem transparent;
     border-bottom: solid 0.25rem transparent;
+}
+
+.weekViewIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 640 640' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='552' id='svg_1' rx='52' ry='52' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1 0 0 1 -1 10)' width='552' x='44.5' y='36'/%3E%3Cpath d='m99.5,110.11c0,-5.49 5.48,-10.11 12,-10.11l416,0c6.52,0 12,4.62 12,10.11l0,175.23c0,5.49 -5.48,10.11 -12,10.11l-416,0c-6.52,0 -12,-4.62 -12,-10.11l0,-175.23z' fill='%23000000' fill-opacity='0' id='svg_3' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40'/%3E%3Cline fill='none' fill-opacity='0' id='svg_5' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(1 0 0 0.778806 0 24.1541)' x1='182.83' x2='182.83' y1='109.2' y2='331.66'/%3E%3Cline fill='none' fill-opacity='0' id='svg_6' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(1 0 0 0.827296 -72 -68.854)' x1='428.87' x2='428.87' y1='209.47' y2='426.53'/%3E%3Cline fill='none' fill-opacity='0' id='svg_9' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(1 0 0 1 0.558659 7.82123)' x1='105.53' x2='530.06' y1='157.47' y2='157.47'/%3E%3Cline fill='none' fill-opacity='0' id='svg_16' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(0.724074 0 0 1 25.0693 22.4178)' x1='101.57' x2='452.07' y1='495.31' y2='495.31'/%3E%3Cline fill='none' fill-opacity='0' id='svg_15' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' x1='466.08' x2='467.58' y1='516.99' y2='516.99'/%3E%3Cline fill='none' fill-opacity='0' id='svg_14' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 14.3709 27.8169)' x1='507.66' x2='509.15' y1='489.19' y2='489.19'/%3E%3Cline fill='none' fill-opacity='0' id='svg_19' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1.01774 0 0 1 2.02299 0)' x1='99.4' x2='385.49' y1='375.94' y2='375.94'/%3E%3Cline fill='none' fill-opacity='0' id='svg_18' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' x1='466.05' x2='467.54' y1='375.21' y2='375.21'/%3E%3Cline fill='none' fill-opacity='0' id='svg_17' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 20.9687 -19.8188)' x1='501.02' x2='502.52' y1='395.05' y2='395.05'/%3E%3Cline fill='none' fill-opacity='0' id='svg_39' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(0.695203 0 0 1 23.4711 4.70588)' x1='103.18' x2='394.36' y1='443' y2='443'/%3E%3Cline fill='none' fill-opacity='0' id='svg_40' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 0 4.70588)' x1='466.05' x2='467.54' y1='442.27' y2='442.27'/%3E%3Cline fill='none' fill-opacity='0' id='svg_41' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 0 4.70588)' x1='521.99' x2='523.49' y1='442.29' y2='442.29'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 640 640' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='552' id='svg_1' rx='52' ry='52' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1 0 0 1 -1 10)' width='552' x='44.5' y='36'/%3E%3Cpath d='m99.5,110.11c0,-5.49 5.48,-10.11 12,-10.11l416,0c6.52,0 12,4.62 12,10.11l0,175.23c0,5.49 -5.48,10.11 -12,10.11l-416,0c-6.52,0 -12,-4.62 -12,-10.11l0,-175.23z' fill='%23000000' fill-opacity='0' id='svg_3' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40'/%3E%3Cline fill='none' fill-opacity='0' id='svg_5' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(1 0 0 0.778806 0 24.1541)' x1='182.83' x2='182.83' y1='109.2' y2='331.66'/%3E%3Cline fill='none' fill-opacity='0' id='svg_6' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(1 0 0 0.827296 -72 -68.854)' x1='428.87' x2='428.87' y1='209.47' y2='426.53'/%3E%3Cline fill='none' fill-opacity='0' id='svg_9' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(1 0 0 1 0.558659 7.82123)' x1='105.53' x2='530.06' y1='157.47' y2='157.47'/%3E%3Cline fill='none' fill-opacity='0' id='svg_16' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(0.724074 0 0 1 25.0693 22.4178)' x1='101.57' x2='452.07' y1='495.31' y2='495.31'/%3E%3Cline fill='none' fill-opacity='0' id='svg_15' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' x1='466.08' x2='467.58' y1='516.99' y2='516.99'/%3E%3Cline fill='none' fill-opacity='0' id='svg_14' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 14.3709 27.8169)' x1='507.66' x2='509.15' y1='489.19' y2='489.19'/%3E%3Cline fill='none' fill-opacity='0' id='svg_19' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1.01774 0 0 1 2.02299 0)' x1='99.4' x2='385.49' y1='375.94' y2='375.94'/%3E%3Cline fill='none' fill-opacity='0' id='svg_18' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' x1='466.05' x2='467.54' y1='375.21' y2='375.21'/%3E%3Cline fill='none' fill-opacity='0' id='svg_17' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 20.9687 -19.8188)' x1='501.02' x2='502.52' y1='395.05' y2='395.05'/%3E%3Cline fill='none' fill-opacity='0' id='svg_39' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(0.695203 0 0 1 23.4711 4.70588)' x1='103.18' x2='394.36' y1='443' y2='443'/%3E%3Cline fill='none' fill-opacity='0' id='svg_40' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 0 4.70588)' x1='466.05' x2='467.54' y1='442.27' y2='442.27'/%3E%3Cline fill='none' fill-opacity='0' id='svg_41' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='50' transform='matrix(1 0 0 1 0 4.70588)' x1='521.99' x2='523.49' y1='442.29' y2='442.29'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+}
+
+.timetableViewIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 640 640' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='552' id='svg_1' rx='52' ry='52' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1 0 0 1 -1 10)' width='552' x='45' y='34'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1.28299 0 0 1 -81.9126 -5)' x1='114' x2='510.92' y1='139.65' y2='139.65'/%3E%3Cline fill='none' fill-opacity='0' id='svg_15' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' x1='318.78' x2='318.78' y1='66.23' y2='574.12'/%3E%3Cline fill='none' fill-opacity='0' id='svg_20' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' x1='108.68' x2='244.68' y1='199' y2='199'/%3E%3Cline fill='none' fill-opacity='0' id='svg_21' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(0.987961 0 0 1 3.8013 0)' x1='105.96' x2='244.05' y1='271' y2='271'/%3E%3Cline fill='none' fill-opacity='0' id='svg_22' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(0.923982 0 0 1 17.8877 0)' x1='96.84' x2='245.87' y1='478.67' y2='478.67'/%3E%3Cline fill='none' fill-opacity='0' id='svg_25' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(1 0 0 1 127 144)' x1='262.34' x2='398.34' y1='201.15' y2='201.15'/%3E%3Cline fill='none' fill-opacity='0' id='svg_24' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(1 0 0 1 127 144)' x1='261.34' x2='399.43' y1='272.18' y2='272.18'/%3E%3Cline fill='none' fill-opacity='0' id='svg_23' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(0.93344 0 0 1 145.952 144)' x1='259.63' x2='408.66' y1='125.93' y2='125.93'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 640 640' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='552' id='svg_1' rx='52' ry='52' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1 0 0 1 -1 10)' width='552' x='45' y='34'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1.28299 0 0 1 -81.9126 -5)' x1='114' x2='510.92' y1='139.65' y2='139.65'/%3E%3Cline fill='none' fill-opacity='0' id='svg_15' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' x1='318.78' x2='318.78' y1='66.23' y2='574.12'/%3E%3Cline fill='none' fill-opacity='0' id='svg_20' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' x1='108.68' x2='244.68' y1='199' y2='199'/%3E%3Cline fill='none' fill-opacity='0' id='svg_21' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(0.987961 0 0 1 3.8013 0)' x1='105.96' x2='244.05' y1='271' y2='271'/%3E%3Cline fill='none' fill-opacity='0' id='svg_22' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(0.923982 0 0 1 17.8877 0)' x1='96.84' x2='245.87' y1='478.67' y2='478.67'/%3E%3Cline fill='none' fill-opacity='0' id='svg_25' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(1 0 0 1 127 144)' x1='262.34' x2='398.34' y1='201.15' y2='201.15'/%3E%3Cline fill='none' fill-opacity='0' id='svg_24' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(1 0 0 1 127 144)' x1='261.34' x2='399.43' y1='272.18' y2='272.18'/%3E%3Cline fill='none' fill-opacity='0' id='svg_23' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(0.93344 0 0 1 145.952 144)' x1='259.63' x2='408.66' y1='125.93' y2='125.93'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+}
+
+.schoolYearViewIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 640 640' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='552' id='svg_1' rx='52' ry='52' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1 0 0 0.895989 -1 73.1958)' width='552' x='45' y='34'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1.28299 0 0 1 -81.9126 87.0635)' x1='114' x2='510.92' y1='139.65' y2='139.65'/%3E%3Cline fill='none' fill-opacity='0' id='svg_86' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' x1='156.29' x2='156.29' y1='88.76' y2='42.64'/%3E%3Cline fill='none' fill-opacity='0' id='svg_87' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(1 0 0 1 -1.47601 -0.738007)' x1='490.24' x2='490.24' y1='89.59' y2='43.47'/%3E%3Crect fill='%23000000' height='83.53' id='svg_141' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='107.63' y='299.95'/%3E%3Crect fill='%23000000' height='83.53' id='svg_149' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='107.63' y='449.07'/%3E%3Crect fill='%23000000' height='83.53' id='svg_150' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='283.44' y='299.95'/%3E%3Crect fill='%23000000' fill-opacity='0' height='83.53' id='svg_151' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='283.44' y='449.07'/%3E%3Crect fill='%23000000' height='83.53' id='svg_152' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='461.16' y='299.95'/%3E%3Crect fill='%23000000' fill-opacity='0' height='83.53' id='svg_153' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='461.16' y='449.07'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 640 640' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='552' id='svg_1' rx='52' ry='52' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1 0 0 0.895989 -1 73.1958)' width='552' x='45' y='34'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='40' transform='matrix(1.28299 0 0 1 -81.9126 87.0635)' x1='114' x2='510.92' y1='139.65' y2='139.65'/%3E%3Cline fill='none' fill-opacity='0' id='svg_86' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' x1='156.29' x2='156.29' y1='88.76' y2='42.64'/%3E%3Cline fill='none' fill-opacity='0' id='svg_87' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='60' transform='matrix(1 0 0 1 -1.47601 -0.738007)' x1='490.24' x2='490.24' y1='89.59' y2='43.47'/%3E%3Crect fill='%23000000' height='83.53' id='svg_141' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='107.63' y='299.95'/%3E%3Crect fill='%23000000' height='83.53' id='svg_149' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='107.63' y='449.07'/%3E%3Crect fill='%23000000' height='83.53' id='svg_150' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='283.44' y='299.95'/%3E%3Crect fill='%23000000' fill-opacity='0' height='83.53' id='svg_151' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='283.44' y='449.07'/%3E%3Crect fill='%23000000' height='83.53' id='svg_152' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='461.16' y='299.95'/%3E%3Crect fill='%23000000' fill-opacity='0' height='83.53' id='svg_153' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='30' transform='matrix(0.918064 0 0 1 8.81888 0)' width='107.06' x='461.16' y='449.07'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
 }

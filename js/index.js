@@ -52,6 +52,7 @@ async function startApp() {
     document.addEventListener('click', (event) => {
         LoginController.dialogEventHandler(event);
         LessonController.timetableClickHandler(event);
+        SettingsController.settingsClickEventHandler(event);
     });
 
     // handlers for empty timeslots
@@ -88,7 +89,7 @@ async function startApp() {
     document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
 
     //school year info and curriculum
-    document.querySelector('#curriculumViewContainer').addEventListener('change', (event) => {
+    document.querySelector('#schoolYearViewContainer').addEventListener('change', (event) => {
         SchoolYearController.changeEventHandler(event);
         CurriculumController.changeEventHandler(event);
     });
@@ -115,7 +116,7 @@ async function startApp() {
     //rerender on resize
     window.addEventListener('resize', () => {
         const curriculumSectionMainViewContainer = document.querySelector('#weekCurriculaDisplay');
-        const curriculumSettingsView = document.querySelector('#curriculumViewContainer');
+        const curriculumSettingsView = document.querySelector('#schoolYearViewContainer');
 
         if (!curriculumSectionMainViewContainer.classList.contains('notDisplayed')) {
             clearTimeout(timeout)

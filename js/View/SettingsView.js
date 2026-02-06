@@ -598,35 +598,9 @@ export default class SettingsView {
     // account settings functions //
     ////////////////////////////////
 
-    static openTimetableSettings() {
-        document.querySelector('#openAccountSettingsButton').classList.remove('selected');
-        document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
-        document.querySelector('#openTimetableSettingsButton').classList.add('selected');
-
-        document.querySelector('#curriculumViewContainer').style.display = 'none';
-        document.querySelector('#accountSettingsContainer').style.display = 'none';
-        document.querySelector('#timetableSettingsContainer').style.display = 'block';
-    }
-
-    static openSchoolYearSettings() {
-        document.querySelector('#openAccountSettingsButton').classList.remove('selected');
-        document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
-        document.querySelector('#openSchoolYearSettingsButton').classList.add('selected');
-
-        document.querySelector('#accountSettingsContainer').style.display = 'none';
-        document.querySelector('#timetableSettingsContainer').style.display = 'none';
-        document.querySelector('#curriculumViewContainer').style.display = 'block';
-    }
-
     static openAccountSettings(userInfo = null) {
         let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
-        let timetableSettingsContainer = document.querySelector('#timetableSettingsContainer');
-        let curriculumEditor = document.querySelector('#curriculumViewContainer');
 
-        let containerHeight = timetableSettingsContainer.clientHeight;
-
-        document.querySelector('#openTimetableSettingsButton').classList.remove('selected');
-        document.querySelector('#openSchoolYearSettingsButton').classList.remove('selected');
         document.querySelector('#openAccountSettingsButton').classList.add('selected');
 
         if (userInfo) {
@@ -658,15 +632,10 @@ export default class SettingsView {
         }
 
         //make account settings visible
-        accountSettingsContainer.style.height = containerHeight + 'px';
         accountSettingsContainer.style.display = 'block';
-
-        timetableSettingsContainer.style.display = 'none';
-        curriculumEditor.style.display = 'none';
-
     }
-    
-    static isAccountSettingsOpen() { 
+
+    static isAccountSettingsOpen() {
         let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
 
         if (accountSettingsContainer.style.display == 'block') return true;
