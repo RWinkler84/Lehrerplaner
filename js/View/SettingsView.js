@@ -112,7 +112,7 @@ export default class SettingsView {
         Controller.deleteSubject(subjectId);
     }
 
-    static saveSubject() {
+    static async saveSubject() {
 
         let colorCssClass = document.querySelector('.colorSelectionBox.selected')
             ? document.querySelector('.colorSelectionBox.selected').dataset.colorclass
@@ -123,7 +123,9 @@ export default class SettingsView {
             'colorCssClass': colorCssClass
         };
 
-        if (Controller.saveSubject(subject)) {
+        let saved = await Controller.saveSubject(subject);
+
+        if (saved == true) {
             document.querySelector('#subjectName').value = '';
         }
 
