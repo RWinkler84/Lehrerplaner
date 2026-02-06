@@ -228,6 +228,14 @@ export default class SettingsController {
         View.openAccountSettings();
     }
 
+    /** If a user purchases is plus licence and returns to the site, the already open account settings window 
+        should be rerendered so that the new expiration date is visible without manual reloading. Only executes, if the account window is open. */
+    static rerenderAccountSettingsAfterPlusPurchase() {
+        if (View.isAccountSettingsOpen()) {
+            this.openAccountSettings();
+        };
+    }
+
     static async settingsClickEventHandler(event) {
         let target = event.target;
 

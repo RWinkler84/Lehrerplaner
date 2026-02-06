@@ -665,6 +665,14 @@ export default class SettingsView {
         curriculumEditor.style.display = 'none';
 
     }
+    
+    static isAccountSettingsOpen() { 
+        let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
+
+        if (accountSettingsContainer.style.display == 'block') return true;
+
+        return false;
+    }
 
     static toogleAccountDeletionMenu(event) {
         let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
@@ -721,7 +729,7 @@ export default class SettingsView {
 
         if (clickedPurchaseButton.id == 'oneYearEduplanioPlusButton') purchaseItem = 'oneYear';
         if (clickedPurchaseButton.id == 'oneMonthEduplanioPlusButton') purchaseItem = 'oneMonth';
-        
+
         newWindow.location.href = `${baselink}?item=${purchaseItem}`;
         window.focus();
     }

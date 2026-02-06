@@ -37,11 +37,14 @@ let abstCtrl = new AbstractController();
 let timeout = false //for resize debouncing
 
 async function startApp() {
-    AbstractController.setVersion('0.9.6');
+    AbstractController.setVersion('0.9.61');
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));
-    window.addEventListener('focus', abstCtrl.syncData.bind(abstCtrl));
+    window.addEventListener('focus', () => {
+        abstCtrl.syncData();
+        SettingsController.rerenderAccountSettingsAfterPlusPurchase();
+    });
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 15);
@@ -131,7 +134,7 @@ async function startApp() {
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
-    
+
     await LessonController.renderCurriculaSelection();
     await LessonController.renderSelectedCurricula();
     await LessonView.renderLesson();
