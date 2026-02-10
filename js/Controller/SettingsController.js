@@ -1,4 +1,3 @@
-import { ONEDAY } from "../index.js";
 import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import AbstractController from "./AbstractController.js";
@@ -86,8 +85,6 @@ export default class SettingsController {
     static async settingsClickEventHandler(event) {
         let target = event.target;
 
-        if (event.target.closest('#schoolYearInfoContainer')) SchoolYearController.clickEventHandler(event);
-
         switch (target.id) {
             //top menu
             case 'openSettingsMenuButton':
@@ -125,13 +122,6 @@ export default class SettingsController {
 
             case 'cancelFailedAccountDeletionButton':
                 View.toogleAccountDeletionMenu(event);
-                break;
-        }
-
-        //identify items by class
-        switch (true) {
-            case event.target.classList.contains('deleteItemButton'):
-                View.deleteSubject(event);
                 break;
         }
     }

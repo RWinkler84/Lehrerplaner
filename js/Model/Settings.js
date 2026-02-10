@@ -173,7 +173,7 @@ export default class Settings extends AbstractModel {
         if (result.status == 'failed') {
             standardTimetable.forEach(entry => {
                 if (entry.validFrom != previousTimetableValidFromDate) return;
-                this.writeToLocalDB('unsyncedTimetables', entry.serialize());
+                this.updateOnLocalDB('unsyncedTimetables', entry.serialize());
             })
         }
 

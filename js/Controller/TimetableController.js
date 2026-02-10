@@ -1,8 +1,11 @@
+import { ONEDAY } from "../index.js";
+
 import View from '../View/TimetableView.js';
 import LessonController from './LessonController.js';
 import LessonNoteController from './LessonNoteController.js';
 import TaskController from './TaskController.js';
 import Settings from '../Model/Settings.js';
+
 
 /** The timetable has no own model. It is managed by the settings model for historic reasons */
 export default class TimetableController {
