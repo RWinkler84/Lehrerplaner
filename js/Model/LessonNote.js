@@ -148,7 +148,7 @@ export default class LessonNote extends AbstractModel {
         const allAffectedNotes = [];
 
         allLessonNotes.forEach(note => {
-            if (new Date(note.date).setHours(12) < new Date().setHours(12)) return;
+            if (new Date(note.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
             if (note.fixedDate) return;
             
             allAffectedNotes.push(note);
