@@ -94,6 +94,8 @@ export default class LessonController {
         if (schoolYears.length == 0) return;
 
         await Lesson.setLessonsInHolidaysCanceled(schoolYears);
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
 
         await this.renderLesson();
     }
@@ -106,6 +108,8 @@ export default class LessonController {
         await lesson.uncancel();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
+
         this.renderLesson();
     }
     /** @param isNewTimetable bool, indicates, if the affected lessons fall into the validity timespan of a new or a an updated timetable, triggering different filter methods */
