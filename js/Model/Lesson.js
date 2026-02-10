@@ -95,9 +95,7 @@ export default class Lesson extends AbstractModel {
         let db = new AbstractModel;
         let dbData = await db.readAllFromLocalDB('timetableChanges');
         let changes = [];
-
-        console.log(JSON.stringify(dbData));
-
+        
         dbData.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
             lesson.id = entry.id;
