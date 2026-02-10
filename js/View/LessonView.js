@@ -2,6 +2,7 @@ import Controller from "../Controller/LessonController.js";
 import AbstractView from "./AbstractView.js";
 import Fn from '../inc/utils.js'
 import Editor from "../inc/editor.js";
+import LessonController from "../Controller/LessonController.js";
 
 export default class LessonView {
 
@@ -255,7 +256,7 @@ export default class LessonView {
 
         //form button event handlers
 
-        timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonView.saveNewLesson);
+        timeslotElement.querySelector('#lessonForm').addEventListener('submit', LessonController.saveNewLesson);
 
         timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => LessonView.removeLessonForm(event));
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
@@ -305,8 +306,6 @@ export default class LessonView {
     }
 
     static saveNewLesson(event) {
-        event.preventDefault();
-
         let timeslotElement = event.target.closest('.timeslot');
 
         let lessonData = {
@@ -319,7 +318,17 @@ export default class LessonView {
             'canceled': 'false'
         }
 
-        Controller.saveNewLesson(lessonData);
+        return lessonData;
+    }
+
+    static toggleSaveLessonButton(event) {
+        const submitButton = event.target.querySelector('.saveNewLessonButton')
+
+        if (submitButton.disabled == true) {
+            submitButton.disabled = false;
+        } else {
+            submitButton.disabled = true;
+        }
     }
 
     /** The lesson update function doesn't really update the lesson, but stores a new on end sets the old one canceled.
@@ -619,14 +628,14 @@ export default class LessonView {
             const spanName = blankDiv.cloneNode();
             spanItemContent.classList.add('spanItemContent');
             spanName.classList.add('spanName');
-            
+
             spanName.textContent = span.name;
 
             // span note
             let noteIcon = blankDiv.cloneNode();
-                noteIcon.classList.add('curriculaSpanNoteIcon');
-                noteIcon.classList.add('noteIcon');
-            
+            noteIcon.classList.add('curriculaSpanNoteIcon');
+            noteIcon.classList.add('noteIcon');
+
             if (span.note == '<p><br></p>') {
                 noteIcon.style.backgroundColor = 'var(--lightgrey)';
             }

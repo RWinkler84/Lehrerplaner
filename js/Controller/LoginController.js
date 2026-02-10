@@ -1,6 +1,7 @@
 import AbstractController from "./AbstractController.js";
 import View from "../View/LoginView.js";
 import Model from "../Model/Login.js";
+import SettingsController from "./SettingsController.js";
 
 export default class LoginController extends AbstractController{
 
@@ -275,6 +276,15 @@ export default class LoginController extends AbstractController{
                 AbstractController.sendSupportTicket(event);
                 break;
 
+            //eduplanio plus shopping
+            case 'startRegistrationButton':
+                SettingsController.closeRegistrationNeededDialog();
+                LoginController.openCreateAccountDialog();
+                break;
+            case 'closeCheckoutDialogButton':
+                SettingsController.closeCheckoutDialog();
+                break;
+
             //links
             case 'continueAsGuest':
                 LoginController.createGuestAccount();
@@ -301,6 +311,10 @@ export default class LoginController extends AbstractController{
 
             case elementClassList.contains('closeSupportDialogButton'):
                 AbstractController.closeSupportDialog();
+                break;
+            
+            case elementClassList.contains('closeRegistrationNeededDialogButton'):
+                SettingsController.closeRegistrationNeededDialog();
                 break;
         }
 

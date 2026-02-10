@@ -326,15 +326,16 @@ export default class Lesson extends AbstractModel {
             lesson.lastEdited = model.formatDateTime(new Date());
             lesson.created = lesson.lastEdited;
 
-            serializedArray.push(lesson.serialize());
+            const serializedLesson = lesson.serialize();
+            serializedArray.push(serializedLesson);
 
-            await lesson.writeToLocalDB('timetableChanges', lesson.serialize());
+            await lesson.writeToLocalDB('timetableChanges', serializedLesson);
         }
 
         let result = await model.makeAjaxQuery('lesson', 'save', serializedArray);
 
         if (result.status == 'failed') {
-            for (const lesson of lessonsArray) {
+            for (const lesson of serializedArray) {
                 model.writeToLocalDB('unsyncedTimetableChanges', lesson);
             }
         }
@@ -349,12 +350,13 @@ export default class Lesson extends AbstractModel {
 
             await lesson.deleteFromLocalDB('timetableChanges', lesson.id);
             await lesson.deleteFromLocalDB('unsyncedTimetableChanges', lesson.id);
+            await lesson.deleteFromLocalDB('unsyncedDeletedTimetableChanges', lesson.id);
         }
 
         let result = await model.makeAjaxQuery('lesson', 'delete', serializedArray);
 
         if (result.status == 'failed') {
-            for (const lesson of lessonsArray) {
+            for (const lesson of serializedArray) {
                 model.writeToLocalDB('unsyncedDeletedTimetableChanges', lesson);
             }
         }

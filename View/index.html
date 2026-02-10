@@ -20,101 +20,114 @@
 <body>
     <nav>
         <div id="topMenuContainer" class="flex spaceBetween doubleGap alignCenter">
-            <div>
-                <h1>Eduplanio</h1>
+            <div class="flex alignCenter gap">
+                <img id="pageLogo" src="favicon.svg" style="width: 2rem; height: 2rem;">
+                <h1 id="pageHeader" >Eduplanio</h1>
             </div>
             <div id="topMenuButtonContainer" class="flex gap">
+                <div id="viewsMenuContainer" class="flex halfGap">
+                    <button id="openWeekViewButton" class="selected topMenuButton"><span class="icon weekViewIcon"
+                            style="width: 1.5rem; height: 1.5rem;"></span><span
+                            class="buttonText">Wochenplan</span></button>
+                    <button id="openTimetableViewButton" class="topMenuButton"><span class="icon timetableViewIcon"
+                            style="width: 1.5rem; height: 1.5rem;"></span><span
+                            class="buttonText">Stundenplan</span></button>
+                    <button id="openSchoolYearViewButton" class="topMenuButton"><span class="icon schoolYearViewIcon"
+                            style="width: 1.5rem; height: 1.5rem;"></span><span
+                            class="buttonText">Schuljahr</span></button>
+                </div>
                 <div id="syncIndicator" class="unsynced">
                     <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem
-                        Internet und melde dich an, um Datenverlust zu vermeiden.</span>
+                        Internet und melde dich an, um Datenverlust sicher zu vermeiden.</span>
                 </div>
-                <div><button id="openMenuButton">&#x2630;</button></div>
+                <div><button id="openBurgerMenuButton">&#x2630;</button></div>
                 <div id="topMenu" class="flex column justifyCenter ">
-                    <button id="openSettingsButton" class="menuButton">Einstellungen</button>
-                    <button id="openSupportDialogButton" class="menuButton">Support</button>
-                    <button id="openLoginButton" class="menuButton">Login</button>
-                    <button id="createAccountButton" class="menuButton">Registrieren</button>
-                    <button id="logoutButton" class="menuButton">Abmelden</button>
+                    <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
+                    <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
+                    <button id="openLoginButton" class="burgerMenuButton">Login</button>
+                    <button id="createAccountButton" class="burgerMenuButton">Registrieren</button>
+                    <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
                 </div>
             </div>
         </div>
     </nav>
 
     <main>
-        <div id="timetableContainer">
-            <div id="calendarWeekContainer" class="flex gap spaceBetween" style="margin-bottom: 1rem;">
-                <div id="calendarWeek" class="flex alignCenter">
-                    <h2><span id="wochenplanText">Wochenplan</span> KW <span id="calendarWeekCounter"
-                            data-split_first_week="false">-</span></h2>
-                    <div id="isCurrentWeekDot"></div>
-                </div>
-                <div class="flex gap" id="weekSwitcher">
-                    <button id="weekBackwardButton">&#9664</button>
-                    <div id="dateSpan" class="flex alignEnd"><span id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span
-                            id="weekEndDate">Sonntag</span></div>
-                    <button id="weekForwardButton">&#9654</button>
-                </div>
-            </div>
-
-            <div id="weekCurriculumContainer" class="marginBottom">
-                <div class="flex responsiveSpaceBetween gap marginBottom">
-                    <label>Stoffverteilungspläne</label>
-                    <button id="resizeCurriculumSectionButton" class="closeDialogButton"
-                        style="width: 1.5rem;">&#9660;</button>
-                </div>
-                <div id="weekCurriculaSelectionContainer" class="notDisplayed">
-                    <div class="flex responsiveSpaceBetween gap" style="margin-bottom: 0.5rem;">
-                        <label>Auswahl:</label>
-                        <button id="resizeCurriculumSelectionButton" class="closeDialogButton"
-                            style="width: 1.5rem;">&#9650;</button>
+        <div id="weekViewContainer" class="mainViewContainer">
+            <div id="timetableContainer">
+                <div id="calendarWeekContainer" class="flex gap spaceBetween" style="margin-bottom: 1rem;">
+                    <div id="calendarWeek" class="flex alignCenter">
+                        <h2><span id="wochenplanText">Wochenplan</span> KW <span id="calendarWeekCounter"
+                                data-split_first_week="false">-</span></h2>
+                        <div id="isCurrentWeekDot"></div>
                     </div>
-                    <div id="weekCurriculaSelectionDisplay" style="padding-left: 1rem"></div>
-                </div>
-            </div>
-
-            <div id="weekOverviewContainer">
-
-                <div id="weekCurriculaDisplay" class="notDisplayed">
-                    <div class="curriculaWeekOverview">
-                        <div id="curriculaTimeslotPlaceholder"></div>
-                        <div class="curriculaDisplayWeekday" data-weekday_number="1" data-date=""></div>
-                        <div class="curriculaDisplayWeekday" data-weekday_number="2" data-date=""></div>
-                        <div class="curriculaDisplayWeekday" data-weekday_number="3" data-date=""></div>
-                        <div class="curriculaDisplayWeekday" data-weekday_number="4" data-date=""></div>
-                        <div class="curriculaDisplayWeekday" data-weekday_number="5" data-date=""></div>
-                        <div class="curriculaDisplayWeekday" data-weekday_number="6" data-date=""></div>
-                        <div class="curriculaDisplayWeekday" data-weekday_number="0" data-date=""></div>
+                    <div class="flex gap" id="weekSwitcher">
+                        <button id="weekBackwardButton">&#9664</button>
+                        <div id="dateSpan" class="flex alignEnd"><span
+                                id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span id="weekEndDate">Sonntag</span></div>
+                        <button id="weekForwardButton">&#9654</button>
                     </div>
                 </div>
 
-                <div class="weekOverview">
-                    <div id="timeslots">
-                        <div></div>
-                        <div class="timeslotLabel">1</div>
-                        <div class="timeslotLabel">2</div>
-                        <div class="timeslotLabel">3</div>
-                        <div class="timeslotLabel">4</div>
-                        <div class="timeslotLabel">5</div>
-                        <div class="timeslotLabel">6</div>
-                        <div class="timeslotLabel">7</div>
-                        <div class="timeslotLabel">8</div>
-                        <div class="timeslotLabel">9</div>
+                <div id="weekCurriculumContainer" class="marginBottom">
+                    <div class="flex responsiveSpaceBetween gap marginBottom">
+                        <label>Stoffverteilungspläne</label>
+                        <button id="resizeCurriculumSectionButton" class="closeDialogButton"
+                            style="width: 1.5rem;">&#9660;</button>
                     </div>
-
-                    <div class="weekday" data-weekday_number="1" data-date="">
-                        <div class="weekdayLabel">Mo<span class="isTodayDot"></span>
-                            <div class="smallDate"></div>
+                    <div id="weekCurriculaSelectionContainer" class="notDisplayed">
+                        <div class="flex responsiveSpaceBetween gap" style="margin-bottom: 0.5rem;">
+                            <label>Auswahl:</label>
+                            <button id="resizeCurriculumSelectionButton" class="closeDialogButton"
+                                style="width: 1.5rem;">&#9650;</button>
                         </div>
-                        <div class="timeslot" data-timeslot="1"></div>
-                        <div class="timeslot" data-timeslot="2"></div>
-                        <div class="timeslot" data-timeslot="3"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
-                        <div class="timeslot" data-timeslot="5"></div>
-                        <div class="timeslot" data-timeslot="6"></div>
-                        <div class="timeslot" data-timeslot="7"></div>
-                        <div class="timeslot" data-timeslot="8"></div>
-                        <div class="timeslot" data-timeslot="9"></div>
+                        <div id="weekCurriculaSelectionDisplay" style="padding-left: 1rem"></div>
                     </div>
+                </div>
+
+                <div id="weekOverviewContainer">
+
+                    <div id="weekCurriculaDisplay" class="notDisplayed">
+                        <div class="curriculaWeekOverview">
+                            <div id="curriculaTimeslotPlaceholder"></div>
+                            <div class="curriculaDisplayWeekday" data-weekday_number="1" data-date=""></div>
+                            <div class="curriculaDisplayWeekday" data-weekday_number="2" data-date=""></div>
+                            <div class="curriculaDisplayWeekday" data-weekday_number="3" data-date=""></div>
+                            <div class="curriculaDisplayWeekday" data-weekday_number="4" data-date=""></div>
+                            <div class="curriculaDisplayWeekday" data-weekday_number="5" data-date=""></div>
+                            <div class="curriculaDisplayWeekday" data-weekday_number="6" data-date=""></div>
+                            <div class="curriculaDisplayWeekday" data-weekday_number="0" data-date=""></div>
+                        </div>
+                    </div>
+
+                    <div class="weekOverview">
+                        <div id="timeslots">
+                            <div></div>
+                            <div class="timeslotLabel">1</div>
+                            <div class="timeslotLabel">2</div>
+                            <div class="timeslotLabel">3</div>
+                            <div class="timeslotLabel">4</div>
+                            <div class="timeslotLabel">5</div>
+                            <div class="timeslotLabel">6</div>
+                            <div class="timeslotLabel">7</div>
+                            <div class="timeslotLabel">8</div>
+                            <div class="timeslotLabel">9</div>
+                        </div>
+
+                        <div class="weekday" data-weekday_number="1" data-date="">
+                            <div class="weekdayLabel">Mo<span class="isTodayDot"></span>
+                                <div class="smallDate"></div>
+                            </div>
+                            <div class="timeslot" data-timeslot="1"></div>
+                            <div class="timeslot" data-timeslot="2"></div>
+                            <div class="timeslot" data-timeslot="3"></div>
+                            <div class="timeslot" data-timeslot="4"></div>
+                            <div class="timeslot" data-timeslot="5"></div>
+                            <div class="timeslot" data-timeslot="6"></div>
+                            <div class="timeslot" data-timeslot="7"></div>
+                            <div class="timeslot" data-timeslot="8"></div>
+                            <div class="timeslot" data-timeslot="9"></div>
+                        </div>
 
                     <div class="weekday" data-weekday_number="2" data-date="">
                         <div class="weekdayLabel">Di<span class="isTodayDot"></span>
@@ -131,133 +144,106 @@
                         <div class="timeslot" data-timeslot="9"></div>
                     </div>
 
-                    <div class="weekday" data-weekday_number="3" data-date="">
-                        <div class="weekdayLabel">Mi<span class="isTodayDot"></span>
-                            <div class="smallDate"></div>
+                        <div class="weekday" data-weekday_number="3" data-date="">
+                            <div class="weekdayLabel">Mi<span class="isTodayDot"></span>
+                                <div class="smallDate"></div>
+                            </div>
+
+                            <div class="timeslot" data-timeslot="1"></div>
+                            <div class="timeslot" data-timeslot="2"></div>
+                            <div class="timeslot" data-timeslot="3"></div>
+                            <div class="timeslot" data-timeslot="4"></div>
+                            <div class="timeslot" data-timeslot="5"></div>
+                            <div class="timeslot" data-timeslot="6"></div>
+                            <div class="timeslot" data-timeslot="7"></div>
+                            <div class="timeslot" data-timeslot="8"></div>
+                            <div class="timeslot" data-timeslot="9"></div>
                         </div>
 
-                        <div class="timeslot" data-timeslot="1"></div>
-                        <div class="timeslot" data-timeslot="2"></div>
-                        <div class="timeslot" data-timeslot="3"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
-                        <div class="timeslot" data-timeslot="5"></div>
-                        <div class="timeslot" data-timeslot="6"></div>
-                        <div class="timeslot" data-timeslot="7"></div>
-                        <div class="timeslot" data-timeslot="8"></div>
-                        <div class="timeslot" data-timeslot="9"></div>
-                    </div>
+                        <div class="weekday" data-weekday_number="4" data-date="">
+                            <div class="weekdayLabel">Do<span class="isTodayDot"></span>
+                                <div class="smallDate"></div>
+                            </div>
 
-                    <div class="weekday" data-weekday_number="4" data-date="">
-                        <div class="weekdayLabel">Do<span class="isTodayDot"></span>
-                            <div class="smallDate"></div>
+                            <div class="timeslot" data-timeslot="1"></div>
+                            <div class="timeslot" data-timeslot="2"></div>
+                            <div class="timeslot" data-timeslot="3"></div>
+                            <div class="timeslot" data-timeslot="4"></div>
+                            <div class="timeslot" data-timeslot="5"></div>
+                            <div class="timeslot" data-timeslot="6"></div>
+                            <div class="timeslot" data-timeslot="7"></div>
+                            <div class="timeslot" data-timeslot="8"></div>
+                            <div class="timeslot" data-timeslot="9"></div>
                         </div>
 
-                        <div class="timeslot" data-timeslot="1"></div>
-                        <div class="timeslot" data-timeslot="2"></div>
-                        <div class="timeslot" data-timeslot="3"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
-                        <div class="timeslot" data-timeslot="5"></div>
-                        <div class="timeslot" data-timeslot="6"></div>
-                        <div class="timeslot" data-timeslot="7"></div>
-                        <div class="timeslot" data-timeslot="8"></div>
-                        <div class="timeslot" data-timeslot="9"></div>
-                    </div>
-
-                    <div class="weekday" data-weekday_number="5" data-date="">
-                        <div class="weekdayLabel">Fr<span class="isTodayDot"></span>
-                            <div class="smallDate"></div>
+                        <div class="weekday" data-weekday_number="5" data-date="">
+                            <div class="weekdayLabel">Fr<span class="isTodayDot"></span>
+                                <div class="smallDate"></div>
+                            </div>
+                            <div class="timeslot" data-timeslot="1"></div>
+                            <div class="timeslot" data-timeslot="2"></div>
+                            <div class="timeslot" data-timeslot="3"></div>
+                            <div class="timeslot" data-timeslot="4"></div>
+                            <div class="timeslot" data-timeslot="5"></div>
+                            <div class="timeslot" data-timeslot="6"></div>
+                            <div class="timeslot" data-timeslot="7"></div>
+                            <div class="timeslot" data-timeslot="8"></div>
+                            <div class="timeslot" data-timeslot="9"></div>
                         </div>
-                        <div class="timeslot" data-timeslot="1"></div>
-                        <div class="timeslot" data-timeslot="2"></div>
-                        <div class="timeslot" data-timeslot="3"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
-                        <div class="timeslot" data-timeslot="5"></div>
-                        <div class="timeslot" data-timeslot="6"></div>
-                        <div class="timeslot" data-timeslot="7"></div>
-                        <div class="timeslot" data-timeslot="8"></div>
-                        <div class="timeslot" data-timeslot="9"></div>
-                    </div>
 
-                    <div class="weekday" data-weekday_number="6" data-date="">
-                        <div class="weekdayLabel">Sa<span class="isTodayDot"></span>
-                            <div class="smallDate"></div>
+                        <div class="weekday" data-weekday_number="6" data-date="">
+                            <div class="weekdayLabel">Sa<span class="isTodayDot"></span>
+                                <div class="smallDate"></div>
+                            </div>
+                            <div class="timeslot" data-timeslot="1"></div>
+                            <div class="timeslot" data-timeslot="2"></div>
+                            <div class="timeslot" data-timeslot="3"></div>
+                            <div class="timeslot" data-timeslot="4"></div>
+                            <div class="timeslot" data-timeslot="5"></div>
+                            <div class="timeslot" data-timeslot="6"></div>
+                            <div class="timeslot" data-timeslot="7"></div>
+                            <div class="timeslot" data-timeslot="8"></div>
+                            <div class="timeslot" data-timeslot="9"></div>
                         </div>
-                        <div class="timeslot" data-timeslot="1"></div>
-                        <div class="timeslot" data-timeslot="2"></div>
-                        <div class="timeslot" data-timeslot="3"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
-                        <div class="timeslot" data-timeslot="5"></div>
-                        <div class="timeslot" data-timeslot="6"></div>
-                        <div class="timeslot" data-timeslot="7"></div>
-                        <div class="timeslot" data-timeslot="8"></div>
-                        <div class="timeslot" data-timeslot="9"></div>
-                    </div>
 
-                    <div class="weekday" data-weekday_number="0" data-date="">
-                        <div class="weekdayLabel">So<span class="isTodayDot"></span>
-                            <div class="smallDate"></div>
+                        <div class="weekday" data-weekday_number="0" data-date="">
+                            <div class="weekdayLabel">So<span class="isTodayDot"></span>
+                                <div class="smallDate"></div>
+                            </div>
+                            <div class="timeslot" data-timeslot="1"></div>
+                            <div class="timeslot" data-timeslot="2"></div>
+                            <div class="timeslot" data-timeslot="3"></div>
+                            <div class="timeslot" data-timeslot="4"></div>
+                            <div class="timeslot" data-timeslot="5"></div>
+                            <div class="timeslot" data-timeslot="6"></div>
+                            <div class="timeslot" data-timeslot="7"></div>
+                            <div class="timeslot" data-timeslot="8"></div>
+                            <div class="timeslot" data-timeslot="9"></div>
                         </div>
-                        <div class="timeslot" data-timeslot="1"></div>
-                        <div class="timeslot" data-timeslot="2"></div>
-                        <div class="timeslot" data-timeslot="3"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
-                        <div class="timeslot" data-timeslot="5"></div>
-                        <div class="timeslot" data-timeslot="6"></div>
-                        <div class="timeslot" data-timeslot="7"></div>
-                        <div class="timeslot" data-timeslot="8"></div>
-                        <div class="timeslot" data-timeslot="9"></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="taskContainer" class="flex doubleGap">
-            <div id="taskViewInfoTooltip" class="tooltip">?
-                <span class="tooltipTextLeft">
-                    Hier kannst du deine Aufgaben verwalten. Um sie zu bearbeiten, wähle sie mit einem Doppelklick aus.
-                    Mit <button class="confirmationButton" style="padding: 0 0.5rem"><span
-                            class="icon checkIcon"></span></button> setzt du sie auf erledigt. Mit <button
-                        class="orangeButton" style="padding: 0 0.5rem"><span
-                            class="icon inProgressIcon"></span></button> kannst du ihren Status auf "in Arbeit" ändern.
-                </span>
-            </div>
-
-            <div id="upcomingTasksContainer">
-                <div style="margin-bottom: 1rem;">
-                    <h2>anstehend:</h2>
+            <div id="taskContainer" class="flex doubleGap">
+                <div id="taskViewInfoTooltip" class="tooltip">?
+                    <span class="tooltipTextLeft">
+                        Hier kannst du deine Aufgaben verwalten. Um sie zu bearbeiten, wähle sie mit einem Doppelklick
+                        aus.
+                        Mit <button class="confirmationButton" style="padding: 0 0.5rem"><span
+                                class="icon checkIcon"></span></button> setzt du sie auf erledigt. Mit <button
+                            class="orangeButton" style="padding: 0 0.5rem"><span
+                                class="icon inProgressIcon"></span></button> kannst du ihren Status auf "in Arbeit"
+                        ändern.
+                    </span>
                 </div>
 
-                <!-- upcoming tasks table -->
-                <table id="upcomingTasksTable">
-                    <thead>
-                        <tr>
-                            <th class="taskAdditionalInfo"></th>
-                            <th class="taskClassName">Kl.</th>
-                            <th>Fach</th>
-                            <th class="taskDescription">Beschreibung</th>
-                            <th class="taskDone"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="taskList">
-                        <!-- in Progress Tasks -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="4" style="border: none; text-align: center; display: none; padding-top: 2rem;"
-                                data-noEntriesFound>Keine Aufgaben gefunden!</td>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div id="upcomingTasksContainer">
+                    <div style="margin-bottom: 1rem;">
+                        <h2>anstehend:</h2>
+                    </div>
 
-            </div>
-            <div id="inProgressTasksContainer">
-                <div style="margin-bottom: 1rem;">
-                    <h2>in Arbeit:</h2>
-                </div>
-                <div>
-                    <!-- in progress tasks table -->
-
-                    <table id="inProgressTasksTable">
+                    <!-- upcoming tasks table -->
+                    <table id="upcomingTasksTable">
                         <thead>
                             <tr>
                                 <th class="taskAdditionalInfo"></th>
@@ -278,365 +264,465 @@
                             </tr>
                         </tfoot>
                     </table>
+
+                </div>
+                <div id="inProgressTasksContainer">
+                    <div style="margin-bottom: 1rem;">
+                        <h2>in Arbeit:</h2>
+                    </div>
+                    <div>
+                        <!-- in progress tasks table -->
+
+                        <table id="inProgressTasksTable">
+                            <thead>
+                                <tr>
+                                    <th class="taskAdditionalInfo"></th>
+                                    <th class="taskClassName">Kl.</th>
+                                    <th>Fach</th>
+                                    <th class="taskDescription">Beschreibung</th>
+                                    <th class="taskDone"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="taskList">
+                                <!-- in Progress Tasks -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4"
+                                        style="border: none; text-align: center; display: none; padding-top: 2rem;"
+                                        data-noEntriesFound>Keine Aufgaben gefunden!</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- timetableView -->
+        <div id="timetableViewContainer" class="mainViewContainer" style="display: none">
+            <div id="settingsSubjectsContainer" class="flex doubleGap">
+                <div id="subjectsInfoTooltip" class="tooltip">?
+                    <span class="tooltipTextLeft">Hier kannst du die von dir unterrichteten Fächer anlegen
+                        und
+                        ihnen
+                        eine Farbe zuweisen. Gib einfach ein Fachkürzel deiner Wahl ein und wähle eine Farbe
+                        aus.</span>
+                </div>
+                <!-- create subjects and select their colors -->
+                <div id="createSubjectContainer" class="flex gap">
+                    <div class="flex gap column">
+                        <div>
+                            <label for="subjectName">Fächer anlegen:</label>
+                            <div class="alertRing"><input type="text" name="subjectName" id="subjectName"
+                                    placeholder="Fachkürzel"></div>
+                        </div>
+                        <div>
+                            <label>Farbe wählen:</label>
+                            <div id="colourSelection" class="flex halfGap"></div>
+                        </div>
+                    </div>
+                    <div class="flex alignEnd justifyEnd">
+                        <div><button id="createSubjectButton">Anlegen</button></div>
+                    </div>
+                </div>
+
+                <!-- existing subjects list -->
+                <div id="existingSubjectsContainer" class="flex gap column">
+                    <div class="flex spaceBetween">
+                        <label>Fachübersicht:</label>
+                    </div>
+                    <div id="subjectsListContainer" class="flex gap"></div>
+                </div>
+            </div>
+
+            <div id="settingsTimetableContainer">
+                <div id="timetableDatePickerContainer" class="flex spaceBetween alignEnd marginBottom gap">
+                    <div class="flex">
+                        <div><label>Stundenpläne anlegen:</label></div>
+                        <div id="noSubjectsAlertTooltip" class="tooltip error">!
+                            <span class="tooltipTextRight">Es wurden keine Fächer gefunden! Bevor du einen
+                                Stundenplan anlegen kannst, musst du oben deine Fächer eintragen.</span>
+                        </div>
+                    </div>
+                    <div id="validFromPickerContainer" class="gap">
+                        <label>gültig ab: </label>
+                        <div class="flex gap">
+                            <button id="timetableBackwardButton">&#9664</button>
+                            <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span>
+                            </div>
+                            <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
+                                <div class="alertRing"><input type="date" name="validFromPicker" id="validFromPicker">
+                                </div>
+                                <div id="validFromPickerAlertTooltip" class="tooltip error">!
+                                    <span class="tooltipTextLeft">Für dieses Datum existiert bereits ein
+                                        Stundenplan. Um
+                                        diesen
+                                        zu ändern, wähle ihn aus und bearbeite ihn direkt.</span>
+                                </div>
+                            </div>
+                            <button id="timetableForwardButton">&#9654</button>
+                        </div>
+                        <div id="timetableInfoTooltip" class="tooltip">?
+                            <span class="tooltipTextLeft">Hier kannst du deine festen Stundenpläne speichern und
+                                bearbeiten.
+                                Lege die Stunden im jeweiligen Zeitslot mit Klasse und Fach an. Wähle außerdem aus,
+                                ab
+                                wann der Plan gültig ist.</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="settingsWeekOverviewContainer">
+                    <div class="settingsWeekOverview alertRing" style="width: 100%;">
+                        <div id="settingsTimeslots">
+                            <div></div>
+                            <div class="timeslotLabel">1</div>
+                            <div class="timeslotLabel">2</div>
+                            <div class="timeslotLabel">3</div>
+                            <div class="timeslotLabel">4</div>
+                            <div class="timeslotLabel">5</div>
+                            <div class="timeslotLabel">6</div>
+                            <div class="timeslotLabel">7</div>
+                            <div class="timeslotLabel">8</div>
+                            <div class="timeslotLabel">9</div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="1">
+                            <div class="weekdayLabel">Mo</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="2">
+                            <div class="weekdayLabel">Di</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="3">
+                            <div class="weekdayLabel">Mi</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="4" data-date="">
+                            <div class="weekdayLabel">Do</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+
+                        <div class="settingsWeekday" data-weekday_number="5">
+                            <div class="weekdayLabel">Fr</div>
+                            <div class="settingsTimeslot" data-timeslot="1"></div>
+                            <div class="settingsTimeslot" data-timeslot="2"></div>
+                            <div class="settingsTimeslot" data-timeslot="3"></div>
+                            <div class="settingsTimeslot" data-timeslot="4"></div>
+                            <div class="settingsTimeslot" data-timeslot="5"></div>
+                            <div class="settingsTimeslot" data-timeslot="6"></div>
+                            <div class="settingsTimeslot" data-timeslot="7"></div>
+                            <div class="settingsTimeslot" data-timeslot="8"></div>
+                            <div class="settingsTimeslot" data-timeslot="9"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="marginTop">
+                    <div id="createChangeTimetableButtonContainer" class="flex justifyEnd halfGap">
+                        <div><button id="editTimetableButton">Bearbeiten</button></div>
+                        <div><button id="createNewTimetableButton">Plan anlegen</button></div>
+                    </div>
+                    <div id="saveDiscardTimetableButtonContainer" class="flex justifyEnd">
+                        <div class="flex halfGap">
+                            <div><button id="saveNewTimetableButton">Speichern</button></div>
+                            <div><button id="discardNewTimetableButton">Abbrechen</button></div>
+                        </div>
+                    </div>
+                    <div id="saveDiscardTimetableChangesButtonContainer" class="flex justifyEnd">
+                        <div class="flex halfGap">
+                            <div><button id="saveTimetableUpdatesButton">Speichern</button></div>
+                            <div><button id="discardTimetableChangesButton">Abbrechen</button></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- curriculum editor -->
+    <div id="schoolYearViewContainer" class="mainViewContainer" style="display: none">
+
+        <!-- school year info -->
+        <div id="schoolYearInfoContainer" class="flex column gap" data-school_year_id data-editongoing="false">
+            <div class="flex spaceBetween alignCenter">
+                <div>
+                    <label>Schuljahr auswählen:</label>
+                    <select name="schoolYearNameSelect" id="schoolYearNameSelect"></select>
+                </div>
+                <button id="createNewSchoolYearButton" class="confirmationButton">Schuljahr anlegen</button>
+                <div id="schoolYearCreationButtonsContainer" class="flex halfGap notDisplayed">
+                    <button id="saveNewSchoolYearButton" class="confirmationButton">Schuljahr speichern</button>
+                    <button id="cancelSchoolYearCreationButton" class="cancelButton">Abbrechen</button>
+                </div>
+            </div>
+
+            <div id="schoolYearDatesGradesContainer" class="flex doubleGap spaceBetween">
+
+                <div id="schoolYearStartEndDateInfoContainer" class="flex column gap spaceBetween growEqually">
+                    <div class="flex column gap">
+                        <div>
+                            <label>Schuljahresbeginn:</label>
+                            <div id="schoolYearStartDateDisplay">Leg ein Schuljahr an,...</div>
+                        </div>
+                        <div>
+                            <label>Schuljahresende:</label>
+                            <div id="schoolYearEndDateDisplay">...damit hier etwas stehen kann.</div>
+                        </div>
+                    </div>
+
+                    <div id="gradeSelectionContainer" class="flex column">
+                        <label style="margin-bottom: 0.5rem;">unterrichtete Klassenstufen:</label>
+                        <div class="flex column spaceBetween growEqually doubleGap">
+                            <div class="flex column halfGap">
+                                <div class="nothingToSee notDisplayed">Hier gibt es noch nichts zu sehen. Lege
+                                    zuerst die Rahmendaten des Schuljahres fest.</div>
+                                <div class="gradeRow">
+                                    <label><input type="checkbox" value="1" disabled>1</label>
+                                    <label><input type="checkbox" value="2" disabled>2</label>
+                                    <label><input type="checkbox" value="3" disabled>3</label>
+                                    <label><input type="checkbox" value="4" disabled>4</label>
+                                </div>
+                                <div class="gradeRow">
+                                    <label><input type="checkbox" value="5" disabled>5</label>
+                                    <label><input type="checkbox" value="6" disabled>6</label>
+                                    <label><input type="checkbox" value="7" disabled>7</label>
+                                    <label><input type="checkbox" value="8" disabled>8</label>
+                                    <label><input type="checkbox" value="9" disabled>9</label>
+                                    <label><input type="checkbox" value="10" disabled>10</label>
+                                </div>
+                                <div class="gradeRow">
+                                    <label><input type="checkbox" value="11" disabled>11</label>
+                                    <label><input type="checkbox" value="12" disabled>12</label>
+                                    <label><input type="checkbox" value="13" disabled>13</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justifyEnd alignEnd">
+                        <button id="editSchoolYearDatesGradesButton"
+                            class="confirmationButton notDisplayed">Bearbeiten</button>
+                        <button id="saveSchoolYearDatesGradesButton"
+                            class="confirmationButton notDisplayed">Speichern</button>
+                    </div>
+                </div>
+
+
+                <div id="holidaysInfoContainer" class="flex column doubleGap spaceBetween growEqually">
+                    <div id="holidaysContainer" class="flex column halfGap">
+                        <div><label>Ferien und freie Tage:</label></div>
+                    </div>
+                    <div class="flex justifyEnd alignEnd">
+                        <button id="editHolidayDatesButton" class="confirmationButton notDisplayed">Bearbeiten</button>
+                        <button id="createHolidayDatesButton" class="confirmationButton notDisplayed">Anlegen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- curriculum -->
+        <div id="curriculumContainer" data-curriculumid>
+            <div id="curriculumLabelAndButtonContainer" class="marginBottom flex spaceBetween">
+                <label><span id="editorNameSpan">Jahresübersicht</span>:</label>
+                <div id="createCurriculumButtonContainer">
+                    <button id="createCurriculumButton" class="confirmationButton">Plan anlegen</button>
+                </div>
+                <div id="saveCancelNewCurriculumButtonContainer" class="notDisplayed flex halfGap">
+                    <button id="saveNewCurriculumButton" class="confirmationButton">Plan speichern</button>
+                    <button id="cancelNewCurriculumButton" class="cancelButton">Abbrechen</button>
+                </div>
+                <button id="closeHolidayEditorButton" class="cancelButton notDisplayed">schließen</button>
+            </div>
+            <div>
+                <div id="curriculumSelectionContainer"></div>
+                <div id="curriculumCreationSelectContainer" class="notDisplayed">
+                    <div id="curriculumCreationSelectWrapper"></div>
+                    <div id="curriculumCreationSelectErrorDisplay"></div>
+                </div>
+                <div id="dayNameContainer" style="display: none;">
+                    <div class="dayName">Mo</div>
+                    <div class="dayName">Di</div>
+                    <div class="dayName">Mi</div>
+                    <div class="dayName">Do</div>
+                    <div class="dayName">Fr</div>
+                    <div class="dayName" data-weekdaynumber="6">Sa</div>
+                    <div class="dayName" data-weekdaynumber="0">So</div>
+                </div>
+                <div data-span_edit_active="false"></div>
+                <div id="yearContainer" class="curriculumEditor">
+                </div>
+                <div id="timeSpanForm">
+                    <div class="flex spaceBetween">
+                        <button id="resizeTimeSpanFormButton" class="closeDialogButton" style="width: 1.5rem">
+                            <div class="icon minimizeIcon"></div>
+                        </button>
+                        <button id="closeTimeSpanFormButton" class="closeDialogButton" style="width: 1.5rem">×</button>
+                    </div>
+                    <div class="flex column">
+                        <input type="text" name="topic" id="topicInput" placeholder="Namen eingeben">
+                        <div id="curriculumNoteEditorContainer" class="flex column halfGap marginTop editorContainer">
+                            <div id="curriculumNoteEditorButtonContainer"
+                                class="flex spaceBetween editorButtonContainer">
+                                <div class="flex halfGap">
+                                    <button class="boldButton" style="font-weight: bold;">b</button>
+                                    <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                                    <button class="unorderedListButton"><span class="icon ulIcon"></span></button>
+                                </div>
+                                <div class="flex halfGap">
+                                    <button class="revertChangeButton">&#8617;</button>
+                                    <button class="redoChangeButton">&#8618;</button>
+                                </div>
+                            </div>
+                            <div id="curriculumSpanNoteEditor" class="textEditor" contenteditable="true"
+                                data-noteversion>
+                                <p></p>
+                            </div>
+                            <div id="cancelSpanCreationButtonContainer" class="flex halfGap justifyEnd">
+                                <button id="saveSpanCreationButton" class="confirmationButton">Speichern</button>
+                                <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
+                                <button id="deleteSelectedSpanButton" class="cancelButton">Löschen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <settings>
         <!-- Settings Menu -->
         <div id="settingsContainer">
             <div id="settingsTitleBar" class="flex spaceBetween alignCenter" style="height: 3rem;">
-                <h3>Einstellungen</h3>
+                <h3>Konto</h3>
                 <div style="position: relative;"><button id="openSettingsMenuButton">&#x2630;</button>
                     <div id="settingsMenu">
-                        <button id="openTimetableSettingsButton"
-                            class="selected settingsMenuButton">Stundenplan</button>
-                        <button id="openSchoolYearSettingsButton" class="settingsMenuButton">Schuljahr</button>
-                        <button id="openAccountSettingsButton" class="settingsMenuButton">Konto</button>
+                        <button id="openAccountSettingsButton" class="settingsMenuButton selected" style="display: none">Konto</button>
                         <button id="closeSettingsButton" class="settingsMenuButton">&#215;</button>
                         <button id="closeSettingsButtonResponsive" class="settingsMenuButton">schließen</button>
                     </div>
                 </div>
             </div>
 
-            <div id="timetableSettingsContainer" class="settingsSubContainer">
-                <div id="settingsSubjectsContainer" class="flex doubleGap">
-                    <div id="subjectsInfoTooltip" class="tooltip">?
-                        <span class="tooltipTextLeft">Hier kannst du die von dir unterrichteten Fächer anlegen
-                            und
-                            ihnen
-                            eine Farbe zuweisen. Gib einfach ein Fachkürzel deiner Wahl ein und wähle eine Farbe
-                            aus.</span>
-                    </div>
-                    <!-- create subjects and select their colors -->
-                    <div id="createSubjectContainer" class="flex gap">
-                        <div class="flex gap column">
-                            <div>
-                                <label for="subjectName">Fächer anlegen:</label>
-                                <div class="alertRing"><input type="text" name="subjectName" id="subjectName"
-                                        placeholder="Fachkürzel"></div>
-                            </div>
-                            <div>
-                                <label>Farbe wählen:</label>
-                                <div id="colourSelection" class="flex halfGap"></div>
-                            </div>
-                        </div>
-                        <div class="flex alignEnd justifyEnd">
-                            <div><button id="createSubjectButton">Anlegen</button></div>
-                        </div>
-                    </div>
-
-                    <!-- existing subjects list -->
-                    <div id="existingSubjectsContainer" class="flex gap column">
-                        <div class="flex spaceBetween">
-                            <label>Fachübersicht:</label>
-                        </div>
-                        <div id="subjectsListContainer" class="flex gap"></div>
-                    </div>
-                </div>
-
-                <div id="settingsTimetableContainer">
-                    <div id="timetableDatePickerContainer" class="flex spaceBetween alignEnd marginBottom gap">
-                        <div class="flex">
-                            <div><label>Stundenpläne anlegen:</label></div>
-                            <div id="noSubjectsAlertTooltip" class="tooltip error">!
-                                <span class="tooltipTextRight">Es wurden keine Fächer gefunden! Bevor du einen
-                                    Stundenplan anlegen kannst, musst du oben deine Fächer eintragen.</span>
-                            </div>
-                        </div>
-                        <div id="validFromPickerContainer" class="gap">
-                            <label>gültig ab: </label>
-                            <div class="flex gap">
-                                <button id="timetableBackwardButton">&#9664</button>
-                                <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span>
-                                </div>
-                                <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
-                                    <div class="alertRing"><input type="date" name="validFromPicker"
-                                            id="validFromPicker">
-                                    </div>
-                                    <div id="validFromPickerAlertTooltip" class="tooltip error">!
-                                        <span class="tooltipTextLeft">Für dieses Datum existiert bereits ein
-                                            Stundenplan. Um
-                                            diesen
-                                            zu ändern, wähle ihn aus und bearbeite ihn direkt.</span>
-                                    </div>
-                                </div>
-                                <button id="timetableForwardButton">&#9654</button>
-                            </div>
-                            <div id="timetableInfoTooltip" class="tooltip">?
-                                <span class="tooltipTextLeft">Hier kannst du deine festen Stundenpläne speichern und
-                                    bearbeiten.
-                                    Lege die Stunden im jeweiligen Zeitslot mit Klasse und Fach an. Wähle außerdem aus,
-                                    ab
-                                    wann der Plan gültig ist.</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="settingsWeekOverviewContainer">
-                        <div class="settingsWeekOverview alertRing" style="width: 100%;">
-                            <div id="settingsTimeslots">
-                                <div></div>
-                                <div class="timeslotLabel">1</div>
-                                <div class="timeslotLabel">2</div>
-                                <div class="timeslotLabel">3</div>
-                                <div class="timeslotLabel">4</div>
-                                <div class="timeslotLabel">5</div>
-                                <div class="timeslotLabel">6</div>
-                                <div class="timeslotLabel">7</div>
-                                <div class="timeslotLabel">8</div>
-                                <div class="timeslotLabel">9</div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="1">
-                                <div class="weekdayLabel">Mo</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="2">
-                                <div class="weekdayLabel">Di</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="3">
-                                <div class="weekdayLabel">Mi</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="4" data-date="">
-                                <div class="weekdayLabel">Do</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-
-                            <div class="settingsWeekday" data-weekday_number="5">
-                                <div class="weekdayLabel">Fr</div>
-                                <div class="settingsTimeslot" data-timeslot="1"></div>
-                                <div class="settingsTimeslot" data-timeslot="2"></div>
-                                <div class="settingsTimeslot" data-timeslot="3"></div>
-                                <div class="settingsTimeslot" data-timeslot="4"></div>
-                                <div class="settingsTimeslot" data-timeslot="5"></div>
-                                <div class="settingsTimeslot" data-timeslot="6"></div>
-                                <div class="settingsTimeslot" data-timeslot="7"></div>
-                                <div class="settingsTimeslot" data-timeslot="8"></div>
-                                <div class="settingsTimeslot" data-timeslot="9"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="marginTop">
-                        <div id="createChangeTimetableButtonContainer" class="flex justifyEnd halfGap">
-                            <div><button id="editTimetableButton">Bearbeiten</button></div>
-                            <div><button id="createNewTimetableButton">Plan anlegen</button></div>
-                        </div>
-                        <div id="saveDiscardTimetableButtonContainer" class="flex justifyEnd">
-                            <div class="flex halfGap">
-                                <div><button id="saveNewTimetableButton">Speichern</button></div>
-                                <div><button id="discardNewTimetableButton">Abbrechen</button></div>
-                            </div>
-                        </div>
-                        <div id="saveDiscardTimetableChangesButtonContainer" class="flex justifyEnd">
-                            <div class="flex halfGap">
-                                <div><button id="saveTimetableUpdatesButton">Speichern</button></div>
-                                <div><button id="discardTimetableChangesButton">Abbrechen</button></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- curriculum editor -->
-            <div id="curriculumViewContainer" class="settingsSubContainer" style="display: none">
-
-                <!-- school year info -->
-                <div id="schoolYearInfoContainer" class="flex column gap" data-school_year_id data-editongoing="false">
-                    <div class="flex spaceBetween alignCenter">
-                        <div>
-                            <label>Schuljahr auswählen:</label>
-                            <select name="schoolYearNameSelect" id="schoolYearNameSelect"></select>
-                        </div>
-                        <button id="createNewSchoolYearButton" class="confirmationButton">Schuljahr anlegen</button>
-                        <div id="schoolYearCreationButtonsContainer" class="flex halfGap notDisplayed">
-                            <button id="saveNewSchoolYearButton" class="confirmationButton">Schuljahr speichern</button>
-                            <button id="cancelSchoolYearCreationButton" class="cancelButton">Abbrechen</button>
-                        </div>
-                    </div>
-
-                    <div id="schoolYearDatesGradesContainer" class="flex doubleGap spaceBetween">
-
-                        <div id="schoolYearStartEndDateInfoContainer" class="flex column gap spaceBetween growEqually">
-                            <div class="flex column gap">
-                                <div>
-                                    <label>Schuljahresbeginn:</label>
-                                    <div id="schoolYearStartDateDisplay">Leg ein Schuljahr an,...</div>
-                                </div>
-                                <div>
-                                    <label>Schuljahresende:</label>
-                                    <div id="schoolYearEndDateDisplay">...damit hier etwas stehen kann.</div>
-                                </div>
-                            </div>
-
-                            <div id="gradeSelectionContainer" class="flex column">
-                                <label style="margin-bottom: 0.5rem;">unterrichtete Klassenstufen:</label>
-                                <div class="flex column spaceBetween growEqually doubleGap">
-                                    <div class="flex column halfGap">
-                                        <div class="nothingToSee notDisplayed">Hier gibt es noch nichts zu sehen. Lege
-                                            zuerst die Rahmendaten des Schuljahres fest.</div>
-                                        <div class="gradeRow">
-                                            <label><input type="checkbox" value="1" disabled>1</label>
-                                            <label><input type="checkbox" value="2" disabled>2</label>
-                                            <label><input type="checkbox" value="3" disabled>3</label>
-                                            <label><input type="checkbox" value="4" disabled>4</label>
-                                        </div>
-                                        <div class="gradeRow">
-                                            <label><input type="checkbox" value="5" disabled>5</label>
-                                            <label><input type="checkbox" value="6" disabled>6</label>
-                                            <label><input type="checkbox" value="7" disabled>7</label>
-                                            <label><input type="checkbox" value="8" disabled>8</label>
-                                            <label><input type="checkbox" value="9" disabled>9</label>
-                                            <label><input type="checkbox" value="10" disabled>10</label>
-                                        </div>
-                                        <div class="gradeRow">
-                                            <label><input type="checkbox" value="11" disabled>11</label>
-                                            <label><input type="checkbox" value="12" disabled>12</label>
-                                            <label><input type="checkbox" value="13" disabled>13</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex justifyEnd alignEnd">
-                                <button id="editSchoolYearDatesGradesButton"
-                                    class="confirmationButton notDisplayed">Bearbeiten</button>
-                                <button id="saveSchoolYearDatesGradesButton"
-                                    class="confirmationButton notDisplayed">Speichern</button>
-                            </div>
-                        </div>
-
-
-                        <div id="holidaysInfoContainer" class="flex column doubleGap spaceBetween growEqually">
-                            <div id="holidaysContainer" class="flex column halfGap">
-                                <div><label>Ferien und freie Tage:</label></div>
-                            </div>
-                            <div class="flex justifyEnd alignEnd">
-                                <button id="editHolidayDatesButton"
-                                    class="confirmationButton notDisplayed">Bearbeiten</button>
-                                <button id="createHolidayDatesButton"
-                                    class="confirmationButton notDisplayed">Anlegen</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- curriculum -->
-                <div id="curriculumContainer" data-curriculumid>
-                    <div id="curriculumLabelAndButtonContainer" class="marginBottom flex spaceBetween">
-                        <label><span id="editorNameSpan">Jahresübersicht</span>:</label>
-                        <div id="createCurriculumButtonContainer">
-                            <button id="createCurriculumButton" class="confirmationButton">Plan anlegen</button>
-                        </div>
-                        <div id="saveCancelNewCurriculumButtonContainer" class="notDisplayed flex halfGap">
-                            <button id="saveNewCurriculumButton" class="confirmationButton">Plan speichern</button>
-                            <button id="cancelNewCurriculumButton" class="cancelButton">Abbrechen</button>
-                        </div>
-                        <button id="closeHolidayEditorButton" class="cancelButton notDisplayed">schließen</button>
-                    </div>
-                    <div>
-                        <div id="curriculumSelectionContainer"></div>
-                        <div id="curriculumCreationSelectContainer" class="notDisplayed">
-                            <div id="curriculumCreationSelectWrapper"></div>
-                            <div id="curriculumCreationSelectErrorDisplay"></div>
-                        </div>
-                        <div id="dayNameContainer" style="display: none;">
-                            <div class="dayName">Mo</div>
-                            <div class="dayName">Di</div>
-                            <div class="dayName">Mi</div>
-                            <div class="dayName">Do</div>
-                            <div class="dayName">Fr</div>
-                            <div class="dayName" data-weekdaynumber="6">Sa</div>
-                            <div class="dayName" data-weekdaynumber="0">So</div>
-                        </div>
-                        <div data-span_edit_active="false"></div>
-                        <div id="yearContainer" class="curriculumEditor">
-                        </div>
-                        <div id="timeSpanForm">
-                            <div class="flex spaceBetween">
-                                <button id="resizeTimeSpanFormButton" class="closeDialogButton" style="width: 1.5rem">
-                                    <div class="icon minimizeIcon"></div>
-                                </button>
-                                <button id="closeTimeSpanFormButton" class="closeDialogButton"
-                                    style="width: 1.5rem">×</button>
-                            </div>
-                            <div class="flex column">
-                                <input type="text" name="topic" id="topicInput" placeholder="Namen eingeben">
-                                <div id="curriculumNoteEditorContainer"
-                                    class="flex column halfGap marginTop editorContainer">
-                                    <div id="curriculumNoteEditorButtonContainer"
-                                        class="flex spaceBetween editorButtonContainer">
-                                        <div class="flex halfGap">
-                                            <button class="boldButton" style="font-weight: bold;">b</button>
-                                            <button class="orderedListButton"><span class="icon olIcon"></span></button>
-                                            <button class="unorderedListButton"><span
-                                                    class="icon ulIcon"></span></button>
-                                        </div>
-                                        <div class="flex halfGap">
-                                            <button class="revertChangeButton">&#8617;</button>
-                                            <button class="redoChangeButton">&#8618;</button>
-                                        </div>
-                                    </div>
-                                    <div id="curriculumSpanNoteEditor" class="textEditor" contenteditable="true"
-                                        data-noteversion>
-                                        <p></p>
-                                    </div>
-                                    <div id="cancelSpanCreationButtonContainer" class="flex halfGap justifyEnd">
-                                        <button id="saveSpanCreationButton"
-                                            class="confirmationButton">Speichern</button>
-                                        <button id="cancelSpanCreationButton" class="cancelButton">Abbrechen</button>
-                                        <button id="deleteSelectedSpanButton" class="cancelButton">Löschen</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
             <!-- account settings -->
-            <div id="accountSettingsContainer" style="display: none;" class="settingsSubContainer">
+            <div id="accountSettingsContainer" class="settingsSubContainer">
+                <div id="eduplanioPlusContainer">
+                    <label class="marginBottom">Eduplanio Plus:</label>
+                    <div id="eduplanioPlusNotLoggedInMessage">
+                        <p>Um deine Eduplanio Plus-Lizenz verwalten zu können, musst du angemeldet sein.</p>
+                    </div>
+                    <div>Lizenzstatus: <span id="eduplanioPlusStatusSpan">-</span></div>
+                    <div>läuft ab: <span id="eduplanioPlusExpirationDateSpan">-</span></div>
+                    <label class="marginTop marginBottom">aktivieren oder verlängern:</label>
+                    <p>Beim Kauf von Eduplanio Plus stehen dir die Monats- und die
+                        Jahreslizenz zur Wahl. Nach Abschluss des Kaufs sind die Eduplanio Plus-Vorteile sofort
+                        verfügbar. Endet der Lizenzzeitraum kannst du Eduplanio weiterhin in der Gratisversion
+                        ohne Plus-Vorteile nutzen. Eine Verlängerung der Lizenz ist jederzeit möglich.</p>
+
+                    <div class="flex growEqually doubleGap" id="plusSalesCardContainer">
+                        <div id="prolongOneMonth" class="eduplanioPlusSalesCard">
+                            <h3>Monatslizenz Eduplanio Plus</h3>
+                            <p>Profitiere für einmalig 5,99 Euro <b>30 Tage</b> von allen Eduplanio Plus-Vorteilen.
+                                Hast du bereits eine aktive Lizenz, wird diese entsprechend verlängert.</p>
+                            <div class="flex justifyEnd alignEnd">einmalig&nbsp;<span class="redText price">5,99
+                                    Euro</span></div>
+                            <div class="buttonContainer">
+                                <div><button class="confirmationButton" id="oneMonthEduplanioPlusButton">jetzt
+                                        kaufen</button></div>
+                            </div>
+                        </div>
+                        <div id="prolongOneYear" class="eduplanioPlusSalesCard">
+                            <h3>Jahreslizenz Eduplanio Plus</h3>
+                            <p>Profitiere für einmalig 49,99 Euro <b>365 Tage</b> von allen Eduplanio
+                                Plus-Vorteilen. Hast du bereits eine aktive Lizenz, wird diese entsprechend verlängert.
+                            </p>
+                            <div class="flex justifyEnd">
+                                <div class="flex column justifyEnd alignEnd">
+                                    <div>einmalig&nbsp;<span class="redText price">49,99 Euro</span></div>
+                                    <div class="greenText savingsNote">30 Prozent Ersparnis auf den Monatspreis</div>
+                                </div>
+                            </div>
+                            <div class="buttonContainer">
+                                <div><button class="confirmationButton" id="oneYearEduplanioPlusButton">jetzt
+                                        kaufen</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="eduplanioPlusAdvantagesList">
+                        <label class="marginBottom">Diese Vorteile bietet dir Eduplanio Plus:</label>
+                        <div class="flex alignCenter">
+                            <div class="iconBackground"><span class="icon checkIcon"></span></div>Nutzung von Eduplanio
+                            auf unbegrenzt vielen Geräten und Browsern:
+                        </div>
+                        <p>In der Gratisversion kannst du Eduplanio nur auf einem Gerät verwenden. Zwar ist es möglich,
+                            unbegrenzt viele Gastkonten zu eröffnen, deine Daten liegen aber immer nur auf dem Gerät und
+                            in dem Browser, in dem du sie erstellt hast.</p>
+                        <div class="flex alignCenter">
+                            <div class="iconBackground"><span class="icon checkIcon"></span></div>Synchronisation deiner
+                            Daten auf all deinen Geräten:
+                        </div>
+                        <p>Mit Eduplanio Plus werden deine Daten synchronisiert, sobald du dich auf einem Gerät
+                            einloggst. Zuhause am Rechner die Planung erarbeiten, unterwegs auf dem Handy eine schnelle
+                            Notiz anlegen und in der Schule auf dem Tablet den Stundenplan anpassen - mit Plus kein
+                            Problem!
+                        </p>
+                        <div class="flex alignCenter">
+                            <div class="iconBackground"><span class="icon checkIcon"></span></div>Schutz vor
+                            Datenverlust durch automatische Backups:
+                        </div>
+                        <p>Deine Daten stehen dir nicht nur überall zur Verfügung, sie sind gleichzeitig optimal vor
+                            Verlust geschützt. So kannst du nahtlos weiterarbeiten, selbst wenn dein Rechner, Tablet
+                            oder Handy unerwartet den Geist aufgibt oder du unabsichtlich den Speicher deines Browsers
+                            löschst.</p>
+                    </div>
+
+
+                </div>
+
                 <div id="deleteAccountContainer">
                     <label>Konto löschen:</label>
                     <div id="requestDeletionContainer">
-                        <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt.</p>
+                        <p>Beim Löschen des Kontos werden alle zugehörigen Daten entfernt. Das betrifft sowohl die lokal
+                            gespeicherten als auch die Daten in der Eduplanio-Cloud, solltest du zuvor Eduplanio
+                            Plus-Nutzer gewesen sein.</p>
+                        <p>Achtung: Da eine aktive Eduplanio Plus-Lizenz an das Konto gebunden ist, geht auch diese
+                            verloren und kann nach einer Neuanmeldung <strong>nicht</strong>
+                            reaktiviert werden.</p>
                         <button id="deleteAccountButton" class="cancelButton">Konto löschen</button>
                     </div>
                     <div id="approveAccountDeletionContainer">
@@ -1126,6 +1212,22 @@
             </div>
         </div>
     </dialog>
+
+    <dialog id="registrationNeededDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Anmeldung erforderlich <span id="curriclumNoteInfo"></span></h3><button
+                class="closeRegistrationNeededDialogButton closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody flex column">
+            <p>Es sieht so aus, als hättest du Eduplanio bisher mit einem Gastkonto genutzt. Um Eduplanio Plus nutzen zu
+                können, musst du dich zuerst registrieren.</p>
+            <div class="flex halfGap justifyEnd">
+                <button id="startRegistrationButton" class="confirmationButton">Jetzt registrieren</button>
+                <button class="closeRegistrationNeededDialogButton cancelButton">Abbrechen</button>
+            </div>
+        </div>
+    </dialog>
+
     <footer><a id="imprintLink" href="./../impressum.html">Impressum</a></footer>
     <script src="./js/index.js" type="module"></script>
 </body>

@@ -9,7 +9,7 @@ export default class AbstractModel {
         let isRegisteredUser = await this.isRegisteredUser();
         let allowedActionsUnregisteredUser = [
             'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
-            'sendPasswortResetMail'
+            'sendPasswortResetMail', 'sendSupportTicket'
         ];
 
         if (!allowedActionsUnregisteredUser.includes(action)) {
@@ -24,7 +24,8 @@ export default class AbstractModel {
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(content)
+                    body: JSON.stringify(content),
+                    signal: AbortSignal.timeout(2000)
                 })
 
             if (!response.ok) {
@@ -33,7 +34,8 @@ export default class AbstractModel {
             }
         }
         catch (error) {
-            AbstractController.setSyncIndicatorStatus('unsynced');
+            AbstractController.setSyncIndicatorStatus('unsynced', 'no server response');
+            console.log(error);
             return {
                 status: 'failed',
                 error: 'no server response',
@@ -56,7 +58,7 @@ export default class AbstractModel {
             AbstractController.openLoginDialog();
             AbstractController.setSyncIndicatorStatus('unsynced');
         } else if (result.status == 'failed') {
-            AbstractController.setSyncIndicatorStatus('unsynced');
+            AbstractController.setSyncIndicatorStatus('unsynced', result.error);
         } else {
             AbstractController.setSyncIndicatorStatus('synced');
         }
@@ -251,15 +253,21 @@ export default class AbstractModel {
         return true;
     }
 
+    /** returns account type, temporarily offline status and if registered user mail, email confirmation status, active until date and login status */
     async getUserInfo() {
         let userInfo = await this.readFromLocalDB('settings', 1);
-        let loginStatus = await this.makeAjaxQuery('abstract', 'getUserLoginStatus');
+
 
         if (!userInfo) {
             userInfo = { accountType: 'not set' };
         }
 
-        userInfo.loggedIn = loginStatus.status == 'true' ? true : false;
+        let serverData = await this.makeAjaxQuery('abstract', 'getUserInfo');
+
+        userInfo.email = serverData.email;
+        userInfo.emailConfirmed = serverData.emailConfirmed;
+        userInfo.activeUntil = serverData.activeUntil;
+        userInfo.loggedIn = serverData.loggedIn == 'true' ? true : false;
 
         return userInfo;
     }

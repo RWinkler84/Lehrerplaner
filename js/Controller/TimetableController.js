@@ -1,12 +1,14 @@
-import { ONEDAY,TODAY } from "../index.js";
-import Settings from "../Model/Settings.js";
-import View from "../View/SettingsView.js";
-import AbstractController from "./AbstractController.js";
-import LessonController from "./LessonController.js";
+import { ONEDAY } from "../index.js";
+
+import View from '../View/TimetableView.js';
+import LessonController from './LessonController.js';
+import LessonNoteController from './LessonNoteController.js';
+import TaskController from './TaskController.js';
+import Settings from '../Model/Settings.js';
 
 
-export default class SettingsController {
-
+/** The timetable has no own model. It is managed by the settings model for historic reasons */
+export default class TimetableController {
     static async saveSubject(subject) {
         let model = new Settings;
 
@@ -78,7 +80,7 @@ export default class SettingsController {
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
         await LessonController.setLessonsInHolidaysCanceled();
-        
+
         LessonController.renderLesson();
 
 
@@ -127,119 +129,102 @@ export default class SettingsController {
         TaskController.renderTaskChanges();
     }
 
-    static logout() {
-        let model = new Settings;
-        model.logout();
+    static deleteTaskById(id) {
+        TaskController.deleteTaskById(id);
     }
 
-    static async deleteAccount() {
-        let model = new Settings;
-        let result = await model.deleteAccount();
-
-        if (result.status == 'success') {
-            View.showAccountDeletionResult('success');
-        } else {
-            View.showAccountDeletionResult('failed');
-        }
-    }
-
-    static async attemptEduplanioPlusPurchase(clickedPurchaseButton, newWindow) {
-        const userInfo = await AbstractController.getUserInfo();
-
-        if (userInfo.accountType != 'registeredUser') {
-            newWindow.close();
-            this.openRegistrationNeededDialog();
-
-            return;
-        }
-
-        View.openCheckout(clickedPurchaseButton, newWindow);
-    }
-
-    static openRegistrationNeededDialog() {
-        View.openRegistrationNeededDialog();
-    }
-
-    static closeRegistrationNeededDialog() {
-        View.closeRegistrationNeededDialog();
-    }
-
-
-    static setVersion(version) {
-        View.setVersionDisplay(version);
-    }
-
-    static async openSettings() {
-        const userInfo = await AbstractController.getUserInfo();
-
-        View.openAccountSettings(userInfo);
-        View.openSettings();
-    }
-
-    static async openAccountSettings() {
-        const userInfo = await AbstractController.getUserInfo();
-
-        if (userInfo.accountType == 'registeredUser' && userInfo.temporarilyOffline == false) {
-            View.openAccountSettings(userInfo);
-            return;
-        }
-
-        View.openAccountSettings();
-    }
-
-
-    /** If a user purchases is plus licence and returns to the site, the already open account settings window 
-        should be rerendered so that the new expiration date is visible without manual reloading. Only executes, if the account window is open. */
-    static rerenderAccountSettingsAfterPlusPurchase() {
-        if (View.isAccountSettingsOpen()) {
-            this.openAccountSettings();
-        };
+    static deleteLessonChangeById(id) {
+        LessonController.deleteLessonById(id);
     }
 
     static async getAllRegularLessons() {
         return await LessonController.getAllRegularLessons();
     }
 
-    static async settingsClickEventHandler(event) {
+    static async getLessonObject(lessonData) {
+        return LessonController.getLessonObject(lessonData);
+    }
+
+    static async renderTimetableLessonChanges() {
+        await View.setDateOfTimetableToDisplay();
+        await View.renderLessons();
+    }
+
+    static async renderSubjectChanges() {
+        await View.renderExistingSubjects();
+    }
+
+    static async renderSelectableLessonColorsChanges() {
+        await View.renderSelectableLessonColors();
+    }
+
+    static renderLesson() {
+        LessonController.renderLesson();
+    }
+
+    static renderTaskChanges() {
+        TaskController.renderTaskChanges();
+    }
+
+    static async getAllSubjects() {
+        let model = new Settings;
+        return await model.getAllSubjects();
+    }
+
+    static async openTimetableSettings() {
+        await View.renderSelectableLessonColors();
+        await View.renderExistingSubjects();
+        await View.setDateOfTimetableToDisplay();
+        await View.renderLessons();
+
+        View.openTimetableSettings();
+    }
+
+    static async timetableClickEventHandler(event) {
         let target = event.target;
 
         switch (target.id) {
-            //top menu
-            case 'openSettingsMenuButton':
-                View.toggleSettingsMenu(event);
+            case 'createSubjectButton':
+                View.saveSubject();
                 break;
 
-            case 'openAccountSettingsButton':
-                SettingsController.openAccountSettings();
+            case 'timetableBackwardButton':
+                View.changeDisplayedTimetable(event);
                 break;
 
-            case 'closeSettingsButton':
-            case 'closeSettingsButtonResponsive':
-                View.closeSettings();
+            case 'timetableForwardButton':
+                View.changeDisplayedTimetable(event);
                 break;
 
-            //account settings
-            case 'oneMonthEduplanioPlusButton':
-            case 'oneYearEduplanioPlusButton':
-                //just for Safari open the window instantly and then pass it around
-                const newWindow = window.open('', '_blank');
-
-                SettingsController.attemptEduplanioPlusPurchase(target, newWindow);
+            case 'createNewTimetableButton':
+                View.makeTimetableEditable();
                 break;
 
-            case 'deleteAccountButton':
-                View.toogleAccountDeletionMenu(event);
+            case 'saveNewTimetableButton':
+                View.saveNewTimetable();
                 break;
 
-            case 'approveAccountDeletionButton':
-                SettingsController.deleteAccount();
-
-            case 'cancelAccountDeletionButton':
-                View.toogleAccountDeletionMenu(event);
+            case 'discardNewTimetableButton':
+                View.discardNewTimetable();
                 break;
 
-            case 'cancelFailedAccountDeletionButton':
-                View.toogleAccountDeletionMenu(event);
+            case 'editTimetableButton':
+                View.makeLessonsEditable();
+                break;
+
+            case 'saveTimetableUpdatesButton':
+                View.saveTimetableUpdates();
+                break;
+
+            case 'discardTimetableChangesButton':
+                View.discardNewTimetable();
+                break;
+        }
+
+        //identify items by class
+        switch (true) {
+            case event.target.classList.contains('deleteSubjectButton'):
+                View.deleteSubject(event);
                 break;
         }
     }
