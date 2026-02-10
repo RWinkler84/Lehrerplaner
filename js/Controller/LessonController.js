@@ -1,12 +1,12 @@
 import Lesson from '../Model/Lesson.js';
 import View from '../View/LessonView.js';
-import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
 import LessonNoteController from './LessonNoteController.js';
 import LessonView from '../View/LessonView.js';
 import CurriculumController from './CurriculumController.js';
 import SchoolYearController from './SchoolYearController.js';
 import Editor from '../inc/editor.js';
+import TimetableController from './TimetableController.js';
 
 export default class LessonController {
 
@@ -142,7 +142,7 @@ export default class LessonController {
     };
 
     static async getAllSubjects() {
-        return await SettingsController.getAllSubjects();
+        return await TimetableController.getAllSubjects();
     }
 
     static async getAllRegularLessons() {

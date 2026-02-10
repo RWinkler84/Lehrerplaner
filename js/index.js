@@ -4,7 +4,6 @@ import TaskController from './Controller/TaskController.js';
 import SettingsController from './Controller/SettingsController.js';
 import AbstractView from './View/AbstractView.js';
 import TaskView from './View/TaskView.js';
-import SettingsView from './View/SettingsView.js';
 import LessonView from './View/LessonView.js';
 import Fn from './inc/utils.js';
 import LessonNoteController from './Controller/LessonNoteController.js';
@@ -12,6 +11,8 @@ import LessonController from './Controller/LessonController.js';
 import CurriculumController from './Controller/CurriculumController.js';
 import SchoolYearController from './Controller/SchoolYearController.js';
 import Editor from './inc/editor.js';
+import TimetableController from './Controller/TimetableController.js';
+import TimetableView from './View/TimetableView.js';
 
 //config
 export const ONEDAY = 86400000;
@@ -53,6 +54,8 @@ async function startApp() {
         LoginController.dialogEventHandler(event);
         LessonController.timetableClickHandler(event);
         SettingsController.settingsClickEventHandler(event);
+        SchoolYearController.clickEventHandler(event);
+        TimetableController.timetableClickEventHandler(event);
     });
 
     // handlers for empty timeslots
@@ -84,9 +87,8 @@ async function startApp() {
     document.querySelector('#upcomingTasksTable tbody').addEventListener('change', TaskController.tasksTableEventHandler);
     document.querySelector('#inProgressTasksTable tbody').addEventListener('change', TaskController.tasksTableEventHandler);
 
-    //handlers for settings
-    document.querySelector('#settingsContainer').addEventListener('click', SettingsController.settingsClickEventHandler);
-    document.querySelector('#validFromPicker').addEventListener('change', SettingsController.isDateTaken);
+    //handlers for timetableView
+    document.querySelector('#validFromPicker').addEventListener('change', TimetableController.isDateTaken);
 
     //school year info and curriculum
     document.querySelector('#schoolYearViewContainer').addEventListener('change', (event) => {
@@ -144,10 +146,10 @@ async function startApp() {
 
     await LessonView.showLessonHasTaskIndicator() // <- this has to run, after Tasks are rendered to work
 
-    await SettingsView.renderSelectableLessonColors();
-    await SettingsView.renderExistingSubjects();
-    await SettingsView.setDateOfTimetableToDisplay();
-    await SettingsView.renderLessons();
+    await TimetableView.renderSelectableLessonColors();
+    await TimetableView.renderExistingSubjects();
+    await TimetableView.setDateOfTimetableToDisplay();
+    await TimetableView.renderLessons();
 
     LoginController.isAuth();
     LoginController.isRegister();

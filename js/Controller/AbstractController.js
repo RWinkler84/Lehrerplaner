@@ -7,6 +7,7 @@ import LoginController from "./LoginController.js";
 import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
 import CurriculumController from "./CurriculumController.js";
+import TimetableController from "./TimetableController.js";
 
 export default class AbstractController {
 
@@ -21,7 +22,7 @@ export default class AbstractController {
     }
 
     static async getAllSubjects() {
-        return await SettingsController.getAllSubjects();
+        return await TimetableController.getAllSubjects();
     }
 
     static async getAllRegularLessons() {
@@ -67,8 +68,8 @@ export default class AbstractController {
 
     static async renderDataChanges(updatedElements = null) {
         if (updatedElements) {
-            if (updatedElements.subjects) await SettingsController.renderSubjectChanges();
-            if (updatedElements.timetable) await SettingsController.renderSettingsLessonChanges();
+            if (updatedElements.subjects) await TimetableController.renderSubjectChanges();
+            if (updatedElements.timetable) await TimetableController.renderTimetableLessonChanges();
             if (updatedElements.timetableChanges) await LessonController.renderLesson();
             if (updatedElements.tasks) await TaskController.renderTaskChanges();
             if (updatedElements.schoolYears) {
@@ -160,7 +161,7 @@ export default class AbstractController {
                     CurriculumController.resizeSpanContentContainers();
                 }
 
-                View.openSchoolYearSettings();
+                SchoolYearController.openSchoolYearSettings();
                 break
 
             case 'logoutButton':
