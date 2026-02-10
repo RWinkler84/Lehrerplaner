@@ -196,6 +196,10 @@ export default class SchoolYearController {
         this.renderSchoolYearInfoSection(View.getSelectedYearId());
     }
 
+    static openSchoolYearSettings() {
+        View.openSchoolYearSettings();
+    }
+
     //event handler
     static clickEventHandler(event) {
         //by id

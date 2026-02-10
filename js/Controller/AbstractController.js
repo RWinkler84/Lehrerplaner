@@ -7,6 +7,7 @@ import LoginController from "./LoginController.js";
 import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
 import CurriculumController from "./CurriculumController.js";
+import TimetableController from "./TimetableController.js";
 
 export default class AbstractController {
 
@@ -21,7 +22,7 @@ export default class AbstractController {
     }
 
     static async getAllSubjects() {
-        return await SettingsController.getAllSubjects();
+        return await TimetableController.getAllSubjects();
     }
 
     static async getAllRegularLessons() {
@@ -67,15 +68,15 @@ export default class AbstractController {
 
     static async renderDataChanges(updatedElements = null) {
         if (updatedElements) {
-            if (updatedElements.subjects) await SettingsController.renderSubjectChanges();
-            if (updatedElements.timetable) await SettingsController.renderSettingsLessonChanges();
+            if (updatedElements.subjects) await TimetableController.renderSubjectChanges();
+            if (updatedElements.timetable) await TimetableController.renderTimetableLessonChanges();
             if (updatedElements.timetableChanges) await LessonController.renderLesson();
             if (updatedElements.tasks) await TaskController.renderTaskChanges();
             if (updatedElements.schoolYears) {
                 await LessonController.renderCurriculaSelection();
                 await LessonController.renderSelectedCurricula();
                 await CurriculumController.renderSchoolYearCurriculumEditor();
-                }
+            }
         }
 
         TaskController.renderTaskChanges();
@@ -93,7 +94,7 @@ export default class AbstractController {
         const userInfo = await db.getUserInfo();
 
         //set the syncIndicator to unsynced, if activeUntil is expired
-        if (new Date().setHours(12,0,0,0) > new Date(userInfo.activeUntil).setHours(12,0,0,0)) AbstractController.setSyncIndicatorStatus('unsynced');
+        if (new Date().setHours(12, 0, 0, 0) > new Date(userInfo.activeUntil).setHours(12, 0, 0, 0)) AbstractController.setSyncIndicatorStatus('unsynced');
 
         return userInfo;
     }
@@ -139,10 +140,30 @@ export default class AbstractController {
         }
     }
 
-    static topMenuClickEventHandler(event) {
-        let target = event.target.id;
+    static async topMenuClickEventHandler(event) {
+        let target = event.target;
 
-        switch (target) {
+        switch (target.id) {
+            case 'openWeekViewButton':
+                View.openWeekView();
+                break;
+
+
+            case 'openTimetableViewButton':
+                TimetableController.openTimetableSettings();
+                break;
+
+            case 'openSchoolYearViewButton':
+                const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
+                //only render, if nothing has been rendered yet, else keep the state, but resize the spanContentContainers in case of a screen resize
+                if (displayedSchoolYearId == "") {
+                    await SchoolYearController.renderSchoolYearInfoSection();
+                    CurriculumController.resizeSpanContentContainers();
+                }
+
+                SchoolYearController.openSchoolYearSettings();
+                break
+
             case 'logoutButton':
                 SettingsController.logout();
                 break;
@@ -155,7 +176,7 @@ export default class AbstractController {
                 SettingsController.openSettings();
                 break;
 
-            case 'openMenuButton':
+            case 'openBurgerMenuButton':
                 View.toggleTopMenu(event);
                 break;
 

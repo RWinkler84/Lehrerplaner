@@ -3,6 +3,36 @@ import AbstractController from "../Controller/AbstractController.js";
 
 export default class AbstractView {
 
+    static openWeekView() {
+        document.querySelector('#openWeekViewButton').classList.add('selected');
+        document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
+        document.querySelector('#openTimetableViewButton').classList.remove('selected');
+
+        document.querySelector('#weekViewContainer').style.display = 'block';
+        document.querySelector('#timetableViewContainer').style.display = 'none';
+        document.querySelector('#schoolYearViewContainer').style.display = 'none';
+    }
+
+    static openTimetableSettings() {
+        document.querySelector('#openWeekViewButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
+        document.querySelector('#openTimetableViewButton').classList.add('selected');
+
+        document.querySelector('#weekViewContainer').style.display = 'none';
+        document.querySelector('#timetableViewContainer').style.display = 'block';
+        document.querySelector('#schoolYearViewContainer').style.display = 'none';
+    }
+
+    static openSchoolYearSettings() {
+        document.querySelector('#openWeekViewButton').classList.remove('selected');
+        document.querySelector('#openTimetableViewButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearViewButton').classList.add('selected');
+
+        document.querySelector('#weekViewContainer').style.display = 'none';
+        document.querySelector('#timetableViewContainer').style.display = 'none';
+        document.querySelector('#schoolYearViewContainer').style.display = 'block';
+    }
+
     static async getSubjectSelectHTML(event = undefined) {
         let allSubjects = await AbstractController.getAllSubjects();
         let optionsHTML = '<option value="">-</option>';
@@ -88,7 +118,7 @@ export default class AbstractView {
         const sundayDate = document.querySelector('.weekday[data-weekday_number="6"]').dataset.date;
 
         const holidays = [];
-        
+
         schoolYears.forEach(schoolYear => holidays.push(...schoolYear.getHolidaysInDateRange(mondayDate, sundayDate)));
 
         //passed days
@@ -277,9 +307,9 @@ export default class AbstractView {
             case 'unsynced':
                 syncIndicator.classList.add('unsynced');
                 let infoText = 'Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.';
-                
+
                 if (errorMessage == 'Plus licence expired') infoText = 'Es sieht so aus als wäre deine Plus-Lizenz abgelaufen. Deine Daten werden nur lokal gespeichert. Erneuere die Lizenz, um Datenverlust sicher zu vermeiden.'
-                
+
                 tooltipText.textContent = infoText;
                 break;
         }

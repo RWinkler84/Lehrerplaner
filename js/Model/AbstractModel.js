@@ -24,7 +24,8 @@ export default class AbstractModel {
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(content)
+                    body: JSON.stringify(content),
+                    signal: AbortSignal.timeout(2000)
                 })
 
             if (!response.ok) {
@@ -34,6 +35,7 @@ export default class AbstractModel {
         }
         catch (error) {
             AbstractController.setSyncIndicatorStatus('unsynced', 'no server response');
+            console.log(error);
             return {
                 status: 'failed',
                 error: 'no server response',

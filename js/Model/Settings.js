@@ -2,6 +2,7 @@ import { ONEDAY } from "../index.js";
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js"
 import SettingsController from "../Controller/SettingsController.js";
+import TimetableController from "../Controller/TimetableController.js";
 
 export default class Settings extends AbstractModel {
     constructor() {
@@ -172,7 +173,7 @@ export default class Settings extends AbstractModel {
         if (result.status == 'failed') {
             standardTimetable.forEach(entry => {
                 if (entry.validFrom != previousTimetableValidFromDate) return;
-                this.writeToLocalDB('unsyncedTimetables', entry.serialize());
+                this.updateOnLocalDB('unsyncedTimetables', entry.serialize());
             })
         }
 
