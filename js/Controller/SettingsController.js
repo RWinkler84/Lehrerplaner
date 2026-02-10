@@ -213,7 +213,10 @@ export default class SettingsController {
         View.setVersionDisplay(version);
     }
 
-    static openSettings() {
+    static async openSettings() {
+        const userInfo = await AbstractController.getUserInfo();
+        
+        View.openAccountSettings(userInfo);
         View.openSettings();
     }
 
