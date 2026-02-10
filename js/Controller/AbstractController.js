@@ -150,7 +150,7 @@ export default class AbstractController {
 
 
             case 'openTimetableViewButton':
-                View.openTimetableSettings();
+                TimetableController.openTimetableSettings();
                 break;
 
             case 'openSchoolYearViewButton':

@@ -1709,7 +1709,11 @@ h4 {
         flex-direction: column-reverse;
     }
 
-    #openSettingsMenuButton,
+    /* DO NOT DELETE */
+
+    /* This is a responsive menu for the settings, that can be used again, if there will be more than just account settings one day */
+
+    /* #openSettingsMenuButton,
     #closeSettingsButtonResponsive {
         display: block;
     }
@@ -1724,7 +1728,7 @@ h4 {
         gap: 0;
         background-color: var(--lightMenuBackground);
         padding: 1rem 1rem;
-    }
+        } 
 
     .settingsMenuButton {
         font-size: 1rem;
@@ -1737,6 +1741,9 @@ h4 {
     #closeSettingsButton {
         display: none;
     }
+    
+    */
+    /* UNTIL HERE */
 
     #createSubjectContainer {
         justify-content: space-between;

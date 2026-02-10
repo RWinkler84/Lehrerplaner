@@ -171,7 +171,12 @@ export default class TimetableController {
         return await model.getAllSubjects();
     }
 
-    static openTimetableSettings() {
+    static async openTimetableSettings() {
+        await View.renderSelectableLessonColors();
+        await View.renderExistingSubjects();
+        await View.setDateOfTimetableToDisplay();
+        await View.renderLessons();
+
         View.openTimetableSettings();
     }
 
@@ -218,7 +223,7 @@ export default class TimetableController {
 
         //identify items by class
         switch (true) {
-            case event.target.classList.contains('deleteItemButton'):
+            case event.target.classList.contains('deleteSubjectButton'):
                 View.deleteSubject(event);
                 break;
         }

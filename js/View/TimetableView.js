@@ -2,7 +2,7 @@ import Fn from '../inc/utils.js';
 import AbstractView from './AbstractView.js';
 import Controller from '../Controller/TimetableController.js';
 
-export default class TimetableView {
+export default class TimetableView extends AbstractView {
     static async renderSelectableLessonColors() {
         let allSubjects = await Controller.getAllSubjects();
         let allColorsArray = [

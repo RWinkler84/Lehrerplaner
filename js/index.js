@@ -38,7 +38,7 @@ let abstCtrl = new AbstractController();
 let timeout = false //for resize debouncing
 
 async function startApp() {
-    AbstractController.setVersion('0.9.61');
+    AbstractController.setVersion('0.9.7');
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));
@@ -145,11 +145,6 @@ async function startApp() {
     await TaskView.renderTasks();
 
     await LessonView.showLessonHasTaskIndicator() // <- this has to run, after Tasks are rendered to work
-
-    await TimetableView.renderSelectableLessonColors();
-    await TimetableView.renderExistingSubjects();
-    await TimetableView.setDateOfTimetableToDisplay();
-    await TimetableView.renderLessons();
 
     LoginController.isAuth();
     LoginController.isRegister();
