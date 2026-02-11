@@ -19,6 +19,12 @@ export default class SchoolYearController {
             }
         }
 
+        if (CurriculumController.getEditorType() == 'Holiday Editor') {
+        View.renderSchoolYearInfoSection(schoolYear, true);
+        
+        return;
+        }
+
         View.renderSchoolYearInfoSection(schoolYear);
     }
 

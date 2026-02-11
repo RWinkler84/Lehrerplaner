@@ -4,7 +4,6 @@ import SchoolYearController from "./SchoolYearController.js";
 import Fn from "../inc/utils.js";
 import SchoolYear from "../Model/SchoolYear.js";
 import AbstractController from "./AbstractController.js";
-import Editor from "../inc/editor.js";
 
 export default class CurriculumController {
     static renderEmptyCalendar(startDate, endDate) {

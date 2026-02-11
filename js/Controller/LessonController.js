@@ -90,6 +90,9 @@ export default class LessonController {
 
     static async setLessonsInHolidaysCanceled(schoolYear = null) {
         let schoolYears = [schoolYear];
+        const oldTimetable = await Lesson.getAllRegularLessons();
+        const oldTimetableChanges = await Lesson.getAllTimetableChanges();
+
         if (!schoolYear) schoolYears = await SchoolYearController.getAllSchoolYears();
         if (schoolYears.length == 0) return;
 

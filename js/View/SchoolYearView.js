@@ -3,7 +3,7 @@ import Controller from "../Controller/SchoolYearController.js";
 import Fn from "../inc/utils.js";
 
 export default class SchoolYearView extends AbstractView {
-    static async renderSchoolYearInfoSection(schoolYear) {
+    static async renderSchoolYearInfoSection(schoolYear, isHolidayEditOngoing = false) {
 
         const infoContainer = document.querySelector('#schoolYearInfoContainer');
         const schoolYearSelect = infoContainer.querySelector('#schoolYearNameSelect');
@@ -67,7 +67,7 @@ export default class SchoolYearView extends AbstractView {
             this.enableEditSchoolYearDatesGradesButton();
 
             this.showSchoolYearCreationButtonsContainer();
-            
+
             this.disableCreateNewSchoolYearButton();
             this.hideCreateNewSchoolYearButton();
             this.hideCreateHolidayDatesButton();
@@ -75,12 +75,29 @@ export default class SchoolYearView extends AbstractView {
             return;
         }
 
+        if (isHolidayEditOngoing) {
+            this.showEditHolidayDatesButton();
+            this.disableEditHolidayDatesButton();
+
+            this.showEditSchoolYearDatesGradesButton();
+            this.disableEditSchoolYearDatesGradesButton();
+
+            this.showCreateNewSchoolYearButton();
+            this.disableCreateNewSchoolYearButton()
+
+            this.hideCreateHolidayDatesButton();
+            this.hideSaveSchoolYearDatesGradesButton();
+            this.hideSchoolYearCreationButtonsContainer();
+
+            return;
+        }
+
         this.showEditHolidayDatesButton();
         this.enableEditHolidayDatesButton();
-        
+
         this.showEditSchoolYearDatesGradesButton();
         this.enableEditSchoolYearDatesGradesButton();
-        
+
         this.showCreateNewSchoolYearButton();
         this.enableCreateNewSchoolYearButton()
 
