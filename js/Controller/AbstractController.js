@@ -145,6 +145,7 @@ export default class AbstractController {
 
         switch (target.id) {
             case 'openWeekViewButton':
+                LessonController.renderSelectedCurricula();
                 View.openWeekView();
                 break;
 
