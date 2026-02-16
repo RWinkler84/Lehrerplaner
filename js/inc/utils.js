@@ -199,4 +199,10 @@ export default class Utils {
 
         return match;
     }
+
+    static unescapeHTMLSpecialChars(string) {
+       const unescapedString = string.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+
+       return unescapedString;
+    }
 }

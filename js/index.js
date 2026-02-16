@@ -37,6 +37,8 @@ let abstCtrl = new AbstractController();
 let timeout = false //for resize debouncing
 
 async function startApp() {
+    registerWorker();
+
     AbstractController.setVersion('0.9.71');
     await abstCtrl.syncData();
 
@@ -351,3 +353,23 @@ async function startApp() {
 }
 
 startApp();
+
+async function registerWorker() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register('./worker.js', {
+                scope: './'
+            });
+            if (registration.installing) {
+                console.log("Service worker installing");
+            } else if (registration.waiting) {
+                console.log("Service worker installed");
+            } else if (registration.active) {
+                console.log("Service worker active");
+            }
+        }
+        catch (error) {
+            console.error(`Service Worker registration failed with: ${error}`);
+        }
+    }
+}
