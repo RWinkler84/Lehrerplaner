@@ -612,6 +612,28 @@ export default class CurriculumView extends AbstractView {
         if (isNewSpan) isNewSpan.removeAttribute('new');
     }
 
+    /** If a curriculum creation or editing of holidays is ongoing, the buttons to save or discard the curriculum or close the holiday editor should stick
+    to the top of the page. */
+    static toggleCurriculumLabelAndButtonContainerSticky() {
+        const container = document.querySelector('#curriculumLabelAndButtonContainer');
+
+        if (container.style.position == 'sticky') {
+            container.style.position = '';
+            container.style.top = '';
+            container.style.zIndex = '';
+            container.firstElementChild.style.display = '';
+
+            return
+        }
+
+        container.style.position = 'sticky';
+        container.style.top = '3rem';
+        container.style.zIndex = '4';
+
+        if (window.innerWidth <= '620') container.firstElementChild.style.display = 'none';
+
+    }
+
     /**@param spanData is the start and end date of the span, as well as its text content,  @param id is the id that is given to the span to identify it later. */
     static renderSpan(id, spanData) {
         const yearContainer = document.querySelector('#yearContainer');

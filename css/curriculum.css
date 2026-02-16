@@ -140,15 +140,20 @@
     gap: 4px;
 }
 
+#curriculumLabelAndButtonContainer {
+    background-color: var(--contentContainerBackground);
+    padding-top: 0.5rem;
+}
+
 #dayNameContainer {
     position: sticky;
-    top: 0;
+    top: 2.25rem;
     background-color: var(--contentContainerBackground);
     color: var(--lightgrey);
     padding-top: 1rem;
     margin-bottom: 0.5rem;
     gap: 0.2rem;
-    z-index: 3;
+    z-index: 2;
     border-bottom: solid 1px var(--lightgrey);
 }
 

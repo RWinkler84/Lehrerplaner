@@ -35,7 +35,6 @@ export default class AbstractModel {
         }
         catch (error) {
             AbstractController.setSyncIndicatorStatus('unsynced', 'no server response');
-            console.log(error);
             return {
                 status: 'failed',
                 error: 'no server response',
