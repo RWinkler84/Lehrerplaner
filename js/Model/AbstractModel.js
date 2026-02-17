@@ -256,7 +256,6 @@ export default class AbstractModel {
     async getUserInfo() {
         let userInfo = await this.readFromLocalDB('settings', 1);
 
-
         if (!userInfo) {
             userInfo = { accountType: 'not set' };
         }
@@ -267,6 +266,17 @@ export default class AbstractModel {
         userInfo.emailConfirmed = serverData.emailConfirmed;
         userInfo.activeUntil = serverData.activeUntil;
         userInfo.loggedIn = serverData.loggedIn == 'true' ? true : false;
+
+        return userInfo;
+    }
+
+    /** returns locally saved user data */
+    async getLocalUserInfo() {
+        let userInfo = await this.readFromLocalDB('settings', 1);
+
+        if (!userInfo) {
+            userInfo = { accountType: 'not set' };
+        }
 
         return userInfo;
     }

@@ -11,6 +11,11 @@ export default class SettingsController {
         model.logout();
     }
 
+    static checkForPendingLogout() {
+        let model = new Settings;
+        model.checkForPendingLogout();
+    }
+
     static async deleteAccount() {
         let model = new Settings;
         let result = await model.deleteAccount();

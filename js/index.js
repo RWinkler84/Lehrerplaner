@@ -40,6 +40,7 @@ async function startApp() {
     registerWorker();
 
     AbstractController.setVersion('0.9.71');
+    await SettingsController.checkForPendingLogout();
     await abstCtrl.syncData();
 
     window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));

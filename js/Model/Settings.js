@@ -201,10 +201,45 @@ export default class Settings extends AbstractModel {
 
     async logout() {
         let result = await this.makeAjaxQuery('user', 'logout');
+        let userInfo = await this.getLocalUserInfo();
+
+        document.cookie = `lprm=; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
 
         if (result.status == 'success') {
-            document.cookie = `lprm=; expires=Thu, 01 Jan 1970 00:00:00 UTC;}`;
+            if (userInfo.logoutPending) {
+                delete userInfo.logoutPending;
+                await this.updateOnLocalDB('settings', userInfo);
+            }
+
             location.reload();
+            return;
+        }
+
+        if (userInfo.logoutPending) {
+            setTimeout(() => { (new Settings).logout() }, 30000);
+
+            return;
+        }
+
+        alert(
+            `Du scheinst gerade offline zu sein und kannst deshalb nicht vom Server ausgeloggt werden. Der Logout wird nachgeholt, sobald der Server wieder erreichbar ist.
+            
+            Solltest du Eduplanio Plus-Nutzer sein, werden nicht synchronisierte Änderungen erst synchronisiert, nachdem du dich auf diesem Gerät wieder eingeloggt hast.
+            `);
+        userInfo.logoutPending = true;
+
+        await this.updateOnLocalDB('settings', userInfo);
+
+        setTimeout(() => { (new Settings).logout() }, 30000);
+    }
+
+    async checkForPendingLogout() {
+        let userInfo = await this.getLocalUserInfo();
+
+        if (userInfo.logoutPending) {
+            this.logout()
+
+            return;
         }
     }
 

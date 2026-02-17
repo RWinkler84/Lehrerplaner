@@ -25,6 +25,7 @@ async function cacheResources(request, dataToCache) {
     const cache = await caches.open('eduplanio')
 
     if (cache) {
+        await cache.delete(request);
         await cache.put(request, dataToCache)
     }
 }
@@ -40,10 +41,6 @@ async function cacheMinimalData() {
         cache.addAll(
             [
                 './',
-                // './favicon-96x96.png',
-                // './favicon.ico',
-                // './favicon.svg',
-                // './site.webmanifest',
                 
                 //css
                 './css/animations.css',

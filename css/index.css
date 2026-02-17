@@ -174,7 +174,7 @@ main {
     display: none;
     flex-direction: column;
     position: absolute;
-    z-index: 4;
+    z-index: 200;
     background-color: var(--bodyBackground);
     top: 1rem;
     left: 2rem;

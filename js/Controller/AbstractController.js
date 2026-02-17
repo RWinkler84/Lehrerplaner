@@ -66,6 +66,10 @@ export default class AbstractController {
         await this.#db.syncData();
     }
 
+    async checkForPendingLogout() {
+        
+    }
+
     static async renderDataChanges(updatedElements = null) {
         if (updatedElements) {
             if (updatedElements.subjects) await TimetableController.renderSubjectChanges();
