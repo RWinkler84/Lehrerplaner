@@ -622,7 +622,7 @@ export default class AbstractModel {
             this.clearObjectStore('unsyncedDeletedSchoolYears');
         }
 
-        this.updateLocalWithRemoteData(tablesToUpdate);
+        await this.updateLocalWithRemoteData(tablesToUpdate);
     }
 
     async updateLocalWithRemoteData(tablesToUpdate) {

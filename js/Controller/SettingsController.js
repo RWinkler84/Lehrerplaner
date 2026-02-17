@@ -11,7 +11,7 @@ export default class SettingsController {
         model.logout();
     }
 
-    static checkForPendingLogout() {
+    static async checkForPendingLogout() {
         let model = new Settings;
         model.checkForPendingLogout();
     }
