@@ -213,6 +213,23 @@ export default class LoginView extends AbstractView {
         errorMessageDisplay.innerText = 'Es wurde bereits eine Authentifierungsmail geschickt. Überprüfe bitte deinen Posteingang oder Spam-Ordner.';
     }
 
+    static togglePasswordVisibility() {
+        const passwordInput = document.querySelector('#password');
+        const eyeIcon = document.querySelector('#revealPasswordIconWrapper');
+
+        if (password.type == 'password') {
+            password.type = 'text';
+            eyeIcon.classList.remove('eyeIcon');
+            eyeIcon.classList.add('crossedEyeIcon');
+
+            return;
+        }
+
+        password.type = 'password';
+        eyeIcon.classList.remove('crossedEyeIcon');
+        eyeIcon.classList.add('eyeIcon');
+    }
+
     //form validation errors
 
     // Account Creation

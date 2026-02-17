@@ -240,6 +240,10 @@ export default class LoginController {
         await db.toggleTemperaryOfflineUsage(offlineStatus);
     }
 
+    static togglePasswordVisibility() {
+        View.togglePasswordVisibility();
+    }
+
     static isReset() {
         View.isReset();
     }
@@ -256,8 +260,14 @@ export default class LoginController {
         let elementId = event.target.id;
         let elementClassList = event.target.classList;
 
+        console.log(event.target.id)
+
         //elements with ids
         switch (elementId) {
+            case 'revealPasswordIconWrapper':
+                LoginController.togglePasswordVisibility();
+                break;
+
             //send forms buttons
             case 'loginButton':
                 LoginController.attemptLogin(event);
@@ -312,7 +322,7 @@ export default class LoginController {
             case elementClassList.contains('closeSupportDialogButton'):
                 AbstractController.closeSupportDialog();
                 break;
-            
+
             case elementClassList.contains('closeRegistrationNeededDialogButton'):
                 SettingsController.closeRegistrationNeededDialog();
                 break;
@@ -322,8 +332,8 @@ export default class LoginController {
         if (event.type == "cancel") {
             switch (elementId) {
                 case 'loginDialog':
-                case 'createAccountDialog': 
-                case 'sendResetPasswordMailDialog': 
+                case 'createAccountDialog':
+                case 'sendResetPasswordMailDialog':
                 case 'resetPasswordDialog':
                     LoginController.toggleTemperaryOfflineUsage(true, event)
                     break;
