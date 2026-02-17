@@ -1426,6 +1426,7 @@ h4 {
 
 .undefined,
 .appointement {
+    background-color: var(--contentContainerBackground);
     border: solid 1px var(--bodyBackground);
     color: var(--bodyBackground);
 }
