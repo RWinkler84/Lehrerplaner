@@ -262,8 +262,6 @@ export default class LoginController {
         let elementId = event.target.id;
         let elementClassList = event.target.classList;
 
-        console.log(event.target.id)
-
         //elements with ids
         switch (elementId) {
             case 'revealPasswordIconWrapper':

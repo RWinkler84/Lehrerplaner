@@ -1,31 +1,69 @@
+const doNotAbortActions = [
+    'login',
+    'logout',
+    'createAccount',
+    'deleteAccount',
+    'resetPassword',
+    'authenticateMail',
+    'resendAuthMail',
+    'sendPasswortResetMail',
+    'processPurchase',
+    'sendSupportTicket'
+]
+
 self.addEventListener('fetch', (event) => {
     event.respondWith(fetchResources(event.request, event))
 });
 
-self.addEventListener('install', (event) => {event.waitUntil(cacheMinimalData())});
+self.addEventListener('install', (event) => { event.waitUntil(cacheMinimalData()) });
 
 
 async function fetchResources(request, event) {
     try {
-        let responseFromNetwork = await fetch(request, { signal: AbortSignal.timeout(1000) });
-        event.waitUntil(cacheResources(request, responseFromNetwork.clone()));
+        const isCritical = includesWhitelisted(request);
+        const timeout = isCritical ? 30000 : 5000;
+
+        let responseFromNetwork = await fetch(request, { signal: AbortSignal.timeout(timeout) });
+
+        if (responseFromNetwork.ok && request.method == 'GET') {
+            event.waitUntil(cacheResources(request, responseFromNetwork.clone()));
+        }
 
         return responseFromNetwork;
     }
     catch {
         const responseFromCache = await getCachedResources(request);
-        return responseFromCache;
+
+        if (responseFromCache) return responseFromCache;
+
+        if (isCritical) {
+            new Response(JSON.stringify({
+                status: 'failed',
+                error: 'no server response',
+                message: 'Scheinbar gibt es gerade ein technisches Problem. Versuche es bitte später noch einmal.'
+            }), {
+                status: 503,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
     }
 }
 
 
-async function cacheResources(request, dataToCache) {
-    if (request.method == 'POST') return;
+function includesWhitelisted(request) {
+    let match = false;
 
+    doNotAbortActions.forEach(action => {
+        if (request.url.includes(action)) match = true;
+    })
+
+    return match;
+}
+
+async function cacheResources(request, dataToCache) {
     const cache = await caches.open('eduplanio')
 
     if (cache) {
-        await cache.delete(request);
         await cache.put(request, dataToCache)
     }
 }
@@ -41,13 +79,13 @@ async function cacheMinimalData() {
         cache.addAll(
             [
                 './',
-                
+
                 //css
                 './css/animations.css',
                 './css/curriculum.css',
                 './css/editor.css',
                 './css/index.css',
-                
+
                 //controller
                 './js/Controller/AbstractController.js',
                 './js/Controller/CurriculumController.js',
@@ -58,7 +96,7 @@ async function cacheMinimalData() {
                 './js/Controller/SettingsController.js',
                 './js/Controller/TaskController.js',
                 './js/Controller/TimetableController.js',
-                
+
                 //model
                 './js/Model/AbstractModel.js',
                 './js/Model/Lesson.js',
@@ -67,7 +105,7 @@ async function cacheMinimalData() {
                 './js/Model/SchoolYear.js',
                 './js/Model/Settings.js',
                 './js/Model/Task.js',
-                
+
                 //view
                 './js/View/AbstractView.js',
                 './js/View/CurriculumView.js',
@@ -78,7 +116,7 @@ async function cacheMinimalData() {
                 './js/View/SettingsView.js',
                 './js/View/TaskView.js',
                 './js/View/TimetableView.js',
-                
+
                 //misc
                 './js/inc/editor.js',
                 './js/inc/utils.js',
@@ -87,39 +125,3 @@ async function cacheMinimalData() {
         );
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

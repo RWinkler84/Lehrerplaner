@@ -39,7 +39,7 @@ let timeout = false //for resize debouncing
 async function startApp() {
     registerWorker();
 
-    AbstractController.setVersion('0.9.71');
+    AbstractController.setVersion('0.9.72');
     await SettingsController.checkForPendingLogout();
     await abstCtrl.syncData();
 
