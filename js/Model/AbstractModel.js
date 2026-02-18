@@ -534,7 +534,6 @@ export default class AbstractModel {
     }
 
     async syncData() {
-        // await this.checkForNulledCreatedField();
         let localSettings = await this.readFromLocalDB('settings', 0);
         let localTimestamps = localSettings == undefined ? false : localSettings.lastUpdated;
         let remoteTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
@@ -677,51 +676,5 @@ export default class AbstractModel {
             await this.updateOnLocalDB(objectStore, dataToStore);
             this.markLocalDBUpdated(objectStore, newLocalTimestamp);
         }
-    }
-
-    async checkForNulledCreatedField() {
-        let timestamp = await this.readFromLocalDB('settings', 0);
-        let subjects = await this.readAllFromLocalDB('subjects');
-        let timetable = await this.readAllFromLocalDB('timetable');
-        let timetableChanges = await this.readAllFromLocalDB('timetableChanges');
-        let tasks = await this.readAllFromLocalDB('tasks');
-
-        subjects.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-        timetable.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-        timetableChanges.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-        tasks.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-
-        if (timestamp && typeof timestamp.lastUpdated == 'string') {
-            await this.updateOnLocalDB('settings', {
-                id: 0,
-                lastUpdated: {
-                    subjects: timestamp.lastUpdated,
-                    timetable: timestamp.lastUpdated,
-                    timetableChanges: timestamp.lastUpdated,
-                    tasks: timestamp.lastUpdated,
-                }
-            });
-        }
-
-        this.updateOnLocalDB('subjects', subjects);
-        this.updateOnLocalDB('timetable', timetable);
-        this.updateOnLocalDB('timetableChanges', timetableChanges);
-        this.updateOnLocalDB('tasks', tasks);
     }
 }

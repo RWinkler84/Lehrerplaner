@@ -4,16 +4,11 @@ import Fn from "../inc/utils.js";
 export default class SettingsView {
 
     static openSettings() {
-        document.querySelector('#settingsContainer').style.display = 'flex';
-        document.querySelector('main').style.filter = 'blur(3px)';
-        document.querySelector('nav').style.filter = 'blur(3px)';
+        document.querySelector('#settingsContainer').showModal();
     }
 
     static closeSettings() {
-        document.querySelector('#settingsContainer').style.display = 'none';
-        document.querySelector('main').style.removeProperty('filter');
-        document.querySelector('nav').style.removeProperty('filter');
-
+        document.querySelector('#settingsContainer').close();
     }
 
     static toggleSettingsMenu(event) {

@@ -171,18 +171,21 @@ main {
 }
 
 #settingsContainer {
-    display: none;
     flex-direction: column;
-    position: absolute;
-    z-index: 200;
     background-color: var(--bodyBackground);
-    top: 1rem;
-    left: 2rem;
-    right: 2rem;
-    bottom: 1rem;
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
     border: solid 0.3rem var(--bodyBackground);
     scrollbar-color: var(--lightgrey) transparent;
+    padding: 0;
+    max-width: unset;
+    min-width: unset;
+    width: calc(100% - 4rem);
+    height: calc(100% - 4rem);
+
+    &[open] {
+        display: flex;
+
+    }
 }
 
 .settingsSubContainer {
@@ -246,7 +249,7 @@ dialog .errorMessageDisplay,
 
 #revealPasswordIconWrapper {
     position: absolute;
-padding: 0.5rem;
+    padding: 0.5rem;
     right: 3rem;
     pointer-events: unset;
 }
@@ -1534,10 +1537,8 @@ h4 {
     }
 
     #settingsContainer {
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
+        width: calc(100% - 2rem);
+        height: calc(100% - 2rem);
     }
 
     #checkoutDialog,
@@ -1637,8 +1638,8 @@ h4 {
     }
 
     #revealPasswordIconWrapper {
-    right: 1.5rem;
-}
+        right: 1.5rem;
+    }
 
     #checkoutCompletedDialog {
         height: 100vh;
