@@ -126,7 +126,7 @@ export default class AbstractView {
             weekday.classList.remove('passed');
             weekday.classList.remove('holiday');
 
-            weekday.querySelector('.holidayNameMask')?.remove();
+            weekday.querySelectorAll('.holidayNameMask').forEach(mask => mask.remove());
 
             if (new Date(weekday.dataset.date).setHours(12, 0, 0, 0) < new Date().setHours(12, 0, 0, 0)) weekday.classList.add('passed');
         })

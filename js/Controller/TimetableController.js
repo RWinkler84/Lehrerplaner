@@ -79,7 +79,7 @@ export default class TimetableController {
         //triggers reordering of tasks for each lesson
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
-        await LessonController.setLessonsInHolidaysCanceled();
+        await LessonController.setLessonsInHolidaysCanceled(null, lessons[0].validFrom);
 
         LessonController.renderLesson();
 
@@ -118,7 +118,7 @@ export default class TimetableController {
 
         await LessonController.renderLesson();
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
-        await LessonController.setLessonsInHolidaysCanceled();
+        await LessonController.setLessonsInHolidaysCanceled(null, lessons[0].validFrom);
 
         View.discardNewTimetable();
     }

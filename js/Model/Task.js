@@ -216,8 +216,8 @@ export default class Task extends AbstractModel {
                 let subjectsArray = subjectsByClass[key];
 
                 for (let subject of subjectsArray) {
-                    let allOldLessonDates = await this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
-                    let allNewLessonDates = await this.calculateAllLessonDates(className, subject, endDate, currentTimetable, currentChanges);
+                    let allOldLessonDates = await this.calculateAllLessonDates(className, subject, endDate, null, oldTimetable, oldTimetableChanges)
+                    let allNewLessonDates = await this.calculateAllLessonDates(className, subject, endDate, null, currentTimetable, currentChanges);
 
                     //in the unlikely case, a tasks exists without a corresponding lesson, jump to the next subject
                     if (allOldLessonDates.length == 0) continue;

@@ -88,7 +88,7 @@ export default class LessonController {
         return lesson.id;
     }
 
-    static async setLessonsInHolidaysCanceled(schoolYear = null) {
+    static async setLessonsInHolidaysCanceled(schoolYear = null, startDate = null) {
         let schoolYears = [schoolYear];
         const oldTimetable = await Lesson.getAllRegularLessons();
         const oldTimetableChanges = await Lesson.getAllTimetableChanges();
@@ -96,7 +96,7 @@ export default class LessonController {
         if (!schoolYear) schoolYears = await SchoolYearController.getAllSchoolYears();
         if (schoolYears.length == 0) return;
 
-        await Lesson.setLessonsInHolidaysCanceled(schoolYears);
+        await Lesson.setLessonsInHolidaysCanceled(schoolYears, startDate);
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
 

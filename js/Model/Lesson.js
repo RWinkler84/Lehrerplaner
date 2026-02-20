@@ -166,19 +166,19 @@ export default class Lesson extends AbstractModel {
 
     async filterAffectedLessonChanges(affectedLessonChanges, timetable, isNewTimetable) {
         let filteredLessonChanges = [];
+        let lessonsToDelete = [];
 
         //a new timetable deletes all canceled lessons, but keeps substitute lessons and appointements after its valid date, 
         //because they could potentially still be valid
         if (isNewTimetable) {
             for (let lesson of affectedLessonChanges) {
                 if (lesson.type == 'appointement' || lesson.type == 'sub') {
-                    filteredLessonChanges.push(lesson); continue;
+                    filteredLessonChanges.push(lesson);
+                    continue;
                 }
 
+                lessonsToDelete.push(lesson);
                 await this.deleteFromLocalDB('timetableChanges', lesson.id);
-                let result = await this.makeAjaxQuery('lesson', 'delete', [lesson.serialize()]);
-
-                if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', lesson.serialize());
             }
         }
 
@@ -191,10 +191,10 @@ export default class Lesson extends AbstractModel {
                     continue;
                 }
 
-                //does the canceled lesson still exist?
+                //does the canceled lesson still exist and is not a lesson canceled because of holidays?
                 let match = false;
 
-                if (lesson.canceled == 'true') {
+                if (lesson.canceled == 'true' && lesson.type != 'holiday') {
                     timetable.forEach(entry => {
                         if (
                             lesson.class == entry.class &&
@@ -210,13 +210,13 @@ export default class Lesson extends AbstractModel {
                 if (match) {
                     filteredLessonChanges.push(lesson);
                 } else {
+                    lessonsToDelete.push(lesson);
                     await this.deleteFromLocalDB('timetableChanges', lesson.id);
-                    let result = await this.makeAjaxQuery('lesson', 'delete', [lesson.serialize()]);
-
-                    if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedTimetableChanges', lesson.serialize());
                 }
             }
         }
+
+        await Lesson.batchDelete(lessonsToDelete);
 
         return filteredLessonChanges;
     }
@@ -259,15 +259,16 @@ export default class Lesson extends AbstractModel {
         }
     }
 
-    static async setLessonsInHolidaysCanceled(schoolYears) {
-        const today = new Date().setHours(12, 0, 0, 0);
+    static async setLessonsInHolidaysCanceled(schoolYears, startDate = null) {
+        startDate ? startDate = new Date(startDate).setHours(12, 0, 0, 0) : startDate = new Date().setHours(12, 0, 0, 0);
+
         const allLessons = await this.getAllRegularLessons();
         let timetableChanges = await this.getAllTimetableChanges();
 
         const filteredSchoolYears = schoolYears.filter(schoolYear => {
-            return new Date(schoolYear.startDate).setHours(12, 0, 0, 0) <= today && new Date(schoolYear.endDate).setHours(12, 0, 0, 0) >= today
+            return new Date(schoolYear.startDate).setHours(12, 0, 0, 0) <= startDate && new Date(schoolYear.endDate).setHours(12, 0, 0, 0) >= startDate
         });
-        const filteredLessons = allLessons.filter(lesson => lesson.validUntil == null || new Date(lesson.validUntil).setHours(12, 0, 0, 0) >= today)
+        const filteredLessons = allLessons.filter(lesson => lesson.validUntil == null || new Date(lesson.validUntil).setHours(12, 0, 0, 0) >= startDate)
         const subjectsByClassName = {};
 
         filteredLessons.forEach(lesson => {
@@ -276,22 +277,22 @@ export default class Lesson extends AbstractModel {
         })
 
         //delete all canceled lessons of type holiday before creating new ones
-        const lessonsToDelete = timetableChanges.filter(canceledLesson => canceledLesson.type == 'holiday');
+        const lessonsToDelete = timetableChanges.filter(canceledLesson => canceledLesson.type == 'holiday' && new Date(canceledLesson.date).setHours(12, 0, 0, 0) > startDate);
+
         await Lesson.batchDelete(lessonsToDelete);
 
         //get all holidays of all filteredSchoolYears, calculate the lessons that would take place in the timespan of said holidays and cancel them
-        timetableChanges = await this.getAllTimetableChanges(); //retrieve the update changes to calculate all lessons correctly
         const allHolidays = [];
         const lessonsToSave = [];
 
         filteredSchoolYears.forEach(schoolYear => allHolidays.push(...schoolYear.holidays));
 
         for (let holiday of allHolidays) {
-            if (new Date(holiday.endDate).setHours(12, 0, 0, 0) < today) continue;
+            if (new Date(holiday.endDate).setHours(12, 0, 0, 0) < startDate) continue;
 
             for (let className of Object.keys(subjectsByClassName)) {
                 for (let subject of subjectsByClassName[className]) {
-                    const allLessonDates = await this.calculateAllLessonDates(className, subject, holiday.endDate);
+                    const allLessonDates = await this.calculateAllLessonDates(className, subject, holiday.endDate, startDate);
 
                     // filter out dates before the holiday starts
                     const lessonsToCancel = allLessonDates.filter(lesson => new Date(lesson.date).setHours(12, 0, 0, 0) >= new Date(holiday.startDate).setHours(12, 0, 0, 0))
@@ -303,7 +304,6 @@ export default class Lesson extends AbstractModel {
                         lesson.type = 'holiday';
                         lesson.canceled = 'true';
 
-                        // await lesson.save();
                         lessonsToSave.push(lesson);
                     }
                 }
@@ -316,9 +316,9 @@ export default class Lesson extends AbstractModel {
     static async batchSave(lessonsArray) {
         let model = new AbstractModel;
         const serializedArray = [];
+        let timetableChanges = await LessonController.getAllTimetableChanges();
 
         for (const lesson of lessonsArray) {
-            let timetableChanges = await LessonController.getAllTimetableChanges();
 
             if (lesson.subject == 'Termin') lesson.type = 'appointement';
 
@@ -328,6 +328,7 @@ export default class Lesson extends AbstractModel {
 
             const serializedLesson = lesson.serialize();
             serializedArray.push(serializedLesson);
+            timetableChanges.push(serializedLesson);
 
             await lesson.writeToLocalDB('timetableChanges', serializedLesson);
         }
