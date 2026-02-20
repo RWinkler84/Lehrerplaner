@@ -221,7 +221,7 @@
     position: absolute;
     background-color: var(--fadedgrey);
     padding: 0.5rem 0.5rem;
-    height: calc(100% - 2.5rem);
+    height: 2.25rem;
     left: 0;
     right: 0;
     border-top: solid 2px var(--topMenuBackgound);
@@ -370,79 +370,83 @@
         padding: 0.5rem 0.5rem;
     }
 
-    .day .dateContainer {
-        flex-direction: column-reverse;
-        align-items: start;
-        justify-content: end;
-        font-size: 0.5rem;
-    }
+    .day {
+        height: 4rem;
 
-    .holidayNameWrapper {
-        width: 100%;
-    }
-
-    #timeSpanForm {
-        transform: translateX(-0.5rem);
-        bottom: 0;
-        width: calc(100% + 1rem);
-    }
-
-    .curriculumSelectionItem:hover {
-        border: 2px solid var(--contentContainerBackground);
-
-        &.curriculumSelectionItem.selected {
-            border: solid 2px var(--lightMatteGreen);
+        .dateContainer {
+            flex-direction: column-reverse;
+            align-items: start;
+            justify-content: end;
+            font-size: 0.5rem;
         }
     }
 
-}
+        .holidayNameWrapper {
+            width: 100%;
+        }
 
-/* curricula on mainView */
+        #timeSpanForm {
+            transform: translateX(-0.5rem);
+            bottom: 0;
+            width: calc(100% + 1rem);
+        }
 
-.curriculaDisplayWeekday {
-    grid-template-rows: unset;
-}
+        .curriculumSelectionItem:hover {
+            border: 2px solid var(--contentContainerBackground);
 
-.curriculumSpanContainer {
-    height: 2.5rem;
-}
+            &.curriculumSelectionItem.selected {
+                border: solid 2px var(--lightMatteGreen);
+            }
+        }
 
-.spanItem {
-    position: absolute;
-    padding: 0.25rem 0.5rem;
-    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-    border-top: solid 2px var(--topMenuBackgound);
-}
+    }
 
-.spanItem.start {
-    border-left: solid 0.75rem var(--topMenuBackgound);
-    border-top-left-radius: var(--standardRadius);
-    border-bottom-left-radius: var(--standardRadius);
-}
+    /* curricula on mainView */
 
-.spanItem.end {
-    border-top-right-radius: var(--standardRadius);
-    border-bottom-right-radius: var(--standardRadius);
-}
+    .curriculaDisplayWeekday {
+        grid-template-rows: unset;
+    }
 
-.spanItemContent {
-    width:fit-content;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    position: sticky;
-    overflow-y: scroll;
-    scrollbar-width: none;
-    left: 2rem;
-    text-wrap: nowrap;
-}
+    .curriculumSpanContainer {
+        height: 2.5rem;
+    }
 
-.curriculaSpanNoteIcon {
-    width: 0.75rem;
-    height: 0.75rem;
-}
+    .spanItem {
+        position: absolute;
+        padding: 0.25rem 0.5rem;
+        box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+        border-top: solid 2px var(--topMenuBackgound);
+    }
 
-/* generics */
-.noTouchActions {
-    touch-action: none;
-}
+    .spanItem.start {
+        border-left: solid 0.75rem var(--topMenuBackgound);
+        border-top-left-radius: var(--standardRadius);
+        border-bottom-left-radius: var(--standardRadius);
+    }
+
+    .spanItem.end {
+        border-top-right-radius: var(--standardRadius);
+        border-bottom-right-radius: var(--standardRadius);
+    }
+
+    .spanItemContent {
+        width: fit-content;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        position: sticky;
+        overflow-y: scroll;
+        scrollbar-width: none;
+        left: 2rem;
+        text-wrap: nowrap;
+    }
+
+    .curriculaSpanNoteIcon {
+        width: 0.75rem;
+        height: 0.75rem;
+    }
+
+    /* generics */
+    .noTouchActions {
+        touch-action: none;
+    }

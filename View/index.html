@@ -62,23 +62,23 @@
                         <div id="isCurrentWeekDot"></div>
                     </div>
                     <div class="flex gap" id="weekSwitcher">
-                        <button id="weekBackwardButton">&#9664</button>
+                        <button id="weekBackwardButton" class="triangleButton">&#9664</button>
                         <div id="dateSpan" class="flex alignEnd"><span
                                 id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span id="weekEndDate">Sonntag</span></div>
-                        <button id="weekForwardButton">&#9654</button>
+                        <button id="weekForwardButton" class="triangleButton">&#9654</button>
                     </div>
                 </div>
 
                 <div id="weekCurriculumContainer" class="marginBottom">
                     <div class="flex responsiveSpaceBetween gap marginBottom">
                         <label>Stoffverteilungspläne</label>
-                        <button id="resizeCurriculumSectionButton" class="closeDialogButton"
+                        <button id="resizeCurriculumSectionButton" class="triangleButton"
                             style="width: 1.5rem;">&#9660;</button>
                     </div>
                     <div id="weekCurriculaSelectionContainer" class="notDisplayed">
                         <div class="flex responsiveSpaceBetween gap" style="margin-bottom: 0.5rem;">
                             <label>Auswahl:</label>
-                            <button id="resizeCurriculumSelectionButton" class="closeDialogButton"
+                            <button id="resizeCurriculumSelectionButton" class="triangleButton"
                                 style="width: 1.5rem;">&#9650;</button>
                         </div>
                         <div id="weekCurriculaSelectionDisplay" style="padding-left: 1rem"></div>
@@ -348,7 +348,7 @@
                     <div id="validFromPickerContainer" class="gap">
                         <label>gültig ab: </label>
                         <div class="flex gap">
-                            <button id="timetableBackwardButton">&#9664</button>
+                            <button id="timetableBackwardButton" class="triangleButton">&#9664</button>
                             <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span>
                             </div>
                             <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
@@ -361,7 +361,7 @@
                                         zu ändern, wähle ihn aus und bearbeite ihn direkt.</span>
                                 </div>
                             </div>
-                            <button id="timetableForwardButton">&#9654</button>
+                            <button id="timetableForwardButton" class="triangleButton">&#9654</button>
                         </div>
                         <div id="timetableInfoTooltip" class="tooltip">?
                             <span class="tooltipTextLeft">Hier kannst du deine festen Stundenpläne speichern und

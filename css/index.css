@@ -352,16 +352,17 @@ dialog .errorMessageDisplay,
 
 /* Time Table */
 
-#weekBackwardButton,
-#weekForwardButton,
-#timetableBackwardButton,
-#timetableForwardButton {
+.triangleButton {
     border: none;
     background-color: var(--contentContainerBackground);
+
+    &#resizeCurriculumSectionButton,
+    &#resizeCurriculumSelectionButton {
+        color: var(--lightgrey);
+    }
 }
 
-#weekBackwardButton:active,
-#weekForwardButton:active {
+.triangleButton:active {
     color: var(--matteRed);
 }
 
@@ -965,7 +966,7 @@ button:disabled:hover {
 #closeSettingsButton,
 #openBurgerMenuButton,
 #openSettingsMenuButton {
-    color: var(--lightgrey);
+    color: var(--lighterText);
     border: none;
     border-radius: var(--smallRadius);
     padding: 0 0.2em;
@@ -1359,15 +1360,15 @@ h4 {
 .subjectColorTwo .lessonHasTaskIndicator,
 .subjectColorThree .lessonHasTaskIndicator,
 .subjectColorFour .lessonHasTaskIndicator,
+.subjectColorEight .lessonHasTaskIndicator,
 .subjectColorNine .lessonHasTaskIndicator,
 .subjectColorTen .lessonHasTaskIndicator {
-    background-color: var(--lightergrey);
+    background-color: var(--lighterText);
 }
 
 .subjectColorFive .lessonHasTaskIndicator,
 .subjectColorSix .lessonHasTaskIndicator,
 .subjectColorSeven .lessonHasTaskIndicator,
-.subjectColorEight .lessonHasTaskIndicator,
 .undefined .lessonHasTaskIndicator,
 .appointement .lessonHasTaskIndicator {
     background-color: var(--labelgrey);
@@ -1377,15 +1378,15 @@ h4 {
 .subjectColorTwo .noteIcon,
 .subjectColorThree .noteIcon,
 .subjectColorFour .noteIcon,
+.subjectColorEight .noteIcon,
 .subjectColorNine .noteIcon,
 .subjectColorTen .noteIcon {
-    background-color: var(--lightergrey);
+    background-color: var(--lighterText);
 }
 
 .subjectColorFive .noteIcon,
 .subjectColorSix .noteIcon,
 .subjectColorSeven .noteIcon,
-.subjectColorEight .noteIcon,
 .undefined .noteIcon,
 .appointement .noteIcon {
     background-color: var(--labelgrey);
