@@ -149,7 +149,7 @@ export default class TaskView extends AbstractView {
         taskElement.querySelector('.smallDate').removeAttribute('style');
         taskElement.querySelector('.taskDateSelectWrapper').innerHTML = '';
         taskElement.querySelector('.taskDateSelectWrapper').removeAttribute('style');
-        taskElement.querySelector('.taskDescription').textContent = task.description;
+        taskElement.querySelector('.taskDescription').innerHTML = task.description;
 
         taskElement.querySelector('.taskAdditionalInfo').innerHTML = this.getAdditionalInfoHTML(task);
 

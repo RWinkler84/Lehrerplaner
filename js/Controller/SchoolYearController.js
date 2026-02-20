@@ -19,6 +19,12 @@ export default class SchoolYearController {
             }
         }
 
+        if (CurriculumController.getEditorType() == 'Holiday Editor') {
+        View.renderSchoolYearInfoSection(schoolYear, true);
+        
+        return;
+        }
+
         View.renderSchoolYearInfoSection(schoolYear);
     }
 
@@ -61,9 +67,8 @@ export default class SchoolYearController {
         View.showSaveSchoolYearDatesGradesButton();
 
         View.hideEditSchoolYearDatesGradesButton();
-        View.hideSchoolYearSelect();
-        View.disableCreateNewSchoolYearButton();
-        View.disableEditHolidayDatesButton();
+
+        this.disableSchoolYearButtons();
 
         View.editSchoolYearDates();
         View.editTaughtGrades();
@@ -86,6 +91,7 @@ export default class SchoolYearController {
         View.hideSaveSchoolYearDatesGradesButton();
         View.showEditSchoolYearDatesGradesButton();
 
+        //is a new year? show previously not displayed buttons
         if (yearData.id == '') {
             yearData.grades = View.saveTaughtGrades();
             const schoolYear = SchoolYear.writeDataToInstance(yearData);
@@ -109,9 +115,8 @@ export default class SchoolYearController {
 
         if (!View.isNewSchoolYear()) {
             View.renderSchoolYearInfoSection(schoolYear);
-            View.showSchoolYearSelect();
-            View.enableCreateNewSchoolYearButton();
-            View.enableEditHolidayDatesButton();
+
+            this.enableSchoolYearButtons();
         }
 
         if (CurriculumController.getEditorType() == 'Curriculum Editor') CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
@@ -124,10 +129,7 @@ export default class SchoolYearController {
         const schoolYear = await SchoolYear.getSchoolYearById(schoolYearId);
         CurriculumController.openHolidayEditor(schoolYear);
 
-        View.disableCreateNewSchoolYearButton();
-        View.disableEditSchoolYearDatesGradesButton();
-        View.disableEditHolidayDatesButton();
-        View.disableCreateHolidayDatesButton();
+        this.disableSchoolYearButtons();
     }
 
     static disableSchoolYearButtons() {
@@ -135,6 +137,7 @@ export default class SchoolYearController {
         View.disableEditSchoolYearDatesGradesButton();
         View.disableCreateHolidayDatesButton();
         View.disableEditHolidayDatesButton();
+        View.disableSchoolYearSelect();
     }
 
     static enableSchoolYearButtons() {
@@ -142,6 +145,7 @@ export default class SchoolYearController {
         View.enableEditSchoolYearDatesGradesButton();
         View.enableCreateHolidayDatesButton();
         View.enableEditHolidayDatesButton();
+        View.enableSchoolYearSelect();
     }
 
     static createNewSchoolYear() {
@@ -194,6 +198,10 @@ export default class SchoolYearController {
 
     static changeDisplayedSchoolYear() {
         this.renderSchoolYearInfoSection(View.getSelectedYearId());
+    }
+
+    static openSchoolYearSettings() {
+        View.openSchoolYearSettings();
     }
 
     //event handler

@@ -1,3 +1,5 @@
+/Controller
+/Model
 /vendor
 /core/mailconfig.php
 /core/stripeConfig.php

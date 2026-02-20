@@ -1,40 +1,8 @@
-import Controller from "../Controller/SettingsController.js";
-import Fn from "../inc/utils.js";
+import Fn from '../inc/utils.js';
+import AbstractView from './AbstractView.js';
+import Controller from '../Controller/TimetableController.js';
 
-export default class SettingsView {
-
-    static openSettings() {
-        document.querySelector('#settingsContainer').showModal();
-    }
-
-    static closeSettings() {
-        document.querySelector('#settingsContainer').close();
-    }
-
-    static toggleSettingsMenu(event) {
-        event.stopPropagation();
-        let settingsMenuElement = document.querySelector('#settingsMenu');
-
-        if (settingsMenuElement.style.display == 'flex') {
-            this.closeSettingsMenu(event);
-            return;
-        }
-
-        settingsMenuElement.style.display = 'flex';
-        document.addEventListener('click', SettingsView.closeSettingsMenu);
-    }
-
-    static closeSettingsMenu(event) {
-        if (event.target.id != 'settingsMenu') {
-            document.querySelector('#settingsMenu').removeAttribute('style');
-            document.removeEventListener('click', SettingsView.closeSettingsMenu);
-        }
-    }
-
-    //////////////////////////////////
-    // timetable settings functions //
-    //////////////////////////////////
-
+export default class TimetableView extends AbstractView {
     static async renderSelectableLessonColors() {
         let allSubjects = await Controller.getAllSubjects();
         let allColorsArray = [
@@ -64,12 +32,12 @@ export default class SettingsView {
 
         selectionContainer.innerHTML = selectableColorsHTML;
 
-        SettingsView.#makeColorsSelectable(selectionContainer);
+        this.#makeColorsSelectable(selectionContainer);
     }
 
     static #makeColorsSelectable(selectionContainer) {
         selectionContainer.querySelectorAll('.colorSelectionBox').forEach(element => {
-            element.addEventListener('click', SettingsView.markColorSelected)
+            element.addEventListener('click', this.markColorSelected)
         });
 
     }
@@ -175,7 +143,7 @@ export default class SettingsView {
         regularLessons.forEach((lesson) => {
             if (lesson.validFrom != dateOfTimetableToDisplay) return;
 
-            let timeslot = SettingsView.#getTimeslotOfLesson(lesson);
+            let timeslot = this.#getTimeslotOfLesson(lesson);
             lesson.cssColorClass = Fn.getCssColorClass(lesson, allSubjects);
 
             timeslot.innerHTML = `
@@ -187,7 +155,7 @@ export default class SettingsView {
                     </div> 
                 </div>`;
 
-            timeslot.querySelector('.deleteLessonButton').addEventListener('click', SettingsView.deleteLesson);
+            timeslot.querySelector('.deleteLessonButton').addEventListener('click', TimetableView.deleteLesson);
         });
 
     }
@@ -226,13 +194,13 @@ export default class SettingsView {
 
         //form button event handlers
 
-        timeslotElement.querySelector('#lessonForm').addEventListener('submit', SettingsView.createNewLesson);
+        timeslotElement.querySelector('#lessonForm').addEventListener('submit', TimetableView.createNewLesson);
 
-        timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => SettingsView.removeLessonForm(event));
+        timeslotElement.querySelector('.discardNewLessonButton').addEventListener('click', (event) => TimetableView.removeLessonForm(event));
         timeslotElement.querySelector('.lessonForm').addEventListener('mouseenter', AbstractView.removeAddLessonButton);
 
         //timeslot event handlers
-        timeslotElement.removeEventListener('click', SettingsView.createLessonForm);
+        timeslotElement.removeEventListener('click', TimetableView.createLessonForm);
         timeslotElement.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
     }
 
@@ -271,7 +239,7 @@ export default class SettingsView {
             document.querySelector('#timetableBackwardButton').style.visibility = 'hidden';
         }
 
-        SettingsView.renderLessons();
+        this.renderLessons();
     }
 
     static removeLessonForm(event) {
@@ -282,7 +250,7 @@ export default class SettingsView {
 
         createLessonForm.remove();
 
-        timeslotElement.addEventListener('click', SettingsView.createLessonForm);
+        timeslotElement.addEventListener('click', TimetableView.createLessonForm);
         timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
 
     }
@@ -300,12 +268,12 @@ export default class SettingsView {
         }
 
         if (lessonData.class == '') {
-            SettingsView.alertClassInput(event);
+            TimetableView.alertClassInput(event);
             return;
         }
 
         if (lessonData.subject == '') {
-            SettingsView.alertSubjectInput(event);
+            TimetableView.alertSubjectInput(event);
             return;
         }
 
@@ -323,7 +291,7 @@ export default class SettingsView {
                 </div>`;
 
         timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
-        timeslotElement.querySelector('.deleteLessonButton').addEventListener('click', SettingsView.deleteLesson);
+        timeslotElement.querySelector('.deleteLessonButton').addEventListener('click', TimetableView.deleteLesson);
     }
 
     static deleteLesson(event) {
@@ -334,7 +302,7 @@ export default class SettingsView {
         event.target.closest('.settingsLesson').remove();
 
         timeslotElement.addEventListener('mouseenter', AbstractView.showAddLessonButton);
-        timeslotElement.addEventListener('click', SettingsView.createLessonForm);
+        timeslotElement.addEventListener('click', TimetableView.createLessonForm);
     }
 
     static saveNewTimetable() {
@@ -365,7 +333,7 @@ export default class SettingsView {
     static discardNewTimetable() {
         document.querySelectorAll('.settingsTimeslot').forEach((element) => {
             element.removeEventListener('mouseenter', AbstractView.showAddLessonButton);
-            element.removeEventListener('click', SettingsView.createLessonForm);
+            element.removeEventListener('click', TimetableView.createLessonForm);
         });
 
         document.querySelector('#createChangeTimetableButtonContainer').style.display = 'flex';
@@ -380,8 +348,8 @@ export default class SettingsView {
         document.querySelector('#validFromPickerWrapper').value = '';
         document.querySelector('#timetableBackwardButton').style.visibility = 'visible';
         document.querySelector('#timetableForwardButton').style.visibility = 'visible';
-        SettingsView.setDateOfTimetableToDisplay();
-        SettingsView.renderLessons();
+        this.setDateOfTimetableToDisplay();
+        this.renderLessons();
     }
 
     static saveTimetableUpdates() {
@@ -478,10 +446,10 @@ export default class SettingsView {
         taskConflictsContainer.querySelector('table tbody').innerHTML = tasksHTML;
 
         dialog.querySelectorAll('.deleteItemButton').forEach(button => {
-            button.addEventListener('click', SettingsView.deleteLessonChangeOrTaskConflict)
+            button.addEventListener('click', TimetableView.deleteLessonChangeOrTaskConflict)
         });
 
-        dialog.querySelector('#closeLessonChangesAndTasksToKeepDialogButton').addEventListener('click', SettingsView.closeLessonChangesAndTasksToKeepDialog);
+        dialog.querySelector('#closeLessonChangesAndTasksToKeepDialogButton').addEventListener('click', TimetableView.closeLessonChangesAndTasksToKeepDialog);
 
         if (lessonConflictsContainer.querySelector('table tbody').children.length > 0 || taskConflictsContainer.querySelector('table tbody').children.length > 0) dialog.showModal();
     }
@@ -510,8 +478,8 @@ export default class SettingsView {
 
     static async makeTimetableEditable() {
 
-        if (await SettingsView.isAllSubjectsEmpty()) {
-            SettingsView.alertTimetable(true);
+        if (await this.isAllSubjectsEmpty()) {
+            this.alertTimetable(true);
 
             return;
         }
@@ -519,7 +487,7 @@ export default class SettingsView {
         document.querySelectorAll('.settingsTimeslot').forEach((element) => {
             element.innerHTML = '';
             element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
-            element.addEventListener('click', SettingsView.createLessonForm);
+            element.addEventListener('click', TimetableView.createLessonForm);
         });
 
         document.querySelector('#validFromPickerWrapper').style.display = 'flex';
@@ -545,7 +513,7 @@ export default class SettingsView {
             document.querySelector('#timetableForwardButton').style.visibility = 'hidden';
 
             element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
-            element.addEventListener('click', SettingsView.createLessonForm);
+            element.addEventListener('click', TimetableView.createLessonForm);
         });
 
         document.querySelector('#createChangeTimetableButtonContainer').style.display = 'none';
@@ -560,7 +528,7 @@ export default class SettingsView {
 
         for (let entry of timetables) {
             if (entry.validFrom == pickedDate) {
-                SettingsView.alertValidFromPicker(true)
+                this.alertValidFromPicker(true)
                 return true;
             }
         }
@@ -588,115 +556,68 @@ export default class SettingsView {
         return timeslot;
     }
 
-    ////////////////////////////////
-    // account settings functions //
-    ////////////////////////////////
+    //////////////////////////
+    // validation functions //
+    //////////////////////////
+    static alertColorSelection() {
+        let colorSelection = document.querySelector('#colourSelection');
 
-    static openAccountSettings(userInfo = null) {
-        let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
+        colorSelection.classList.add('validationError');
+        setTimeout(() => {
+            colorSelection.classList.remove('validationError');
+        }, 300);
+    }
 
-        document.querySelector('#openAccountSettingsButton').classList.add('selected');
+    static alertSubjectNameInput() {
+        let subjectNameInput = document.querySelector('#subjectName');
 
-        if (userInfo) {
-            const notLoggedInMessage = accountSettingsContainer.querySelector('#eduplanioPlusNotLoggedInMessage');
-            const eduplanioPlusStatusSpan = document.querySelector('#eduplanioPlusStatusSpan');
-            const eduplanioPlusExpirationDateSpan = document.querySelector('#eduplanioPlusExpirationDateSpan');
+        subjectNameInput.parentElement.classList.add('validationError');
+        setTimeout(() => {
+            subjectNameInput.parentElement.classList.remove('validationError');
+        }, 300);
+    }
 
-            let expirationDateString = '-';
-            let statusString = 'inaktiv';
-            let statusTextClass = 'redText';
+    static alertValidFromPicker(dateTaken = false) {
+        let validFromPicker = document.querySelector('#validFromPicker');
+        let alertTooltip = document.querySelector('#validFromPickerAlertTooltip');
 
-            eduplanioPlusStatusSpan.classList.remove('redText');
-            eduplanioPlusStatusSpan.classList.remove('greenText');
+        if (dateTaken) alertTooltip.style.display = 'flex';
 
-            if (userInfo.activeUntil) {
-                const expirationDate = new Date(userInfo.activeUntil);
-                const todayTimestamp = new Date().setHours(12, 0, 0, 0);
+        validFromPicker.parentElement.classList.add('validationError');
+        setTimeout(() => {
+            validFromPicker.parentElement.classList.remove('validationError');
+        }, 300);
+    }
 
-                if (expirationDate.setHours(12, 0, 0, 0) >= todayTimestamp) {
-                    statusString = 'aktiv';
-                    statusTextClass = 'greenText';
-                }
+    static alertTimetable(noSubjectsFound = false) {
+        let timetable = document.querySelector('.settingsWeekOverview.alertRing');
 
-                expirationDateString = Fn.formatDateWithFullYear(expirationDate);
-            }
-
-            eduplanioPlusStatusSpan.textContent = statusString;
-            eduplanioPlusExpirationDateSpan.textContent = expirationDateString;
-
-            notLoggedInMessage.classList.add('notDisplayed');
-            eduplanioPlusStatusSpan.classList.add(statusTextClass);
+        if (noSubjectsFound == true) {
+            document.querySelector('#noSubjectsAlertTooltip').style.display = 'flex';
         }
 
-        //make account settings visible
-        accountSettingsContainer.style.display = 'block';
+        timetable.classList.add('validationError');
+        setTimeout(() => {
+            timetable.classList.remove('validationError');
+        }, 300);
     }
 
-    static isAccountSettingsOpen() {
-        let accountSettingsContainer = document.querySelector('#accountSettingsContainer');
+    static alertClassInput(event) {
+        let alertRing = event.target.querySelector('#class').parentElement;
 
-        if (accountSettingsContainer.style.display == 'block') return true;
-
-        return false;
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
     }
 
-    static toogleAccountDeletionMenu(event) {
-        let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
-        let requestDeletionMenu = document.querySelector('#requestDeletionContainer');
-        let deletionErrorDisplay = document.querySelector('#deletionErrorDisplay');
+    static alertSubjectInput(event) {
+        let alertRing = event.target.querySelector('#subject').parentElement;
 
-        if (event.target.id == 'deleteAccountButton') {
-            requestDeletionMenu.style.display = 'none';
-            deletionErrorDisplay.style.display = 'none';
-            deleteAccountMenu.style.display = 'block';
-        }
-
-        if (event.target.id == 'cancelAccountDeletionButton') {
-            requestDeletionMenu.style.display = 'block';
-            deleteAccountMenu.style.display = 'none';
-            deletionErrorDisplay.style.display = 'none';
-        }
-
-        if (event.target.id == 'cancelFailedAccountDeletionButton') {
-            requestDeletionMenu.style.display = 'block';
-            deleteAccountMenu.style.display = 'none';
-            deletionErrorDisplay.style.display = 'none';
-        }
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
     }
 
-    static showAccountDeletionResult(status) {
-        if (status == 'success') {
-            alert('Dein Account wurde erfolgreich gelöscht.');
-            Controller.logout();
-        }
-
-        if (status == 'failed') {
-            document.querySelector('#deletionErrorDisplay').style.display = 'block';
-            document.querySelector('#approveAccountDeletionContainer').style.display = 'none';
-        }
-    }
-
-    static setVersionDisplay(version) {
-        document.querySelector('#versionDisplay').textContent = version;
-    }
-
-    static openRegistrationNeededDialog() {
-        document.querySelector('#registrationNeededDialog').showModal();
-    }
-
-    static closeRegistrationNeededDialog() {
-        document.querySelector('#registrationNeededDialog').close();
-    }
-
-    static openCheckout(clickedPurchaseButton, newWindow) {
-        const baselink = './stripe/checkout.html';
-
-        let purchaseItem;
-
-        if (clickedPurchaseButton.id == 'oneYearEduplanioPlusButton') purchaseItem = 'oneYear';
-        if (clickedPurchaseButton.id == 'oneMonthEduplanioPlusButton') purchaseItem = 'oneMonth';
-
-        newWindow.location.href = `${baselink}?item=${purchaseItem}`;
-        window.focus();
-    }
 }

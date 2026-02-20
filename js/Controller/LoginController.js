@@ -1,6 +1,7 @@
 import AbstractController from "./AbstractController.js";
 import View from "../View/LoginView.js";
 import Model from "../Model/Login.js";
+import SettingsController from "./SettingsController.js";
 
 export default class LoginController extends AbstractController{
 
@@ -63,8 +64,10 @@ export default class LoginController extends AbstractController{
             let abstCtrl = new AbstractController;
 
             View.closeLoginDialog();
-            AbstractController.renderTopMenu();
-            abstCtrl.syncData();
+            await AbstractController.renderTopMenu();
+            await abstCtrl.syncData();
+            await AbstractController.greyOutHolidaysAndPassedDays();
+            
             window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
         } else {
             View.showLoginErrorMessage(result.error, result.message);
@@ -239,6 +242,10 @@ export default class LoginController extends AbstractController{
         await db.toggleTemperaryOfflineUsage(offlineStatus);
     }
 
+    static togglePasswordVisibility() {
+        View.togglePasswordVisibility();
+    }
+
     static isReset() {
         View.isReset();
     }
@@ -257,6 +264,10 @@ export default class LoginController extends AbstractController{
 
         //elements with ids
         switch (elementId) {
+            case 'revealPasswordIconWrapper':
+                LoginController.togglePasswordVisibility();
+                break;
+
             //send forms buttons
             case 'loginButton':
                 LoginController.attemptLogin(event);
@@ -273,6 +284,15 @@ export default class LoginController extends AbstractController{
 
             case 'sendSupportTicketButton':
                 AbstractController.sendSupportTicket(event);
+                break;
+
+            //eduplanio plus shopping
+            case 'startRegistrationButton':
+                SettingsController.closeRegistrationNeededDialog();
+                LoginController.openCreateAccountDialog();
+                break;
+            case 'closeCheckoutDialogButton':
+                SettingsController.closeCheckoutDialog();
                 break;
 
             //links
@@ -302,14 +322,18 @@ export default class LoginController extends AbstractController{
             case elementClassList.contains('closeSupportDialogButton'):
                 AbstractController.closeSupportDialog();
                 break;
+
+            case elementClassList.contains('closeRegistrationNeededDialogButton'):
+                SettingsController.closeRegistrationNeededDialog();
+                break;
         }
 
         //dialog cancel event
         if (event.type == "cancel") {
             switch (elementId) {
                 case 'loginDialog':
-                case 'createAccountDialog': 
-                case 'sendResetPasswordMailDialog': 
+                case 'createAccountDialog':
+                case 'sendResetPasswordMailDialog':
                 case 'resetPasswordDialog':
                     LoginController.toggleTemperaryOfflineUsage(true, event)
                     break;

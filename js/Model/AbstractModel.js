@@ -9,7 +9,7 @@ export default class AbstractModel {
         let isRegisteredUser = await this.isRegisteredUser();
         let allowedActionsUnregisteredUser = [
             'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
-            'sendPasswortResetMail'
+            'sendPasswortResetMail', 'sendSupportTicket'
         ];
 
         if (!allowedActionsUnregisteredUser.includes(action)) {
@@ -24,7 +24,8 @@ export default class AbstractModel {
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(content)
+                    body: JSON.stringify(content),
+                    signal: AbortSignal.timeout(2000)
                 })
 
             if (!response.ok) {
@@ -33,7 +34,7 @@ export default class AbstractModel {
             }
         }
         catch (error) {
-            AbstractController.setSyncIndicatorStatus('unsynced');
+            AbstractController.setSyncIndicatorStatus('unsynced', 'no server response');
             return {
                 status: 'failed',
                 error: 'no server response',
@@ -56,7 +57,7 @@ export default class AbstractModel {
             AbstractController.openLoginDialog();
             AbstractController.setSyncIndicatorStatus('unsynced');
         } else if (result.status == 'failed') {
-            AbstractController.setSyncIndicatorStatus('unsynced');
+            AbstractController.setSyncIndicatorStatus('unsynced', result.error);
         } else {
             AbstractController.setSyncIndicatorStatus('synced');
         }
@@ -251,15 +252,31 @@ export default class AbstractModel {
         return true;
     }
 
+    /** returns account type, temporarily offline status and if registered user mail, email confirmation status, active until date and login status */
     async getUserInfo() {
         let userInfo = await this.readFromLocalDB('settings', 1);
-        let loginStatus = await this.makeAjaxQuery('abstract', 'getUserLoginStatus');
 
         if (!userInfo) {
             userInfo = { accountType: 'not set' };
         }
 
-        userInfo.loggedIn = loginStatus.status == 'true' ? true : false;
+        let serverData = await this.makeAjaxQuery('abstract', 'getUserInfo');
+
+        userInfo.email = serverData.email;
+        userInfo.emailConfirmed = serverData.emailConfirmed;
+        userInfo.activeUntil = serverData.activeUntil;
+        userInfo.loggedIn = serverData.loggedIn == 'true' ? true : false;
+
+        return userInfo;
+    }
+
+    /** returns locally saved user data */
+    async getLocalUserInfo() {
+        let userInfo = await this.readFromLocalDB('settings', 1);
+
+        if (!userInfo) {
+            userInfo = { accountType: 'not set' };
+        }
 
         return userInfo;
     }
@@ -323,7 +340,7 @@ export default class AbstractModel {
         return await this.makeAjaxQuery('abstract', 'sendSupportTicket', formData);
     }
 
-    static async calculateAllLessonDates(className, subject, endDate, timetable = null, lessonChanges = null) {
+    static async calculateAllLessonDates(className, subject, endDate, startDate = null, timetable = null, lessonChanges = null) {
 
         let dateIterator = new Date('2025-06-24').setHours(12, 0, 0, 0);
         let validTimetableDates = await AbstractModel.getCurrentlyAndFutureValidTimetableDates();
@@ -517,7 +534,6 @@ export default class AbstractModel {
     }
 
     async syncData() {
-        // await this.checkForNulledCreatedField();
         let localSettings = await this.readFromLocalDB('settings', 0);
         let localTimestamps = localSettings == undefined ? false : localSettings.lastUpdated;
         let remoteTimestamps = await this.makeAjaxQuery('abstract', 'getDbUpdateTimestamps');
@@ -605,7 +621,7 @@ export default class AbstractModel {
             this.clearObjectStore('unsyncedDeletedSchoolYears');
         }
 
-        this.updateLocalWithRemoteData(tablesToUpdate);
+        await this.updateLocalWithRemoteData(tablesToUpdate);
     }
 
     async updateLocalWithRemoteData(tablesToUpdate) {
@@ -660,51 +676,5 @@ export default class AbstractModel {
             await this.updateOnLocalDB(objectStore, dataToStore);
             this.markLocalDBUpdated(objectStore, newLocalTimestamp);
         }
-    }
-
-    async checkForNulledCreatedField() {
-        let timestamp = await this.readFromLocalDB('settings', 0);
-        let subjects = await this.readAllFromLocalDB('subjects');
-        let timetable = await this.readAllFromLocalDB('timetable');
-        let timetableChanges = await this.readAllFromLocalDB('timetableChanges');
-        let tasks = await this.readAllFromLocalDB('tasks');
-
-        subjects.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-        timetable.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-        timetableChanges.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-        tasks.forEach(entry => {
-            if (!entry.created) {
-                entry.created = '1970-01-01 00-00-00';
-            }
-        });
-
-        if (timestamp && typeof timestamp.lastUpdated == 'string') {
-            await this.updateOnLocalDB('settings', {
-                id: 0,
-                lastUpdated: {
-                    subjects: timestamp.lastUpdated,
-                    timetable: timestamp.lastUpdated,
-                    timetableChanges: timestamp.lastUpdated,
-                    tasks: timestamp.lastUpdated,
-                }
-            });
-        }
-
-        this.updateOnLocalDB('subjects', subjects);
-        this.updateOnLocalDB('timetable', timetable);
-        this.updateOnLocalDB('timetableChanges', timetableChanges);
-        this.updateOnLocalDB('tasks', tasks);
     }
 }

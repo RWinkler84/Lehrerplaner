@@ -148,7 +148,7 @@ export default class LessonNote extends AbstractModel {
         const allAffectedNotes = [];
 
         allLessonNotes.forEach(note => {
-            if (new Date(note.date).setHours(12) < new Date().setHours(12)) return;
+            if (new Date(note.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
             if (note.fixedDate) return;
             
             allAffectedNotes.push(note);
@@ -171,8 +171,8 @@ export default class LessonNote extends AbstractModel {
                 let subjectsArray = subjectsByClass[key];
 
                 for (let subject of subjectsArray) {
-                    let allOldLessonDates = await this.calculateAllLessonDates(className, subject, endDate, oldTimetable, oldTimetableChanges)
-                    let allNewLessonDates = await this.calculateAllLessonDates(className, subject, endDate, currentTimetable, currentChanges);
+                    let allOldLessonDates = await this.calculateAllLessonDates(className, subject, endDate, null, oldTimetable, oldTimetableChanges)
+                    let allNewLessonDates = await this.calculateAllLessonDates(className, subject, endDate, null, currentTimetable, currentChanges);
 
                     //in the unlikely case, a lesson note exists without a corresponding lesson, jump to the next subject
                     if (allOldLessonDates.length == 0) continue;

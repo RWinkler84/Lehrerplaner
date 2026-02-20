@@ -4,7 +4,6 @@ import SchoolYearController from "./SchoolYearController.js";
 import Fn from "../inc/utils.js";
 import SchoolYear from "../Model/SchoolYear.js";
 import AbstractController from "./AbstractController.js";
-import Editor from "../inc/editor.js";
 
 export default class CurriculumController {
     static renderEmptyCalendar(startDate, endDate) {
@@ -52,11 +51,15 @@ export default class CurriculumController {
     static openHolidayEditor(schoolYear) {
         this.renderEmptyCalendar(schoolYear.startDate, schoolYear.endDate);
         View.openHolidayEditor(schoolYear);
+
+        View.toggleCurriculumLabelAndButtonContainerSticky();
         View.hideCreateCurriculumButton();
     }
 
     static closeHolidayEditor() {
         View.closeHolidayEditor();
+        View.toggleCurriculumLabelAndButtonContainerSticky();
+
         this.renderSchoolYearCurriculumEditor();
     }
 
@@ -93,6 +96,8 @@ export default class CurriculumController {
 
         View.showSaveCancelNewCurriculumButtonContainer();
         View.showCurriculumCreationSelectContainer();
+
+        View.toggleCurriculumLabelAndButtonContainerSticky();
     }
 
     static async saveNewCurriculum() {
@@ -101,6 +106,7 @@ export default class CurriculumController {
 
         View.hideSaveCancelNewCurriculumButtonContainer();
         View.hideCurriculumCreationSelectContainer();
+        View.toggleCurriculumLabelAndButtonContainerSticky();
 
         View.showCurriculumSelectionContainer();
         View.showCreateCurriculumButton();
@@ -119,6 +125,7 @@ export default class CurriculumController {
         View.setDisplayedCurriculumId('');
         View.hideCurriculumCreationSelectContainer();
         View.hideSaveCancelNewCurriculumButtonContainer();
+        View.toggleCurriculumLabelAndButtonContainerSticky();
 
         View.showCurriculumSelectionContainer();
         this.renderSchoolYearCurriculumEditor(schoolYear);

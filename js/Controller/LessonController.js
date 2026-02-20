@@ -1,12 +1,12 @@
 import Lesson from '../Model/Lesson.js';
 import View from '../View/LessonView.js';
-import SettingsController from './SettingsController.js';
 import TaskController from './TaskController.js';
 import LessonNoteController from './LessonNoteController.js';
 import LessonView from '../View/LessonView.js';
 import CurriculumController from './CurriculumController.js';
 import SchoolYearController from './SchoolYearController.js';
 import Editor from '../inc/editor.js';
+import TimetableController from './TimetableController.js';
 
 export default class LessonController {
 
@@ -14,27 +14,33 @@ export default class LessonController {
         View.renderLesson();
     }
 
-    static async saveNewLesson(lessonData) {
+    static async saveNewLesson(event) {
+        event.preventDefault();
 
+        View.toggleSaveLessonButton(event);
+
+        let lessonData = LessonView.saveNewLesson(event);
         let lesson = LessonController.#lessonDataToLessonObject(lessonData);
         let oldTimetable = await Lesson.getOldTimetableCopy();
         let oldTimetableChanges = await Lesson.getOldTimetableChanges();
 
         if (lessonData.class == '' && lessonData.subject != 'Termin') {
             View.alertClassInput();
-            return false;
+            View.toggleSaveLessonButton(event);
+            return;
         }
 
         if (lessonData.subject == '') {
             View.alertSubjectSelect();
-            return false;
+            View.toggleSaveLessonButton(event);
+            return;
         }
 
         await lesson.save();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
         await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
-        this.renderLesson();
+        LessonController.renderLesson();
     }
 
     static async deleteLessonById(id) {
@@ -82,12 +88,17 @@ export default class LessonController {
         return lesson.id;
     }
 
-    static async setLessonsInHolidaysCanceled(schoolYear = null) {
+    static async setLessonsInHolidaysCanceled(schoolYear = null, startDate = null) {
         let schoolYears = [schoolYear];
+        const oldTimetable = await Lesson.getAllRegularLessons();
+        const oldTimetableChanges = await Lesson.getAllTimetableChanges();
+
         if (!schoolYear) schoolYears = await SchoolYearController.getAllSchoolYears();
         if (schoolYears.length == 0) return;
 
-        await Lesson.setLessonsInHolidaysCanceled(schoolYears);
+        await Lesson.setLessonsInHolidaysCanceled(schoolYears, startDate);
+        await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
 
         await this.renderLesson();
     }
@@ -100,6 +111,8 @@ export default class LessonController {
         await lesson.uncancel();
 
         await TaskController.reorderTasks(oldTimetable, oldTimetableChanges);
+        await LessonNoteController.reorderLessonNotes(oldTimetable, oldTimetableChanges);
+
         this.renderLesson();
     }
     /** @param isNewTimetable bool, indicates, if the affected lessons fall into the validity timespan of a new or a an updated timetable, triggering different filter methods */
@@ -136,7 +149,7 @@ export default class LessonController {
     };
 
     static async getAllSubjects() {
-        return await SettingsController.getAllSubjects();
+        return await TimetableController.getAllSubjects();
     }
 
     static async getAllRegularLessons() {
