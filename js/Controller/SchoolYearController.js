@@ -67,9 +67,8 @@ export default class SchoolYearController {
         View.showSaveSchoolYearDatesGradesButton();
 
         View.hideEditSchoolYearDatesGradesButton();
-        View.hideSchoolYearSelect();
-        View.disableCreateNewSchoolYearButton();
-        View.disableEditHolidayDatesButton();
+
+        this.disableSchoolYearButtons();
 
         View.editSchoolYearDates();
         View.editTaughtGrades();
@@ -92,6 +91,7 @@ export default class SchoolYearController {
         View.hideSaveSchoolYearDatesGradesButton();
         View.showEditSchoolYearDatesGradesButton();
 
+        //is a new year? show previously not displayed buttons
         if (yearData.id == '') {
             yearData.grades = View.saveTaughtGrades();
             const schoolYear = SchoolYear.writeDataToInstance(yearData);
@@ -115,9 +115,8 @@ export default class SchoolYearController {
 
         if (!View.isNewSchoolYear()) {
             View.renderSchoolYearInfoSection(schoolYear);
-            View.showSchoolYearSelect();
-            View.enableCreateNewSchoolYearButton();
-            View.enableEditHolidayDatesButton();
+
+            this.enableSchoolYearButtons();
         }
 
         if (CurriculumController.getEditorType() == 'Curriculum Editor') CurriculumController.renderSchoolYearCurriculumEditor(schoolYear);
