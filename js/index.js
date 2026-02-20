@@ -39,7 +39,7 @@ let timeout = false //for resize debouncing
 
 async function startApp() {
     await LoginController.createGuestAccount(); //creates user data
-    AbstractController.setVersion('0.9.1');
+    AbstractController.setVersion('0.9.7');
     await abstCtrl.syncData();
 
     //live demo stuff
@@ -439,7 +439,7 @@ async function startApp() {
 
             case 'lessonFormOpened':
                 let navHeight = nav.getBoundingClientRect().height;
-                nav.style.transform = `translate(0, -${navHeight}px`;
+                // nav.style.transform = `translate(0, -${navHeight}px`;
                 translateLeft = getElementProperty(document.querySelector('.lessonForm'), 'left') + getElementProperty(document.querySelector('.lessonForm'), 'width') / 2;
 
                 document.querySelector('#weekOverviewContainer').classList.remove('highlighted');
@@ -672,13 +672,15 @@ async function startApp() {
 
                 case 'lessonFormOpened':
                     let form = document.querySelector('#lessonForm');
-                    y = form.getBoundingClientRect().y;
+                    y = form.getBoundingClientRect().y ;
                     window.scrollTo(0, y - 40);
                     break;
 
                 case 'window7Confirm':
                     let markedSlot = document.querySelector('#markedSlot');
-                    y = markedSlot.getBoundingClientRect().y - markedSlot.getBoundingClientRect().height;
+                    let nav = document.querySelector('nav');
+
+                    y = markedSlot.getBoundingClientRect().y - markedSlot.getBoundingClientRect().height - nav.getBoundingClientRect().height;
                     window.scrollTo(0, y + window.scrollY);
                     break;
 

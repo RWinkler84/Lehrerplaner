@@ -1,6 +1,6 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from "../inc/utils.js";
-import { ONEDAY } from "../index.js";
+import { ONEDAY, TODAY } from "../index.js";
 import LessonNoteController from "../Controller/LessonNoteController.js";
 
 export default class LessonNote extends AbstractModel {
@@ -148,7 +148,7 @@ export default class LessonNote extends AbstractModel {
         const allAffectedNotes = [];
 
         allLessonNotes.forEach(note => {
-            if (new Date(note.date).setHours(12,0,0,0) < new Date().setHours(12,0,0,0)) return;
+            if (new Date(note.date).setHours(12,0,0,0) < new Date(TODAY).setHours(12,0,0,0)) return;
             if (note.fixedDate) return;
             
             allAffectedNotes.push(note);
