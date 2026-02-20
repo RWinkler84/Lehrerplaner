@@ -331,6 +331,9 @@ export default class SchoolYearView extends AbstractView {
     static showSchoolYearSelect() {
         document.querySelector('#schoolYearNameSelect').parentElement.classList.remove('hidden');
     }
+    static disableSchoolYearSelect() {
+        document.querySelector('#schoolYearNameSelect').disabled = true;
+    }
 
     //enable
     static enableSaveNewSchoolYearButton() {
@@ -347,6 +350,9 @@ export default class SchoolYearView extends AbstractView {
     }
     static enableCreateHolidayDatesButton() {
         document.querySelector('#createHolidayDatesButton').disabled = false;
+    }
+    static enableSchoolYearSelect() {
+        document.querySelector('#schoolYearNameSelect').disabled = false;
     }
 
 
