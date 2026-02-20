@@ -158,12 +158,12 @@ export default class CurriculumView extends AbstractView {
             this.renderSpanContentContainer(holiday.id, holiday);
         });
 
-        document.querySelector('#closeHolidayEditorButton').classList.remove('notDisplayed');
+        document.querySelector('#closeHolidayEditorButtonContainer').classList.remove('notDisplayed');
         document.querySelector('#editorNameSpan').textContent = `Ferien und freie Tage ${schoolYear.name}`;
     }
 
     static closeHolidayEditor() {
-        document.querySelector('#closeHolidayEditorButton').classList.add('notDisplayed');
+        document.querySelector('#closeHolidayEditorButtonContainer').classList.add('notDisplayed');
     }
 
     static async renderSchoolYearCurriculumEditor(schoolYear, curriculumId = null) {
@@ -1064,7 +1064,7 @@ export default class CurriculumView extends AbstractView {
         document.querySelector('#curriculumCreationSelectContainer').classList.add('notDisplayed');
     }
     static hideCloseHolidayEditorButton() {
-        document.querySelector('#closeHolidayEditorButton').classList.add('notDisplayed');
+        document.querySelector('#closeHolidayEditorButtonContainer').classList.add('notDisplayed');
     }
 
     //set span edit status active/inactive

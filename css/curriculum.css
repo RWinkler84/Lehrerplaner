@@ -7,7 +7,7 @@
 #schoolYearDatesGradesContainer {
     display: flex;
     justify-content: space-between;
-    gap: max(2rem, 10vw);
+    gap: 2rem;
 }
 
 .gradeRow {

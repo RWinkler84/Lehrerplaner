@@ -849,6 +849,12 @@ tr[data-new]:has(td[data-taskDescription]) td {
     }
 }
 
+.card {
+    padding: 1rem;
+    background-color: white;
+    border-radius: var(--standardRadius);
+}
+
 /* Buttons */
 button:disabled,
 button:disabled:hover {
@@ -1777,6 +1783,10 @@ h4 {
 
     #validFromPickerContainer {
         width: 100%;
+    }
+
+    .card {
+        padding: 0.5rem;
     }
 
     /* generic classes */

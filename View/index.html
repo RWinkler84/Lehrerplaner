@@ -22,7 +22,7 @@
         <div id="topMenuContainer" class="flex spaceBetween doubleGap alignCenter">
             <div class="flex alignCenter gap">
                 <img id="pageLogo" src="favicon.svg" style="width: 2rem; height: 2rem;">
-                <h1 id="pageHeader" >Eduplanio</h1>
+                <h1 id="pageHeader">Eduplanio</h1>
             </div>
             <div id="topMenuButtonContainer" class="flex gap">
                 <div id="viewsMenuContainer" class="flex halfGap">
@@ -494,7 +494,7 @@
 
             <div id="schoolYearDatesGradesContainer" class="flex doubleGap spaceBetween">
 
-                <div id="schoolYearStartEndDateInfoContainer" class="flex column gap spaceBetween growEqually">
+                <div id="schoolYearStartEndDateInfoContainer" class="card flex column gap spaceBetween growEqually">
                     <div class="flex column gap">
                         <div>
                             <label>Schuljahresbeginn:</label>
@@ -543,7 +543,7 @@
                 </div>
 
 
-                <div id="holidaysInfoContainer" class="flex column doubleGap spaceBetween growEqually">
+                <div id="holidaysInfoContainer" class="card flex column doubleGap spaceBetween growEqually">
                     <div id="holidaysContainer" class="flex column halfGap">
                         <div><label>Ferien und freie Tage:</label></div>
                     </div>
@@ -566,7 +566,9 @@
                     <button id="saveNewCurriculumButton" class="confirmationButton">Plan speichern</button>
                     <button id="cancelNewCurriculumButton" class="cancelButton">Abbrechen</button>
                 </div>
-                <button id="closeHolidayEditorButton" class="cancelButton notDisplayed">schließen</button>
+                <div id="closeHolidayEditorButtonContainer" class="notDisplayed" style="align-self: end;">
+                    <button id="closeHolidayEditorButton" class="cancelButton">schließen</button>
+                </div>
             </div>
             <div>
                 <div id="curriculumSelectionContainer"></div>
@@ -631,7 +633,8 @@
                 <h3>Konto</h3>
                 <div style="position: relative;"><button id="openSettingsMenuButton">&#x2630;</button>
                     <div id="settingsMenu">
-                        <button id="openAccountSettingsButton" class="settingsMenuButton selected" style="display: none">Konto</button>
+                        <button id="openAccountSettingsButton" class="settingsMenuButton selected"
+                            style="display: none">Konto</button>
                         <button id="closeSettingsButton" class="settingsMenuButton">&#215;</button>
                         <button id="closeSettingsButtonResponsive" class="settingsMenuButton">schließen</button>
                     </div>
@@ -757,7 +760,8 @@
                 <div>
                     <label for="password" style="display: block">Passwort</label>
                     <div class="alertRing flex alignCenter"><input type="password" name="password" id="password">
-                    <div id="revealPasswordIconWrapper" class="icon eyeIcon"></div></div>
+                        <div id="revealPasswordIconWrapper" class="icon eyeIcon"></div>
+                    </div>
                 </div>
             </div>
             <div id="loginErrorMessageDisplay" class="errorMessageDisplay alertRing">

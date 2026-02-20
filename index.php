@@ -44,10 +44,14 @@ if (isset($_GET['c']) && isset($_GET['a'])) {
             exit;
         }
     }
+    
+    $userId = $_SESSION['userId'] ?? 'not set';
+    error_log("action: {$_GET['a']} UID: {$userId}");
 
     $controllerName = '\Controller\\' . ucfirst($_GET['c']) .  'Controller';
     $action = $_GET['a'];
     $controller = new $controllerName;
+    
 
     $controller->$action();
     exit;
