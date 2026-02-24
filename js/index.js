@@ -18,6 +18,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
+export const VERSION = '0.9.260224';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
@@ -37,9 +38,11 @@ let abstCtrl = new AbstractController();
 let timeout = false //for resize debouncing
 
 async function startApp() {
-    registerWorker();
+    await registerWorker();
 
-    AbstractController.setVersion('0.9.72');
+    AbstractController.checkVersion();
+    SettingsController.setVersion(VERSION);
+
     await SettingsController.checkForPendingLogout();
     await abstCtrl.syncData();
 
@@ -79,7 +82,7 @@ async function startApp() {
     })
 
     //top menu handlers
-    document.querySelector('#topMenuContainer').addEventListener('click', AbstractController.topMenuClickEventHandler)
+    document.querySelector('nav').addEventListener('click', AbstractController.topMenuClickEventHandler)
 
     //handler for task tables
     document.querySelector('#upcomingTasksTable tbody').addEventListener('click', TaskController.tasksTableEventHandler);
@@ -361,10 +364,12 @@ async function registerWorker() {
             const registration = await navigator.serviceWorker.register('./worker.js', {
                 scope: './'
             });
+
             if (registration.installing) {
                 console.log("Service worker installing");
             } else if (registration.waiting) {
-                console.log("Service worker installed");
+                console.log('Service working awaiting registration');
+                AbstractController.showUpdateNotification();
             } else if (registration.active) {
                 console.log("Service worker active");
             }

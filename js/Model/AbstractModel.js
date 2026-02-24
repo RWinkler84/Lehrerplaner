@@ -1,4 +1,4 @@
-import { ONEDAY } from "../index.js";
+import { ONEDAY, VERSION } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -281,8 +281,17 @@ export default class AbstractModel {
         return userInfo;
     }
 
-    async setVersion(version) {
-        await this.updateOnLocalDB('settings', { id: 2, version: version });
+    async checkVersion() {
+        const response = await this.makeAjaxQuery('versionCheck', '');
+
+        if (response.status == 'success') {
+            return {
+                remoteVersion: response.version,
+                localVersion: VERSION
+            }
+        }
+
+        return false;
     }
 
     async markLocalDBUpdated(store, date = null) {

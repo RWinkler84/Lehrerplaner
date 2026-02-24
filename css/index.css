@@ -108,7 +108,6 @@ nav {
     background-color: var(--topMenuBackgound);
     color: var(--lighterText);
     padding: 0.5rem 2rem;
-    margin-bottom: 0.5rem;
 }
 
 #topMenuButtonContainer {
@@ -149,6 +148,18 @@ nav {
     top: 2rem;
     right: 0rem;
     padding: 1rem 1rem;
+}
+
+#updateNotifcation {
+    width: 100%;
+    padding: 0.25rem 2rem;
+    background-color: var(--darkChampagne);
+    text-align: center;
+
+    a {
+        text-decoration: underline;
+        cursor: pointer;
+    }
 }
 
 /* Content Containers */

@@ -8,6 +8,7 @@ import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
 import CurriculumController from "./CurriculumController.js";
 import TimetableController from "./TimetableController.js";
+import { ONEDAY } from "../index.js";
 
 export default class AbstractController {
 
@@ -52,10 +53,44 @@ export default class AbstractController {
         View.setSyncIndicatorStatus(status, errorMessage);
     }
 
-    static setVersion(version) {
-        let db = new Model;
-        db.setVersion(version);
-        SettingsController.setVersion(version);
+    static async checkVersion() {
+        const db = new Model;
+        const versions =  await db.checkVersion();
+
+        setTimeout(() => {this.checkVersion()}, ONEDAY / 2);
+
+        if (!versions) return;
+
+        if (versions.remoteVersion != versions.localVersion) {
+            this.showUpdateNotification();
+        }
+    }
+
+    static showUpdateNotification() {
+
+        View.showUpdateNotification();
+    }
+
+    static async runUpdate() {
+        if ('caches' in window) {
+            caches.delete('eduplanio');
+        }
+
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+
+            for (const registration of registrations) {
+                if (registration.waiting) {
+                    registration.waiting.postMessage('skip waiting');
+
+                    continue;
+                }
+
+                registration.unregister();
+            }
+        }
+
+        location.reload();
     }
 
     static async toggleTemperaryOfflineUsage(offlineStatus) {
@@ -187,6 +222,10 @@ export default class AbstractController {
 
             case 'openSupportDialogButton':
                 AbstractController.openSupportDialog();
+                break;
+
+            case 'updateNowLink':
+                AbstractController.runUpdate();
                 break;
         }
     }
