@@ -6,7 +6,7 @@
     --topMenuBackgound: #542344;
     --lightMenuBackground: #81366A;
     --contentContainerBackground: #f6f6f9;
-    --lightText: rgb(164, 164, 164);
+    --lightText: #a4a4a4;
     --lighterText: #F3F5F7;
     --matteRed: #F05D5E;
     --matteGreen: #138e90;
@@ -1309,16 +1309,28 @@ h4 {
 .subjectColorFive {
     background-color: var(--mint) !important;
     color: black !important;
+
+    button {
+        color: black !important;
+    }
 }
 
 .subjectColorSix {
     background-color: var(--robinBlue) !important;
     color: black !important;
+
+    button {
+        color: black !important;
+    }
 }
 
 .subjectColorSeven {
     background-color: var(--champagne) !important;
     color: black !important;
+
+    button {
+        color: black !important;
+    }
 }
 
 .subjectColorEight {
@@ -1335,6 +1347,7 @@ h4 {
     /* color: black; */
 }
 
+.subjectColorFive button,
 .subjectColorFive.light.lessonOptionsWrapper .lessonOption button {
     color: black;
 }
@@ -1459,12 +1472,23 @@ h4 {
     color: var(--bodyBackground);
 }
 
+.undefined .lessonOptionsButton,
+.appointement .lessonOptionsButton,
+.undefined .deleteLessonButton,
+.appointement .deleteLessonButton {
+    color: black;
+}
+
 .appointement.light.lessonOptionsWrapper .lessonOption button {
     color: var(--bodyBackground);
 }
 
 .appointement.canceled {
-    border-color: var(--lightgrey)
+    border-color: var(--lightgrey);
+
+    .lessonOptionsButton {
+        color: var(--lightgrey);
+    }
 }
 
 .canceled {
@@ -1498,6 +1522,86 @@ h4 {
 .alertRing {
     width: fit-content;
     border: solid 3px rgba(0, 0, 0, 0);
+}
+
+/* demo tour */
+html {
+    scroll-behavior: smooth;
+}
+
+.introWindow {
+    display: none;
+    position: absolute;
+    z-index: 3;
+    width: 500px;
+    min-height: 200px;
+    background-color: var(--contentContainerBackground);
+    border: solid 1px var(--bodyBackground);
+    padding: 1rem 2rem;
+}
+
+.introWindow p>button.confirmationButton,
+.introWindow p>button.cancelButton,
+.introWindow p>button.orangeButton {
+    padding: 0 1rem;
+}
+
+#window1 {
+    top: 4rem;
+}
+
+#window6,
+#window7,
+#window8 {
+    transform: translate(-50%);
+}
+
+#window1,
+#window4,
+#window5,
+#window9,
+#window10,
+#window12,
+#window13,
+#window14 {
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.introWindow .buttons {
+    flex-grow: 1;
+    margin-top: 2rem;
+}
+
+.introTextItem {
+    background-color: var(--lightergrey);
+    border-radius: 3px;
+    padding: 0 0.5rem;
+}
+
+p {
+    margin: 0.5rem;
+}
+
+.highlighted {
+    border: solid 3px transparent;
+    animation-name: blinking;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes blinking {
+    0% {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: var(--matteRed);
+    }
+
+    100% {
+        border-color: transparent
+    }
 }
 
 /* responsiveness */
@@ -1652,6 +1756,11 @@ h4 {
 
         .headline {
             margin: -1.5rem -0.75rem 1.5rem;
+        }
+
+        &#settingsContainer {
+            width: 100%;
+            height: 100%;
         }
     }
 
