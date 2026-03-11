@@ -318,6 +318,10 @@ export default class AbstractView {
         }
     }
 
+    static showUpdateNotification() {
+        document.querySelector('#updateNotifcation').classList.remove('notDisplayed');
+    }
+
     static openSupportDialog() {
         let dialog = document.querySelector('#supportDialog');
         dialog.showModal();

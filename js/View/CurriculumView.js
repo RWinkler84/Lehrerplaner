@@ -521,13 +521,21 @@ export default class CurriculumView extends AbstractView {
         form.querySelector('#deleteSelectedSpanButton').removeAttribute('style');
 
         if (this.getEditorType() == 'Holiday Editor') {
+            form.querySelector('#timeSpanFormTitle').textContent = 'Ferien';
+
             form.querySelector('.editorButtonContainer').classList.add('notDisplayed');
             editor.classList.add('notDisplayed');
             form.querySelector('#resizeTimeSpanFormButton').classList.add('hidden');
         }
 
         if (this.getEditorType() == 'Curriculum Editor') {
+            form.querySelector('#timeSpanFormTitle').textContent = 'Sequenznotiz';
+
+            if (form.querySelector('#curriculumSpanNoteEditor').classList.contains('notDisplayed')) {
+                form.querySelector('#resizeTimeSpanFormButton').style.transform = 'rotate(180deg)';
+            }
             form.querySelector('#resizeTimeSpanFormButton').classList.remove('hidden');
+
         }
 
         if (isNewSpan) deleteButton.style.display = 'none';

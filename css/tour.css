@@ -1,0 +1,76 @@
+#tourDialog {
+    border: none;
+    border-radius: 10px;
+    padding: 3rem 4rem;
+    min-width: 50%;
+
+    .header {
+        align-items: center;
+        margin: -1rem -1rem 0 0;
+
+        .closeDialogButton {
+            color: black;
+            font-size: 2rem;
+
+            &:hover {
+                color: var(--matteRed);
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    img {
+        min-width: 0;
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+
+        &[src=""] {
+            display: none;
+        }
+    }
+
+    p {
+        font-family: sans-serif;
+        font-weight: 200;
+
+        .symbol {
+            padding: 0.1rem 0.5rem;
+            background-color: var(--lightergrey);
+        }
+
+        .icon {
+            display: inline-block;
+        }
+
+        .noteIcon {
+            width: 0.8rem;
+            height: 0.8rem;
+        }
+    }
+
+    .divider {
+        height: 1rem;
+    }
+
+    #tourButtonContainer {
+        margin-left: -1rem;
+        margin-right: -1rem;
+
+        .navigationButton {
+            color: black;
+            font-size: 1.5rem;
+            border: none;
+            background-color: none;
+            border-radius: 50%;
+            padding: 0.25rem;
+            width: 2.25rem;
+
+            &:hover {
+                color: var(--matteRed);
+            }
+        }
+    }
+}

@@ -54,25 +54,22 @@
     left: 100%;
     background-color: var(--contentContainerBackground);
     z-index: 3;
-}
 
-#closeTimeSpanFormButton,
-#resizeTimeSpanFormButton {
-    margin-right: -1rem;
-    background-color: var(--lightergrey);
-    color: var(--bodyBackground);
-}
+    #resizeTimeSpanFormButton {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-#resizeTimeSpanFormButton {
-    margin-left: -1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#closeTimeSpanFormButton:hover,
-#resizeTimeSpanFormButton:hover {
-    background-color: var(--lightgrey);
+        .minimizeIcon {
+            width: 0.5rem;
+            height: 0.5rem;
+            margin-top: 0.25rem;
+            border-top: solid 0.25rem var(--lighterText);
+            border-left: solid 0.25rem transparent;
+            border-right: solid 0.25rem transparent;
+            border-bottom: solid 0.25rem transparent;
+        }
+    }
 }
 
 #yearContainer {
@@ -381,72 +378,72 @@
         }
     }
 
-        .holidayNameWrapper {
-            width: 100%;
+    .holidayNameWrapper {
+        width: 100%;
+    }
+
+    #timeSpanForm {
+        transform: translateX(-0.5rem);
+        bottom: 0;
+        width: calc(100% + 1rem);
+    }
+
+    .curriculumSelectionItem:hover {
+        border: 2px solid var(--contentContainerBackground);
+
+        &.curriculumSelectionItem.selected {
+            border: solid 2px var(--lightMatteGreen);
         }
-
-        #timeSpanForm {
-            transform: translateX(-0.5rem);
-            bottom: 0;
-            width: calc(100% + 1rem);
-        }
-
-        .curriculumSelectionItem:hover {
-            border: 2px solid var(--contentContainerBackground);
-
-            &.curriculumSelectionItem.selected {
-                border: solid 2px var(--lightMatteGreen);
-            }
-        }
-
     }
 
-    /* curricula on mainView */
+}
 
-    .curriculaDisplayWeekday {
-        grid-template-rows: unset;
-    }
+/* curricula on mainView */
 
-    .curriculumSpanContainer {
-        height: 2.5rem;
-    }
+.curriculaDisplayWeekday {
+    grid-template-rows: unset;
+}
 
-    .spanItem {
-        position: absolute;
-        padding: 0.25rem 0.5rem;
-        box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
-        border-top: solid 2px var(--topMenuBackgound);
-    }
+.curriculumSpanContainer {
+    height: 2.5rem;
+}
 
-    .spanItem.start {
-        border-left: solid 0.75rem var(--topMenuBackgound);
-        border-top-left-radius: var(--standardRadius);
-        border-bottom-left-radius: var(--standardRadius);
-    }
+.spanItem {
+    position: absolute;
+    padding: 0.25rem 0.5rem;
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    border-top: solid 2px var(--topMenuBackgound);
+}
 
-    .spanItem.end {
-        border-top-right-radius: var(--standardRadius);
-        border-bottom-right-radius: var(--standardRadius);
-    }
+.spanItem.start {
+    border-left: solid 0.75rem var(--topMenuBackgound);
+    border-top-left-radius: var(--standardRadius);
+    border-bottom-left-radius: var(--standardRadius);
+}
 
-    .spanItemContent {
-        width: fit-content;
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        position: sticky;
-        overflow-y: scroll;
-        scrollbar-width: none;
-        left: 2rem;
-        text-wrap: nowrap;
-    }
+.spanItem.end {
+    border-top-right-radius: var(--standardRadius);
+    border-bottom-right-radius: var(--standardRadius);
+}
 
-    .curriculaSpanNoteIcon {
-        width: 0.75rem;
-        height: 0.75rem;
-    }
+.spanItemContent {
+    width: fit-content;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    position: sticky;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    left: 2rem;
+    text-wrap: nowrap;
+}
 
-    /* generics */
-    .noTouchActions {
-        touch-action: none;
-    }
+.curriculaSpanNoteIcon {
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+/* generics */
+.noTouchActions {
+    touch-action: none;
+}
