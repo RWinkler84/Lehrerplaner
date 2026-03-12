@@ -95,8 +95,6 @@ export default class Tour {
     static clickHandler(event) {
         let target = event.target;
 
-        console.log(target)
-
         switch (target.id) {
             case 'resizeSlideButton':
                 this.resizeTourModal();

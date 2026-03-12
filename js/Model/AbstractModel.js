@@ -181,7 +181,7 @@ export default class AbstractModel {
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio', 4);
+            let request = window.indexedDB.open('eduplanio_demo', 4);
             let store;
 
             request.onupgradeneeded = (event) => {

@@ -48,6 +48,7 @@
 
     .dialogBody {
         overflow-y: scroll;
+        scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
 
         img {
             min-width: 0;
