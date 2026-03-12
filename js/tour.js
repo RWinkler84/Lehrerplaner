@@ -14,7 +14,6 @@ export default class Tour {
         this.dialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
         this.minimizedTourDialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
 
-        this.dialog.querySelector('#startTourButton').addEventListener('click', () => { Tour.runTour() });
         this.setOpenedViewOnDialog('weekOverview');
         this.dialog.showModal();
     }
@@ -24,6 +23,7 @@ export default class Tour {
     }
 
     static runTour() {
+        
         tourStatus.running = true;
         this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed');
 
@@ -57,7 +57,11 @@ export default class Tour {
                 this.forwardBtn.classList.remove('hidden') :
                 this.forwardBtn.classList.add('hidden');
 
-            if (this.dialog.querySelector('#tourButtonContainer').classList.contains('notDisplayed')) this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed');
+            if (!slideData.backwardBtn && !slideData.forwardBtn) {
+                this.dialog.querySelector('#tourButtonContainer').classList.add('notDisplayed');
+            } else {
+                this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed');
+            }
         }
 
         this.dialog.showModal();
@@ -96,6 +100,10 @@ export default class Tour {
         let target = event.target;
 
         switch (target.id) {
+            case 'startTourButton':
+                Tour.runTour();
+                break;
+                
             case 'resizeSlideButton':
                 this.resizeTourModal();
                 break;
