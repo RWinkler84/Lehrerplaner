@@ -59,10 +59,10 @@ async function startApp() {
 
     //live demo stuff
     window.addEventListener("beforeunload", async () => {
-        window.indexedDB.deleteDatabase('eduplanio');
+        window.indexedDB.deleteDatabase('eduplanio_demo');
     });
     document.querySelector('#logoutButton').addEventListener('click', async () => {
-        window.indexedDB.deleteDatabase('eduplanio');
+        window.indexedDB.deleteDatabase('eduplanio_demo');
         window.location = '../'
     });
 
