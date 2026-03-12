@@ -95,7 +95,7 @@ export default class Lesson extends AbstractModel {
         let db = new AbstractModel;
         let dbData = await db.readAllFromLocalDB('timetableChanges');
         let changes = [];
-        
+
         dbData.forEach((entry) => {
             let lesson = new Lesson(entry.class, entry.subject);
             lesson.id = entry.id;
@@ -259,9 +259,8 @@ export default class Lesson extends AbstractModel {
         }
     }
 
-    static async setLessonsInHolidaysCanceled(schoolYears) {
-        const today = new Date(TODAY).setHours(12, 0, 0, 0);
-        const allLessons = await this.getAllRegularLessons();
+    static async setLessonsInHolidaysCanceled(schoolYears, startDate = null) {
+        startDate ? startDate = new Date(startDate).setHours(12, 0, 0, 0) : startDate = new Date().setHours(12, 0, 0, 0); const allLessons = await this.getAllRegularLessons();
         let timetableChanges = await this.getAllTimetableChanges();
 
         const filteredSchoolYears = schoolYears.filter(schoolYear => {

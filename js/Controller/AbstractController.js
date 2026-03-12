@@ -192,13 +192,13 @@ export default class AbstractController {
             case 'openSchoolYearViewButton':
                 const displayedSchoolYearId = SchoolYearController.getDisplayedSchoolYearId();
                 //only render, if nothing has been rendered yet, else keep the state, but resize the spanContentContainers in case of a screen resize
-                // if (displayedSchoolYearId == "") {
+                if (displayedSchoolYearId == "") {
                     await SchoolYearController.renderSchoolYearInfoSection();
                     CurriculumController.resizeSpanContentContainers();
-                // }
+                }
 
                 SchoolYearController.openSchoolYearSettings();
-                break
+                break;
 
             case 'logoutButton':
                 SettingsController.logout();

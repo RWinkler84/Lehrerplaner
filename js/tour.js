@@ -2,6 +2,7 @@ import { tourStatus } from "./index.js";
 
 export default class Tour {
 
+    static minimizedTourDialog = document.querySelector('#minimizedTourIcon');
     static dialog = document.querySelector('#tourDialog');
     static headline = this.dialog.querySelector('#tourDialogHeadline');
     static image = this.dialog.querySelector('#tourImage');
@@ -11,6 +12,7 @@ export default class Tour {
 
     static openTourModal() {
         this.dialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
+        this.minimizedTourDialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
 
         this.dialog.querySelector('#startTourButton').addEventListener('click', () => { Tour.runTour() });
         this.setOpenedViewOnDialog('weekOverview');
@@ -31,6 +33,7 @@ export default class Tour {
     /** @param direction 'forward' or 'backward' or null, if the current slide should not be changed */
     static openSlide(direction = null) {
         if (tourStatus.running == false) return;
+        if (this.minimizedTourDialog.classList.contains('minimized')) return;
 
         const currentSlide = Number(this.dialog.dataset.current_slide);
         const viewName = this.dialog.dataset.viewname;
@@ -60,6 +63,26 @@ export default class Tour {
         this.dialog.showModal();
     }
 
+    static resizeTourModal() {
+        const dialogProps = this.dialog.getBoundingClientRect();
+
+        if (this.minimizedTourDialog.classList.contains('minimized')) {
+            this.minimizedTourDialog.classList.remove('minimized');
+
+            this.openSlide();
+
+            return;
+        }
+
+        document.documentElement.style.setProperty('--dialogBottom', `${dialogProps.y}px`);
+        document.documentElement.style.setProperty('--dialogRight', `${dialogProps.x}px`);
+        document.documentElement.style.setProperty('--dialogWidth', `${dialogProps.width}px`);
+        document.documentElement.style.setProperty('--dialogHeight', `${dialogProps.height}px`);
+
+        this.dialog.close();
+        this.minimizedTourDialog.classList.add('minimized');
+    }
+
     /** @param viewName 'weekOverview', 'timetableOverview', 'yearOverview' */
     static setOpenedViewOnDialog(viewName) {
         this.dialog.dataset.viewname = viewName;
@@ -72,7 +95,13 @@ export default class Tour {
     static clickHandler(event) {
         let target = event.target;
 
+        console.log(target)
+
         switch (target.id) {
+            case 'resizeSlideButton':
+                this.resizeTourModal();
+                break;
+
             case 'endTourButton':
                 this.closeTourModal();
                 break;
@@ -86,6 +115,11 @@ export default class Tour {
                 break;
 
             //top menu clicks
+            case 'openWeekViewButton':
+                Tour.setOpenedViewOnDialog('weekOverview');
+                Tour.setSlideIdOnDialog(1);
+                Tour.openSlide();
+                break;
             case 'openTimetableViewButton':
                 Tour.setOpenedViewOnDialog('timetableOverview');
                 Tour.setSlideIdOnDialog(0);
@@ -97,13 +131,32 @@ export default class Tour {
                 Tour.setSlideIdOnDialog(0);
                 Tour.openSlide();
                 break;
+
+            //minimizedDialogIcon
+            case 'minimizedTourIcon':
+                this.resizeTourModal();
+                break;
         }
     }
 
     static slides = {
         weekOverview: [
             {
-                //empty by default
+                headline: 'Eduplanio-Einführung',
+                image: '',
+                text: `
+                <p>Hey, willkommen auf dem Eduplanio Demo-Konto!</p>
+                <p>Falls du Eduplanio noch nicht kennst und eine kurze Einführung möchtest, kannst du eine kleine
+                    Einführungstour machen.</p>
+                <p>Zu jedem Abschnitt der App erhältst du dann die wichtigsten Infos zur Verwendung. Wenn du dich 
+                erst einmal umschauen willst, minimiere dieses Fenster und leg später los.</p>
+                <div class="divider"></div>
+                <div class="flex justifyCenter"><button id="startTourButton" class="confirmationButton">Tour
+                        starten</button></div>
+                </div>
+                `,
+                forwardBtn: false,
+                backwardBtn: false
             },
             {
                 headline: 'Die Hauptansicht',
@@ -220,7 +273,7 @@ export default class Tour {
                     </p>
                     <p>
                     Bist du mit deinen Änderungen zufrieden, speicherst du sie über den 
-                    <button class="confirmationButton" style="padding: 0 0.5rem"><span class="icon checkIcon"></span></button>-Button. Willst du die sie 
+                    <button class="confirmationButton" style="padding: 0 0.5rem"><span class="icon checkIcon"></span></button>-Button. Willst du sie 
                     rückgängig machen, klickst du auf 
                     <button class="cancelButton" style="padding: 0 0.5rem"><span class="icon crossIcon"></span></button> und die ursprüngliche Aufgabe 
                     wird wiederhergestellt.
@@ -235,11 +288,11 @@ export default class Tour {
                 text: `
                     <p>
                     Die Grundlagen der Hauptansicht kennst du damit. Probiere dich gern selbst aus und erstelle Stunden, lege Vertretungen an oder
-                    spiele mit der Aufgabenansicht herum. Keine Sorge, sämtliche deiner Änderungen am Demokonto werden rückgängig gemacht, sobald du die
+                    spiele mit der Aufgabenansicht herum. Keine Sorge, alle deine Änderungen am Demokonto werden rückgängig gemacht, sobald du die
                     Seite schließt.
                     </p>
                     <p>
-                    Schau vorher aber unbedingt in der Stundenplan-Ansicht vorbei und absolviere die dortige Tour. Die Stundenplan-Ansicht ist für die 
+                    Schau vorher aber unbedingt in der Stundenplanansicht vorbei und absolviere die dortige Tour. Die Stundenplanansicht ist für die 
                     Einrichtung deines eigenen Eduplanio-Kontos zentral. Du solltest sie also kennen, um Eduplanio richtig nutzen zu können.
                     </p>
                 `,
@@ -253,7 +306,7 @@ export default class Tour {
                 image: './tour_img/stundenplan_ansicht_gesamt.jpg',
                 text: `
                     <p>
-                    Die Stundenplanansicht ähnelt auf den ersten Blick der Wochenansicht, dient aber ausschließlich zur Verwaltung deiner festen 
+                    Die Stundenplanansicht ähnelt auf den ersten Blick der Wochenübersicht, dient aber ausschließlich zur Verwaltung deiner festen 
                     Stundenpläne und deiner Fächer. Im oberen Teil kannst du deine Fächer eintragen. Wie das funktioniert, klären wir gleich. Der 
                     untere Teil dient zur Arbeit an den Stundenplänen. Hier kannst du sie anlegen, ändern und dir ältere Pläne anzeigen lassen, 
                     solltest du mehrere eingetragen haben.
@@ -269,7 +322,7 @@ export default class Tour {
                     <p>
                     Beginnst du mit der Nutzung von Eduplanio, musst du zuerst deine Fächer anlegen. Andernfalls hast du keine Möglichkeit, 
                     einen Stundenplan einzutragen. Auch beim Eintragen von Stunden in der Wochenansicht bist du ohne Fächer auf das Erstellen von 
-                    Terminen beschränkt. Dein erster Weg beim Einrichten der App führt deshalb in die Stundenplan-Ansicht in den Abschnitt 
+                    Terminen beschränkt. Dein erster Weg beim Einrichten der App führt deshalb in die Stundenplanansicht in den Abschnitt 
                     "Fächer anlegen".
                     </p>
                     <p>
@@ -287,7 +340,7 @@ export default class Tour {
                 image: './tour_img/stundenplan_eintragen.gif',
                 text: `
                     <p>
-                    Das Anlegen der Pläne funktioniert wie das Anlegen von Stunden in der Hauptansicht. Klicke auf "Plan anlegen" und dir wird eine
+                    Das Anlegen der Pläne ist unkompliziert und schnell erledigt. Klicke auf "Plan anlegen" und dir wird eine
                     leere Woche bereitgestellt, in die du deinen Unterricht eintragen kannst. Damit sich der Plan speichern lässt, musst du angeben, 
                     ab wann er gültig ist. Danach kannst du deine Stunden wie gehabt erstellen: Klicke auf ein freies Feld, und fülle das sich öffnende 
                     Formular mit Klasse und Fach aus. Hast du alle Stunden eingetragen, speicherst du den Plan. 
@@ -306,7 +359,7 @@ export default class Tour {
                 image: './tour_img/top_menu_jahresansicht.jpg',
                 text: `
                     <p>
-                    Damit weißt du, wie die Stundenplan-Ansicht funktioniert. Hast du deine Fächer und deinen Stundenplan eingetragen, ist Eduplanio grundsätzlich 
+                    Damit weißt du, wie die Stundenplanansicht funktioniert. Hast du deine Fächer und deinen Stundenplan eingetragen, ist Eduplanio grundsätzlich 
                     für den Einsatz im Schulalltag startklar. Willst du das volle Potenzial der App für dich nutzen, solltest du aber auch die Schuljahransicht
                     kennenlernen. Dort kannst du Informationen verwalten, die das gesamte Schuljahr betreffen, wie zum Beispiel deine Stoffverteilungspläne.
                     </p>
@@ -321,14 +374,14 @@ export default class Tour {
                 image: './tour_img/jahresansicht.jpg',
                 text: `
                     <p>
-                    Die Jahresansicht erlaubt es dir wichtige Informationen zum Schuljahr in Eduplanio einzutragen. Dazu gehören das Start- und Enddatum des 
-                    Schuljahres, die unterrichteten Klassenstufen und die Ferien und freien Tage. Die App funktioniert auch, ohne dass du ein Schuljahr anlegst, 
+                    Die Jahresansicht erlaubt es dir, wichtige Informationen zum Schuljahr in Eduplanio einzutragen. Dazu gehören das Start- und Enddatum des 
+                    Schuljahres, die unterrichteten Klassenstufen und die Ferien sowie freie Tage. Die App funktioniert auch, ohne dass du ein Schuljahr anlegst, 
                     das Nutzungserlebnis ist dann aber eventuell etwas schlechter.
                     </p>
                     <p>
                     Verzichtest du zum Beispiel darauf, Ferienzeiten einzutragen, kann Eduplanio diese 
                     nicht beim Neuterminieren deiner Aufgaben berücksichtigen oder Stunden an freien Tagen automatisch als ausfallend markieren. Stoffverteilungspläne 
-                    zu erstellen ist ohne Schuljahr, dem sie zugeordnet werden, ist ebenfalls unmöglich. 
+                    zu erstellen ist ohne Schuljahr, dem sie zugeordnet werden, ebenfalls nicht möglich. 
                     </p>
                 `,
                 forwardBtn: true,
@@ -336,21 +389,101 @@ export default class Tour {
             },
             {
                 headline: 'Die Jahresansicht 2',
-                image: './tour_img/jahresansicht.jpg',
+                image: './tour_img/schuljahr_anlegen.gif',
                 text: `
                     <p>
-                    Die Jahresansicht erlaubt es dir wichtige Informationen zum Schuljahr in Eduplanio einzutragen. Dazu gehören das Start- und Enddatum des 
-                    Schuljahres, die unterrichteten Klassenstufen und die Ferien und freien Tage. Die App funktioniert auch, ohne dass du ein Schuljahr anlegst, 
-                    das Nutzungserlebnis ist dann aber eventuell etwas schlechter.
+                    Nachdem du "Schuljahr anlegen" geklickt hast, erhältst du die Möglichkeit, ein Start- und ein Enddatum für das Schuljahr festzulegen. 
+                    Sie markieren den Beginn und das Ende des Schuljahreskalenders in Eduplanio. Dieser wird sicht- und nutzbar, nachdem du die Daten gespeichert hast. 
+                    Willst du deine Stoffverteilungspläne mit Eduplanio verwalten, musst du außerdem die unterrichteten Klassenstufen anhaken.
                     </p>
                     <p>
-                    Verzichtest du zum Beispiel darauf, Ferienzeiten einzutragen, kann Eduplanio diese 
-                    nicht beim Neuterminieren deiner Aufgaben berücksichtigen oder Stunden an freien Tagen automatisch als ausfallend markieren. Stoffverteilungspläne 
-                    zu erstellen ist ohne Schuljahr, dem sie zugeordnet werden, ist ebenfalls unmöglich. 
+                    Hast du deine Eingaben erledigt, drückst du auf "Speichern" und kannst beginnen, mit dem Jahreskalender zu arbeiten.
                     </p>
                 `,
                 forwardBtn: true,
-                backwardBtn: false
+                backwardBtn: true
+            },
+            {
+                headline: 'Die Jahresansicht 3',
+                image: './tour_img/ferien_eintragen.gif',
+                text: `
+                    <p>
+                    Damit der Jahreskalender dir die Ferienzeiten anzeigt, was das Erstellen von Stoffverteilungsplänen erleichtert, solltest du 
+                    zuerst die Ferien und freien Tage eintragen. Den Ferienkalender öffnest du mit einem Klick auf "Anlegen" rechts im Bereich 
+                    "Ferien und freie Tage".
+                    </p>
+                    <p>
+                    Zeiträume im Kalender können einen oder mehrere Tage überspannen. Um einen neuen Zeitraum anzulegen, klicke auf einen leeren 
+                    Tag im Kalender und passe die Länge nach Bedarf an. Vergib anschließend einen Namen und speichere den Zeitraum. Solltest du ihn 
+                    später bearbeiten wollen, musst du ihn nur anklicken.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Stoffverteilungspläne',
+                image: './tour_img/stoffverteilungsplan_anlegen.gif',
+                text: `
+                    <p>
+                    Hast du dein neu angelegtes Schuljahr gespeichert, wird der Editor für Stoffverteilungspläne verfügbar. Er befindet sich wie der 
+                    Ferienkalender unterhalb der Schuljahresübersicht. Um den ersten Stoffverteilungsplan anzulegen, klicke auf "Plan anlegen", 
+                    wähle die benötigte Fach- und Klassenstufenkombination aus und beginne dann, deine Sequenzen einzutragen.
+                    </p>
+                    <p>
+                    Wichtig ist, dass du vorher alle deine Fächer in der Stundenplanansicht eingetragen hast. Andernfalls kannst du keinen Stoffverteilungsplan 
+                    für die fehlenden Fächer anlegen.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Stoffverteilungspläne 2',
+                image: './tour_img/sequenz_anlegen.gif',
+                text: `
+                    <p>
+                    Im nächsten Schritt trägst du deine geplanten Sequenzen ein. Das funktioniert wie schon bei den Schulferien gezeigt. Klicke auf 
+                    einen leeren Tag im Kalender, passe den Zeitraum an und vergib einen Namen für die Sequenz. Anders als bei Ferien hast du hier 
+                    zusätzlich die Möglichkeit, eine Notiz anzulegen. Diese kannst du beispielsweise zur Ideensammlung nutzen.
+                    </p>
+                    <p>
+                    Bearbeiten kannst du eine Sequenz nach dem Speichern, indem du sie erneut anklickst. Sowohl die Notiz als auch die 
+                    Zeitspanne können dann angepasst werden, was die Arbeit mit Stoffverteilungsplänen sehr flexibel macht.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Stoffverteilungspläne 3',
+                image: './tour_img/stoffverteilungsplan_wochenansicht.jpg',
+                text: `
+                    <p>
+                    Hast du deinen Stoffverteilungsplan gespeichert, kannst du dessen Inhalt nicht nur über die Schuljahresansicht abrufen. Er 
+                    taucht auch in der Wochenansicht auf. Über dem Kalender kannst du dort im Bereich "Stoffverteilungspläne" einen oder mehrere 
+                    Pläne auswählen, die dir angezeigt werden sollen. Gibt es für die jeweilige Woche eine geplante Sequenz, wird diese nun über 
+                    dem Wochenplan eingeblendet.
+                    </p>
+                    <p>
+                    Du erhältst darüber auch die Möglichkeit, die Notiz für die jeweilige Sequenz anzusehen, zu bearbeiten oder neu anzulegen, 
+                    falls es noch keine gibt. Dafür musst du einfach auf das Notiz-Symbol (<span class="icon noteIcon"></span>) klicken, das vor 
+                    dem Sequenznamen angezeigt wird.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Jahrensansicht 4',
+                image: './tour_img/stoffverteilungsplan_wochenansicht.jpg',
+                text: `
+                    <p>
+                    Damit bist du mit den wichtigsten Funktionen der Jahresansicht vertraut. 
+                    </p>
+                `,
+                forwardBtn: false,
+                backwardBtn: true
             },
         ]
     };

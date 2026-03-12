@@ -1,12 +1,20 @@
 #tourDialog {
     border: none;
     border-radius: 10px;
-    padding: 3rem 4rem;
-    min-width: 50%;
+    padding: 2rem 4rem 3rem;
+    min-width: max(50%, 750px);
+
+    &[open] {
+        display: flex;
+        flex-direction: column;
+    }
 
     .header {
+        position: sticky;
+        top: 0;
+        background-color: var(--contentContainerBackground);
         align-items: center;
-        margin: -1rem -1rem 0 0;
+        margin: 0 -1rem 0 0;
 
         .closeDialogButton {
             color: black;
@@ -20,34 +28,54 @@
                 outline: none;
             }
         }
-    }
 
-    img {
-        min-width: 0;
-        max-width: 100%;
-        margin-bottom: 0.5rem;
+        #resizeSlideButton {
+            .minimizeIcon {
+                width: 0.8rem;
+                height: 0.8rem;
+                border-top: solid 0.4rem var(--bodyBackground);
+                border-left: solid 0.4rem transparent;
+                border-right: solid 0.4rem transparent;
+                border-bottom: solid 0.4rem transparent;
 
-        &[src=""] {
-            display: none;
+            }
+
+            &:hover .minimizeIcon {
+                border-top: solid 0.4rem var(--matteRed);
+            }
         }
     }
 
-    p {
-        font-family: sans-serif;
-        font-weight: 200;
+    .dialogBody {
+        overflow-y: scroll;
 
-        .symbol {
-            padding: 0.1rem 0.5rem;
-            background-color: var(--lightergrey);
+        img {
+            min-width: 0;
+            max-width: 100%;
+            margin-bottom: 0.5rem;
+
+            &[src=""] {
+                display: none;
+            }
         }
 
-        .icon {
-            display: inline-block;
-        }
+        p {
+            font-family: sans-serif;
+            font-weight: 200;
 
-        .noteIcon {
-            width: 0.8rem;
-            height: 0.8rem;
+            .symbol {
+                padding: 0.1rem 0.5rem;
+                background-color: var(--lightergrey);
+            }
+
+            .icon {
+                display: inline-block;
+            }
+
+            .noteIcon {
+                width: 0.8rem;
+                height: 0.8rem;
+            }
         }
     }
 
@@ -56,6 +84,9 @@
     }
 
     #tourButtonContainer {
+        display: flex;
+        align-items: end;
+        flex-grow: 1;
         margin-left: -1rem;
         margin-right: -1rem;
 
@@ -71,6 +102,89 @@
             &:hover {
                 color: var(--matteRed);
             }
+        }
+    }
+}
+
+#minimizedTourIcon {
+    display: none;
+    position: absolute;
+    bottom: var(--dialogBottom);
+    right: var(--dialogRight);
+    width: var(--dialogWidth);
+    height: var(--dialogHeight);
+    border-radius: 10px;
+    border: solid 1px var(--lightgrey);
+    padding: 1rem 1rem;
+    background-color: var(--contentContainerBackground);
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+    z-index: 100;
+
+    strong {
+        pointer-events: none;
+    }
+
+    &.minimized {
+        display: flex;
+        position: fixed;
+        align-items: center;
+        justify-content: center;
+        border-radius: 25%;
+        right: 1rem;
+        bottom: 1rem;
+        width: 75px;
+        height: 75px;
+        animation: minimizeAnimation 0.4s ease-out;
+    }
+}
+
+@keyframes minimizeAnimation {
+    0% {
+        bottom: var(--dialogBottom);
+        right: var(--dialogRight);
+        width: var(--dialogWidth);
+        height: var(--dialogHeight);
+    }
+
+    50% {}
+
+    100% {
+
+        right: 1rem;
+        bottom: 1rem;
+        width: 70px;
+        height: 70px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    #tourDialog {
+        min-width: 90%;
+
+
+        img {
+            max-height: 450px;
+        }
+    }
+}
+
+@media screen and (max-width: 750px) {
+    #tourDialog {
+        padding: 2rem 2rem 3rem;
+    }
+}
+
+@media screen and (max-width: 620px) {
+    #tourDialog {
+        padding: 2rem 0.5rem 3rem;
+        border-radius: 0;
+
+        .header {
+            margin: 0;
+        }
+
+        #tourButtonContainer {
+            margin: 0 1rem;
         }
     }
 }

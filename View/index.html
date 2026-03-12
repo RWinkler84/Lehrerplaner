@@ -132,20 +132,20 @@
                             <div class="timeslot" data-timeslot="9"></div>
                         </div>
 
-                    <div class="weekday" data-weekday_number="2" data-date="">
-                        <div class="weekdayLabel">Di<span class="isTodayDot"></span>
-                            <div class="smallDate"></div>
+                        <div class="weekday" data-weekday_number="2" data-date="">
+                            <div class="weekdayLabel">Di<span class="isTodayDot"></span>
+                                <div class="smallDate"></div>
+                            </div>
+                            <div class="timeslot" data-timeslot="1"></div>
+                            <div class="timeslot" data-timeslot="2"></div>
+                            <div class="timeslot" data-timeslot="3" id="markedSlot"></div>
+                            <div class="timeslot" data-timeslot="4"></div>
+                            <div class="timeslot" data-timeslot="5"></div>
+                            <div class="timeslot" data-timeslot="6"></div>
+                            <div class="timeslot" data-timeslot="7"></div>
+                            <div class="timeslot" data-timeslot="8"></div>
+                            <div class="timeslot" data-timeslot="9"></div>
                         </div>
-                        <div class="timeslot" data-timeslot="1"></div>
-                        <div class="timeslot" data-timeslot="2"></div>
-                        <div class="timeslot" data-timeslot="3" id="markedSlot"></div>
-                        <div class="timeslot" data-timeslot="4"></div>
-                        <div class="timeslot" data-timeslot="5"></div>
-                        <div class="timeslot" data-timeslot="6"></div>
-                        <div class="timeslot" data-timeslot="7"></div>
-                        <div class="timeslot" data-timeslot="8"></div>
-                        <div class="timeslot" data-timeslot="9"></div>
-                    </div>
 
                         <div class="weekday" data-weekday_number="3" data-date="">
                             <div class="weekdayLabel">Mi<span class="isTodayDot"></span>
@@ -1037,28 +1037,39 @@
 
     <!-- demo tour dialog -->
 
-    <dialog id="tourDialog" data-current_slide = "0" data-viewname>
-    <div class="flex spaceBetween header">
-        <h3 id="tourDialogHeadline">Eduplanio-Einführung</h3>
-        <button id="endTourButton" class="closeDialogButton">×</button>
-    </div>
-    <div class="divider"></div>
+    <dialog id="tourDialog" data-current_slide="0" data-viewname>
+        <div class="flex spaceBetween header">
+            <h3 id="tourDialogHeadline">Eduplanio-Einführung</h3>
+            <div class="flex noWrap halfGap">
+                <button id="resizeSlideButton" class="closeDialogButton">
+                    <div class="icon minimizeIcon"></div>
+                </button>
+                <button id="endTourButton" class="closeDialogButton">×</button>
+            </div>
+        </div>
 
-    <div class="flex justifyCenter"><img id="tourImage" src="" alt=""></div>
-    <div id="tourText">
-        <p>Hey, willkommen auf dem Eduplanio Demo-Konto!</p>
-        <p>Falls du Eduplanio noch nicht kennst und eine kurze Einführung möchtest, kannst du eine kleine Einführungstour machen.</p>
-        <p>Zu jedem Abschnitt der App erhältst du dann die wichtigsten Infos zur Verwendung.</p>
-        <div class="divider"></div>
-        <div class="flex justifyCenter"><button id="startTourButton" class="confirmationButton">Tour starten</button></div>
-    </div>
+        <div class="dialogBody">
+            <div class="flex justifyCenter"><img id="tourImage" src="" alt=""></div>
+            <div id="tourText">
+                <p>Hey, willkommen auf dem Eduplanio Demo-Konto!</p>
+                <p>Falls du Eduplanio noch nicht kennst und eine kurze Einführung möchtest, kannst du eine kleine
+                    Einführungstour machen.</p>
+                <p>Zu jedem Abschnitt der App erhältst du dann die wichtigsten Infos zur Verwendung. Wenn du dich 
+                erst einmal umschauen willst, minimiere dieses Fenster und leg später los.</p>
+                <div class="divider"></div>
+                <div class="flex justifyCenter"><button id="startTourButton" class="confirmationButton">Tour
+                        starten</button></div>
+            </div>
+            <div class="divider"></div>
+        </div>
 
-    <div class="divider"></div>
-    <div id="tourButtonContainer" class="flex spaceBetween notDisplayed">
-    <button id="goBackBtn" class="navigationButton">&#x276E;</button>
-    <button id="goForwardBtn" class="navigationButton">&#x276F;</button>
-    </div>
+        <div id="tourButtonContainer" class="flex spaceBetween notDisplayed">
+            <button id="goBackBtn" class="navigationButton">&#x276E;</button>
+            <button id="goForwardBtn" class="navigationButton">&#x276F;</button>
+        </div>
     </dialog>
+
+    <div id="minimizedTourIcon"><strong>Tour</strong></div>
 
     <footer><a id="imprintLink" href="./../impressum.html">Impressum</a></footer>
     <script src="./js/index.js" type="module"></script>
