@@ -56,7 +56,7 @@ if (isset($_GET['c']) && isset($_GET['a'])) {
     }
     
     $userId = $_SESSION['userId'] ?? 'not set';
-    error_log("action: {$_GET['a']} UID: {$userId}");
+    error_log("action: {$_GET['a']} controller: {$_GET['c']} UID: {$userId}");
 
     $controllerName = '\Controller\\' . ucfirst($_GET['c']) .  'Controller';
     $action = $_GET['a'];
