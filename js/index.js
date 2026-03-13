@@ -13,6 +13,14 @@ import SchoolYearController from './Controller/SchoolYearController.js';
 import Editor from './inc/editor.js';
 import TimetableController from './Controller/TimetableController.js';
 
+//tour stuff
+export let tourStatus = {
+    running: true
+};
+import Tour from './tour.js';
+document.addEventListener('DOMContentLoaded', () => { Tour.openTourModal() });
+document.querySelector('#topMenuContainer').addEventListener('click', Tour.clickHandler);
+
 //config
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
