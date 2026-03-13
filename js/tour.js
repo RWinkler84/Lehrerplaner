@@ -13,6 +13,10 @@ export default class Tour {
     static openTourModal() {
         this.dialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
         this.minimizedTourDialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
+        this.image.addEventListener('load', () => {
+            Tour.image.parentElement.classList.remove('loading');
+            Tour.image.classList.remove('notDisplayed');
+            });
 
         this.setOpenedViewOnDialog('weekOverview');
         this.dialog.showModal();
@@ -62,6 +66,9 @@ export default class Tour {
             } else {
                 this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed');
             }
+
+            this.image.parentElement.classList.add('loading');
+            this.image.classList.add('notDisplayed');
         }
 
         this.dialog.showModal();
@@ -103,7 +110,7 @@ export default class Tour {
             case 'startTourButton':
                 Tour.runTour();
                 break;
-                
+
             case 'resizeSlideButton':
                 this.resizeTourModal();
                 break;
