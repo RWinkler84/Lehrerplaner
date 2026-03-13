@@ -10,7 +10,7 @@ export default class Tour {
     static backwardBtn = this.dialog.querySelector('#goBackBtn');
     static forwardBtn = this.dialog.querySelector('#goForwardBtn');
 
-    static openTourModal() {
+    static initTourModal() {
         this.dialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
         this.minimizedTourDialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
         this.image.addEventListener('load', () => {
@@ -67,7 +67,8 @@ export default class Tour {
                 this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed');
             }
 
-            this.image.parentElement.classList.add('loading');
+            if (slideData.image != '') {this.image.parentElement.classList.add('loading')}
+            else {this.image.parentElement.classList.remove('loading')};
             this.image.classList.add('notDisplayed');
         }
 

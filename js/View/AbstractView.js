@@ -390,6 +390,12 @@ export default class AbstractView {
         }
     }
 
+    static getCurrentlyOpenedView() {
+        if (document.querySelector('#weekViewContainer').style.display == 'block') return 'weekOverview';
+        if (document.querySelector('#timetableViewContainer').style.display == 'block') return 'timetableOverview';
+        if (document.querySelector('#schoolYearViewContainer').style.display == 'block') return 'yearOverview';
+    }
+
     //support ticket alerts
 
     static alertSupportTicketUserEmail(message = null) {
