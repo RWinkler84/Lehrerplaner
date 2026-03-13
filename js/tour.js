@@ -10,24 +10,24 @@ export default class Tour {
     static backwardBtn = this.dialog.querySelector('#goBackBtn');
     static forwardBtn = this.dialog.querySelector('#goForwardBtn');
 
-    static openTourModal() {
+    static initTourModal() {
         this.dialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
         this.minimizedTourDialog.addEventListener('click', (event) => { Tour.clickHandler(event) });
         this.image.addEventListener('load', () => {
             Tour.image.parentElement.classList.remove('loading');
             Tour.image.classList.remove('notDisplayed');
-            });
+        });
 
         this.setOpenedViewOnDialog('weekOverview');
-        this.dialog.showModal();
     }
 
     static closeTourModal() {
+        tourStatus.running = false;
         this.dialog.close();
     }
 
     static runTour() {
-        
+
         tourStatus.running = true;
         this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed');
 
@@ -61,13 +61,12 @@ export default class Tour {
                 this.forwardBtn.classList.remove('hidden') :
                 this.forwardBtn.classList.add('hidden');
 
-            if (!slideData.backwardBtn && !slideData.forwardBtn) {
-                this.dialog.querySelector('#tourButtonContainer').classList.add('notDisplayed');
-            } else {
-                this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed');
-            }
+            if (!slideData.backwardBtn && !slideData.forwardBtn) { this.dialog.querySelector('#tourButtonContainer').classList.add('notDisplayed'); }
+            else { this.dialog.querySelector('#tourButtonContainer').classList.remove('notDisplayed'); }
 
-            this.image.parentElement.classList.add('loading');
+            if (slideData.image != '') { this.image.parentElement.classList.add('loading'); }
+            else { this.image.parentElement.classList.remove('loading'); }
+
             this.image.classList.add('notDisplayed');
         }
 
@@ -300,12 +299,8 @@ export default class Tour {
                 image: './tour_img/top_menu_stundenplan.jpg',
                 text: `
                     <p>
-                    Die Grundlagen der Hauptansicht kennst du damit. Probiere dich gern selbst aus und erstelle Stunden, lege Vertretungen an oder
-                    spiele mit der Aufgabenansicht herum. Keine Sorge, alle deine Änderungen am Demokonto werden rückgängig gemacht, sobald du die
-                    Seite schließt.
-                    </p>
-                    <p>
-                    Schau vorher aber unbedingt in der Stundenplanansicht vorbei und absolviere die dortige Tour. Die Stundenplanansicht ist für die 
+                    Die Grundlagen der Hauptansicht kennst du damit. Wenn du neu bei Eduplanio bist und nicht weißt, wo du mit der Einrichtung beginnen 
+                    sollst, schau dir unbedingt die Hilfe zur Stundenplanansicht an. Die Stundenplanansicht ist für die 
                     Einrichtung deines eigenen Eduplanio-Kontos zentral. Du solltest sie also kennen, um Eduplanio richtig nutzen zu können.
                     </p>
                 `,

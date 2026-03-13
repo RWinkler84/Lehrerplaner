@@ -15,10 +15,10 @@ import TimetableController from './Controller/TimetableController.js';
 
 //tour stuff
 export let tourStatus = {
-    running: true
+    running: false
 };
 import Tour from './tour.js';
-document.addEventListener('DOMContentLoaded', () => { Tour.openTourModal() });
+document.addEventListener('DOMContentLoaded', () => { Tour.initTourModal() });
 document.querySelector('#topMenuContainer').addEventListener('click', Tour.clickHandler);
 
 //config
@@ -26,7 +26,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.260306';
+export const VERSION = '0.9.260313';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];

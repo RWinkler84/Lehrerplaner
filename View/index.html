@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/editor.css">
     <link rel="stylesheet" href="./css/curriculum.css">
     <link rel="stylesheet" href="./css/animations.css">
+    <link rel="stylesheet" href="./css/tour.css">
     <link rel="icon" type="image/png" href="../favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
     <link rel="shortcut icon" href="../favicon.ico" />
@@ -44,6 +45,7 @@
                 <div id="topMenu" class="flex column justifyCenter ">
                     <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
                     <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
+                    <button id="openHelpButton" class="burgerMenuButton">Hilfe</button>
                     <button id="openLoginButton" class="burgerMenuButton">Login</button>
                     <button id="createAccountButton" class="burgerMenuButton">Registrieren</button>
                     <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
@@ -55,7 +57,7 @@
     </nav>
 
     <main>
-        <div id="weekViewContainer" class="mainViewContainer">
+        <div id="weekViewContainer" class="mainViewContainer" style="display: block;">
             <div id="timetableContainer">
                 <div id="calendarWeekContainer" class="flex gap spaceBetween" style="margin-bottom: 1rem;">
                     <div id="calendarWeek" class="flex alignCenter">
@@ -1033,6 +1035,42 @@
             </div>
         </div>
     </dialog>
+
+    <!-- demo tour dialog -->
+
+    <dialog id="tourDialog" data-current_slide="0" data-viewname>
+        <div class="flex spaceBetween header">
+            <h3 id="tourDialogHeadline">Eduplanio-Einführung</h3>
+            <div class="flex noWrap halfGap">
+                <button id="resizeSlideButton" class="closeDialogButton">
+                    <div class="icon minimizeIcon"></div>
+                </button>
+                <button id="endTourButton" class="closeDialogButton">×</button>
+            </div>
+        </div>
+
+        <div class="body">
+            <div id="tourImageContainer" class="flex justifyCenter"><img id="tourImage" src="" alt=""></div>
+            <div id="tourText">
+                <p>Hey, willkommen auf dem Eduplanio Demo-Konto!</p>
+                <p>Falls du Eduplanio noch nicht kennst und eine kurze Einführung möchtest, kannst du eine kleine
+                    Einführungstour machen.</p>
+                <p>Zu jedem Abschnitt der App erhältst du dann die wichtigsten Infos zur Verwendung. Wenn du dich
+                    erst einmal umschauen willst, minimiere dieses Fenster und leg später los.</p>
+                <div class="divider"></div>
+                <div class="flex justifyCenter"><button id="startTourButton" class="confirmationButton">Tour
+                        starten</button></div>
+            </div>
+            <div class="divider"></div>
+        </div>
+
+        <div id="tourButtonContainer" class="flex spaceBetween notDisplayed">
+            <button id="goBackBtn" class="navigationButton">&#x276E;</button>
+            <button id="goForwardBtn" class="navigationButton">&#x276F;</button>
+        </div>
+    </dialog>
+
+    <div id="minimizedTourIcon"><strong>Tour</strong></div>
 
     <footer><a id="imprintLink" href="./../impressum.html">Impressum</a></footer>
     <script src="./js/index.js" type="module"></script>

@@ -8,7 +8,8 @@ import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
 import CurriculumController from "./CurriculumController.js";
 import TimetableController from "./TimetableController.js";
-import { ONEDAY } from "../index.js";
+import { ONEDAY, tourStatus } from "../index.js";
+import Tour from "../tour.js";
 
 export default class AbstractController {
 
@@ -142,6 +143,17 @@ export default class AbstractController {
         View.closeSupportDialog();
     }
 
+    static openHelpDialog() {
+        const currentlyOpenedView = View.getCurrentlyOpenedView();
+        const slideId = currentlyOpenedView == 'weekOverview' ? '1' : '0';
+
+        tourStatus.running = true;
+
+        Tour.setOpenedViewOnDialog(currentlyOpenedView);
+        Tour.setSlideIdOnDialog(slideId);
+        Tour.openSlide();
+    }
+
     static async sendSupportTicket(event) {
         event.preventDefault();
         let formData = View.getSupportTicketContentFromForm();
@@ -222,6 +234,10 @@ export default class AbstractController {
 
             case 'openSupportDialogButton':
                 AbstractController.openSupportDialog();
+                break;
+            
+            case 'openHelpButton':
+                AbstractController.openHelpDialog();
                 break;
 
             case 'updateNowLink':
