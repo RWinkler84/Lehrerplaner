@@ -319,6 +319,24 @@ export default class AbstractView {
         document.querySelector('#updateNotifcation').classList.remove('notDisplayed');
     }
 
+    static openPlusExpirationDialog(daysLeft) {
+        const dialog = document.querySelector('#plusExpirationDialog');
+        const daysLeftSpan = dialog.querySelector('#plusDaysRemainingSpan');
+        const daysLeftString = {
+            0: 'heute',
+            1: 'in einem Tag',
+            7: 'in sieben Tagen'
+        }
+
+        daysLeftSpan.textContent = daysLeftString[daysLeft];
+
+        dialog.showModal();
+    }
+
+    static closePlusExpirationDialog() {
+        const dialog = document.querySelector('#plusExpirationDialog').close();
+    }
+
     static openSupportDialog() {
         let dialog = document.querySelector('#supportDialog');
         dialog.showModal();

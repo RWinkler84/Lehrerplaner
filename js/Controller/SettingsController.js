@@ -80,6 +80,17 @@ export default class SettingsController {
         };
     }
 
+    /**  @param status: boolean true or false */
+    static setExpirationWarningDismissedStatus(status) {
+        const model = new Settings();
+        model.setExpirationWarningDismissedStatus(status);
+    }
+
+    static async getExpirationWarningDismissedStatus() {
+        const model = new Settings();
+        return await model.getExpirationWarningDismissedStatus();
+    }
+
     static async getAllRegularLessons() {
         return await LessonController.getAllRegularLessons();
     }

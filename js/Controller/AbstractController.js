@@ -56,9 +56,9 @@ export default class AbstractController {
 
     static async checkVersion() {
         const db = new Model;
-        const versions =  await db.checkVersion();
+        const versions = await db.checkVersion();
 
-        setTimeout(() => {this.checkVersion()}, ONEDAY / 2);
+        setTimeout(() => { this.checkVersion() }, ONEDAY / 2);
 
         if (!versions) return;
 
@@ -129,10 +129,37 @@ export default class AbstractController {
         let db = new AbstractModel;
         const userInfo = await db.getUserInfo();
 
-        //set the syncIndicator to unsynced, if activeUntil is expired
-        if (new Date().setHours(12, 0, 0, 0) > new Date(userInfo.activeUntil).setHours(12, 0, 0, 0)) AbstractController.setSyncIndicatorStatus('unsynced');
+        //warn, if Plus is about to expire
+        this.checkForPlusExpiration(userInfo);
 
         return userInfo;
+    }
+
+    static async checkForPlusExpiration(userInfo) {
+        const today = new Date().setHours(12, 0, 0, 0);
+        const plusExpirationDate = new Date(userInfo.activeUntil).setHours(12, 0, 0, 0);
+        const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
+
+        if (new Date(expirationWarningStatus.lastUpdated).setHours(12, 0, 0, 0) != today) SettingsController.setExpirationWarningDismissedStatus(false);
+
+        if (!expirationWarningStatus || expirationWarningStatus.expirationWarningDismissed == false) {
+            if (plusExpirationDate - (ONEDAY * 7) == today) AbstractController.openPlusExpirationDialog(7);
+            if (plusExpirationDate - ONEDAY == today) AbstractController.openPlusExpirationDialog(1);
+            if (plusExpirationDate == today) AbstractController.openPlusExpirationDialog(0);
+        }
+        
+        //set the syncIndicator to unsynced, if activeUntil is expired
+        if (today > plusExpirationDate) AbstractController.setSyncIndicatorStatus('unsynced');
+    }
+
+    static async openPlusExpirationDialog(daysLeft) {
+        const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
+
+        if (!expirationWarningStatus || expirationWarningStatus.expirationWarningDismissed == false) View.openPlusExpirationDialog(daysLeft);
+    }
+    static closePlusExpirationDialog() {
+        SettingsController.setExpirationWarningDismissedStatus(true);
+        View.closePlusExpirationDialog();
     }
 
     static openSupportDialog() {
@@ -235,7 +262,7 @@ export default class AbstractController {
             case 'openSupportDialogButton':
                 AbstractController.openSupportDialog();
                 break;
-            
+
             case 'openHelpButton':
                 AbstractController.openHelpDialog();
                 break;

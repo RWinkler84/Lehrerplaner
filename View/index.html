@@ -1023,7 +1023,7 @@
 
     <dialog id="registrationNeededDialog">
         <div class="headline flex spaceBetween">
-            <h3>Anmeldung erforderlich <span id="curriclumNoteInfo"></span></h3><button
+            <h3>Anmeldung erforderlich</h3><button
                 class="closeRegistrationNeededDialogButton closeDialogButton" style="width: 1.5rem">×</button>
         </div>
         <div class="dialogBody flex column">
@@ -1032,6 +1032,22 @@
             <div class="flex halfGap justifyEnd">
                 <button id="startRegistrationButton" class="confirmationButton">Jetzt registrieren</button>
                 <button class="closeRegistrationNeededDialogButton cancelButton">Abbrechen</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="plusExpirationDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Eduplanio Plus läuft bald ab</h3><button
+                class="closePlusExpirationDialogButton closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody flex column">
+            <p>Deine Eduplanio Plus-Lizenz läuft <span id="plusDaysRemainingSpan" style="font-weight: bold;"></span> ab.</p>
+            <p>Du kannst Eduplanio danach weiter verwenden, musst aber auf die Cloud-Backups und auf die Synchronisation 
+            zwischen mehreren Geräten verzichten. Deine Lizenz kannst du in den Kontoeinstellungen verlängern.</p>
+            <div class="flex halfGap justifyEnd">
+                <button id="goToAccoutSettingsButton" class="confirmationButton">Jetzt verlängern</button>
+                <button class="closePlusExpirationDialogButton confirmationButton">Okay</button>
             </div>
         </div>
     </dialog>

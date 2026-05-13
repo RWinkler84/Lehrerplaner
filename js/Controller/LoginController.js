@@ -67,7 +67,7 @@ export default class LoginController {
             await AbstractController.renderTopMenu();
             await abstCtrl.syncData();
             await AbstractController.greyOutHolidaysAndPassedDays();
-            
+
             window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
         } else {
             View.showLoginErrorMessage(result.error, result.message);
@@ -295,6 +295,12 @@ export default class LoginController {
                 SettingsController.closeCheckoutDialog();
                 break;
 
+            //eduplanio plus expires dialog
+            case 'goToAccoutSettingsButton':
+                AbstractController.closePlusExpirationDialog();
+                SettingsController.openSettings();
+                break;
+
             //links
             case 'continueAsGuest':
                 LoginController.createGuestAccount();
@@ -325,6 +331,10 @@ export default class LoginController {
 
             case elementClassList.contains('closeRegistrationNeededDialogButton'):
                 SettingsController.closeRegistrationNeededDialog();
+                break;
+
+            case elementClassList.contains('closePlusExpirationDialogButton'):
+                AbstractController.closePlusExpirationDialog();
                 break;
         }
 
