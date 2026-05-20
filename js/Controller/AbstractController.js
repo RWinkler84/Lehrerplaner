@@ -74,7 +74,8 @@ export default class AbstractController {
 
     static async runUpdate() {
         if ('caches' in window) {
-            caches.delete('eduplanio');
+            // const deleted = await caches.delete('eduplanio');
+            // console.log(await caches.keys())
         }
 
         if ('serviceWorker' in navigator) {
@@ -87,7 +88,7 @@ export default class AbstractController {
                     continue;
                 }
 
-                registration.unregister();
+                await registration.unregister();
             }
         }
 
@@ -140,14 +141,14 @@ export default class AbstractController {
         const plusExpirationDate = new Date(userInfo.activeUntil).setHours(12, 0, 0, 0);
         const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
 
-        if (new Date(expirationWarningStatus.lastUpdated).setHours(12, 0, 0, 0) != today) SettingsController.setExpirationWarningDismissedStatus(false);
+        if (!expirationWarningStatus || new Date(expirationWarningStatus.lastUpdated).setHours(12, 0, 0, 0) != today) SettingsController.setExpirationWarningDismissedStatus(false);
 
         if (!expirationWarningStatus || expirationWarningStatus.expirationWarningDismissed == false) {
             if (plusExpirationDate - (ONEDAY * 7) == today) AbstractController.openPlusExpirationDialog(7);
             if (plusExpirationDate - ONEDAY == today) AbstractController.openPlusExpirationDialog(1);
             if (plusExpirationDate == today) AbstractController.openPlusExpirationDialog(0);
         }
-        
+
         //set the syncIndicator to unsynced, if activeUntil is expired
         if (today > plusExpirationDate) AbstractController.setSyncIndicatorStatus('unsynced');
     }
