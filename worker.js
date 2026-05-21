@@ -28,14 +28,14 @@ async function fetchResources(request) {
 }
 
 async function removeOldCaches() {
-    //remove old caches 
-    let cacheNames = await caches.keys();
-    for (cache of cacheNames) {
-        if (!cache.includes('eduplanio')) continue;
-        if (cache == `eduplanio_${version}`) continue;
-        await caches.delete(cache);
+    if ('caches' in window) {
+        let cacheNames = await caches.keys();
+        for (cache of cacheNames) {
+            if (!cache.includes('eduplanio')) continue;
+            if (cache == `eduplanio_${version}`) continue;
+            await caches.delete(cache);
+        }
     }
-
 }
 
 async function cacheMinimalData() {

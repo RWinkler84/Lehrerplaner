@@ -38,14 +38,14 @@ export default class Login extends AbstractModel {
 
         if (accountInfo.status == 'failed' || accountInfo.accountType == 'guestUser') {
             let db = await this.openIndexedDB();
-            db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 1, accountType: 'registeredUser', temporarilyOffline: false });
+            db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: true  });
         }
     }
 
     async attemptAccountCreation(accountData) {
 
         let result = await this.makeAjaxQuery('user', 'createAccount', accountData);
-        if (result.status == 'success') this.updateOnLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false })
+        if (result.status == 'success') this.updateOnLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: true })
 
         return result;
     }

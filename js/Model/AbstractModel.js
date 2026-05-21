@@ -6,17 +6,25 @@ export default class AbstractModel {
 
     async makeAjaxQuery(controller, action, content = '') {
         let response;
-        let isRegisteredUser = await this.isRegisteredUser();
+        let userInfo = await this.getLocalUserInfo();
         let allowedActionsUnregisteredUser = [
             'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
             'sendPasswortResetMail', 'sendSupportTicket'
         ];
+        let allowedActionsPlusExpired = [
+            'getUserInfo', 'login', 'logout', 'authenticateMail', 'resendAuthMail', 'resetPassword', 'sendPasswortResetMail',
+            'sendSupportTicket', 'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate', 'getDbUpdateTimestamps',
+            'delete', 'saveTimetableUpdates'
+        ];
 
-        if (!allowedActionsUnregisteredUser.includes(action)) {
-            if (!isRegisteredUser) {
-                AbstractController.openLoginDialog();
-                return { status: 'failed', error: 'unregistered user' }
-            };
+        if (!allowedActionsUnregisteredUser.includes(action) && userInfo.accountType == 'guestUser') {
+            AbstractController.openLoginDialog();
+            
+            return { status: 'failed', error: 'unregistered user' }
+        }
+
+        if (!allowedActionsPlusExpired.includes(action) && userInfo.plusActive == false) {
+            return { status: 'failed', error: 'Plus licence expired' }
         }
 
         try {
@@ -52,14 +60,23 @@ export default class AbstractModel {
             return { status: 'failed', message: error.message };
         }
 
-        if (result.status == 'failed' && result.error == 'User not logged in') {
-            await AbstractController.toggleTemperaryOfflineUsage(false);
-            AbstractController.openLoginDialog();
-            AbstractController.setSyncIndicatorStatus('unsynced');
-        } else if (result.status == 'failed') {
+        if (result.status == 'failed') {
+            if (result.error == 'User not logged in') {
+                await AbstractController.toggleTemperaryOfflineUsage(false);
+                AbstractController.openLoginDialog();
+                AbstractController.setSyncIndicatorStatus('unsynced');
+
+                return result;
+            }
+
+            if (result.error == 'Plus licence expired') {
+                this.tooglePlusStatus(false);
+            }
+
             AbstractController.setSyncIndicatorStatus('unsynced', result.error);
         } else {
             AbstractController.setSyncIndicatorStatus('synced');
+            this.tooglePlusStatus(true);
         }
 
         return result;
@@ -279,6 +296,11 @@ export default class AbstractModel {
         }
 
         return userInfo;
+    }
+
+    async tooglePlusStatus(isActive) {
+
+        this.writeRemoteToLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: isActive })
     }
 
     async checkVersion() {

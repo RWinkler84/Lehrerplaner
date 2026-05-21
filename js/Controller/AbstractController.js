@@ -73,11 +73,6 @@ export default class AbstractController {
     }
 
     static async runUpdate() {
-        if ('caches' in window) {
-            // const deleted = await caches.delete('eduplanio');
-            // console.log(await caches.keys())
-        }
-
         if ('serviceWorker' in navigator) {
             const registrations = await navigator.serviceWorker.getRegistrations();
 
