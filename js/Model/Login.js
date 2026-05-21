@@ -27,10 +27,11 @@ export default class Login extends AbstractModel {
         let data = {
             id: 1,
             accountType: 'guestUser',
-            temporarilyOffline: true
+            temporarilyOffline: true,
+            plusActive: false
         }
 
-        this.writeToLocalDB('settings', data);
+        await this.writeToLocalDB('settings', data);
     }
 
     async updateAccountType() {

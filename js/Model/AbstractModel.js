@@ -17,6 +17,7 @@ export default class AbstractModel {
             'delete', 'saveTimetableUpdates'
         ];
 
+
         if (!allowedActionsUnregisteredUser.includes(action) && userInfo.accountType == 'guestUser') {
             AbstractController.openLoginDialog();
             
@@ -62,6 +63,7 @@ export default class AbstractModel {
 
         if (result.status == 'failed') {
             if (result.error == 'User not logged in') {
+
                 await AbstractController.toggleTemperaryOfflineUsage(false);
                 AbstractController.openLoginDialog();
                 AbstractController.setSyncIndicatorStatus('unsynced');
@@ -70,7 +72,7 @@ export default class AbstractModel {
             }
 
             if (result.error == 'Plus licence expired') {
-                this.tooglePlusStatus(false);
+                await this.tooglePlusStatus(false);
             }
 
             AbstractController.setSyncIndicatorStatus('unsynced', result.error);
@@ -299,8 +301,7 @@ export default class AbstractModel {
     }
 
     async tooglePlusStatus(isActive) {
-
-        this.writeRemoteToLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: isActive })
+        await this.updateOnLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: isActive })
     }
 
     async checkVersion() {
@@ -577,6 +578,7 @@ export default class AbstractModel {
             lessonNotes: false,
             schoolYears: false
         };
+
 
         if (remoteTimestamps.status == 'failed') return;
 

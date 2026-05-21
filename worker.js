@@ -1,10 +1,13 @@
-const version = '0.9.260518';
+const version = '0.9.260519';
 
 self.addEventListener('fetch', (event) => {
     event.respondWith(fetchResources(event.request))
 });
 
-self.addEventListener('install', (event) => { event.waitUntil(cacheMinimalData()) });
+self.addEventListener('install', (event) => {
+    event.waitUntil(cacheMinimalData())
+});
+
 self.addEventListener('message', async (event) => {
     if (event.data == 'skip waiting') self.skipWaiting();
 
@@ -22,19 +25,18 @@ self.addEventListener('activate', async (event) => { event.waitUntil(removeOldCa
 
 
 async function fetchResources(request) {
-    const responseFromCache = await caches.match(request);
+    const cache = await caches.open(`eduplanio_${version}`);
+    const responseFromCache = await cache.match(request);
 
     return responseFromCache || fetch(request);
 }
 
 async function removeOldCaches() {
-    if ('caches' in window) {
-        let cacheNames = await caches.keys();
-        for (cache of cacheNames) {
-            if (!cache.includes('eduplanio')) continue;
-            if (cache == `eduplanio_${version}`) continue;
-            await caches.delete(cache);
-        }
+    let cacheNames = await caches.keys();
+    for (cache of cacheNames) {
+        if (!cache.includes('eduplanio')) continue;
+        if (cache == `eduplanio_${version}`) continue;
+        await caches.delete(cache);
     }
 }
 
