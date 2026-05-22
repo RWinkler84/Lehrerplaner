@@ -123,18 +123,18 @@ export default class SettingsController {
                 break;
 
             case 'deleteAccountButton':
-                View.toogleAccountDeletionMenu(event);
+                View.toggleAccountDeletionMenu(event);
                 break;
 
             case 'approveAccountDeletionButton':
                 SettingsController.deleteAccount();
 
             case 'cancelAccountDeletionButton':
-                View.toogleAccountDeletionMenu(event);
+                View.toggleAccountDeletionMenu(event);
                 break;
 
             case 'cancelFailedAccountDeletionButton':
-                View.toogleAccountDeletionMenu(event);
+                View.toggleAccountDeletionMenu(event);
                 break;
         }
     }

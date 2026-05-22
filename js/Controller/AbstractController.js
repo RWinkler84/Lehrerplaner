@@ -69,7 +69,6 @@ export default class AbstractController {
     }
 
     static showUpdateNotification() {
-
         View.showUpdateNotification();
     }
 
@@ -133,8 +132,10 @@ export default class AbstractController {
     }
 
     static async checkForPlusExpiration(userInfo) {
+
+        console.log(userInfo);
         const today = new Date().setHours(12, 0, 0, 0);
-        const plusExpirationDate = new Date(userInfo.activeUntil).setHours(12, 0, 0, 0);
+        const plusExpirationDate = userInfo.activeUntil ? new Date(userInfo.activeUntil).setHours(12, 0, 0, 0) : null;
         const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
 
         if (!expirationWarningStatus || new Date(expirationWarningStatus.lastUpdated).setHours(12, 0, 0, 0) != today) SettingsController.setExpirationWarningDismissedStatus(false);
@@ -146,7 +147,11 @@ export default class AbstractController {
         }
 
         //set the syncIndicator to unsynced, if activeUntil is expired
-        if (today > plusExpirationDate) AbstractController.setSyncIndicatorStatus('unsynced', 'Plus licence expired');
+        if (plusExpirationDate && today > plusExpirationDate) {
+            AbstractController.setSyncIndicatorStatus('unsynced', 'Plus licence expired');
+        } else {
+            await AbstractController.togglePlusStatus(true);
+        }
     }
 
     static async openPlusExpirationDialog(daysLeft) {
@@ -154,6 +159,7 @@ export default class AbstractController {
 
         if (!expirationWarningStatus || expirationWarningStatus.expirationWarningDismissed == false) View.openPlusExpirationDialog(daysLeft);
     }
+
     static closePlusExpirationDialog() {
         SettingsController.setExpirationWarningDismissedStatus(true);
         View.closePlusExpirationDialog();
@@ -209,6 +215,12 @@ export default class AbstractController {
             View.toggleSupportDialogButtons('failed');
             View.displayMessageOnSupportDialog(result);
         }
+    }
+
+    static async togglePlusStatus(isActive) {
+        const db = new AbstractModel;
+        
+        // await db.togglePlusStatus(isActive);
     }
 
     static async topMenuClickEventHandler(event) {

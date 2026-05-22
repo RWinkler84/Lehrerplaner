@@ -18,7 +18,8 @@ export default class AbstractModel {
         ];
 
 
-        if (!allowedActionsUnregisteredUser.includes(action) && userInfo.accountType == 'guestUser') {
+        if (!allowedActionsUnregisteredUser.includes(action) && userInfo.accountType != 'registeredUser') {
+
             AbstractController.openLoginDialog();
             
             return { status: 'failed', error: 'unregistered user' }
@@ -72,13 +73,12 @@ export default class AbstractModel {
             }
 
             if (result.error == 'Plus licence expired') {
-                await this.tooglePlusStatus(false);
+                await this.togglePlusStatus(false);
             }
 
             AbstractController.setSyncIndicatorStatus('unsynced', result.error);
         } else {
             AbstractController.setSyncIndicatorStatus('synced');
-            this.tooglePlusStatus(true);
         }
 
         return result;
@@ -300,7 +300,7 @@ export default class AbstractModel {
         return userInfo;
     }
 
-    async tooglePlusStatus(isActive) {
+    async togglePlusStatus(isActive) {
         await this.updateOnLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: isActive })
     }
 

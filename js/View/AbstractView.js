@@ -163,7 +163,7 @@ export default class AbstractView {
         })
     }
 
-    static toogleIsCurrentWeekDot() {
+    static toggleIsCurrentWeekDot() {
         let today = new Date();
         let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"').dataset.date;
         let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"').dataset.date;

@@ -597,11 +597,17 @@ export default class SettingsView {
 
         document.querySelector('#openAccountSettingsButton').classList.add('selected');
 
+        console.log(userInfo);
+
         if (userInfo) {
             const notLoggedInMessage = accountSettingsContainer.querySelector('#eduplanioPlusNotLoggedInMessage');
             const eduplanioPlusStatusSpan = document.querySelector('#eduplanioPlusStatusSpan');
             const eduplanioPlusExpirationDateSpan = document.querySelector('#eduplanioPlusExpirationDateSpan');
+            const accountTypeSpan = document.querySelector('#accountTypeSpan');
+            const loginStatusSpan = document.querySelector('#loginStatusSpan');
 
+            let accountTypeString = 'Gast';
+            let loginStatusString = '-';
             let expirationDateString = '-';
             let statusString = 'inaktiv';
             let statusTextClass = 'redText';
@@ -621,11 +627,18 @@ export default class SettingsView {
                 expirationDateString = Fn.formatDateWithFullYear(expirationDate);
             }
 
+            if (userInfo.accountType == 'registeredUser') {
+                accountTypeString = 'registrierter Nutzer';
+                loginStatusString = userInfo.loggedIn ? 'eingeloggt' : 'ausgeloggt';
+            }
+
+            accountTypeSpan.textContent = accountTypeString;
+            loginStatusSpan.textContent = loginStatusString;
             eduplanioPlusStatusSpan.textContent = statusString;
             eduplanioPlusExpirationDateSpan.textContent = expirationDateString;
 
-            notLoggedInMessage.classList.add('notDisplayed');
             eduplanioPlusStatusSpan.classList.add(statusTextClass);
+            userInfo.loggedIn ? notLoggedInMessage.classList.add('notDisplayed') : notLoggedInMessage.classList.remove('notDisplayed');
         }
 
         //make account settings visible
@@ -640,7 +653,7 @@ export default class SettingsView {
         return false;
     }
 
-    static toogleAccountDeletionMenu(event) {
+    static toggleAccountDeletionMenu(event) {
         let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
         let requestDeletionMenu = document.querySelector('#requestDeletionContainer');
         let deletionErrorDisplay = document.querySelector('#deletionErrorDisplay');

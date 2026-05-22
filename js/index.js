@@ -243,7 +243,7 @@ async function startApp() {
 
         AbstractView.setDateOnWeekdayLabel();
         AbstractController.greyOutHolidaysAndPassedDays();
-        AbstractView.toogleIsCurrentWeekDot();
+        AbstractView.toggleIsCurrentWeekDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(false);
         AbstractView.setIsTodayDot();
@@ -272,7 +272,7 @@ async function startApp() {
 
         AbstractView.setDateOnWeekdayLabel();
         AbstractController.greyOutHolidaysAndPassedDays();
-        AbstractView.toogleIsCurrentWeekDot();
+        AbstractView.toggleIsCurrentWeekDot();
         setWeekStartAndEndDate();
         calcCalendarWeek(true);
         AbstractView.setIsTodayDot();
