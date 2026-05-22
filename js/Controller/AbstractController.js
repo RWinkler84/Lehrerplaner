@@ -50,6 +50,7 @@ export default class AbstractController {
     }
 
     /** @param status 'synced', 'unsynced' */
+    /** @param errorMessage 'Plus licence expired' to display, if the synchronizations was stopped because of this */
     static setSyncIndicatorStatus(status, errorMessage = null) {
         View.setSyncIndicatorStatus(status, errorMessage);
     }
@@ -145,7 +146,7 @@ export default class AbstractController {
         }
 
         //set the syncIndicator to unsynced, if activeUntil is expired
-        if (today > plusExpirationDate) AbstractController.setSyncIndicatorStatus('unsynced');
+        if (today > plusExpirationDate) AbstractController.setSyncIndicatorStatus('unsynced', 'Plus licence expired');
     }
 
     static async openPlusExpirationDialog(daysLeft) {
