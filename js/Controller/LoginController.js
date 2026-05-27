@@ -36,8 +36,23 @@ export default class LoginController {
 
     static closeLoginDialog() {
         View.closeLoginDialog();
+
+        AbstractController.checkForFirstTimeUser();
     }
 
+    static closeSendResetPasswordMailDialog() {
+        View.closeSendResetPasswordMailDialog();
+    }
+
+    static closeCreateAccountDialog() {
+        View.closeCreateAccountDialog();
+
+        AbstractController.checkForFirstTimeUser();
+    }
+
+    static closeResetPasswordDialog() {
+        View.closeResetPasswordDialog();
+    }
     static closeSendResetPasswordMailDialog() {
         View.closeSendResetPasswordMailDialog();
     }
@@ -63,10 +78,10 @@ export default class LoginController {
         if (result.status == 'success') {
             let abstCtrl = new AbstractController;
 
-            View.closeLoginDialog();
             await AbstractController.renderTopMenu();
             await abstCtrl.syncData();
             await AbstractController.greyOutHolidaysAndPassedDays();
+            this.closeLoginDialog();
 
             window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
         } else {
@@ -232,10 +247,10 @@ export default class LoginController {
     static async toggleTemperaryOfflineUsage(offlineStatus, event = null) {
         if (event) {
             event.preventDefault();
-            View.closeLoginDialog();
-            View.closeCreateAccountDialog();
-            View.closeResetPasswordDialog();
-            View.closeSendResetPasswordMailDialog();
+            this.closeLoginDialog();
+            this.closeCreateAccountDialog();
+            this.closeResetPasswordDialog();
+            this.closeSendResetPasswordMailDialog();
         }
 
         let db = new Model;
@@ -336,6 +351,9 @@ export default class LoginController {
             case elementClassList.contains('closePlusExpirationDialogButton'):
                 AbstractController.closePlusExpirationDialog();
                 break;
+
+            case elementClassList.contains('closeWelcomeDialogButton'):
+                AbstractController.closeWelcomeDialog();
         }
 
         //dialog cancel event

@@ -1,4 +1,4 @@
-import { ONEDAY, VERSION } from "../index.js";
+import { ONEDAY, userStatus, VERSION } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -21,7 +21,7 @@ export default class AbstractModel {
         if (!allowedActionsUnregisteredUser.includes(action) && userInfo.accountType != 'registeredUser') {
 
             AbstractController.openLoginDialog();
-            
+
             return { status: 'failed', error: 'unregistered user' }
         }
 
@@ -228,6 +228,9 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
+
+                        //add first time user flag
+                        userStatus.firstTimeUser = true;
                         break;
                     //case 1 was skipped
                     case 2:
@@ -267,6 +270,28 @@ export default class AbstractModel {
         let userInfo = await this.readFromLocalDB('settings', 1);
 
         if (!userInfo || userInfo.accountType == 'guestUser') return false;
+
+        return true;
+    }
+
+    async checkForFirstTimeUser() {
+        const timestamps = await this.getLocalUpdateTimestamps();
+
+        let updatedTimestampFound = false;
+
+        if (timestamps) {
+            Object.keys(timestamps.lastUpdated).forEach(key => {
+                const timestamp = timestamps.lastUpdated[key];
+                if (timestamp != null && timestamp != 0) updatedTimestampFound = true;
+            })
+        }
+
+        // if the a timestamp is not null or 0, it was updated, therefore it is not a new user
+        if (updatedTimestampFound) {
+            userStatus.firstTimeUser = false;
+
+            return false
+        }
 
         return true;
     }
@@ -315,6 +340,12 @@ export default class AbstractModel {
         }
 
         return false;
+    }
+
+    async getLocalUpdateTimestamps() {
+        const timestamps = await this.readFromLocalDB('settings', 0);
+
+        return timestamps || false;
     }
 
     async markLocalDBUpdated(store, date = null) {
@@ -623,6 +654,8 @@ export default class AbstractModel {
         }
 
         let result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
+
+        if (result.status == 'failed') return;
 
         //check the results and clear data that has been synced
         if (result.subjects.status && result.subjects.status == 'success') {

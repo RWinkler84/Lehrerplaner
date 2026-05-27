@@ -1,4 +1,5 @@
-#tourDialog {
+#tourDialog,
+#welcomeDialog {
     border: none;
     border-radius: 10px;
     padding: 2rem 4rem 3rem;
@@ -58,20 +59,26 @@
                 animation: color-shift 2s infinite;
             }
 
-            img {
-                min-width: 0;
-                max-width: 100%;
-                margin-bottom: 0.5rem;
+        }
 
-                &[src=""] {
-                    display: none;
-                }
+        img {
+            min-width: 0;
+            max-width: 100%;
+            margin-bottom: 0.5rem;
+
+            &[src=""] {
+                display: none;
+            }
+
+            &.mobileScreens {
+                display: none;
             }
         }
 
         p {
             font-family: sans-serif;
             font-weight: 200;
+            margin: 1rem 0;
 
             .symbol {
                 padding: 0.1rem 0.5rem;
@@ -149,7 +156,8 @@
 }
 
 @media screen and (max-width: 900px) {
-    #tourDialog {
+    #tourDialog,
+    #welcomeDialog {
         min-width: 90%;
 
 
@@ -160,13 +168,15 @@
 }
 
 @media screen and (max-width: 750px) {
-    #tourDialog {
+    #tourDialog,
+    #welcomeDialog {
         padding: 2rem 2rem 3rem;
     }
 }
 
 @media screen and (max-width: 620px) {
-    #tourDialog {
+    #tourDialog,
+    #welcomeDialog {
         padding: 2rem 0.5rem 3rem;
         border-radius: 0;
 
@@ -176,6 +186,18 @@
 
         #tourButtonContainer {
             margin: 0 1rem;
+        }
+
+        .body {
+            img {
+                &.mobileScreens {
+                    display: block;
+                }
+
+                &.largeScreens {
+                    display: none;
+                }
+            }
         }
     }
 }
@@ -201,6 +223,11 @@
 }
 
 @keyframes color-shift {
-    0%{background-position:100% 50%}
-    100%{background-position:0% 50%}
+    0% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
 }

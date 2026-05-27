@@ -26,7 +26,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.260519';
+export const VERSION = '0.9.260522';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
@@ -41,6 +41,10 @@ export let mailStatus = {
 };
 
 export let taskBackupArray = [];
+
+export let userStatus = {
+    firstTimeUser: false
+}
 
 let abstCtrl = new AbstractController();
 let timeout = false //for resize debouncing

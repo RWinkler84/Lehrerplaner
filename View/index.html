@@ -1092,6 +1092,51 @@
 
     <div id="minimizedTourIcon"><strong>Tour</strong></div>
 
+    <!-- welcome dialog -->
+    <dialog id="welcomeDialog">
+        <div class="header">
+            <h2 id="tourDialogHeadline" class="marginBottom">Neu hier? Nimm dir kurz Zeit...</h2>
+        </div>
+
+        <div class="body">
+            <div id="tourImageContainer" class="flex justifyCenter"><img id="tourImage" src="" alt=""></div>
+            <div class="tourText">
+                <p>Hey, scheint so, als würdest du Eduplanio zum ersten Mal besuchen!</p>
+                <p>Solltest du die Tour auf dem <a href="https://eduplanio.app/livedemo">Demokonto</a> noch nicht
+                    angeschaut haben, empfehlen wir dir, das nachzuholen, um dich mit den Funktionen von Eduplanio
+                    vertraut zu machen.</p>
+                <img src="./img/eduplanio_stundenplan_menu_mobil.jpg" class="mobileScreens">
+                <img src="./img/eduplanio_stundenplan_menu.jpg" class="largeScreens">
+                <p>Du kannst natürlich trotzdem sofort loslegen. Trage dann in jedem Fall zuerst deine Fächer und deinen
+                    Stundenplan unter "Stundenplan" ein. Danach taucht dein Stundenplan in der Wochenübersicht auf und
+                    du kannst beginnen, Aufgaben und Stundennotizen anzulegen und deinen Wochenplan zu verwalten.
+                    Verzichtest du darauf, deine Fächer und deinen Stundenplan einzutragen, wirst du Eduplanio nicht
+                    sinnvoll einsetzen können. Aber keine Sorge: Die Einrichtung braucht keine fünf Minuten.</p>
+                <p>Falls während der Nutzung doch etwas unklar ist, kannst du über das Menü rechts oben eine Hilfe zu
+                    jedem Abschnitt der App öffnen. Darin wird dir die Verwendung erklärt. Oder schau dir unseren <a
+                        href="https://eduplanio.app/blog/?eduplanio-erste-schritte" target="_blank">Erste
+                        Schritte</a>-Artikel an.</p>
+                <img src="./img/eduplanio_hilfe_menu_mobil.jpg" class="mobileScreens">
+                <img src="./img/eduplanio_hilfe_menu.jpg" class="largeScreens">
+                <h3>Nicht neu hier?</h3>
+                <p>Sollte dir dieses Fenster anzeigt werden, obwohl du bereits seit längerem Eduplanio
+                    verwendest, hast du vermutlich versucht, dich auf einem neuen Gerät einzuloggen und deine
+                    Daten wurden nicht synchronisiert. Das ist der Fall, wenn deine Eduplanio Plus-Lizenz
+                    abgelaufen ist oder du gerade keine Internetverbindung hast. Deine Lizenz kannst du
+                    jederzeit im Menü unter "Konto" verlängern.</p>
+                <div class="divider"></div>
+                <div class="flex justifyCenter"><button class="confirmationButton closeWelcomeDialogButton">Alles
+                        klar!</button></div>
+            </div>
+            <div class="divider"></div>
+        </div>
+
+        <div id="tourButtonContainer" class="flex spaceBetween notDisplayed">
+            <button id="goBackBtn" class="navigationButton">&#x276E;</button>
+            <button id="goForwardBtn" class="navigationButton">&#x276F;</button>
+        </div>
+    </dialog>
+
     <footer><a id="imprintLink" href="./../impressum.html">Impressum</a></footer>
     <script src="./js/index.js" type="module"></script>
 </body>

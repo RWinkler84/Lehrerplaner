@@ -8,7 +8,7 @@ import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
 import CurriculumController from "./CurriculumController.js";
 import TimetableController from "./TimetableController.js";
-import { ONEDAY, tourStatus } from "../index.js";
+import { ONEDAY, tourStatus, userStatus } from "../index.js";
 import Tour from "../tour.js";
 
 export default class AbstractController {
@@ -131,9 +131,21 @@ export default class AbstractController {
         return userInfo;
     }
 
-    static async checkForPlusExpiration(userInfo) {
+    static async checkForFirstTimeUser() {
+        if (!userStatus.firstTimeUser) return;
+        const db = new AbstractModel;
 
-        console.log(userInfo);
+        const isFirstTimer = await db.checkForFirstTimeUser();
+        console.log('isFirstTimer', isFirstTimer)
+
+        if (isFirstTimer) this.openWelcomeDialog();
+    }
+
+    static openWelcomeDialog() {
+        View.openWelcomeDialog();
+    }
+
+    static async checkForPlusExpiration(userInfo) {
         const today = new Date().setHours(12, 0, 0, 0);
         const plusExpirationDate = userInfo.activeUntil ? new Date(userInfo.activeUntil).setHours(12, 0, 0, 0) : null;
         const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
@@ -145,6 +157,8 @@ export default class AbstractController {
             if (plusExpirationDate - ONEDAY == today) AbstractController.openPlusExpirationDialog(1);
             if (plusExpirationDate == today) AbstractController.openPlusExpirationDialog(0);
         }
+
+        if (userInfo.accountType != 'registeredUser') return; 
 
         //set the syncIndicator to unsynced, if activeUntil is expired
         if (plusExpirationDate && today > plusExpirationDate) {
@@ -171,6 +185,10 @@ export default class AbstractController {
 
     static closeSupportDialog() {
         View.closeSupportDialog();
+    }
+
+    static closeWelcomeDialog() {
+        View.closeWelcomeDialog();
     }
 
     static openHelpDialog() {
@@ -220,7 +238,7 @@ export default class AbstractController {
     static async togglePlusStatus(isActive) {
         const db = new AbstractModel;
         
-        // await db.togglePlusStatus(isActive);
+        await db.togglePlusStatus(isActive);
     }
 
     static async topMenuClickEventHandler(event) {

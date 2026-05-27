@@ -355,6 +355,15 @@ export default class AbstractView {
         dialog.close();
     }
 
+    static openWelcomeDialog() {
+        document.querySelector('#welcomeDialog').showModal();
+    }
+
+    static closeWelcomeDialog() {
+        document.querySelector('#welcomeDialog').close();
+    }
+    
+
     static getSupportTicketContentFromForm() {
         let dialog = document.querySelector('#supportDialog');
 
