@@ -328,6 +328,18 @@ export default class AbstractView {
             7: 'in sieben Tagen'
         }
 
+        if (daysLeft == -1) {
+            dialog.querySelector('h3').textContent = 'Eduplanio Plus abgelaufen'
+            dialog.querySelector('.dialogText').innerHTML = `
+                <p>Deine Eduplanio Plus-Lizenz ist <strong>abgelaufen</strong>.</p>
+                <p>Du kannst Eduplanio weiter verwenden, musst aber auf die Cloud-Backups und auf die Synchronisation zwischen mehreren Geräten verzichten. 
+                Deine Lizenz kannst du in den Kontoeinstellungen verlängern.</p>
+            `;
+            dialog.showModal();
+
+            return;
+        }
+
         daysLeftSpan.textContent = daysLeftString[daysLeft];
 
         dialog.showModal();
@@ -362,7 +374,7 @@ export default class AbstractView {
     static closeWelcomeDialog() {
         document.querySelector('#welcomeDialog').close();
     }
-    
+
 
     static getSupportTicketContentFromForm() {
         let dialog = document.querySelector('#supportDialog');

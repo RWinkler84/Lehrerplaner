@@ -1042,13 +1042,18 @@
     <dialog id="plusExpirationDialog">
         <div class="headline flex spaceBetween">
             <h3>Eduplanio Plus läuft bald ab</h3><button class="closePlusExpirationDialogButton closeDialogButton"
-                style="width: 1.5rem">×</button>
+                style="width: 1.5rem" autofocus="false">×</button>
         </div>
         <div class="dialogBody flex column">
-            <p>Deine Eduplanio Plus-Lizenz läuft <span id="plusDaysRemainingSpan" style="font-weight: bold;"></span> ab.
-            </p>
-            <p>Du kannst Eduplanio danach weiter verwenden, musst aber auf die Cloud-Backups und auf die Synchronisation
-                zwischen mehreren Geräten verzichten. Deine Lizenz kannst du in den Kontoeinstellungen verlängern.</p>
+            <div class="dialogText">
+                <p>Deine Eduplanio Plus-Lizenz läuft <span id="plusDaysRemainingSpan" style="font-weight: bold;"></span>
+                    ab.
+                </p>
+                <p>Du kannst Eduplanio danach weiter verwenden, musst aber auf die Cloud-Backups und auf die
+                    Synchronisation
+                    zwischen mehreren Geräten verzichten. Deine Lizenz kannst du in den Kontoeinstellungen verlängern.
+                </p>
+            </div>
             <div class="flex halfGap justifyEnd marginTop">
                 <button id="goToAccoutSettingsButton" class="confirmationButton">Jetzt verlängern</button>
                 <button class="closePlusExpirationDialogButton confirmationButton">Okay</button>

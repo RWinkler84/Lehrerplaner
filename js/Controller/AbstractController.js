@@ -149,13 +149,16 @@ export default class AbstractController {
         const today = new Date().setHours(12, 0, 0, 0);
         const plusExpirationDate = userInfo.activeUntil ? new Date(userInfo.activeUntil).setHours(12, 0, 0, 0) : null;
         const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
+        const expirationWarningLastUpdated = expirationWarningStatus ? new Date(expirationWarningStatus.lastUpdated).setHours(12, 0, 0, 0) : null;
 
-        if (!expirationWarningStatus || new Date(expirationWarningStatus.lastUpdated).setHours(12, 0, 0, 0) != today) SettingsController.setExpirationWarningDismissedStatus(false);
+        if (!expirationWarningStatus || expirationWarningLastUpdated != today) SettingsController.setExpirationWarningDismissedStatus(false);
 
         if (!expirationWarningStatus || expirationWarningStatus.expirationWarningDismissed == false) {
             if (plusExpirationDate - (ONEDAY * 7) == today) AbstractController.openPlusExpirationDialog(7);
             if (plusExpirationDate - ONEDAY == today) AbstractController.openPlusExpirationDialog(1);
             if (plusExpirationDate == today) AbstractController.openPlusExpirationDialog(0);
+            //show warning one last time, after plus is expired
+            if (expirationWarningLastUpdated && expirationWarningLastUpdated <= plusExpirationDate) AbstractController.openPlusExpirationDialog(-1)
         }
 
         if (userInfo.accountType != 'registeredUser') return; 
