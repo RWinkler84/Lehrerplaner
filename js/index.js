@@ -26,7 +26,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.260528';
+export const VERSION = '0.9.260529';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
