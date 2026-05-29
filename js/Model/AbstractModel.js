@@ -128,7 +128,7 @@ export default class AbstractModel {
                 entry.id = Number(entry.id);
                 let transaction = db.transaction(store, 'readwrite').objectStore(store).add();
                 transaction.onsuccess = () => {
-                    this.markLocalDBUpdated();
+                    this.markLocalDBUpdated(store);
                 }
             });
 
@@ -159,6 +159,9 @@ export default class AbstractModel {
                     transaction.onsuccess = () => {
                         this.markLocalDBUpdated(store);
                         resolve();
+                    transaction.onerror = () => {
+                        resolve({status: 'failed'})
+                    }
                     }
                 })
             });
@@ -173,6 +176,9 @@ export default class AbstractModel {
             transaction.onsuccess = () => {
                 this.markLocalDBUpdated(store)
                 resolve();
+            transaction.onerror = () => {
+                resolve({status: 'failed'})
+            }
             }
         })
     }
@@ -518,8 +524,8 @@ export default class AbstractModel {
     }
 
     //In some situations lessons can have multiple entries in allLessonDates, being canceled and reactiveted later on
-    //Canceled lessons need to be removed, but with reactivated once, the latest entry needs to be kept as it holds the final 
-    //cancelation state
+    //Canceled lessons need to be removed, but with reactivated ones, the latest entry needs to be kept as it holds the final 
+    //cancelation state.
     //if a date must be kept, the function returns the lesson, else it returns false
     static checkForLessonToKeep(lessonToRemove, allLessonDates) {
         let lessonEntries = [];
@@ -657,7 +663,7 @@ export default class AbstractModel {
 
         if (result.status == 'failed') return;
 
-        //check the results and clear data that has been synced
+        //check the results and clear stores for unsynced data, if sync was successful
         if (result.subjects.status && result.subjects.status == 'success') {
             this.clearObjectStore('unsyncedSubjects');
             this.clearObjectStore('unsyncedDeletedSubjects');
@@ -695,27 +701,27 @@ export default class AbstractModel {
 
         if (tablesToUpdate.subjects) {
             let subjects = await this.makeAjaxQuery('abstract', 'getSubjects');
-            await this.writeRemoteToLocalDB('subjects', subjects, remoteTimestamps[0].subjects);
+            if (!subjects.status) await this.writeRemoteToLocalDB('subjects', subjects, remoteTimestamps[0].subjects);
         }
 
         if (tablesToUpdate.timetable) {
             let timetable = await this.makeAjaxQuery('abstract', 'getTimetable');
-            await this.writeRemoteToLocalDB('timetable', timetable, remoteTimestamps[0].timetable);
+            if (!timetable.status) await this.writeRemoteToLocalDB('timetable', timetable, remoteTimestamps[0].timetable);
         }
 
         if (tablesToUpdate.timetableChanges) {
             let timetableChanges = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
-            await this.writeRemoteToLocalDB('timetableChanges', timetableChanges, remoteTimestamps[0].timetableChanges);
+            if (!timetableChanges.status) await this.writeRemoteToLocalDB('timetableChanges', timetableChanges, remoteTimestamps[0].timetableChanges);
         }
 
         if (tablesToUpdate.tasks) {
             let tasks = await this.makeAjaxQuery('abstract', 'getAllTasks');
-            await this.writeRemoteToLocalDB('tasks', tasks, remoteTimestamps[0].tasks);
+            if (!tasks.status) await this.writeRemoteToLocalDB('tasks', tasks, remoteTimestamps[0].tasks);
         }
 
         if (tablesToUpdate.lessonNotes) {
             let lessonNotes = await this.makeAjaxQuery('abstract', 'getAllLessonNotes');
-            await this.writeRemoteToLocalDB('lessonNotes', lessonNotes, remoteTimestamps[0].lessonNotes);
+            if (!lessonNotes.status) await this.writeRemoteToLocalDB('lessonNotes', lessonNotes, remoteTimestamps[0].lessonNotes);
         }
 
         if (tablesToUpdate.schoolYears) {
@@ -736,10 +742,18 @@ export default class AbstractModel {
     }
 
     async writeRemoteToLocalDB(objectStore, dataToStore, newLocalTimestamp) {
+        let previousData = await this.readAllFromLocalDB(objectStore);
         let result = await this.clearObjectStore(objectStore);
 
         if (result.status == 'success' && !dataToStore.status) {
-            await this.updateOnLocalDB(objectStore, dataToStore);
+            let isUpdated = await this.updateOnLocalDB(objectStore, dataToStore);
+            
+            if (isUpdated.status == 'failed') {
+                await this.updateOnLocalDB(objectStore, previousData);
+
+                return;
+            }
+
             this.markLocalDBUpdated(objectStore, newLocalTimestamp);
         }
     }
