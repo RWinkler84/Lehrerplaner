@@ -158,7 +158,7 @@ export default class AbstractController {
             if (plusExpirationDate - ONEDAY == today) AbstractController.openPlusExpirationDialog(1);
             if (plusExpirationDate == today) AbstractController.openPlusExpirationDialog(0);
             //show warning one last time, after plus is expired
-            if (expirationWarningLastUpdated && expirationWarningLastUpdated <= plusExpirationDate) AbstractController.openPlusExpirationDialog(-1)
+            if (expirationWarningLastUpdated && expirationWarningLastUpdated <= plusExpirationDate && today > plusExpirationDate) AbstractController.openPlusExpirationDialog(-1)
         }
 
         if (userInfo.accountType != 'registeredUser') return; 

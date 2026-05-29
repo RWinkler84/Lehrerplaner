@@ -154,6 +154,7 @@ export default class LoginController {
         let db = new Model;
         await db.createGuestAccount();
         AbstractController.renderTopMenu();
+        this.closeLoginDialog()
     }
 
     static async sendResetPasswordMail(event) {
@@ -318,6 +319,7 @@ export default class LoginController {
 
             //links
             case 'continueAsGuest':
+                event.preventDefault();
                 LoginController.createGuestAccount();
                 break;
             case 'createAccount':
