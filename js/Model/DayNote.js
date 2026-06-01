@@ -8,37 +8,46 @@ export default class DayNote extends AbstractModel {
     #created;
     #lastEdited;
 
-    static getAllDayNotes() {
-        const model = new AbstractModel;
-
-        let allDayNotes = [
+    static allDayNotes = [ //testing
             {id: 1, date: '2026-06-01', content: '<p>test</p>', created: 'Mon Jun 01 2026 11:56:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:59:19 GMT+0200 (Mitteleuropäische Sommerzeit)'},
             {id: 2, date: '2026-06-04', content: '<p>test 2</p>', created: 'Mon Jun 01 2026 11:58:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:59:29 GMT+0200 (Mitteleuropäische Sommerzeit)'},
             {id: 3, date: '2026-06-02', content: '<p>test 3</p>', created: 'Mon Jun 01 2026 11:57:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:57:29 GMT+0200 (Mitteleuropäische Sommerzeit)'},
             {id: 4, date: '2026-06-09', content: '<p>test 4</p>', created: 'Mon Jun 01 2026 11:57:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:57:29 GMT+0200 (Mitteleuropäische Sommerzeit)'}
         ];
 
-        // const allDayNotes = model.readAllFromLocalDB('dayNotes');
+    static async getAllDayNotes() {
+        const model = new AbstractModel;
 
-        if (allDayNotes.length == 0) return [];
+        // const allDayNotes = await model.readAllFromLocalDB('dayNotes');
 
-        const notesArray = allDayNotes.map(note => this.writeDataToInstance(note));
+        // if (allDayNotes.length == 0) return [];
+
+        let allDayNotes = this.allDayNotes; //testing
+        const notesArray = allDayNotes.map(note => this.writeDataToInstance(note)); //testing
 
         notesArray.sort((a, b) => Fn.sortByDate(a, b));
 
         return notesArray;
     }
 
-    static getAllDayNotesInTimeSpan(startDate, endDate) {
-        const allDayNotes = this.getAllDayNotes();
-
-        if (!startDate instanceof Date) startDate = new Date(startDate);
-        if (!endDate instanceof Date) endDate = new Date(endDate);
+    static async getAllDayNotesInTimeSpan(startDate, endDate) {
+        const allDayNotes = await this.getAllDayNotes();
+        
+        if (startDate instanceof Date == false) startDate = new Date(startDate);
+        if (endDate instanceof Date == false) endDate = new Date(endDate);
 
         const startTimestamp = startDate.setHours(12,0,0,0);
         const endTimestamp = endDate.setHours(12,0,0,0);
 
         return allDayNotes.filter(note => note.date.setHours(12,0,0,0) >= startTimestamp && note.date.setHours(12,0,0,0) <= endTimestamp );
+    }
+
+    static async getById(id) {
+        const model = new AbstractModel;
+        
+        return this.allDayNotes.find(note => note.id == id); //testing
+        return await model.readFromLocalDB('dayNotes', id);
+
     }
 
     static writeDataToInstance(noteData, instance = null) {

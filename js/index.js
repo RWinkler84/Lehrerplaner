@@ -12,13 +12,13 @@ import CurriculumController from './Controller/CurriculumController.js';
 import SchoolYearController from './Controller/SchoolYearController.js';
 import Editor from './inc/editor.js';
 import TimetableController from './Controller/TimetableController.js';
+import DayNoteController from './Controller/DayNoteController.js';
 
 //tour stuff
 export let tourStatus = {
     running: false
 };
 import Tour from './tour.js';
-import DayNoteController from './Controller/DayNoteController.js';
 document.addEventListener('DOMContentLoaded', () => { Tour.initTourModal() });
 document.querySelector('#topMenuContainer').addEventListener('click', Tour.clickHandler);
 
@@ -75,6 +75,7 @@ async function startApp() {
         SettingsController.settingsClickEventHandler(event);
         SchoolYearController.clickEventHandler(event);
         TimetableController.timetableClickEventHandler(event);
+        DayNoteController.clickHandler(event);
     });
 
     // handlers for empty timeslots

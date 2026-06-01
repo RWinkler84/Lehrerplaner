@@ -3,23 +3,38 @@ import View from '../View/DayNoteView.js';
 import Fn from '../inc/utils.js';
 
 export default class DayNoteController {
-    static renderDayNoteIcons() {
+    static async renderDayNoteIcons() {
         const week = Fn.getDatesOfCurrentlyDisplayedWeek();
-        const dayNotes = DayNote.getAllDayNotesInTimeSpan(week.monday, week.sunday);
+        const dayNotes = await DayNote.getAllDayNotesInTimeSpan(week.monday, week.sunday);
 
         View.renderDayNoteIcons(dayNotes);
     }
 
-    static openDayNote(event) {
+    static async openDayNote(event) {
         const id = event.target.dataset.note_id;
-        if (id) {
-            const noteData = DayNote.getDayNoteById(id);
+        const weekdayElement = event.target.closest('.weekday');
         
-            View.openDayNote(noteData);
+        if (id) {
+            const noteData = await DayNote.getById(id);
+        
+            View.openDayNote(weekdayElement, noteData);
+
+            return;
         }
+
+        View.openDayNote(weekdayElement);
+    }
+
+    static closeDayNote() {
+        View.closeDayNote();
     }
 
     static clickHandler(event) {
+        const target = event.target;
 
+        switch (target.id) {
+            case 'closeDayNoteButton':
+            DayNoteController.closeDayNote(); 
+        }
     }
 }
