@@ -742,7 +742,7 @@ export default class AbstractModel {
     }
 
     async writeRemoteToLocalDB(objectStore, dataToStore, newLocalTimestamp) {
-        if (dataToStore.status) return; //status is only set, when there was an error reading the data on the server or the db is empty
+        if (dataToStore.status && dataToStore.status == 'failed') return;
 
         let previousData = await this.readAllFromLocalDB(objectStore);
         let result = await this.clearObjectStore(objectStore);

@@ -60,6 +60,7 @@ async function cacheMinimalData() {
         `./js/Controller/SettingsController.js?v=${version}`,
         `./js/Controller/TaskController.js?v=${version}`,
         `./js/Controller/TimetableController.js?v=${version}`,
+        `./js/Controller/YearNoteController.js?v=${version}`,
 
         //model
         `./js/Model/AbstractModel.js?v=${version}`,
@@ -69,6 +70,7 @@ async function cacheMinimalData() {
         `./js/Model/SchoolYear.js?v=${version}`,
         `./js/Model/Settings.js?v=${version}`,
         `./js/Model/Task.js?v=${version}`,
+        `./js/Model/YearNote.js?v=${version}`,
 
         //view
         `./js/View/AbstractView.js?v=${version}`,
@@ -80,6 +82,7 @@ async function cacheMinimalData() {
         `./js/View/SettingsView.js?v=${version}`,
         `./js/View/TaskView.js?v=${version}`,
         `./js/View/TimetableView.js?v=${version}`,
+        `./js/View/YearNoteView.js?v=${version}`,
 
         //misc
         `./js/inc/editor.js?v=${version}`,
@@ -93,6 +96,5 @@ async function cacheMinimalData() {
         const response = await fetch(url, { cache: 'reload' });
         let shortenedUrl = url.split('?')[0];
         cache.put(shortenedUrl, response);
-        // cache.put(url, response);
     }
 }

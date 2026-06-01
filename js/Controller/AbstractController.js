@@ -1,13 +1,12 @@
 import Model from "../Model/AbstractModel.js";
 import View from "../View/AbstractView.js";
 import SettingsController from "./SettingsController.js";
-import LessonController from "./LessonController.js";
 import TaskController from "./TaskController.js";
 import LoginController from "./LoginController.js";
-import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
 import CurriculumController from "./CurriculumController.js";
 import TimetableController from "./TimetableController.js";
+import LessonController from "./LessonController.js";
 import { ONEDAY, tourStatus, userStatus } from "../index.js";
 import Tour from "../tour.js";
 
@@ -122,7 +121,7 @@ export default class AbstractController {
     }
 
     static async getUserInfo() {
-        let db = new AbstractModel;
+        let db = new Model;
         const userInfo = await db.getUserInfo();
 
         //warn, if Plus is about to expire
@@ -133,7 +132,7 @@ export default class AbstractController {
 
     static async checkForFirstTimeUser() {
         if (!userStatus.firstTimeUser) return;
-        const db = new AbstractModel;
+        const db = new Model;
 
         const isFirstTimer = await db.checkForFirstTimeUser();
         console.log('isFirstTimer', isFirstTimer)
@@ -224,7 +223,7 @@ export default class AbstractController {
 
         View.toggleSupportDialogButtons('sending');
 
-        let db = new AbstractModel;
+        let db = new Model;
         let result = await db.sendSupportTicket(formData);
 
         if (result.status == 'success') {
@@ -239,7 +238,7 @@ export default class AbstractController {
     }
 
     static async togglePlusStatus(isActive) {
-        const db = new AbstractModel;
+        const db = new Model;
         
         await db.togglePlusStatus(isActive);
     }

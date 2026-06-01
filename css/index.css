@@ -431,13 +431,20 @@ dialog .errorMessageDisplay,
 .weekdayLabel {
     font-weight: bold;
     color: var(--labelgrey);
+
+        .smallDate {
+            font-weight: normal;
+            font-size: 0.8rem;
+            color: var(--lightText);
+        }
+
+        .dayNoteIndicator {
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: var(--lightgrey);
+        }
 }
 
-.smallDate {
-    font-weight: normal;
-    font-size: 0.8rem;
-    color: var(--lightText);
-}
 
 .weekday,
 .curriculaDisplayWeekday,

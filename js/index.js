@@ -18,6 +18,7 @@ export let tourStatus = {
     running: false
 };
 import Tour from './tour.js';
+import DayNoteController from './Controller/DayNoteController.js';
 document.addEventListener('DOMContentLoaded', () => { Tour.initTourModal() });
 document.querySelector('#topMenuContainer').addEventListener('click', Tour.clickHandler);
 
@@ -155,6 +156,8 @@ async function startApp() {
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
+    
+    await DayNoteController.renderDayNoteIcons();
 
     await LessonController.renderCurriculaSelection();
     await LessonController.renderSelectedCurricula();

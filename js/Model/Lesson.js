@@ -3,7 +3,6 @@ import { ONEDAY } from "../index.js";
 import Fn from '../inc/utils.js';
 import LessonController from "../Controller/LessonController.js";
 
-
 export default class Lesson extends AbstractModel {
 
     #id;
