@@ -94,6 +94,8 @@ export default class DayNote extends AbstractModel {
     }
 
     async delete() {
+        this.lastEdited = this.formatDateTime(new Date());
+
         await this.deleteFromLocalDB('dayNotes', this.id);
         await this.deleteFromLocalDB('unsyncedDayNotes', this.id);
         let result = await this.makeAjaxQuery('dayNote', 'delete', this.serialize());

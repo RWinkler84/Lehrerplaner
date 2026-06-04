@@ -115,7 +115,7 @@
 @media screen and (max-width: 620px) {
     
     #lessonNoteDialog,
-    #dayNoteEditorContainer,
+    #dayNoteDialog,
     #curriculumNoteDialog {
         min-width: 100%;
         max-width: 100%;

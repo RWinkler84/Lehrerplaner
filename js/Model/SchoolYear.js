@@ -260,6 +260,8 @@ export default class SchoolYear extends AbstractModel {
     }
 
     async delete() {
+        this.lastEdited = this.formatDateTime(new Date());
+
         await this.deleteFromLocalDB('schoolYears', this.id);
         await this.deleteFromLocalDB('unsyncedSchoolYears', this.id);
 

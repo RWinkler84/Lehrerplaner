@@ -134,6 +134,8 @@ export default class LessonNote extends AbstractModel {
     }
 
     async delete() {
+        this.lastEdited = this.formatDateTime(new Date());
+
         await this.deleteFromLocalDB('lessonNotes', this.id);
         await this.deleteFromLocalDB('unsyncedLessonNotes', this.id);
         let result = await this.makeAjaxQuery('lessonNote', 'delete', this.serialize());

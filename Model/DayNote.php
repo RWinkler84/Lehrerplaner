@@ -5,64 +5,62 @@ namespace Model;
 use Model\AbstractModel;
 use DateTime;
 
-class LessonNote extends AbstractModel
+class DayNote extends AbstractModel
 {
-    private $tableName = TABLEPREFIX . 'lessonNotes';
+    private $tableName = TABLEPREFIX . 'dayNotes';
 
-    public function save($lessonNote)
+    public function save($dayNote)
     {
-        $lessonNote = $this->preprocessDataToWrite($lessonNote);
+        $dayNote = $this->preprocessDataToWrite($dayNote);
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, content, fixedDate, created, lastEdited)
-            VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :content,:fixedDate, :created, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, date, content, created, lastEdited)
+            VALUES (:userId, :itemId, :date, :content, :created, :lastEdited)
             ";
 
-        $result = $this->write($query, $lessonNote);
-        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonNote['lastEdited']));
+        $result = $this->write($query, $dayNote);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($dayNote['lastEdited']));
 
         return $result;
     }
 
-    public function update($lessonNote)
+    public function update($dayNote)
     {
-        $lessonNote = $this->preprocessDataToWrite($lessonNote);
+        $dayNote = $this->preprocessDataToWrite($dayNote);
         $query = "
-            UPDATE $this->tableName SET date = :date, weekday = :weekday, timeslot = :timeslot, class = :class, subject = :subject, content = :content, fixedDate = :fixedDate, lastEdited = :lastEdited 
+            UPDATE $this->tableName SET date = :date, content = :content, lastEdited = :lastEdited 
             WHERE userId = :userId AND itemId = :itemId AND created = :created
             ";
 
-        $result = $this->write($query, $lessonNote);
-        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonNote['lastEdited']));
+        $result = $this->write($query, $dayNote);
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($dayNote['lastEdited']));
 
         return $result;
     }
 
-    public function deleteLessonNote($lessonNote)
+    public function deleteDayNote($dayNote)
     {
-        $lessonNote = $this->preprocessDataToWrite($lessonNote);
+        $dayNote = $this->preprocessDataToWrite($dayNote);
         $query = "DELETE FROM $this->tableName WHERE userId = :userId AND itemId = :itemId AND created = :created";
         $params = [
-            'userId' => $lessonNote['userId'],
-            'itemId' => $lessonNote['itemId'],
-            'created' => $lessonNote['created']
+            'userId' => $dayNote['userId'],
+            'itemId' => $dayNote['itemId'],
+            'created' => $dayNote['created']
         ];
 
-        error_log(print_r($lessonNote, true));
-
         $result = $this->delete($query, $params);
-        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonNote['lastEdited']));
+        if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($dayNote['lastEdited']));
 
         return $result;
     }
 
-    public function syncLessonNotes($notesToSync, $notesToDelete)
+    public function syncDayNotes($notesToSync, $notesToDelete)
     {
         global $user;
         $finalResult = ['status' => 'success'];
 
         if (!empty($notesToDelete)) {
             foreach ($notesToDelete as $note) {
-                $result = $this->deleteLessonNote($note);
+                $result = $this->deleteDayNote($note);
 
                 if ($result['status'] == 'failed') {
                     return [
@@ -100,7 +98,7 @@ class LessonNote extends AbstractModel
             if (!is_null($matchingNote)) {
                 if ($noteToSync['created'] == $matchingNote['created'] && $noteToSync['lastEdited'] > $matchingNote['lastEdited']) {
                     $query = "
-                        UPDATE $this->tableName SET date = :date, weekday = :weekday, timeslot = :timeslot, class = :class, subject = :subject, content = :content, fixedDate = :fixedDate, lastEdited = :lastEdited 
+                        UPDATE $this->tableName SET date = :date, content = :content, lastEdited = :lastEdited 
                         WHERE userId = :userId AND itemId = :itemId AND created = :created
                     ";
                 }
@@ -112,8 +110,8 @@ class LessonNote extends AbstractModel
                     $storedNotes[] = $noteToSync;
 
                     $query = "
-                                INSERT INTO $this->tableName (userId, itemId, date, weekday, timeslot, class, subject, content, fixedDate, created, lastEdited)
-                                VALUES (:userId, :itemId, :date, :weekday, :timeslot, :class, :subject, :content, :fixedDate ,:created, :lastEdited)
+                                INSERT INTO $this->tableName (userId, itemId, date, content, created, lastEdited)
+                                VALUES (:userId, :itemId, :date, :content, :created, :lastEdited)
                             ";
                 }
             }

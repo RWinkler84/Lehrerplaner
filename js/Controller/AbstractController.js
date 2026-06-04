@@ -109,7 +109,7 @@ export default class AbstractController {
                 await LessonController.renderSelectedCurricula();
                 await CurriculumController.renderSchoolYearCurriculumEditor();
             }
-            if (updatedElements.dayNote) await DayNoteController.renderDayNoteIcons();
+            if (updatedElements.dayNotes) await DayNoteController.renderDayNoteIcons();
         }
 
         TaskController.renderTaskChanges();
