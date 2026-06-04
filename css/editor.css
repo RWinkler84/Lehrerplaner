@@ -42,12 +42,14 @@
 }
 
 #noteSavedMessage,
+#dayNoteSavedMessage,
 #curriculumNoteSavedMessage {
     visibility: hidden;
     color: var(--matteGreen);
 }
 
 #noteSavedMessage.active,
+#dayNoteSavedMessage.active,
 #curriculumNoteSavedMessage.active {
     visibility: visible;
     animation-name: showSavedMessage;
@@ -64,6 +66,7 @@
 /* lessonNote editor styles */
 
 #lessonNoteDialog,
+#dayNoteDialog,
 #curriculumNoteDialog {
     width: 50vw;
     max-width: 50vw;
@@ -72,12 +75,14 @@
 }
 
 #lessonNoteDialog[open],
+#dayNoteDialog[open],
 #curriculumNoteDialog[open] {
     display: flex;
     flex-direction: column;
 }
 
 #lessonNoteDialog .dialogBody,
+#dayNoteDialog .dialogBody,
 #curriculumNoteDialog .dialogBody {
     display: flex;
     flex-direction: column;
@@ -91,6 +96,7 @@
 }
 
 #noteEditorContainer,
+#dayNoteEditorContainer,
 #curriculumNoteEditorContainer {
     display: flex;
     flex-direction: column;
@@ -109,6 +115,7 @@
 @media screen and (max-width: 620px) {
     
     #lessonNoteDialog,
+    #dayNoteEditorContainer,
     #curriculumNoteDialog {
         min-width: 100%;
         max-width: 100%;

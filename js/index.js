@@ -132,6 +132,7 @@ async function startApp() {
         Editor.normalizeInput(event);
         LessonNoteController.toggleSaveLessonNoteButton(event);
         LessonController.toggleSaveCurriculumSpanNoteButton(event);
+        DayNoteController.toggleSaveDayNoteButton(event);
     });
     document.addEventListener('selectionchange', Editor.updateButtonStatus);
 
@@ -256,6 +257,7 @@ async function startApp() {
         calcCalendarWeek(false);
         AbstractView.setIsTodayDot();
         AbstractView.scrollToCurrentDay();
+        DayNoteController.renderDayNoteIcons();
     }
 
     function switchToNextWeek() {
@@ -285,6 +287,7 @@ async function startApp() {
         calcCalendarWeek(true);
         AbstractView.setIsTodayDot();
         AbstractView.scrollToCurrentDay();
+        DayNoteController.renderDayNoteIcons();
     }
 
     function calcCalendarWeek(countUp = true) {

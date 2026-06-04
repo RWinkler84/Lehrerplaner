@@ -42,6 +42,7 @@ export default class DayNoteView {
         }
 
         noteDateSpan.textContent = Fn.formatDate(weekdayElement.dataset.date);
+        dialog.dataset.note_date = weekdayElement.dataset.date;
         Editor.init(editor);
 
         dialog.showModal();
@@ -54,5 +55,44 @@ export default class DayNoteView {
 
         dialog.close();
         while (editor.childNodes.length != 0) editor.childNodes[0].remove();
+    }
+
+
+    static getNoteDataFromForm() {
+        const dialog = document.querySelector('#dayNoteDialog');
+        const editor = dialog.querySelector('.textEditor');
+
+        return {
+            id: dialog.dataset.note_id,
+            date: dialog.dataset.note_date,
+            content: Editor.getContent(editor)
+        }
+    }
+
+    static toggleSaveDayNoteButton(activate = false) {
+        if (activate) {
+            document.querySelector('#saveDayNoteButton').removeAttribute('disabled');
+            return;
+        }
+
+        document.querySelector('#saveDayNoteButton').setAttribute('disabled', '');
+    }
+
+    static updateDayNoteDialog(note) {
+        const dialog = document.querySelector('#dayNoteDialog');
+
+        dialog.dataset.note_id = note.id;
+    }
+
+    static removeIdFromDialog() {
+        document.querySelector('#dayNoteDialog').dataset.note_id = '';
+    }
+    
+    static showDayNoteSavedMessage() {
+        const message = document.querySelector('#dayNoteSavedMessage');
+        message.classList.add('active');
+        setTimeout(() => {
+            message.classList.remove('active');
+        }, 2000);
     }
 }

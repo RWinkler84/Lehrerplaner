@@ -159,9 +159,9 @@ export default class AbstractModel {
                     transaction.onsuccess = () => {
                         this.markLocalDBUpdated(store);
                         resolve();
-                    transaction.onerror = () => {
-                        resolve({status: 'failed'})
-                    }
+                        transaction.onerror = () => {
+                            resolve({ status: 'failed' })
+                        }
                     }
                 })
             });
@@ -176,9 +176,9 @@ export default class AbstractModel {
             transaction.onsuccess = () => {
                 this.markLocalDBUpdated(store)
                 resolve();
-            transaction.onerror = () => {
-                resolve({status: 'failed'})
-            }
+                transaction.onerror = () => {
+                    resolve({ status: 'failed' })
+                }
             }
         })
     }
@@ -206,7 +206,7 @@ export default class AbstractModel {
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio', 4);
+            let request = window.indexedDB.open('eduplanio', 5);
             let store;
 
             request.onupgradeneeded = (event) => {
@@ -218,9 +218,11 @@ export default class AbstractModel {
                         db.createObjectStore('tasks', { keyPath: 'id' });
                         db.createObjectStore('subjects', { keyPath: 'id' });
                         db.createObjectStore('settings', { keyPath: 'id' });
+                        db.createObjectStore('schoolYears', { keyPath: 'id' });
                         store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
-                        db.createObjectStore('schoolYears', { keyPath: 'id' });
+                        store = db.createObjectStore('dayNotes', { keyPath: 'id' });
+                        store.createIndex('date', 'date');
 
                         db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
@@ -228,12 +230,14 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDayNotes', { keyPath: 'id' });
 
                         db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedDayNotes', { keyPath: 'id' });
 
                         //add first time user flag
                         userStatus.firstTimeUser = true;
@@ -250,6 +254,11 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         break;
+                    case 4:
+                        store = db.createObjectStore('dayNotes', { keyPath: 'id' });
+                        store.createIndex('date', 'date');
+                        db.createObjectStore('unsyncedDayNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedDayNotes', { keyPath: 'id' });
                 }
             }
 
@@ -749,7 +758,7 @@ export default class AbstractModel {
 
         if (result.status == 'success') {
             let isUpdated = await this.updateOnLocalDB(objectStore, dataToStore);
-            
+
             if (isUpdated.status == 'failed') {
                 await this.updateOnLocalDB(objectStore, previousData);
 

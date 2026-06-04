@@ -8,22 +8,17 @@ export default class DayNote extends AbstractModel {
     #created;
     #lastEdited;
 
-    static allDayNotes = [ //testing
-            {id: 1, date: '2026-06-01', content: '<p>test</p>', created: 'Mon Jun 01 2026 11:56:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:59:19 GMT+0200 (Mitteleuropäische Sommerzeit)'},
-            {id: 2, date: '2026-06-04', content: '<p>test 2</p>', created: 'Mon Jun 01 2026 11:58:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:59:29 GMT+0200 (Mitteleuropäische Sommerzeit)'},
-            {id: 3, date: '2026-06-02', content: '<p>test 3</p>', created: 'Mon Jun 01 2026 11:57:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:57:29 GMT+0200 (Mitteleuropäische Sommerzeit)'},
-            {id: 4, date: '2026-06-09', content: '<p>test 4</p>', created: 'Mon Jun 01 2026 11:57:19 GMT+0200 (Mitteleuropäische Sommerzeit)', lastEdited: 'Mon Jun 01 2026 11:57:29 GMT+0200 (Mitteleuropäische Sommerzeit)'}
-        ];
+    constructor() {
+        super()
+    }
 
     static async getAllDayNotes() {
         const model = new AbstractModel;
+        const allDayNotes = await model.readAllFromLocalDB('dayNotes');
 
-        // const allDayNotes = await model.readAllFromLocalDB('dayNotes');
+        if (allDayNotes.length == 0) return [];
 
-        // if (allDayNotes.length == 0) return [];
-
-        let allDayNotes = this.allDayNotes; //testing
-        const notesArray = allDayNotes.map(note => this.writeDataToInstance(note)); //testing
+        const notesArray = allDayNotes.map(note => this.writeDataToInstance(note));
 
         notesArray.sort((a, b) => Fn.sortByDate(a, b));
 
@@ -31,23 +26,91 @@ export default class DayNote extends AbstractModel {
     }
 
     static async getAllDayNotesInTimeSpan(startDate, endDate) {
-        const allDayNotes = await this.getAllDayNotes();
-        
-        if (startDate instanceof Date == false) startDate = new Date(startDate);
-        if (endDate instanceof Date == false) endDate = new Date(endDate);
+        let model = new AbstractModel;
+        let db = await model.openIndexedDB();
+        let store = db.transaction('dayNotes', 'readonly').objectStore('dayNotes');
+        let index = store.index('date');
 
-        const startTimestamp = startDate.setHours(12,0,0,0);
-        const endTimestamp = endDate.setHours(12,0,0,0);
+        if (!endDate) endDate = startDate;
 
-        return allDayNotes.filter(note => note.date.setHours(12,0,0,0) >= startTimestamp && note.date.setHours(12,0,0,0) <= endTimestamp );
+        let range = IDBKeyRange.bound(model.formatDate(startDate), model.formatDate(endDate));
+
+        return new Promise((resolve, reject) => {
+            let results = [];
+            let search = index.openCursor(range);
+
+            search.onsuccess = (event) => {
+                let cursor = event.target.result;
+
+                if (cursor) {
+                    let note = new DayNote;
+                    let noteData = cursor.value;
+
+                    note = this.writeDataToInstance(noteData, note);
+
+                    results.push(note);
+                    cursor.continue();
+                } else {
+                    resolve(results);
+                }
+            };
+
+            search.onerror = (event) => {
+                console.error('Fetching failed', event.target.error);
+                reject(event.target.error);
+            }
+        });
     }
 
     static async getById(id) {
         const model = new AbstractModel;
         
-        return this.allDayNotes.find(note => note.id == id); //testing
-        return await model.readFromLocalDB('dayNotes', id);
+        return this.writeDataToInstance(await model.readFromLocalDB('dayNotes', id));
+    }
 
+    async save() {
+        let allDayNotes = await DayNote.getAllDayNotes();
+
+        this.id = Fn.generateId(allDayNotes);
+        this.lastEdited = this.formatDateTime(new Date());
+
+        await this.writeToLocalDB('dayNotes', this.serialize());
+        let result = await this.makeAjaxQuery('dayNotes', 'save', this.serialize());
+
+        if (result.status == 'failed') {
+            await this.writeToLocalDB('unsyncedDayNotes', this.serialize());
+        }
+    }
+
+    async update() {
+        this.lastEdited = this.formatDateTime(new Date());
+
+        await this.updateOnLocalDB('dayNotes', this.serialize());
+        let result = await this.makeAjaxQuery('dayNotes', 'update', this.serialize());
+
+        if (result.status == 'failed') {
+            await this.updateOnLocalDB('unsyncedDayNotes', this.serialize());
+        }
+    }
+
+    async delete() {
+        await this.deleteFromLocalDB('dayNotes', this.id);
+        await this.deleteFromLocalDB('unsyncedDayNotes', this.id);
+        let result = await this.makeAjaxQuery('dayNotes', 'delete', this.serialize());
+
+        if (result.status == 'failed') {
+            await this.writeToLocalDB('unsyncedDeletedDayNotes', this.serialize());
+        }
+    }
+
+    serialize() {
+        return {
+            id: this.id,
+            date: this.formatDate(this.date),
+            content: this.content,
+            created: this.created,
+            lastEdited: this.lastEdited
+        }
     }
 
     static writeDataToInstance(noteData, instance = null) {
