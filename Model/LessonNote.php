@@ -47,8 +47,6 @@ class LessonNote extends AbstractModel
             'created' => $lessonNote['created']
         ];
 
-        error_log(print_r($lessonNote, true));
-
         $result = $this->delete($query, $params);
         if ($result['status'] == 'success') $this->setDbUpdateTimestamp($this->tableName, new DateTime($lessonNote['lastEdited']));
 
