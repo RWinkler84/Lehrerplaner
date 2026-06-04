@@ -75,7 +75,7 @@ export default class DayNote extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.writeToLocalDB('dayNotes', this.serialize());
-        let result = await this.makeAjaxQuery('dayNotes', 'save', this.serialize());
+        let result = await this.makeAjaxQuery('dayNote', 'save', this.serialize());
 
         if (result.status == 'failed') {
             await this.writeToLocalDB('unsyncedDayNotes', this.serialize());
@@ -86,7 +86,7 @@ export default class DayNote extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.updateOnLocalDB('dayNotes', this.serialize());
-        let result = await this.makeAjaxQuery('dayNotes', 'update', this.serialize());
+        let result = await this.makeAjaxQuery('dayNote', 'update', this.serialize());
 
         if (result.status == 'failed') {
             await this.updateOnLocalDB('unsyncedDayNotes', this.serialize());
@@ -96,7 +96,7 @@ export default class DayNote extends AbstractModel {
     async delete() {
         await this.deleteFromLocalDB('dayNotes', this.id);
         await this.deleteFromLocalDB('unsyncedDayNotes', this.id);
-        let result = await this.makeAjaxQuery('dayNotes', 'delete', this.serialize());
+        let result = await this.makeAjaxQuery('dayNote', 'delete', this.serialize());
 
         if (result.status == 'failed') {
             await this.writeToLocalDB('unsyncedDeletedDayNotes', this.serialize());

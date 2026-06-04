@@ -9,6 +9,7 @@ import TimetableController from "./TimetableController.js";
 import LessonController from "./LessonController.js";
 import { ONEDAY, tourStatus, userStatus } from "../index.js";
 import Tour from "../tour.js";
+import DayNoteController from "./DayNoteController.js";
 
 export default class AbstractController {
 
@@ -108,6 +109,7 @@ export default class AbstractController {
                 await LessonController.renderSelectedCurricula();
                 await CurriculumController.renderSchoolYearCurriculumEditor();
             }
+            if (updatedElements.dayNote) await DayNoteController.renderDayNoteIcons();
         }
 
         TaskController.renderTaskChanges();

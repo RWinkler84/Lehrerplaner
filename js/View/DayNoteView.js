@@ -32,6 +32,7 @@ export default class DayNoteView {
 
         if (noteData) {
             dialog.dataset.note_id = noteData.id;
+            dialog.dataset.created = noteData.created;
             editor.innerHTML = noteData.content;
         } else {
             const p = document.createElement('p');
@@ -65,7 +66,8 @@ export default class DayNoteView {
         return {
             id: dialog.dataset.note_id,
             date: dialog.dataset.note_date,
-            content: Editor.getContent(editor)
+            content: Editor.getContent(editor),
+            created: dialog.dataset.created
         }
     }
 
@@ -82,6 +84,7 @@ export default class DayNoteView {
         const dialog = document.querySelector('#dayNoteDialog');
 
         dialog.dataset.note_id = note.id;
+        dialog.dataset.created = note.created;
     }
 
     static removeIdFromDialog() {

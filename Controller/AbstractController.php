@@ -7,6 +7,9 @@ use Controller\LessonController;
 use Controller\SettingsController;
 use Controller\TaskController;
 use Controller\UserController;
+use Controller\SchoolYearController;
+use Controller\LessonNoteController;
+use Controller\DayNoteController;
 
 class AbstractController
 {
@@ -78,6 +81,16 @@ class AbstractController
         echo json_encode($result);
     }
 
+    public function getAllDayNotes()
+    {
+        global $user;
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
+
+        $result = $this->db->getAllDayNotes();
+
+        echo json_encode($result);
+    }
+
     public function setDbUpdateTimestamp($updatedTableName, $dateTime)
     {
         global $user;
@@ -102,12 +115,16 @@ class AbstractController
         if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
 
         $dataToSync = json_decode(file_get_contents('php://input'), true);
+
+        error_log(print_r($dataToSync, true));
+        
         $subjectsResults = [];
         $timetableResults = [];
         $timetableChangesResults = [];
         $taskResults = [];
         $lessonNotesResults = [];
         $schoolYearResults = [];
+        $dayNotesResults = [];
 
         if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
             $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
@@ -133,13 +150,18 @@ class AbstractController
             $schoolYearResults = SchoolYearController::syncSchoolYears($dataToSync['schoolYears'], $dataToSync['deletedSchoolYears']);
         }
 
+        if (!empty($dataToSync['dayNotes']) || !empty($dataToSync['deletedDayNotes'])) {
+            $dayNotesResults = DayNoteController::syncDayNotes($dataToSync['dayNotes'], $dataToSync['deletedDayNotes']);
+        }
+
         $result = [
             'subjects' => $subjectsResults,
             'timetable' => $timetableResults,
             'timetableChanges' => $timetableChangesResults,
             'tasks' => $taskResults,
             'lessonNotes' => $lessonNotesResults,
-            'schoolYears' => $schoolYearResults
+            'schoolYears' => $schoolYearResults,
+            'dayNotes' => $dayNotesResults
         ];
 
         echo json_encode($result);
@@ -248,11 +270,11 @@ class AbstractController
         }
 
         if ($user->isActive() == false)
-        echo json_encode([
-            'status' => 'failed',
-            'error' => 'Plus licence expired',
-            'message' => 'You need an active Eduplanio Plus licence to perform this action.'
-        ]);
+            echo json_encode([
+                'status' => 'failed',
+                'error' => 'Plus licence expired',
+                'message' => 'You need an active Eduplanio Plus licence to perform this action.'
+            ]);
 
         exit;
     }

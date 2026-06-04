@@ -375,7 +375,8 @@ export default class AbstractModel {
                 timetableChanges: null,
                 tasks: null,
                 lessonNotes: null,
-                schoolYears: null
+                schoolYears: null,
+                dayNotes: null
             }
         }
 
@@ -388,6 +389,7 @@ export default class AbstractModel {
             dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
             dataToStore.lastUpdated.lessonNotes = timestamps.lastUpdated.lessonNotes ? timestamps.lastUpdated.lessonNotes : 0;
             dataToStore.lastUpdated.schoolYears = timestamps.lastUpdated.schoolYears ? timestamps.lastUpdated.schoolYears : 0;
+            dataToStore.lastUpdated.dayNotes = timestamps.lastUpdated.dayNotes ? timestamps.lastUpdated.dayNotes : 0;
         }
 
         switch (store) {
@@ -408,6 +410,10 @@ export default class AbstractModel {
                 break;
             case 'schoolYears':
                 dataToStore.lastUpdated.schoolYears = this.formatDateTime(date);
+                break;
+            case 'dayNotes':
+                dataToStore.lastUpdated.dayNotes = this.formatDateTime(date);
+                break;
         }
 
         db.transaction('settings', 'readwrite').objectStore('settings').put(dataToStore)
@@ -622,14 +628,15 @@ export default class AbstractModel {
             timetableChanges: false,
             tasks: false,
             lessonNotes: false,
-            schoolYears: false
+            schoolYears: false,
+            dayNotes: false
         };
 
 
         if (remoteTimestamps.status == 'failed') return;
 
         if (!localTimestamps) {
-            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true, schoolYears: true });
+            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true, schoolYears: true, dayNotes: true });
         }
 
         //send data with differing timestamps
@@ -668,6 +675,12 @@ export default class AbstractModel {
             tablesToUpdate.schoolYears = true;
         }
 
+        if (remoteTimestamps[0].dayNotes != localTimestamps.dayNotes) {
+            dataToSync['dayNotes'] = await this.readAllFromLocalDB('unsyncedDayNotes');
+            dataToSync['deletedDayNotes'] = await this.readAllFromLocalDB('unsyncedDeletedDayNotes');
+            tablesToUpdate.dayNotes = true;
+        }
+
         let result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
         if (result.status == 'failed') return;
@@ -700,6 +713,11 @@ export default class AbstractModel {
         if (result.schoolYears.status && result.schoolYears.status == 'success') {
             this.clearObjectStore('unsyncedSchoolYears');
             this.clearObjectStore('unsyncedDeletedSchoolYears');
+        }
+
+        if (result.dayNotes.status && result.dayNotes.status == 'success') {
+            this.clearObjectStore('unsyncedDayNotes');
+            this.clearObjectStore('unsyncedDeletedDayNotes');
         }
 
         await this.updateLocalWithRemoteData(tablesToUpdate);
@@ -745,6 +763,11 @@ export default class AbstractModel {
 
                 await this.writeRemoteToLocalDB('schoolYears', schoolYears, remoteTimestamps[0].schoolYears);
             }
+        }
+
+        if (tablesToUpdate.dayNotes) {
+            let dayNotes = await this.makeAjaxQuery('abstract', 'getAllDayNotes');
+            if (!dayNotes.status) await this.writeRemoteToLocalDB('dayNotes', dayNotes, remoteTimestamps[0].dayNotes);
         }
 
         AbstractController.renderDataChanges(tablesToUpdate);

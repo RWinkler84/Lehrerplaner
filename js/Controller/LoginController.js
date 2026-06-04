@@ -78,12 +78,10 @@ export default class LoginController {
         if (result.status == 'success') {
             let abstCtrl = new AbstractController;
 
-            await AbstractController.renderTopMenu();
             await abstCtrl.syncData();
-            await AbstractController.greyOutHolidaysAndPassedDays();
-            this.closeLoginDialog();
 
-            window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
+            window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`);
+            window.location.reload();
         } else {
             View.showLoginErrorMessage(result.error, result.message);
         }

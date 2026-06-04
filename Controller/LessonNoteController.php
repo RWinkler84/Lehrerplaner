@@ -3,7 +3,6 @@
 namespace Controller;
 
 use Controller\AbstractController;
-use Model\AbstractModel;
 use Model\LessonNote;
 
 class LessonNoteController extends AbstractController
