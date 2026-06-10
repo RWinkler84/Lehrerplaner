@@ -61,10 +61,7 @@ export default class DayNoteController {
     static async updateDayNote(noteData) {
         let note = await DayNote.getById(noteData.id);
 
-
-        console.log(note);
         note = DayNote.writeDataToInstance(noteData, note);
-        console.log(note);
 
         await note.update();
 

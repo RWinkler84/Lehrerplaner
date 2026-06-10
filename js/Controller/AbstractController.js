@@ -137,7 +137,6 @@ export default class AbstractController {
         const db = new Model;
 
         const isFirstTimer = await db.checkForFirstTimeUser();
-        console.log('isFirstTimer', isFirstTimer)
 
         if (isFirstTimer) this.openWelcomeDialog();
     }

@@ -69,7 +69,7 @@ export default class TaskController {
         await task.save();
         LessonController.renderLesson();
 
-        return true;
+        return task;
     }
 
     static async getById(id) {

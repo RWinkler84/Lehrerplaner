@@ -432,17 +432,17 @@ dialog .errorMessageDisplay,
     font-weight: bold;
     color: var(--labelgrey);
 
-        .smallDate {
-            font-weight: normal;
-            font-size: 0.8rem;
-            color: var(--lightText);
-        }
+    .smallDate {
+        font-weight: normal;
+        font-size: 0.8rem;
+        color: var(--lightText);
+    }
 
-        .dayNoteIndicator {
-            width: 0.75rem;
-            height: 0.75rem;
-            background-color: var(--lightgrey);
-        }
+    .dayNoteIndicator {
+        width: 0.75rem;
+        height: 0.75rem;
+        background-color: var(--lightgrey);
+    }
 }
 
 
@@ -730,6 +730,18 @@ tr[data-new] td.taskAdditionalInfo {
 
 tr[data-new]:has(td[data-taskDescription]) td {
     border-top: solid 1px var(--contentContainerBackground);
+}
+
+.taskList {
+    tr {
+        &.transitioning {
+            transition: all 0.3s ease-out;
+
+            background-color: var(--contentContainerBackground);
+        }
+    }
+
+
 }
 
 /* Settings Container */

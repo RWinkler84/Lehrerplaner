@@ -27,6 +27,8 @@ export default class TaskView extends AbstractView {
         let allOpenTaskIds = [];
         let allInProgressTaskIds = [];
 
+        let inititalPositions = [];
+
         if (allOpenTasks.length > 0) {
             openTaskTable.querySelector('thead').removeAttribute('style');
             openTaskTable.querySelector('td[data-noentriesfound]').style.display = 'none';
@@ -57,10 +59,12 @@ export default class TaskView extends AbstractView {
         document.querySelectorAll('.taskList')
             .forEach(taskList => taskList.querySelectorAll('tr')
                 .forEach(tr => {
+                    inititalPositions.push(tr.getBoundingClientRect().top);
                     allRenderedTaskTrs.push(tr);
-                    tr.remove();
                 })
             );
+
+        allRenderedTaskTrs.forEach(tr => tr.remove()); //only remove after initial positions are saved
 
         allOpenTaskIds.forEach(taskId => {
             if (taskId == 0) return;
@@ -83,7 +87,7 @@ export default class TaskView extends AbstractView {
                 }
             });
 
-            //no element was found, because the task wasn't rendered yet (added by a syncing data from another device)                
+            //no element was found, because the task wasn't rendered yet (added by syncing data from another device)                
             if (!taskElement) {
                 let task = allOpenTasks.find(task => task.id == taskId);
                 taskElement = this.getTaskTrHTML(task);
@@ -132,7 +136,10 @@ export default class TaskView extends AbstractView {
 
             inProgressTaskTableBody.insertBefore(taskElement, inProgressTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
             inProgressTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
+
         })
+
+        this.#runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions);
     }
 
     static updateTaskElement(taskElement, task) {
@@ -311,7 +318,7 @@ export default class TaskView extends AbstractView {
                     <div>
                         <label><input type="checkbox" name="fixedDate" value="fixed">fester Termin?</label>
                     </div>
-                    <div class="flex alignCenter reoccuringTaskContainer" >
+                    <div class="flex alignCenter halfGap reoccuringTaskContainer" >
                         <label><input type="checkbox" name="reoccuringTask" value="reoccuring">wiederholen?</label>
                         <div class="alertRing">
                             <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
@@ -399,7 +406,10 @@ export default class TaskView extends AbstractView {
             'reoccuringInterval': checkBoxElement.querySelector('select').value
         }
 
-        if (await Controller.saveTask(taskData, event)) {
+        let task = await Controller.saveTask(taskData, event);
+
+        if (task) {
+            taskElement.dataset.taskid = task.id;
 
             TaskView.removeNewDataset(event);
             TaskView.removeEditability(event);
@@ -630,9 +640,40 @@ export default class TaskView extends AbstractView {
         }
     }
 
+    static async #runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions) {
+        const finalPositions = allRenderedTaskTrs.map(tr => tr.getBoundingClientRect().top);
+
+        allRenderedTaskTrs.forEach((tr, index) => {
+            if (inititalPositions[index] != finalPositions[index]) {
+                const delta = inititalPositions[index] - finalPositions[index];
+
+                console.log(tr, delta);
+
+                tr.style.transform = `translateY(${delta}px)`;
+                
+                requestAnimationFrame(() => {
+                    tr.classList.add('transitioning')
+                    tr.style.transform = '';
+                    });
+            }
+        })
+
+
+        setTimeout(() => {
+            allRenderedTaskTrs.forEach((tr, index) => {
+                if (inititalPositions[index] != finalPositions[index]) {
+                    const delta = inititalPositions[index] - finalPositions[index];
+
+                    tr.classList.remove('transitioning');
+                }
+            })
+        }, 300)
+
+    }
+
     static async runSetInProgressAnimation(event) {
         const taskElement = event.target.closest('tr');
-        
+
         taskElement.classList.add('fadeOut');
 
         setTimeout(() => {

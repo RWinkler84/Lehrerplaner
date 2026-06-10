@@ -44,7 +44,6 @@ export default class Task extends AbstractModel {
 
         let result = await this.makeAjaxQuery('task', 'save', this.serialize());
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTasks', this.serialize());
-
     }
 
     async delete() {
