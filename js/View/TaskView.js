@@ -139,7 +139,7 @@ export default class TaskView extends AbstractView {
 
         })
 
-        this.#runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions);
+        this.runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions);
     }
 
     static updateTaskElement(taskElement, task) {
@@ -640,21 +640,29 @@ export default class TaskView extends AbstractView {
         }
     }
 
-    static async #runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions) {
+    // animations 
+
+    static runOpenTaskFormAnimation() {
+
+    }
+
+    static runCloseTaskFormAnimation() {
+
+    }
+
+    static runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions) {
         const finalPositions = allRenderedTaskTrs.map(tr => tr.getBoundingClientRect().top);
 
         allRenderedTaskTrs.forEach((tr, index) => {
             if (inititalPositions[index] != finalPositions[index]) {
                 const delta = inititalPositions[index] - finalPositions[index];
 
-                console.log(tr, delta);
-
                 tr.style.transform = `translateY(${delta}px)`;
-                
+
                 requestAnimationFrame(() => {
                     tr.classList.add('transitioning')
                     tr.style.transform = '';
-                    });
+                });
             }
         })
 
@@ -667,9 +675,11 @@ export default class TaskView extends AbstractView {
                     tr.classList.remove('transitioning');
                 }
             })
-        }, 300)
+        }, ANIMATIONRUNTIME)
 
     }
+
+
 
     static async runSetInProgressAnimation(event) {
         const taskElement = event.target.closest('tr');
@@ -688,12 +698,53 @@ export default class TaskView extends AbstractView {
         })
     }
 
-    static async runRemoveTaskAnimation(event) {
+    static async runRemoveTaskAnimation(event, task) {
         const taskElement = event.target.closest('tr');
+        const taskElementList = taskElement.closest('.taskList');
+        const taskContainer = taskElement.closest('#taskContainer');
+        const openTaskList = taskContainer.querySelector('#upcomingTasksTable .taskList');
+        const inProgressTaskList = taskContainer.querySelector('#inProgressTasksTable .taskList');
+        const taskElementHeight = taskElement.getBoundingClientRect().height;
+        const otherElementPos = [];
+
+        const allTaskElementsInList = Array.from(taskElementList.children);
+
+        let taskElementIndex = allTaskElementsInList.indexOf(taskElement);
+
+        if (task.reoccuring) {
+            this.renderTasks();
+            return;
+        }
+        
+        //let affected elements slide to their new position
+        for (let i = taskElementIndex + 1; i < allTaskElementsInList.length; i++) {
+            allTaskElementsInList[i].classList.add('transitioning');
+            allTaskElementsInList[i].style.transform = `translateY(-${taskElementHeight}px)`;
+        }
+
+        //apply an animation to the taskContainer, if the changed list is longer than the other one
+        if (
+            (taskElementList == openTaskList && taskElementList.childElementCount > inProgressTaskList.childElementCount) ||
+            (taskElementList == inProgressTaskList && taskElementList.childElementCount > openTaskList.childElementCount)
+        ) {
+            taskContainer.classList.add('transitioning');
+            taskContainer.style.height = `${taskContainer.getBoundingClientRect().height}px`;
+
+            requestAnimationFrame(() => taskContainer.style.height = `${taskContainer.getBoundingClientRect().height - taskElementHeight}px`);
+        }
+
         taskElement.classList.add('shrink');
 
         setTimeout(() => {
             taskElement.classList.remove('shrink');
+            taskContainer.classList.remove('transitioning');
+            taskContainer.style.height = '';
+
+            for (let i = taskElementIndex + 1; i < allTaskElementsInList.length; i++) {
+                allTaskElementsInList[i].classList.remove('transitioning');
+                allTaskElementsInList[i].style.transform = '';
+
+            }
         }, ANIMATIONRUNTIME);
 
         return new Promise((resolve) => {

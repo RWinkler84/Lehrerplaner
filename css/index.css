@@ -1311,6 +1311,10 @@ h4 {
     visibility: hidden;
 }
 
+.transitioning {
+    transition: all 0.3s ease-out;
+}
+
 /* Lesson Colors */
 .subjectColorOne {
     background-color: var(--matteGreen) !important;

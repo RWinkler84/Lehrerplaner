@@ -124,7 +124,7 @@ export default class TaskController {
     static async setTaskDone(id, event) {
         let task = await Task.getById(id);
 
-        await View.runRemoveTaskAnimation(event);
+        await View.runRemoveTaskAnimation(event, task);
         task.setDone();
         this.renderTaskChanges();
 
