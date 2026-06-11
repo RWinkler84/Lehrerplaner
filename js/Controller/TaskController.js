@@ -58,7 +58,6 @@ export default class TaskController {
         task.reoccuring = taskData.reoccuring;
         task.reoccuringInterval = taskData.reoccuringInterval;
 
-
         if (task.reoccuring && task.reoccuringInterval == '') {
             View.alertReoccuringIntervalSelect(event);
             return false;
@@ -103,12 +102,13 @@ export default class TaskController {
 
         task.update();
 
-        this.renderTaskChanges();
-        LessonController.renderLesson();
         
         View.removeEditability(event);
         View.showSetDoneOrInProgressButtons(event);
 
+        this.renderTaskChanges();
+        LessonController.renderLesson();
+        
         return true;
     }
 
@@ -138,6 +138,7 @@ export default class TaskController {
     }
 
     static revertTaskChanges(event) {
+
         View.removeEditability(event);
         View.showSetDoneOrInProgressButtons(event);
         View.renderTasks();

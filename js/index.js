@@ -60,11 +60,11 @@ async function startApp() {
     await SettingsController.checkForPendingLogout();
     await abstCtrl.syncData();
 
-    window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));
-    window.addEventListener('focus', () => {
-        abstCtrl.syncData();
-        SettingsController.rerenderAccountSettingsAfterPlusPurchase();
-    });
+    // window.addEventListener('blur', abstCtrl.syncData.bind(abstCtrl));
+    // window.addEventListener('focus', () => {
+    //     abstCtrl.syncData();
+    //     SettingsController.rerenderAccountSettingsAfterPlusPurchase();
+    // });
 
     //checking for unsynced changes
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 15);

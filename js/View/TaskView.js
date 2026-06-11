@@ -447,29 +447,36 @@ export default class TaskView extends AbstractView {
 
         this.#backupTaskData(event);
 
-        let parentTr = event.target.closest('tr');
-        let dateSelect = this.getDateSelectHTML(parentTr, upcomingLessons);
+        let taskElement = event.target.closest('tr');
+        let checkboxTr = taskElement.nextElementSibling;
+        let dateSelect = this.getDateSelectHTML(taskElement, upcomingLessons);
 
         if (window.innerWidth > 620) {
-            parentTr.nextElementSibling.style.display = 'table-row';
+            checkboxTr.style.display = 'table-row';
+
+            this.runOpenTaskFormAnimation(checkboxTr);
         } else {
-            parentTr.nextElementSibling.style.display = 'block';
-            parentTr.nextElementSibling.style.marginTop = '-2rem';
+            checkboxTr.style.display = 'block';
+
+            // last checkboxTr must not have a margin or animations will be buggy
+            if (checkboxTr.nextElementSibling) checkboxTr.style.marginTop = '-2rem';
+
+            this.runOpenTaskFormAnimation(checkboxTr);
         }
 
-        parentTr.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
-        parentTr.querySelector('td[data-taskdescription]').focus();
+        taskElement.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
+        taskElement.querySelector('td[data-taskdescription]').focus();
 
-        parentTr.querySelector('.taskDateSelectWrapper').append(dateSelect);
-        parentTr.querySelector('.taskDateSelectWrapper').style.display = "block";
-        parentTr.querySelector('.smallDate').style.display = 'none';
+        taskElement.querySelector('.taskDateSelectWrapper').append(dateSelect);
+        taskElement.querySelector('.taskDateSelectWrapper').style.display = "block";
+        taskElement.querySelector('.smallDate').style.display = 'none';
 
         window.getSelection().removeAllRanges();
         TaskView.showSaveOrDiscardChangesButtons(event);
 
-        parentTr.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
-        parentTr.nextElementSibling.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
-        parentTr.nextElementSibling.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
+        taskElement.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        checkboxTr.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
+        checkboxTr.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
     }
 
     static getDateSelectHTML(taskElement, upcomingLessons) {
@@ -534,28 +541,25 @@ export default class TaskView extends AbstractView {
         event.target.closest('tr').previousElementSibling.removeAttribute('style');
     }
 
-    static removeEditability(event) {
-
+    static async removeEditability(event) {
         let taskTr = event.target.closest('tr');
+        let checkBoxElement = taskTr.nextElementSibling;
 
         taskTr.querySelector('td[data-taskdescription]').removeAttribute('contenteditable');
-        taskTr.nextElementSibling.style.display = "none";
+        this.runCloseTaskFormAnimation(checkBoxElement, checkBoxElement.getBoundingClientRect().height);
+        checkBoxElement.style.display = 'none';
     }
 
+    //removes 'new' dataset of the given task form, after it was saved
     static removeNewDataset(event) {
-        //removes 'new' dataset of the given task form, after it was saved
-
         let buttonWrapper = event.target.closest('td');
         let fixedDateTr = buttonWrapper.closest('tr').nextElementSibling;
 
-
         buttonWrapper.closest('tr').removeAttribute('data-new');
         fixedDateTr.removeAttribute('data-new');
-        fixedDateTr.style.display = 'none';
     }
 
     static removeTaskForm(event) {
-
         let taskTr = event.target.closest('tr');
 
         if (!taskTr.hasAttribute('data-new')) {
@@ -642,12 +646,57 @@ export default class TaskView extends AbstractView {
 
     // animations 
 
-    static runOpenTaskFormAnimation() {
+    static runOpenTaskFormAnimation(checkboxElement) {
+        const listContainer = checkboxElement.closest('div');
+        const checkboxElementHeight = checkboxElement.getBoundingClientRect().height;
+        const listContainerHeight = listContainer.getBoundingClientRect().height;
+        const allListItems = Array.from(checkboxElement.closest('.taskList').children);
+        const index = allListItems.indexOf(checkboxElement);
 
+        checkboxElement.style.transform = `translateY(-${checkboxElementHeight}px)`;
+        listContainer.style.height = `${listContainerHeight - checkboxElementHeight}px`;
+
+        for (let i = index; i < allListItems.length; i++) {
+            allListItems[i].style.transform = `translateY(-${checkboxElementHeight}px)`;
+        }
+
+        requestAnimationFrame(() => {
+            listContainer.classList.add('transitioning');
+            listContainer.style.height = `${listContainerHeight}px`;
+
+            checkboxElement.classList.add('transitioning');
+            checkboxElement.style.transform = '';
+
+            for (let i = index; i < allListItems.length; i++) {
+                allListItems[i].classList.add('transitioning');
+                allListItems[i].style.transform = '';
+            }
+        })
+
+        setTimeout(() => {
+            listContainer.classList.remove('transitioning');
+            listContainer.style.height = '';
+            
+            allListItems.forEach(tr => tr.classList.remove('transitioning'));
+
+        }, ANIMATIONRUNTIME)
     }
 
-    static runCloseTaskFormAnimation() {
+    static runCloseTaskFormAnimation(checkboxElement, delta) {
+        const listContainer = checkboxElement.closest('div');
+        const listContainerHeight = listContainer.getBoundingClientRect().height;
 
+        listContainer.style.height = `${listContainerHeight}px`;
+
+        requestAnimationFrame(() => {
+            listContainer.classList.add('transitioning');
+            listContainer.style.height = `${listContainerHeight - delta}px`;
+        })
+
+        setTimeout(() => {
+            listContainer.style.height = '';
+            listContainer.classList.remove('transitioning');
+        }, ANIMATIONRUNTIME)
     }
 
     static runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions) {
@@ -678,8 +727,6 @@ export default class TaskView extends AbstractView {
         }, ANIMATIONRUNTIME)
 
     }
-
-
 
     static async runSetInProgressAnimation(event) {
         const taskElement = event.target.closest('tr');

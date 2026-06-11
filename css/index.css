@@ -716,29 +716,41 @@ dialog .errorMessageDisplay,
     flex-wrap: wrap;
 }
 
-tr[data-new] {
-    background-color: var(--lightergrey);
-}
 
-tr[data-new] td {
-    border-color: var(--contentContainerBackground) !important;
-}
-
-tr[data-new] td.taskAdditionalInfo {
-    border-color: var(--lightergrey) !important;
-}
-
-tr[data-new]:has(td[data-taskDescription]) td {
-    border-top: solid 1px var(--contentContainerBackground);
-}
 
 .taskList {
     tr {
+
+        position: relative;
+        background-color: var(--contentContainerBackground);
+
         &.transitioning {
             transition: all 0.3s ease-out;
-
-            background-color: var(--contentContainerBackground);
         }
+    }
+
+    tr[data-taskid] {
+        z-index: 1;
+    }
+
+    tr[data-checkboxtr] {
+        z-index: 0;
+    }
+
+    tr[data-new] {
+        background-color: var(--lightergrey);
+    }
+
+    tr[data-new] td {
+        border-color: var(--contentContainerBackground) !important;
+    }
+
+    tr[data-new] td.taskAdditionalInfo {
+        border-color: var(--lightergrey) !important;
+    }
+
+    tr[data-new]:has(td[data-taskDescription]) td {
+        border-top: solid 1px var(--contentContainerBackground);
     }
 
 
@@ -1818,10 +1830,17 @@ p {
         display: none;
     }
 
-    tr {
-        position: relative;
-        display: block;
-        margin-bottom: 2rem;
+    .taskList {
+        tr {
+            position: relative;
+            display: block;
+            margin-bottom: 2rem;
+        }
+
+        tr[data-taskid]:not(:has(~ tr[data-taskid])),
+        tr:last-of-type {
+            margin-bottom: 0;
+        }
     }
 
     td {
