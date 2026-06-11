@@ -701,9 +701,7 @@ export default class TaskView extends AbstractView {
     static async runRemoveTaskAnimation(event, task) {
         const taskElement = event.target.closest('tr');
         const taskElementList = taskElement.closest('.taskList');
-        const taskContainer = taskElement.closest('#taskContainer');
-        const openTaskList = taskContainer.querySelector('#upcomingTasksTable .taskList');
-        const inProgressTaskList = taskContainer.querySelector('#inProgressTasksTable .taskList');
+        const listContainer = taskElement.closest('div');
         const taskElementHeight = taskElement.getBoundingClientRect().height;
         const otherElementPos = [];
 
@@ -715,30 +713,25 @@ export default class TaskView extends AbstractView {
             this.renderTasks();
             return;
         }
-        
+
         //let affected elements slide to their new position
         for (let i = taskElementIndex + 1; i < allTaskElementsInList.length; i++) {
             allTaskElementsInList[i].classList.add('transitioning');
             allTaskElementsInList[i].style.transform = `translateY(-${taskElementHeight}px)`;
         }
 
-        //apply an animation to the taskContainer, if the changed list is longer than the other one
-        if (
-            (taskElementList == openTaskList && taskElementList.childElementCount > inProgressTaskList.childElementCount) ||
-            (taskElementList == inProgressTaskList && taskElementList.childElementCount > openTaskList.childElementCount)
-        ) {
-            taskContainer.classList.add('transitioning');
-            taskContainer.style.height = `${taskContainer.getBoundingClientRect().height}px`;
+        //let the list container shrink
+        listContainer.classList.add('transitioning');
+        listContainer.style.height = `${listContainer.getBoundingClientRect().height}px`;
 
-            requestAnimationFrame(() => taskContainer.style.height = `${taskContainer.getBoundingClientRect().height - taskElementHeight}px`);
-        }
+        requestAnimationFrame(() => listContainer.style.height = `${listContainer.getBoundingClientRect().height - taskElementHeight}px`);
 
         taskElement.classList.add('shrink');
 
         setTimeout(() => {
             taskElement.classList.remove('shrink');
-            taskContainer.classList.remove('transitioning');
-            taskContainer.style.height = '';
+            listContainer.classList.remove('transitioning');
+            listContainer.style.height = '';
 
             for (let i = taskElementIndex + 1; i < allTaskElementsInList.length; i++) {
                 allTaskElementsInList[i].classList.remove('transitioning');

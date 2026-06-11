@@ -1673,7 +1673,7 @@ p {
 
     #upcomingTasksContainer,
     #inProgressTasksContainer {
-        flex: 1 1 100%;
+        flex: unset;
         max-width: 100%;
     }
 }
