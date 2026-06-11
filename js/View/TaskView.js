@@ -569,6 +569,8 @@ export default class TaskView extends AbstractView {
 
         let tableBody = event.target.closest('tbody');
 
+        this.runCloseTaskFormAnimation(taskTr.nextElementSibling, taskTr.getBoundingClientRect().height + taskTr.nextElementSibling.getBoundingClientRect().height);
+
         taskTr.nextElementSibling.remove();
         taskTr.remove();
 
