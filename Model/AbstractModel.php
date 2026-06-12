@@ -56,9 +56,6 @@ class AbstractModel
                         $value = $date->format('Y-m-d');
                     }
 
-                    if ($key == 'lastEdited') {
-                    }
-
                     if ($key == 'validUntil' && $value == 'null') {
                         $stmt->bindValue($key, null, PDO::PARAM_NULL);
                     } else {

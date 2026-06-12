@@ -29,8 +29,30 @@ export default class Task extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
         await this.updateOnLocalDB('tasks', this.serialize());
 
-        let result = await this.makeAjaxQuery('task', 'update', this.serialize());
+        let result = await this.makeAjaxQuery('task', 'update', [this.serialize()]);
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedTasks', this.serialize());
+    }
+
+    async batchUpdate(tasksToUpdate) {
+        const serializedTasks = [];
+
+        console.log(tasksToUpdate)
+
+        for (const task of tasksToUpdate) {
+            task.lastEdited = this.formatDateTime(new Date());
+
+            const serialized = task.serialize();
+            serializedTasks.push(serialized);
+
+            await this.updateOnLocalDB('tasks', serialized);
+        }
+
+        let result = await this.makeAjaxQuery('task', 'update', serializedTasks);
+        if (result.status == 'failed') {
+            for (const task of serializedTasks) {
+                this.updateOnLocalDB('unsyncedTasks', task);
+            }
+        }
     }
 
     async save() {
@@ -195,6 +217,7 @@ export default class Task extends AbstractModel {
     static async reorderTasks(oldTimetable, oldTimetableChanges) {
         let currentTimetable = await TaskController.getAllRegularLessons();
         let currentChanges = await TaskController.getAllTimetableChanges();
+        const tasksToUpdate = [];
 
         let allAffectedTasks = await this.#getAllAffectedTasks() //all tasks after the date of the timetable change
 
@@ -250,11 +273,14 @@ export default class Task extends AbstractModel {
                         if (allNewLessonDates[indexInOldDates]) {
                             task.date = allNewLessonDates[indexInOldDates].date;
                             task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                            task.update();
+                            // task.update();
+                            tasksToUpdate.push(task);
                         }
                     });
                 }
             }
+
+            await (new Task).batchUpdate(tasksToUpdate);
         }
     }
 
@@ -353,8 +379,8 @@ export default class Task extends AbstractModel {
 
     get created() {
         return this.#created;
-    } 
-    
+    }
+
     get lastEdited() {
         return this.#lastEdited;
     }
@@ -400,7 +426,7 @@ export default class Task extends AbstractModel {
     set reoccuringInterval(reoccuringInterval) {
         this.#reoccuringInterval = reoccuringInterval;
     }
-    
+
     set created(created) {
         this.#created = created;
     }

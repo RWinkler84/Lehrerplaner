@@ -25,10 +25,15 @@ class LessonNoteController extends AbstractController
 
     public function update()
     {
-        $lessonNote = json_decode(file_get_contents('php://input'), true);
-        $result = $this->model->update($lessonNote);
+        $lessonNotes = json_decode(file_get_contents('php://input'), true);
+        $finalResult = ['status' => 'success'];
 
-        echo json_encode($result);
+        foreach ($lessonNotes as $k => $note) {
+            $result = $this->model->update($note);
+            if ($result['status'] == 'failed') $finalResult = $result;
+        }
+
+        echo json_encode($finalResult);
     }
 
     public function delete()

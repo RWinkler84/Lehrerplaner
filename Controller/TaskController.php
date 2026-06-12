@@ -27,11 +27,16 @@ class TaskController extends AbstractController
 
     public function update()
     {
-        $taskData = json_decode(file_get_contents('php://input'), true);
+        $taskArray = json_decode(file_get_contents('php://input'), true);
+        $finalResult = ['status' => 'success'];
 
-        $result = $this->model->update($taskData);
+        foreach ($taskArray as $k => $task) {
+        $result = $this->model->update($task);
 
-        echo json_encode($result);
+        if ($result['status'] == 'failed') $finalResult = $result;
+        }
+
+        echo json_encode($finalResult);
     }
 
     public function delete()
