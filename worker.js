@@ -1,4 +1,4 @@
-const version = '0.9.040626';
+const version = '0.9.110626';
 
 self.addEventListener('fetch', (event) => {
     event.respondWith(fetchResources(event.request))

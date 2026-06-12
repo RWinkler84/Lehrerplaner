@@ -94,7 +94,9 @@ export default class Editor {
         })
     }
 
-    static updateButtonStatus() {
+    static updateButtonStatus(event) {
+        if (event.srcElement.activeElement && !event.srcElement.activeElement.classList.contains('textEditor')) return;
+
         const selection = document.getSelection();
         const focusElement = selection.focusNode.nodeType == Node.TEXT_NODE ? selection.focusNode.parentElement : selection.focusNode;
         const editor = focusElement.closest('.textEditor');
