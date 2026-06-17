@@ -230,13 +230,12 @@ export default class LessonNote extends AbstractModel {
                         if (allNewLessonDates[indexInOldDates]) {
                             note.date = allNewLessonDates[indexInOldDates].date;
                             note.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                            // note.update();
                             notesToUpdate.push(note);
                         }
                     });
                 }
             }
-            
+
             await (new LessonNote).batchUpdate(notesToUpdate);
         }
     }

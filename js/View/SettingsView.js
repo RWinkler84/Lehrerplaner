@@ -597,8 +597,6 @@ export default class SettingsView {
 
         document.querySelector('#openAccountSettingsButton').classList.add('selected');
 
-        console.log(userInfo);
-
         if (userInfo) {
             const notLoggedInMessage = accountSettingsContainer.querySelector('#eduplanioPlusNotLoggedInMessage');
             const eduplanioPlusStatusSpan = document.querySelector('#eduplanioPlusStatusSpan');

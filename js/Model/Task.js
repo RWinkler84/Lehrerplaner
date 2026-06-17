@@ -36,8 +36,6 @@ export default class Task extends AbstractModel {
     async batchUpdate(tasksToUpdate) {
         const serializedTasks = [];
 
-        console.log(tasksToUpdate)
-
         for (const task of tasksToUpdate) {
             task.lastEdited = this.formatDateTime(new Date());
 
@@ -273,7 +271,6 @@ export default class Task extends AbstractModel {
                         if (allNewLessonDates[indexInOldDates]) {
                             task.date = allNewLessonDates[indexInOldDates].date;
                             task.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                            // task.update();
                             tasksToUpdate.push(task);
                         }
                     });
