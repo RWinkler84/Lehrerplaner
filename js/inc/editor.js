@@ -723,10 +723,13 @@ export default class Editor {
 
     static trackNoteChanges(editor) {
         let currentContent = Editor.serializeNodeContent(editor, true);
-        let noteVersion = editorChangesArray.length;
+        let noteVersion = this.editorChangesArray.length;
+        let previousVersion = this.editorChangesArray[noteVersion - 1];
 
-        editorChangesArray.push({ version: noteVersion, content: currentContent });
-        Editor.setDisplayedNoteVersion(editor, noteVersion);
+        if (!previousVersion || currentContent != this.editorChangesArray[editor.dataset.noteversion]['content']) {
+            this.editorChangesArray.push({ version: noteVersion, content: currentContent });
+            Editor.setDisplayedNoteVersion(editor, noteVersion);
+        }
     }
 
     static updateEditorContent(editor, content) {
@@ -799,6 +802,7 @@ export default class Editor {
 
             //change edit version forward/backward
             case clickedElement.classList.contains('revertChangeButton'):
+                Editor.trackNoteChanges(editor);
                 Editor.changeNoteVersion(editor, 'revert');
                 break;
             case clickedElement.classList.contains('redoChangeButton'):
