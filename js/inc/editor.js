@@ -723,11 +723,11 @@ export default class Editor {
 
     static trackNoteChanges(editor) {
         let currentContent = Editor.serializeNodeContent(editor, true);
-        let noteVersion = this.editorChangesArray.length;
-        let previousVersion = this.editorChangesArray[noteVersion - 1];
+        let noteVersion = editorChangesArray.length;
+        let previousVersion = editorChangesArray[noteVersion - 1];
 
-        if (!previousVersion || currentContent != this.editorChangesArray[editor.dataset.noteversion]['content']) {
-            this.editorChangesArray.push({ version: noteVersion, content: currentContent });
+        if (!previousVersion || currentContent != editorChangesArray[editor.dataset.noteversion]['content']) {
+            editorChangesArray.push({ version: noteVersion, content: currentContent });
             Editor.setDisplayedNoteVersion(editor, noteVersion);
         }
     }
