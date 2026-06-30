@@ -222,7 +222,7 @@ export default class AbstractController {
             return false;
         }
 
-        View.toggleSupportDialogButtons('sending');
+        View.toggleRevocationDialogButtons('sending');
 
         let db = new Model;
         let result = await db.sendSupportTicket(formData);

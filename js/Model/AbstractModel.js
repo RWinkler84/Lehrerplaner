@@ -9,12 +9,12 @@ export default class AbstractModel {
         let userInfo = await this.getLocalUserInfo();
         let allowedActionsUnregisteredUser = [
             'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
-            'sendPasswortResetMail', 'sendSupportTicket'
+            'sendPasswortResetMail', 'sendSupportTicket', 'sendPlusRevocation'
         ];
         let allowedActionsPlusExpired = [
             'getUserInfo', 'login', 'logout', 'authenticateMail', 'resendAuthMail', 'resetPassword', 'sendPasswortResetMail',
             'sendSupportTicket', 'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate', 'getDbUpdateTimestamps',
-            'delete', 'saveTimetableUpdates'
+            'delete', 'saveTimetableUpdates', 'sendPlusRevocation'
         ];
 
 
@@ -423,6 +423,12 @@ export default class AbstractModel {
         formData.sendAt = this.formatDateTime(new Date());
         return await this.makeAjaxQuery('abstract', 'sendSupportTicket', formData);
     }
+
+    async sendPlusRevocation(formData){
+        formData.sendAt = this.formatDateTime(new Date());
+        return await this.makeAjaxQuery('abstract', 'sendPlusRevocation', formData);
+    }
+
 
     static async calculateAllLessonDates(className, subject, endDate, startDate = null, timetable = null, lessonChanges = null) {
 

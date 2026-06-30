@@ -315,6 +315,14 @@ export default class LoginController {
                 SettingsController.openSettings();
                 break;
 
+            //plus revocation
+            case 'closeRevocationDialogButton':
+                SettingsController.closeRevocationDialog();
+                break;
+            case 'sendRevocationFormButton':
+                SettingsController.attemptPlusRevocation();
+                break;
+
             //links
             case 'continueAsGuest':
                 event.preventDefault();
@@ -354,6 +362,9 @@ export default class LoginController {
 
             case elementClassList.contains('closeWelcomeDialogButton'):
                 AbstractController.closeWelcomeDialog();
+
+            case elementClassList.contains('closeRevocationDialogButton'):
+                SettingsController.closeRevocationDialog();
         }
 
         //dialog cancel event

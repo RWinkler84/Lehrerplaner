@@ -752,6 +752,14 @@
                             oder Handy unerwartet den Geist aufgibt oder du unabsichtlich den Speicher deines Browsers
                             löschst.</p>
                     </div>
+                    <div>
+                        <label class="marginBottom marginTop">Eduplanio Plus-Kauf widerrufen</label>
+                        <p>Solltest du mit deiner Eduplanio Plus-Lizenz unzufrieden sein, kannst du deine Bestellung den
+                            <a href="https://eduplanio.app/planer/agb.html" target="_blank">Widerrufsbestimmungen</a>
+                            folgend widerrufen.</p>
+
+                        <div><button id="revokePlusButton" class="cancelButton">Widerruf starten</button></div>
+                    </div>
                 </div>
 
                 <div id="deleteAccountContainer">
@@ -1113,6 +1121,53 @@
             <div class="flex halfGap justifyEnd marginTop">
                 <button id="goToAccoutSettingsButton" class="confirmationButton">Jetzt verlängern</button>
                 <button class="closePlusExpirationDialogButton confirmationButton">Okay</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="revocationDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Widerrufsformular</h3><button class="closeDialogButton closeRevocationDialogButton"
+                style="width: 1.5rem" autofocus="false">×</button>
+        </div>
+        <div class="dialogBody flex column">
+            <form id="revocationForm">
+                <div class="flex column halfGap marginTop" class="formBody">
+                    <div class="dialogText">
+                        <p>Fülle dafür bitte das unten stehende Formular aus. Mit * gekennzeichnete Felder sind
+                            Pflichtfelder.</p>
+                    </div>
+                    <div>
+                        <label for="revocationUserName" style="display: block">Name*</label>
+                        <div class="alertRing"><input type="text" name="revocationUserName" id="revocationUserName"
+                                autofocus>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="revocationUserEmail" style="display: block">E-Mail-Adresse*</label>
+                        <div class="alertRing"><input type="email" name="revocationUserEmail" id="revocationUserEmail">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="revocationInvoiceId" style="display: block">Rechnungsnummer*</label>
+                        <div class="alertRing"><input type="text" name="revocationInvoiceId" id="revocationInvoiceId">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="invocationReason" style="display: block">Warum möchtest die Bestellung
+                            widerrufen?</label>
+                        <div class="alertRing"><textarea name="invocationReason" id="invocationReason"
+                                placeholder="Wir würden uns freuen, zu erfahren, warum du dich gegen Eduplanio Plus entschieden hast, um unseren Service weiter verbessern zu können."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div id="revocationErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
+            </form>
+            <div class="flex justifyEnd alignEnd marginTop navigation">
+                <button id="sendRevocationFormButton" class="confirmationButton" style="margin-right: 3px">Widerruf
+                    senden</button>
+                <button class="confirmationButton closeRevocationDialogButton" id="closeRevocationDialogButton"
+                    style="margin-right: 3px; display: none">Schließen</button>
             </div>
         </div>
     </dialog>

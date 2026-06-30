@@ -699,6 +699,25 @@ export default class SettingsView {
         document.querySelector('#registrationNeededDialog').close();
     }
 
+    static getRevocationFormData() {
+        const formElement = document.querySelector('#revocationForm');
+
+        return {
+            userName: formElement.querySelector('#revocationUserName').value,
+            email: formElement.querySelector('#revocationUserEmail').value,
+            invoiceId: formElement.querySelector('#revocationInvoiceId').value,
+            revocationReason: formElement.querySelector('#invocationReason').value
+        }
+    }
+
+    static openRevocationDialog() {
+        document.querySelector('#revocationDialog').showModal();
+    }
+
+    static closeRevocationDialog() {
+        document.querySelector('#revocationDialog').close();
+    }
+
     static openCheckout(clickedPurchaseButton, newWindow) {
         const baselink = './stripe/checkout.html';
 
@@ -709,5 +728,79 @@ export default class SettingsView {
 
         newWindow.location.href = `${baselink}?item=${purchaseItem}`;
         window.focus();
+    }
+
+    static toggleRevocationDialogButtons(status) {
+        const sendButton = document.querySelector('#sendRevocationFormButton');
+        const closeButton = document.querySelector('#closeRevocationDialogButton');
+
+        console.log(closeButton)
+
+        switch (status) {
+            case 'sending':
+                sendButton.disabled = true;
+                sendButton.textContent = 'Wird gesendet';
+                break;
+
+            case 'success':
+                sendButton.disabled = false;
+                sendButton.textContent = 'Widerruf senden';
+                sendButton.style.display = 'none';
+                closeButton.style.display = 'block';
+                break;
+
+            case 'failed':
+                sendButton.disabled = false;
+                sendButton.textContent = 'Erneut senden';
+                break;
+
+            case 'close':
+                sendButton.style.display = 'block';
+                closeButton.style.display = 'none';
+                break;
+        }
+    }
+
+    static displayMessageOnRevocationDialog(result) {
+        let errorMessageDisplay = document.querySelector('#revocationErrorMessageDisplay');
+
+        if (result.status == 'success') {
+            errorMessageDisplay.textContent = result.message;
+            errorMessageDisplay.style.color = 'var(--matteGreen)';
+        }
+
+        if (result.status == 'failed') {
+            errorMessageDisplay.textContent = result.message;
+            if (errorMessageDisplay.hasAttribute('style')) errorMessageDisplay.removeAttribute('style');
+        }
+    }
+
+    //form validation errors
+
+    static alertRevocationDialogUserNameInput() {
+        let alertRing = document.querySelector('#revocationUserName').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertRevocationDialogEmailInput() {
+        let alertRing = document.querySelector('#revocationUserEmail').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertRevocationInvoiceIdInput() {
+        let alertRing = document.querySelector('#revocationInvoiceId').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
     }
 }

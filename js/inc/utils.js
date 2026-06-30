@@ -28,6 +28,12 @@ export default class Utils {
         return false;
     }
 
+    static isValidEmail(mailString) {
+        const mailRegEx = /^[^@]+@[^@]+\.[^@]+$/;
+
+        return mailRegEx.test(mailString);
+    }
+
     static formatSubjectName(name) {
         let reformated = []
 

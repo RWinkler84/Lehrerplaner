@@ -2,6 +2,8 @@ import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import AbstractController from "./AbstractController.js";
 import LessonController from "./LessonController.js";
+import Fn from '../inc/utils.js';
+import AbstractModel from "../Model/AbstractModel.js";
 
 
 export default class SettingsController {
@@ -95,6 +97,50 @@ export default class SettingsController {
         return await LessonController.getAllRegularLessons();
     }
 
+    static async attemptPlusRevocation() {
+        const formData = View.getRevocationFormData();
+
+        if (!formData.userName) {
+            View.alertRevocationDialogUserNameInput();
+            return;
+        }
+
+        if (!formData.email || !Fn.isValidEmail(formData.email)) {
+            View.alertRevocationDialogEmailInput();
+            return;
+        }
+
+        if (!formData.invoiceId) {
+            View.alertRevocationInvoiceIdInput();
+            return;
+        }
+
+        View.toggleRevocationDialogButtons('sending');
+
+        const db = new AbstractModel;
+        const result = await db.sendPlusRevocation(formData);
+
+        result.status = 'success';
+
+        if (result.status == 'success') {
+            result.message = 'Dein Widerruf wurde erfolgreich übermittelt und eine Bestätigungsmail an die von dir angegeben Adresse gesendet. Wir melden uns schnellstmöglich bei dir.'
+            View.toggleRevocationDialogButtons('success');
+            View.displayMessageOnRevocationDialog(result);
+        } else {
+            result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später noch einmal.'
+            View.toggleRevocationDialogButtons('failed');
+            View.displayMessageOnRevocationDialog(result);
+        }
+    }
+
+    static openRevocationDialog() {
+        View.openRevocationDialog();
+    }
+
+    static closeRevocationDialog() {
+        View.closeRevocationDialog();
+    }
+
     static async settingsClickEventHandler(event) {
         let target = event.target;
 
@@ -120,6 +166,10 @@ export default class SettingsController {
                 const newWindow = window.open('', '_blank');
 
                 SettingsController.attemptEduplanioPlusPurchase(target, newWindow);
+                break;
+
+            case 'revokePlusButton':
+                SettingsController.openRevocationDialog();
                 break;
 
             case 'deleteAccountButton':
