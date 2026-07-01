@@ -715,7 +715,22 @@ export default class SettingsView {
     }
 
     static closeRevocationDialog() {
-        document.querySelector('#revocationDialog').close();
+        const dialog = document.querySelector('#revocationDialog');
+
+        //reset inputs
+        dialog.querySelector('#revocationUserName').value = '';
+        dialog.querySelector('#revocationUserEmail').value = '';
+        dialog.querySelector('#revocationInvoiceId').value = '';
+        dialog.querySelector('#invocationReason').value = '';
+
+        //reset message container
+        dialog.querySelector('#revocationErrorMessageDisplay').textContent = '';
+
+        //reset buttons
+        dialog.querySelector('#sendRevocationFormButton').style.display = 'block';
+        dialog.querySelector('#closeRevocationDialogButton').style.display = 'none';
+
+        dialog.close();
     }
 
     static openCheckout(clickedPurchaseButton, newWindow) {
@@ -734,8 +749,6 @@ export default class SettingsView {
         const sendButton = document.querySelector('#sendRevocationFormButton');
         const closeButton = document.querySelector('#closeRevocationDialogButton');
 
-        console.log(closeButton)
-
         switch (status) {
             case 'sending':
                 sendButton.disabled = true;
@@ -752,11 +765,6 @@ export default class SettingsView {
             case 'failed':
                 sendButton.disabled = false;
                 sendButton.textContent = 'Erneut senden';
-                break;
-
-            case 'close':
-                sendButton.style.display = 'block';
-                closeButton.style.display = 'none';
                 break;
         }
     }

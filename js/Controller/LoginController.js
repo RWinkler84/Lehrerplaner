@@ -318,6 +318,7 @@ export default class LoginController {
             //plus revocation
             case 'closeRevocationDialogButton':
                 SettingsController.closeRevocationDialog();
+                SettingsController.
                 break;
             case 'sendRevocationFormButton':
                 SettingsController.attemptPlusRevocation();

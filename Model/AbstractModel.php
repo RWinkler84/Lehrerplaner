@@ -410,6 +410,45 @@ class AbstractModel
         ];
     }
 
+    public function sendPlusRevocation($revocationData):array {
+        $userName = $revocationData['userName'];
+        $userEmail = $revocationData['email'];
+        $invoiceId = $revocationData['invoiceId'];
+        $reason = $revocationData['revocationReason'];
+        $revocationDate = (new DateTime($revocationData['sendAt']))->format('d.m.Y');
+        $revocationTime = (new DateTime($revocationData['sendAt']))->format('h:i');
+
+        $adminMailContent = "
+            <p><b>Nutzer-Mail:</b> $userEmail</p>
+            <p><b>Nutzername:</b> $userName</p>
+            <p><b>Rechnungsnummer:</b> $invoiceId</p>
+            <p><b>Begründung:</b> $reason</p>
+            <p><b>erhalten: </b>$revocationDate, um $revocationTime Uhr</p>
+        ";
+
+        $userMailContent = "
+            <p>Hallo $userName,</p>
+            <p>hiermit bestätigen wir den Empfang deines Widerrufs zur Rechnung $invoiceId am $revocationDate um $revocationTime Uhr.</p>
+            <p>Wir werden dein Anliegen schnellstmöglich prüfen und im Falle der Bestätigung die gesamte Rechnungsumme zurückzahlen.</p>
+            <p>Mit freundlichen Grüßen</p>
+            <p>Ralf von Eduplanio</p>
+        ";
+
+        $adminMailSend = $this->sendMail('support@eduplanio.app', 'Neuer Widerruf', $adminMailContent);
+
+        if ($adminMailSend) {
+            $userMailSend = $this->sendMail($userEmail, 'Widerruf deiner Eduplanio Plus-Bestellung', $userMailContent);
+
+            if ($userMailSend) return ['status' => 'success'];
+            if (!$userMailSend) return ['status' => 'failed', 'error' => 'User mail could not be send'];
+        }
+
+        return [
+            'status' => 'failed',
+            'error' => 'Admin mail could not be send'
+        ];
+    }
+
     protected function sendMail($recipient, $subject, $message): bool
     {
         $mail = new PHPMailer(true);

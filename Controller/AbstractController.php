@@ -191,6 +191,17 @@ class AbstractController
         echo json_encode($result);
     }
 
+    public function sendPlusRevocation() {
+        $revocationData = json_decode(file_get_contents('php://input'), true);
+        $result = $this->db->sendPlusRevocation($revocationData);
+
+        // echo json_encode($result);
+        echo json_encode( [
+            'status' => 'failed',
+            'error' => 'jadajaja'
+        ]);
+    }
+
     public function createStripeSession()
     {
         $checkoutSession = createStripeSession($_GET['item']);
@@ -204,10 +215,6 @@ class AbstractController
         require_once './vendor/autoload.php';
 
         \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
-        // Replace this endpoint secret with your endpoint's unique secret
-        // If you are testing with the CLI, find the secret by running 'stripe listen'
-        // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
-        // at https://dashboard.stripe.com/webhooks
         $endpoint_secret = STRIPE_ENDPOINT_SECRET;
 
         $payload = file_get_contents('php://input');

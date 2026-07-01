@@ -120,14 +120,16 @@ export default class SettingsController {
         const db = new AbstractModel;
         const result = await db.sendPlusRevocation(formData);
 
-        result.status = 'success';
-
         if (result.status == 'success') {
             result.message = 'Dein Widerruf wurde erfolgreich übermittelt und eine Bestätigungsmail an die von dir angegeben Adresse gesendet. Wir melden uns schnellstmöglich bei dir.'
             View.toggleRevocationDialogButtons('success');
             View.displayMessageOnRevocationDialog(result);
+        } else if (result.error == 'Admin mail could not be send') {
+            result.message = 'Da ist etwas schief gelaufen. Dein Widerruf wurde vom System nicht korrekt verarbeitet. Versuche es bitte später noch einmal. Sollte das Problem bestehen bleiben, wende dich direkt an support@eduplanio.app.'
+            View.toggleRevocationDialogButtons('failed');
+            View.displayMessageOnRevocationDialog(result);
         } else {
-            result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später noch einmal.'
+            result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später noch einmal. Sollte das Problem bestehen bleiben, wende dich direkt an support@eduplanio.app.'
             View.toggleRevocationDialogButtons('failed');
             View.displayMessageOnRevocationDialog(result);
         }

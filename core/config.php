@@ -8,7 +8,7 @@ const ALLOWEDACTIONS = [
     'deleteSubjects', 'saveSubject', 'saveTimetable', 'saveTimetableUpdates', 'updateValidUntil',
     'login', 'logout', 'createAccount', 'deleteAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword', 'sendPasswortResetMail', 
     'sendSupportTicket',
-    'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate'
+    'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate', 'sendPlusRevocation'
     ];
 
 const ALLOWED_CONTROLLER_FREE_USER = [
