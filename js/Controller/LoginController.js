@@ -301,10 +301,6 @@ export default class LoginController {
                 break;
 
             //eduplanio plus shopping
-            case 'startRegistrationButton':
-                SettingsController.closeRegistrationNeededDialog();
-                LoginController.openCreateAccountDialog();
-                break;
             case 'closeCheckoutDialogButton':
                 SettingsController.closeCheckoutDialog();
                 break;
@@ -351,10 +347,6 @@ export default class LoginController {
 
             case elementClassList.contains('closeSupportDialogButton'):
                 AbstractController.closeSupportDialog();
-                break;
-
-            case elementClassList.contains('closeRegistrationNeededDialogButton'):
-                SettingsController.closeRegistrationNeededDialog();
                 break;
 
             case elementClassList.contains('closePlusExpirationDialogButton'):

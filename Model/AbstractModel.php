@@ -416,7 +416,7 @@ class AbstractModel
         $invoiceId = $revocationData['invoiceId'];
         $reason = $revocationData['revocationReason'];
         $revocationDate = (new DateTime($revocationData['sendAt']))->format('d.m.Y');
-        $revocationTime = (new DateTime($revocationData['sendAt']))->format('h:i');
+        $revocationTime = (new DateTime($revocationData['sendAt']))->format('H:i');
 
         $adminMailContent = "
             <p><b>Nutzer-Mail:</b> $userEmail</p>

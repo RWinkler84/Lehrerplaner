@@ -32,24 +32,8 @@ export default class SettingsController {
     static async attemptEduplanioPlusPurchase(clickedPurchaseButton, newWindow) {
         const userInfo = await AbstractController.getUserInfo();
 
-        if (userInfo.accountType != 'registeredUser') {
-            newWindow.close();
-            this.openRegistrationNeededDialog();
-
-            return;
-        }
-
         View.openCheckout(clickedPurchaseButton, newWindow);
     }
-
-    static openRegistrationNeededDialog() {
-        View.openRegistrationNeededDialog();
-    }
-
-    static closeRegistrationNeededDialog() {
-        View.closeRegistrationNeededDialog();
-    }
-
 
     static setVersion(version) {
         View.setVersionDisplay(version);

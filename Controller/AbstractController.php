@@ -195,11 +195,7 @@ class AbstractController
         $revocationData = json_decode(file_get_contents('php://input'), true);
         $result = $this->db->sendPlusRevocation($revocationData);
 
-        // echo json_encode($result);
-        echo json_encode( [
-            'status' => 'failed',
-            'error' => 'jadajaja'
-        ]);
+        echo json_encode($result);
     }
 
     public function createStripeSession()

@@ -195,7 +195,13 @@ main {
 
     &[open] {
         display: flex;
+    }
 
+    #oneMonthEduplanioPlusButton,
+    #oneYearEduplanioPlusButton {
+        &[disabled]::after {
+            content: "*";
+        }
     }
 }
 

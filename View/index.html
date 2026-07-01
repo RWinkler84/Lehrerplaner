@@ -690,6 +690,10 @@
                     <div>Lizenzstatus: <span id="eduplanioPlusStatusSpan">-</span></div>
                     <div>läuft ab: <span id="eduplanioPlusExpirationDateSpan">-</span></div>
                     <label class="marginTop marginBottom">aktivieren oder verlängern:</label>
+                    <!-- <div class="errorMessageDisplay" id="accountNeededForPlusMessage" style="font-weight: bold;">
+                        *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
+                    <div class="errorMessageDisplay" id="loginNeededForPlusMessage" style="font-weight: bold;">*Du
+                        musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div> -->
                     <p>Beim Kauf von Eduplanio Plus stehen dir die Monats- und die
                         Jahreslizenz zur Wahl. Nach Abschluss des Kaufs sind die Eduplanio Plus-Vorteile sofort
                         verfügbar. Endet der Lizenzzeitraum kannst du Eduplanio weiterhin in der Gratisversion
@@ -724,6 +728,10 @@
                             </div>
                         </div>
                     </div>
+                        <div id="accountNeededForPlusMessage" class="marginTop">
+                            *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
+                        <div id="loginNeededForPlusMessage" class="marginTop">*Du
+                            musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div>
 
                     <div id="eduplanioPlusAdvantagesList">
                         <label class="marginBottom">Diese Vorteile bietet dir Eduplanio Plus:</label>
@@ -756,7 +764,8 @@
                         <label class="marginBottom marginTop">Eduplanio Plus-Kauf widerrufen</label>
                         <p>Solltest du mit deiner Eduplanio Plus-Lizenz unzufrieden sein, kannst du deine Bestellung den
                             <a href="https://eduplanio.app/planer/agb.html" target="_blank">Widerrufsbestimmungen</a>
-                            folgend widerrufen.</p>
+                            folgend widerrufen.
+                        </p>
 
                         <div><button id="revokePlusButton" class="cancelButton">Widerruf starten</button></div>
                     </div>
@@ -1084,21 +1093,6 @@
                     <div id="dayNoteSavedMessage">gespeichert</div><button id="saveDayNoteButton"
                         class="confirmationButton" disabled>Speichern</button>
                 </div>
-            </div>
-        </div>
-    </dialog>
-
-    <dialog id="registrationNeededDialog">
-        <div class="headline flex spaceBetween">
-            <h3>Anmeldung erforderlich</h3><button class="closeRegistrationNeededDialogButton closeDialogButton"
-                style="width: 1.5rem">×</button>
-        </div>
-        <div class="dialogBody flex column">
-            <p>Es sieht so aus, als hättest du Eduplanio bisher mit einem Gastkonto genutzt. Um Eduplanio Plus nutzen zu
-                können, musst du dich zuerst registrieren.</p>
-            <div class="flex halfGap justifyEnd marginTop">
-                <button id="startRegistrationButton" class="confirmationButton">Jetzt registrieren</button>
-                <button class="closeRegistrationNeededDialogButton cancelButton">Abbrechen</button>
             </div>
         </div>
     </dialog>

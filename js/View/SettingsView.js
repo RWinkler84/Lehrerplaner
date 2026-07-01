@@ -637,6 +637,29 @@ export default class SettingsView {
 
             eduplanioPlusStatusSpan.classList.add(statusTextClass);
             userInfo.loggedIn ? notLoggedInMessage.classList.add('notDisplayed') : notLoggedInMessage.classList.remove('notDisplayed');
+
+            //eduplanio plus purchase buttons
+            const buyMonthButton = accountSettingsContainer.querySelector('#oneMonthEduplanioPlusButton');
+            const buyYearButton = accountSettingsContainer.querySelector('#oneYearEduplanioPlusButton');
+            const loginNeededMessage = accountSettingsContainer.querySelector('#loginNeededForPlusMessage');
+            const accountNeededMessage = accountSettingsContainer.querySelector('#accountNeededForPlusMessage');
+
+            buyMonthButton.disabled = false;
+            buyYearButton.disabled = false;
+            accountNeededMessage.style.display = 'none';
+            loginNeededMessage.style.display = 'none';
+
+            if (userInfo.accountType == 'guestUser') {
+                buyMonthButton.disabled = true;
+                buyYearButton.disabled = true;
+                accountNeededMessage.style.display = 'block';
+            }
+
+            if (userInfo.accountType == 'registeredUser' && !userInfo.loggedIn) {
+                buyMonthButton.disabled = true;
+                buyYearButton.disabled = true;
+                loginNeededMessage.style.display = 'block';
+            }
         }
 
         //make account settings visible
@@ -689,14 +712,6 @@ export default class SettingsView {
 
     static setVersionDisplay(version) {
         document.querySelector('#versionDisplay').textContent = version;
-    }
-
-    static openRegistrationNeededDialog() {
-        document.querySelector('#registrationNeededDialog').showModal();
-    }
-
-    static closeRegistrationNeededDialog() {
-        document.querySelector('#registrationNeededDialog').close();
     }
 
     static getRevocationFormData() {
