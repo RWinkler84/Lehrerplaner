@@ -38,6 +38,7 @@ body {
     background-color: var(--bodyBackground);
     display: flex;
     flex-direction: column;
+    min-height: 98vh;
 }
 
 footer {
@@ -171,6 +172,8 @@ main {
 #settingsTimetableContainer,
 #schoolYearInfoContainer,
 #curriculumContainer,
+#globalNotesContainer,
+#accountInformationContainer,
 #eduplanioPlusContainer,
 #deleteAccountContainer,
 #timetableContainer,
@@ -316,7 +319,7 @@ dialog .errorMessageDisplay,
     min-width: 50vw !important;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     scrollbar-color: var(--lightgrey) transparent;
 
@@ -902,6 +905,44 @@ dialog .errorMessageDisplay,
     padding: 1rem;
     background-color: white;
     border-radius: var(--standardRadius);
+}
+
+/* globalNotes */
+#globalNotesContainer {
+    flex-grow: 1;
+
+    #globalNotesFileSystemDisplay {
+
+        #folderIconContainer,
+        #noteIconContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .fileIconContainer {
+            width: 5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            align-items: center;
+            overflow: hidden;
+
+            .fileIcon {
+                width: 2rem;
+                height: 2rem;
+            }
+        }
+
+        .fileNameWrapper {
+            max-width: 100%;
+            font-size: 0.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            cursor: default;
+        }
+    }
 }
 
 /* Buttons */
@@ -1737,6 +1778,7 @@ p {
     #settingsTimetableContainer,
     #schoolYearInfoContainer,
     #curriculumContainer,
+    #globalNotesContainer,
     #eduplanioPlusContainer,
     #deleteAccountContainer {
         padding: 1.5rem 0.5rem;

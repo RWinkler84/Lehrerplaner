@@ -36,6 +36,9 @@
                     <button id="openSchoolYearViewButton" class="topMenuButton"><span class="icon schoolYearViewIcon"
                             style="width: 1.5rem; height: 1.5rem;"></span><span
                             class="buttonText">Schuljahr</span></button>
+                    <button id="openGlobalNotesViewButton" class="topMenuButton"><span class="icon noteIcon"
+                            style="width: 1.5rem; height: 1.5rem;"></span><span
+                            class="buttonText">Notizen</span></button>
                 </div>
                 <div id="syncIndicator" class="unsynced">
                     <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem
@@ -662,6 +665,20 @@
         </div>
     </div>
 
+    <!-- global notes -->
+    <div id="globalNotesContainer" class="mainViewContainer" style="display: none">
+        <div id="globalNotesFileContainer" data-displayed_folder="0">
+        <div id="globalNoteButtonContainer">
+            <button id="createGlobalNoteButton" class="confirmationButton">Neue Notiz</button>
+            <button id="createGlobalNoteFolder" class="confirmationButton">Neuer Ordner</button>
+        </div>
+        <div id="globalNotesFileSystemDisplay" class="marginTop">
+            <div id="folderIconContainer"></div>
+            <div id="noteIconContainer"></div>
+        </div>
+        </div>
+    </div>
+
     <settings>
         <!-- Settings Menu -->
         <dialog id="settingsContainer">
@@ -679,10 +696,13 @@
 
             <!-- account settings -->
             <div id="accountSettingsContainer" class="settingsSubContainer">
-                <div id="eduplanioPlusContainer">
+                <div id="accountInformationContainer">
                     <label class="marginBottom">Kontoinformation:</label>
                     <div>Kontoart: <span id="accountTypeSpan">Gast</span></div>
                     <div>Login-Status: <span id="loginStatusSpan">-</span></div>
+                </div>
+
+                <div id="eduplanioPlusContainer">
                     <label class="marginBottom marginTop">Eduplanio Plus:</label>
                     <div id="eduplanioPlusNotLoggedInMessage">
                         <p>Um deine Eduplanio Plus-Lizenz verwalten zu können, musst du angemeldet sein.</p>
@@ -690,10 +710,7 @@
                     <div>Lizenzstatus: <span id="eduplanioPlusStatusSpan">-</span></div>
                     <div>läuft ab: <span id="eduplanioPlusExpirationDateSpan">-</span></div>
                     <label class="marginTop marginBottom">aktivieren oder verlängern:</label>
-                    <!-- <div class="errorMessageDisplay" id="accountNeededForPlusMessage" style="font-weight: bold;">
-                        *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
-                    <div class="errorMessageDisplay" id="loginNeededForPlusMessage" style="font-weight: bold;">*Du
-                        musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div> -->
+
                     <p>Beim Kauf von Eduplanio Plus stehen dir die Monats- und die
                         Jahreslizenz zur Wahl. Nach Abschluss des Kaufs sind die Eduplanio Plus-Vorteile sofort
                         verfügbar. Endet der Lizenzzeitraum kannst du Eduplanio weiterhin in der Gratisversion
@@ -728,10 +745,10 @@
                             </div>
                         </div>
                     </div>
-                        <div id="accountNeededForPlusMessage" class="marginTop">
-                            *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
-                        <div id="loginNeededForPlusMessage" class="marginTop">*Du
-                            musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div>
+                    <div id="accountNeededForPlusMessage" class="marginTop">
+                        *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
+                    <div id="loginNeededForPlusMessage" class="marginTop">*Du
+                        musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div>
 
                     <div id="eduplanioPlusAdvantagesList">
                         <label class="marginBottom">Diese Vorteile bietet dir Eduplanio Plus:</label>
