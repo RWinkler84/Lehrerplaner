@@ -222,6 +222,7 @@ export default class TaskView extends AbstractView {
 
         let formTr = this.getTaskTrHTML(task);;
         let checkBoxTR = this.getCheckboxTR();
+        const textarea = document.createElement('textarea');
 
         checkBoxTR.setAttribute('data-new', '');
         checkBoxTR.removeAttribute('style');
@@ -231,7 +232,7 @@ export default class TaskView extends AbstractView {
         formTr.setAttribute('data-date', task.date);
         formTr.setAttribute('data-timeslot', task.timeslot);
 
-        formTr.querySelector('.taskDescription').contentEditable = true;
+        formTr.querySelector('.taskDescription').append(textarea);
         formTr.querySelectorAll('.taskDone>div').forEach(div => {
             if (div.classList.contains('editableTask')) {
                 div.style.display = 'flex';
@@ -242,6 +243,8 @@ export default class TaskView extends AbstractView {
 
         taskTable.append(formTr);
         taskTable.append(checkBoxTR);
+
+        textarea.focus();
 
         if (taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
             taskTable.parentElement.querySelector('thead').removeAttribute('style');
@@ -271,7 +274,7 @@ export default class TaskView extends AbstractView {
                     <div class="smallDate">${subjectDate}</div>
                     <div class="taskDateSelectWrapper"></div>
                 </td>
-                <td class="taskDescription" data-taskDescription="" data-heading="Beschreibung:">${task.description}</td>
+                <td class="taskDescription" data-taskDescription="" data-heading="Beschreibung:" autocorrect="off" autocapitalize="off" spellcheck="false">${task.description}</td>
                 <td class="taskDone">
                     <div class="openTask">
                         <button class="confirmationButton setTaskDoneButton" title="erledigt"><span class="icon checkIcon"></span></button>
@@ -400,7 +403,8 @@ export default class TaskView extends AbstractView {
             'subject': taskElement.querySelector('td[data-subject]').dataset.subject,
             'date': taskElement.dataset.date,
             'timeslot': taskElement.dataset.timeslot,
-            'description': taskElement.querySelector('td[data-taskDescription]').innerText,
+            // 'description': taskElement.querySelector('td[data-taskDescription]').innerText,
+            'description': taskElement.querySelector('textarea').value,
             'fixedTime': checkBoxElement.querySelector('input[name="fixedDate"]').checked,
             'reoccuring': checkBoxElement.querySelector('input[name="reoccuringTask"]').checked,
             'reoccuringInterval': checkBoxElement.querySelector('select').value
@@ -429,7 +433,7 @@ export default class TaskView extends AbstractView {
             'class': classTd.dataset.class,
             'date': taskTr.querySelector('.taskDateSelect').value,
             'subject': subjectTd.dataset.subject,
-            'description': taskTr.querySelector('td[data-taskdescription]').innerText,
+            'description': taskTr.querySelector('textarea').value,
             'fixedTime': taskTr.nextElementSibling.querySelector('input[type="checkbox"]').checked,
             'reoccuring': taskTr.nextElementSibling.querySelector('input[name="reoccuringTask"]').checked,
             'reoccuringInterval': taskTr.nextElementSibling.querySelector('select').value
@@ -443,7 +447,7 @@ export default class TaskView extends AbstractView {
     static makeEditable(event, upcomingLessons) {
 
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
-        if (event.target.closest('tr').querySelector('td[data-taskdescription]').hasAttribute('contenteditable')) return;
+        if (event.target.closest('tr').querySelector('td[data-taskdescription] textarea')) return;
 
         this.#backupTaskData(event);
 
@@ -464,14 +468,20 @@ export default class TaskView extends AbstractView {
             this.runOpenTaskFormAnimation(checkboxTr);
         }
 
-        taskElement.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
-        taskElement.querySelector('td[data-taskdescription]').focus();
+        const textarea = document.createElement('textarea');
+        textarea.value = taskElement.querySelector('td[data-taskdescription]').textContent;
+
+        // taskElement.querySelector('td[data-taskdescription]').setAttribute('contenteditable', 'true');
+        // taskElement.querySelector('td[data-taskdescription]').focus();
+
+        taskElement.querySelector('td[data-taskdescription]').textContent = '';
+        taskElement.querySelector('td[data-taskdescription]').append(textarea);
+        textarea.focus();
 
         taskElement.querySelector('.taskDateSelectWrapper').append(dateSelect);
         taskElement.querySelector('.taskDateSelectWrapper').style.display = "block";
         taskElement.querySelector('.smallDate').style.display = 'none';
 
-        window.getSelection().removeAllRanges();
         TaskView.showSaveOrDiscardChangesButtons(event);
 
         taskElement.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
@@ -529,7 +539,8 @@ export default class TaskView extends AbstractView {
             class: taskElement.querySelector('.taskClassName').dataset.class,
             subject: taskElement.querySelector('.taskSubjectContainer').dataset.subject,
             date: taskElement.dataset.date,
-            description: taskElement.querySelector('.taskDescription').innerText
+            // description: taskElement.querySelector('.taskDescription').innerText
+            description: taskElement.querySelector('textarea') ? taskElement.querySelector('textarea').value : taskElement.querySelector('.taskDescription').innerText
         };
     }
 
@@ -544,8 +555,13 @@ export default class TaskView extends AbstractView {
     static async removeEditability(event) {
         let taskTr = event.target.closest('tr');
         let checkBoxElement = taskTr.nextElementSibling;
+        const textarea = taskTr.querySelector('textarea');
 
         taskTr.querySelector('td[data-taskdescription]').removeAttribute('contenteditable');
+        taskTr.querySelector('td[data-taskdescription]').textContent = textarea.value;
+
+        textarea.remove();
+        
         this.runCloseTaskFormAnimation(checkBoxElement, checkBoxElement.getBoundingClientRect().height);
         checkBoxElement.style.display = 'none';
     }

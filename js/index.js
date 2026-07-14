@@ -129,12 +129,18 @@ async function startApp() {
     document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
     document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
+        if (!event.target.closest('.texteditor')) return;
         Editor.normalizeInput(event);
         LessonNoteController.toggleSaveLessonNoteButton(event);
         LessonController.toggleSaveCurriculumSpanNoteButton(event);
         DayNoteController.toggleSaveDayNoteButton(event);
     });
-    document.addEventListener('selectionchange', Editor.updateButtonStatus);
+
+    document.addEventListener('selectionchange', (event) => {
+        // if (event.srcElement.activeElement.classList.contains('taskDescription')) return;
+        // console.log('da')
+        Editor.updateButtonStatus(event)
+    });
 
     //rerender on resize
     window.addEventListener('resize', () => {
@@ -158,7 +164,7 @@ async function startApp() {
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
-    
+
     await DayNoteController.renderDayNoteIcons();
 
     await LessonController.renderCurriculaSelection();

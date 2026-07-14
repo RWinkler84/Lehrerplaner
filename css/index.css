@@ -703,6 +703,21 @@ dialog .errorMessageDisplay,
 
     &[contenteditable] {
         background-color: white;
+        height: 10rem;
+    }
+
+    &:has(textarea) {
+        padding: 0  !important;
+    }
+
+    textarea {
+        resize: none;
+        field-sizing: content;
+        height: unset;
+        width: calc(100% - 10px);
+        min-height: 3rem;
+        padding: 8px 16px;
+        margin: 0 5px;
     }
 }
 
@@ -1867,6 +1882,7 @@ p {
         min-width: 100%;
         max-width: 100%;
         padding-bottom: 1rem;
+        overflow-y: auto;
     }
 
     .responsiveButtonsTr {
