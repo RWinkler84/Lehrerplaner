@@ -27,7 +27,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.010726';
+export const VERSION = '0.9.140726';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
@@ -137,8 +137,7 @@ async function startApp() {
     });
 
     document.addEventListener('selectionchange', (event) => {
-        // if (event.srcElement.activeElement.classList.contains('taskDescription')) return;
-        // console.log('da')
+        if (event.srcElement.tagName == 'TEXTAREA') return;
         Editor.updateButtonStatus(event)
     });
 
