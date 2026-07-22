@@ -313,6 +313,32 @@ dialog .errorMessageDisplay,
     padding: 1rem 0;
 }
 
+/* global notes dialog */
+
+#globalNoteDialog {
+    width: 80%;
+    height: 80%;
+    max-width: 900px;
+
+    &[open] {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dialogBody {
+        display: flex;
+        flex-grow: 1;
+
+        #globalNoteEditorContainer {
+            flex-grow: 1;
+        }
+    }
+
+    /* .textEditor {
+        height: 100%;
+    } */
+}
+
 /* stripe html pages*/
 #checkoutDialog {
     position: relative;
@@ -912,6 +938,9 @@ dialog .errorMessageDisplay,
     flex-grow: 1;
 
     #globalNotesFileSystemDisplay {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
 
         #folderIconContainer,
         #noteIconContainer {
@@ -920,7 +949,36 @@ dialog .errorMessageDisplay,
             gap: 1rem;
         }
 
-        .fileIconContainer {
+        #folderPathContainer {
+            .folderPathItemContainer {
+                display: flex;
+                overflow: hidden;
+                flex-wrap: nowrap;
+
+                .folderNameWrapper {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-wrap: nowrap;
+
+                    &:hover {
+                        cursor: default;
+                        text-decoration: underline;
+                    }
+                }
+
+                &:last-child {
+                    min-width: fit-content;
+
+                    .folderNameWrapper {
+                        overflow: auto;
+                        text-overflow: unset;
+                    }
+                }
+            }
+        }
+
+        .folderIconContainer,
+        .noteIconContainer {
             width: 5rem;
             display: flex;
             flex-direction: column;
@@ -932,16 +990,19 @@ dialog .errorMessageDisplay,
                 width: 2rem;
                 height: 2rem;
             }
+
+            .folderNameWrapper,
+            .fileNameWrapper {
+                max-width: 100%;
+                font-size: 0.8rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                cursor: default;
+
+            }
         }
 
-        .fileNameWrapper {
-            max-width: 100%;
-            font-size: 0.8rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: center;
-            cursor: default;
-        }
     }
 }
 
@@ -2024,6 +2085,22 @@ p {
     width: 100%;
     height: 100%;
 }
+
+.folderIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23494747' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='none' stroke='%23000000' stroke-width='10' d='m6,17.02c0,-4.35 3.68,-8 8.06,-8c6.39,0 14.37,-0.14 20.76,-0.14c5.02,0 7.93,18.56 14.2,20.88l19.85,-0.03l17.45,0.21c-1.92,0.37 7.59,-1.58 7.63,5.92l-0.32,50.16c0,4.35 -3.68,8 -8.06,8l-71.52,0c-4.38,0 -8.06,-3.65 -8.06,-8l0,-69z' id='svg_7' transform='matrix(1 0 0 1 0 0)'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23494747' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='none' stroke='%23000000' stroke-width='10' d='m6,17.02c0,-4.35 3.68,-8 8.06,-8c6.39,0 14.37,-0.14 20.76,-0.14c5.02,0 7.93,18.56 14.2,20.88l19.85,-0.03l17.45,0.21c-1.92,0.37 7.59,-1.58 7.63,5.92l-0.32,50.16c0,4.35 -3.68,8 -8.06,8l-71.52,0c-4.38,0 -8.06,-3.65 -8.06,-8l0,-69z' id='svg_7' transform='matrix(1 0 0 1 0 0)'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+    width: 100%;
+    height: 100%;
+}
+
+.folderIconSolid {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23494747' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23000000' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23000000' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='%2381366a' stroke='%23000000' stroke-width='10' d='m6,17.02c0,-4.35 3.68,-8 8.06,-8c6.39,0 14.37,-0.14 20.76,-0.14c5.02,0 7.93,18.56 14.2,20.88l19.85,-0.03l17.45,0.21c-1.92,0.37 7.59,-1.58 7.63,5.92l-0.32,50.16c0,4.35 -3.68,8 -8.06,8l-71.52,0c-4.38,0 -8.06,-3.65 -8.06,-8l0,-69z' id='svg_7' transform='matrix(1 0 0 1 0 0)'/%3E%3C/g%3E%3C/svg%3E%3C/g%3E%3C/svg%3E");
+    width: 100%;
+    height: 100%;
+}
+
+
 
 .inProgressIcon {
     mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='45' id='svg_1' rx='5' ry='5' stroke='%23000000' stroke-width='9' width='90' x='5' y='27.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-width='16' x1='23.16' x2='23.16' y1='38.86' y2='61.79'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-width='16' x1='46' x2='46' y1='38.82' y2='61.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_31' stroke='%23000000' stroke-width='9' x1='65.46' x2='65.46' y1='38.86' y2='61.79'/%3E%3C/g%3E%3C/svg%3E");

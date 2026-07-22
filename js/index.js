@@ -19,6 +19,7 @@ export let tourStatus = {
     running: false
 };
 import Tour from './tour.js';
+import GlobalNotesController from './Controller/GlobalNotesController.js';
 document.addEventListener('DOMContentLoaded', () => { Tour.initTourModal() });
 document.querySelector('#topMenuContainer').addEventListener('click', Tour.clickHandler);
 
@@ -76,6 +77,7 @@ async function startApp() {
         SchoolYearController.clickEventHandler(event);
         TimetableController.timetableClickEventHandler(event);
         DayNoteController.clickHandler(event);
+        GlobalNotesController.clickHandler(event);
     });
 
     // handlers for empty timeslots
@@ -133,6 +135,7 @@ async function startApp() {
         LessonNoteController.toggleSaveLessonNoteButton(event);
         LessonController.toggleSaveCurriculumSpanNoteButton(event);
         DayNoteController.toggleSaveDayNoteButton(event);
+        GlobalNotesController.toggleSaveGlobalNoteButton(event);
     });
     document.addEventListener('selectionchange', Editor.updateButtonStatus);
 

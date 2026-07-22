@@ -667,15 +667,22 @@
 
     <!-- global notes -->
     <div id="globalNotesContainer" class="mainViewContainer" style="display: none">
-        <div id="globalNotesFileContainer" data-displayed_folder="0">
-        <div id="globalNoteButtonContainer">
-            <button id="createGlobalNoteButton" class="confirmationButton">Neue Notiz</button>
-            <button id="createGlobalNoteFolder" class="confirmationButton">Neuer Ordner</button>
-        </div>
-        <div id="globalNotesFileSystemDisplay" class="marginTop">
-            <div id="folderIconContainer"></div>
-            <div id="noteIconContainer"></div>
-        </div>
+        <div id="globalNotesFileContainer" data-folder_id="0">
+            <div id="globalNoteButtonContainer">
+                <button id="createGlobalNoteButton" class="confirmationButton">Neue Notiz</button>
+                <button id="createGlobalNoteFolder" class="confirmationButton">Neuer Ordner</button>
+            </div>
+            <div id="globalNotesFileSystemDisplay" class="marginTop">
+                <div id="folderNavigatonContainer" class="flex spaceBetween">
+                    <div id="folderPathContainer" class="flex"></div>
+                    <div id="folderNavigationButtonContainer" class="flex halfGap" data-history_step="0">
+                        <button class="confirmationButton" id="folderBackwardButton" disabled>&#8617;</button>
+                        <button class="confirmationButton" id="folderForwardButton" disabled>&#8618;</button>
+                    </div>
+                </div>
+                <div id="folderIconContainer"></div>
+                <div id="noteIconContainer"></div>
+            </div>
         </div>
     </div>
 
@@ -1108,6 +1115,37 @@
                 </div>
                 <div class="flex halfGap spaceBetween">
                     <div id="dayNoteSavedMessage">gespeichert</div><button id="saveDayNoteButton"
+                        class="confirmationButton" disabled>Speichern</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="globalNoteDialog" data-note_id>
+        <div class="headline flex spaceBetween">
+            <h3>allgemeine Notiz <span id="dayNoteDateSpan"></span></h3><button id="closeGlobalNoteButton"
+                class="closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <div id="globalNoteEditorContainer" class="flex column halfGap marginTop editorContainer">
+                <div class="alertRing">
+                    <input type="text" id="globalNoteTitleInput" placeholder="Titel">
+                </div>
+                <div id="globalNoteEditorButtonContainer" class="flex spaceBetween editorButtonContainer">
+                    <div class="flex halfGap">
+                        <button class="boldButton" style="font-weight: bold;">b</button>
+                        <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                        <button class="unorderedListButton"><span class="icon ulIcon"></span></button>
+                    </div>
+                    <div class="flex halfGap">
+                        <button class="revertChangeButton">&#8617;</button>
+                        <button class="redoChangeButton">&#8618;</button>
+                    </div>
+                </div>
+                <div id="globalNoteContentEditor" class="textEditor" contenteditable="true" data-noteversion>
+                </div>
+                <div class="flex halfGap spaceBetween">
+                    <div id="globalNoteSavedMessage">gespeichert</div><button id="saveGlobalNoteButton"
                         class="confirmationButton" disabled>Speichern</button>
                 </div>
             </div>
