@@ -111,7 +111,7 @@ export default class GlobalNotesView {
             id: dialog.dataset.note_id,
             title: dialog.querySelector('#globalNoteTitleInput').value,
             content: Editor.getContent(dialog.querySelector('#globalNoteContentEditor')),
-            parentFolder: this.getDisplayedFolderId()
+            parentFolderId: this.getDisplayedFolderId()
         }
     }
 
@@ -145,6 +145,54 @@ export default class GlobalNotesView {
     static getCurrentNavigationStep() {
         return document.querySelector('#folderNavigationButtonContainer').dataset.history_step;
     }
+
+    static createNewGlobalNoteFolder(){
+        const folderDisplay = document.querySelector('#folderIconContainer');
+        
+        const blankDiv = document.createElement('div');
+        const textarea = document.createElement('textarea');
+        const blankButton = document.createElement('button');
+        const blankSpan = document.createElement('span');
+
+        const folderContainer = blankDiv.cloneNode();
+        const iconWrapper = blankDiv.cloneNode();
+        const folderIcon = blankDiv.cloneNode();
+        const buttonContainer = blankDiv.cloneNode();
+        const saveButton = blankButton.cloneNode();
+        const cancelButton = blankButton.cloneNode();
+        const checkIcon = blankSpan.cloneNode()
+        const crossIcon = blankSpan.cloneNode()
+
+        folderIcon.classList.add('folderIconSolid', 'fileIcon');
+        folderContainer.classList.add('folderIconContainer', 'new');
+        buttonContainer.classList.add('flex', 'halfGap');
+
+        textarea.id = 'folderNameInput';
+        textarea.placeholder = 'Ordername';
+
+        saveButton.classList.add('confirmationButton');
+        cancelButton.classList.add('cancelButton');
+        
+        checkIcon.classList.add('icon', 'checkIcon');
+        crossIcon.classList.add('icon', 'crossIcon');
+
+        saveButton.append(checkIcon);
+        cancelButton.append(crossIcon);
+        buttonContainer.append(saveButton);
+        buttonContainer.append(cancelButton);
+
+        iconWrapper.append(folderIcon);
+
+        folderContainer.append(iconWrapper);
+        folderContainer.append(textarea);
+        folderContainer.append(buttonContainer);
+
+        folderDisplay.append(folderContainer);
+    }
+
+    /////////////
+    // buttons //
+    /////////////
 
     static toggleSaveDayNoteButton(activate = false) {
         const saveGlobalNoteButton = document.querySelector('#saveGlobalNoteButton');

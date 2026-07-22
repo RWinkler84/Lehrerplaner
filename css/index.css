@@ -1003,6 +1003,14 @@ dialog .errorMessageDisplay,
             }
         }
 
+        .folderIconContainer.new {
+            textarea {
+                font-size: 0.8rem;
+                resize: none;
+                height: fit-content;
+            }
+        }
+
     }
 }
 

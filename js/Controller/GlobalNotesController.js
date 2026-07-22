@@ -26,12 +26,6 @@ export default class GlobalNotesController {
         View.renderFolderPath(allParentFolders);
     }
 
-    static toggleSaveGlobalNoteButton(event) {
-        if (event.target.id == 'globalNoteContentEditor' || event.target.id == 'globalNoteTitle') {
-            View.toggleSaveDayNoteButton(true);
-        }
-    }
-
     static async openGlobalNoteDialog(noteId = null) {
 
         if (noteId) {
@@ -48,21 +42,15 @@ export default class GlobalNotesController {
         View.closeGlobalNoteDialog();
     }
 
-    static openFolder(folderId) {
-        const globalNotesFileContainer = document.querySelector('#globalNotesFileContainer');
-
-        if (globalNotesFileContainer.dataset.folder_id == folderId) return;
-
-        globalNotesFileContainer.dataset.folder_id = folderId;
-
-        this.renderGlobalNotesView();
-    }
+    //////////////////////////////
+    // global note crud methods //
+    //////////////////////////////
 
     static createNewGlobalNote() {
         this.openGlobalNoteDialog();
     }
 
-    static saveGlobalNote() {
+    static async saveGlobalNote() {
         const globalNoteData = View.getDataFromGlobalNoteDialog();
 
         if (globalNoteData.title == '') {
@@ -79,17 +67,70 @@ export default class GlobalNotesController {
 
         const globalNote = GlobalNote.writeDataToInstance(globalNoteData)
 
-        globalNote.save();
+        await globalNote.save();
+        await this.renderGlobalNoteIcons();
     }
 
-    static updateGlobalNote(globalNoteData) {
+    static async updateGlobalNote(globalNoteData) {
         const globalNote = GlobalNote.writeDataToInstance(globalNoteData)
 
-        globalNote.update();
+        await globalNote.update();
+        await this.renderGlobalNoteIcons();
     }
 
     static deleteGlobalNote() { }
 
+    /////////////////////////
+    // folder crud methods //
+    /////////////////////////
+
+    static openFolder(folderId) {
+        const globalNotesFileContainer = document.querySelector('#globalNotesFileContainer');
+
+        if (globalNotesFileContainer.dataset.folder_id == folderId) return;
+
+        globalNotesFileContainer.dataset.folder_id = folderId;
+
+        this.renderGlobalNotesView();
+    }
+
+    static createNewGlobalNoteFolder() {
+        View.createNewGlobalNoteFolder();
+    }
+
+    static async saveGlobalNoteFolder() {
+        const globalNoteFolderData = View.getDataFromGlobalNoteFolder();
+
+        if (globalNoteFolderData.name == '') {
+            View.alertGlobalNoteFolderNameInput();
+
+            return;
+        }
+
+        if (globalNoteFolderData.id != '') {
+            this.updateGlobalNote(globalNoteFolderData);
+
+            return;
+        }
+
+        const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(globalNoteFolderData)
+
+        await globalNoteFolder.save();
+        await this.renderFolderIcons();
+    }
+
+    static async updateGlobalNoteFolder(globalNoteFolderData) {
+        const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(globalNoteFolderData)
+
+        await globalNoteFolder.update();
+        await this.renderFolderIcons();
+    }
+
+    static deleteGlobalNoteFolder() { }
+
+    ///////////////////////
+    // folder navigation //
+    ///////////////////////
 
     /**@param direction: 'forward' or 'backward' */
     static navigateFolderHistory(direction) {
@@ -107,6 +148,12 @@ export default class GlobalNotesController {
 
             View.toggleNavigationButtons(navigationData);
             this.openFolder(navigationData.folderToOpen);
+        }
+    }
+
+    static toggleSaveGlobalNoteButton(event) {
+        if (event.target.id == 'globalNoteContentEditor' || event.target.id == 'globalNoteTitle') {
+            View.toggleSaveDayNoteButton(true);
         }
     }
 
@@ -155,7 +202,7 @@ export default class GlobalNotesController {
                     break;
 
                 case 'createGlobalNoteFolder':
-
+                    this.createNewGlobalNoteFolder();
                     break;
             }
 

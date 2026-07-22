@@ -1,4 +1,5 @@
 import AbstractModel from "./AbstractModel.js";
+import Fn from '../inc/utils.js';
 
 export default class GlobalNote extends AbstractModel {
     #id;
@@ -8,50 +9,18 @@ export default class GlobalNote extends AbstractModel {
     #created;
     #lastEdited;
 
-
-    static mockupFiles = [
-        {
-            id: 1,
-            title: 'Abgabe Hausaufgaben 8a',
-            content: '<p><b>fehlende Abgaben</b></p><p>Ronny Reinemacher</p>',
-            parentFolderId: 0,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 2,
-            title: 'Protokoll Dienstberatung',
-            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
-            parentFolderId: 0,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 3,
-            title: 'Ich bin raus',
-            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
-            parentFolderId: 1,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 4,
-            title: 'Ich bin in der 2',
-            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
-            parentFolderId: 2,
-            created: '',
-            lastEdited: ''
-        }
-    ];
-
     static async getAllNotes() {
-        const dataArray = this.mockupFiles;
+        const globalNote = new GlobalNote;
+        const dataArray = await globalNote.readAllFromLocalDB('globalNotes')
 
-        return dataArray.map(globalNote => this.writeDataToInstance(globalNote));
+        return dataArray.map(noteData => this.writeDataToInstance(noteData));
     }
 
     static async getById(id) {
-        return this.writeDataToInstance(this.mockupFiles.find(globalNote => globalNote.id == id));
+        const globalNote = new GlobalNote;
+        const noteData = await globalNote.readFromLocalDB('globalNotes', id);
+
+        return this.writeDataToInstance(noteData);
     }
 
     static async getAllByParentFolderId(parentFolderId) {
@@ -65,6 +34,38 @@ export default class GlobalNote extends AbstractModel {
         })
 
         return dataArray.filter(globalNote => globalNote.parentFolderId == parentFolderId);
+    }
+
+    async save() {
+        let allGlobalNotes = await GlobalNote.getAllNotes();
+
+        this.id = Fn.generateId(allGlobalNotes);
+        this.lastEdited = this.formatDateTime(new Date());
+        this.created = this.lastEdited;
+
+        await this.writeToLocalDB('globalNotes', this.serialize());
+        // let result = await this.makeAjaxQuery('globalNote', 'save', [this.serialize()]);
+
+        // if (result.status == 'failed') this.writeToLocalDB('unsyncedGlobalNotes', this.serialize());
+    }
+
+    async delete() {
+        let deletedItem = await this.readFromLocalDB('globalNotes', this.id);
+        this.deleteFromLocalDB('globalNotes', this.id);
+        this.deleteFromLocalDB('unsyncedGlobalNotes', this.id);
+
+        // let result = await this.makeAjaxQuery('globalNote', 'delete', [this.serialize()]);
+
+        // if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNotes', deletedItem);
+    }
+
+    async update() {
+        this.lastEdited = this.formatDateTime(new Date());
+
+        this.updateOnLocalDB('globalNotes', this.serialize());
+        // let result = await this.makeAjaxQuery('globalNote', 'update', this.serialize());
+
+        // if (result.status == 'failed') this.updateOnLocalDB('unsyncedGlobalNotes', this.serialize());
     }
 
     serialize() {

@@ -13,13 +13,13 @@ import SchoolYearController from './Controller/SchoolYearController.js';
 import Editor from './inc/editor.js';
 import TimetableController from './Controller/TimetableController.js';
 import DayNoteController from './Controller/DayNoteController.js';
+import GlobalNotesController from './Controller/GlobalNotesController.js';
 
 //tour stuff
 export let tourStatus = {
     running: false
 };
 import Tour from './tour.js';
-import GlobalNotesController from './Controller/GlobalNotesController.js';
 document.addEventListener('DOMContentLoaded', () => { Tour.initTourModal() });
 document.querySelector('#topMenuContainer').addEventListener('click', Tour.clickHandler);
 

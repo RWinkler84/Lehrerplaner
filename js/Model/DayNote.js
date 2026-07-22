@@ -31,6 +31,8 @@ export default class DayNote extends AbstractModel {
         let store = db.transaction('dayNotes', 'readonly').objectStore('dayNotes');
         let index = store.index('date');
 
+        store.openCursor()
+
         if (!endDate) endDate = startDate;
 
         let range = IDBKeyRange.bound(model.formatDate(startDate), model.formatDate(endDate));

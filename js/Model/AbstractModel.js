@@ -206,7 +206,7 @@ export default class AbstractModel {
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio', 5);
+            let request = window.indexedDB.open('eduplanio', 6);
             let store;
 
             request.onupgradeneeded = (event) => {
@@ -223,6 +223,8 @@ export default class AbstractModel {
                         store.createIndex('date', 'date');
                         store = db.createObjectStore('dayNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
+                        db.createObjectStore('globalNotes', { keyPath: 'id' })
+                        db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
 
                         db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
@@ -231,6 +233,8 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDayNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedGlobalNoteFolders', { keyPath: 'id' })
 
                         db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
@@ -238,6 +242,8 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedDayNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedDeletedGlobalNoteFolders', { keyPath: 'id' })
 
                         //add first time user flag
                         userStatus.firstTimeUser = true;
@@ -259,6 +265,15 @@ export default class AbstractModel {
                         store.createIndex('date', 'date');
                         db.createObjectStore('unsyncedDayNotes', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedDayNotes', { keyPath: 'id' });
+                        break;
+                    case 5:
+                        db.createObjectStore('globalNotes', { keyPath: 'id' })
+                        db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedGlobalNoteFolders', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedDeletedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedDeletedGlobalNoteFolders', { keyPath: 'id' })
+                        break;
                 }
             }
 
@@ -424,7 +439,7 @@ export default class AbstractModel {
         return await this.makeAjaxQuery('abstract', 'sendSupportTicket', formData);
     }
 
-    async sendPlusRevocation(formData){
+    async sendPlusRevocation(formData) {
         formData.sendAt = this.formatDateTime(new Date());
         return await this.makeAjaxQuery('abstract', 'sendPlusRevocation', formData);
     }
