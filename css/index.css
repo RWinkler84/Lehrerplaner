@@ -955,7 +955,7 @@ dialog .errorMessageDisplay,
                 overflow: hidden;
                 flex-wrap: nowrap;
 
-                .folderNameWrapper {
+                .folderNameWrapperOnPath {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     text-wrap: nowrap;
@@ -979,7 +979,7 @@ dialog .errorMessageDisplay,
 
         .folderIconContainer,
         .noteIconContainer {
-            width: 5rem;
+            width: 6.5rem;
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
@@ -992,6 +992,7 @@ dialog .errorMessageDisplay,
             }
 
             .folderNameWrapper,
+            .folderNameWrapperOnPath,
             .fileNameWrapper {
                 max-width: 100%;
                 font-size: 0.8rem;
@@ -1004,10 +1005,15 @@ dialog .errorMessageDisplay,
         }
 
         .folderIconContainer.new {
+            .alertRing {
+                width: 100%;
+            }
+            
             textarea {
                 font-size: 0.8rem;
                 resize: none;
-                height: fit-content;
+                field-sizing: content;
+                height: unset;
             }
         }
 

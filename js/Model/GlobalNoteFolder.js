@@ -1,4 +1,5 @@
 import AbstractModel from "./AbstractModel.js";
+import Fn from '../inc/utils.js';
 
 export default class GlobalNoteFolder extends AbstractModel {
     #id;

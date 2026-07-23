@@ -119,11 +119,30 @@ export default class GlobalNotesController {
         await this.renderFolderIcons();
     }
 
+    static async saveGlobalNotesFolder(event) {
+        const noteFolderData = View.getFolderDataFromForm(event);
+
+        if (!noteFolderData.name) {
+            View.alertFolderNameInput(event);
+
+            return;
+        }
+
+        const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(noteFolderData);
+
+        await globalNoteFolder.save();
+        await this.renderFolderIcons();
+    }
+
     static async updateGlobalNoteFolder(globalNoteFolderData) {
         const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(globalNoteFolderData)
 
         await globalNoteFolder.update();
         await this.renderFolderIcons();
+    }
+
+    static cancelGlobalNotesFolderCreation(event) {
+
     }
 
     static deleteGlobalNoteFolder() { }
@@ -213,7 +232,7 @@ export default class GlobalNotesController {
                     break;
 
                 // folder navigation
-                case target.classList.contains('folderNameWrapper'):
+                case target.classList.contains('folderNameWrapperOnPath'):
                     folderId = target.closest('.folderPathItemContainer').dataset.folder_id;
 
                     GlobalNoteFolder.updateNavigationHistory(folderId, currentStep);
@@ -221,12 +240,25 @@ export default class GlobalNotesController {
                     this.openFolder(folderId);
                     break;
 
-                case target.closest('.folderIconContainer') != undefined:
+                case target.classList.contains('folderIconContainer'):
+                case target.classList.contains('folderIconSolid'):
+                case target.classList.contains('folderNameWrapper'):
+                    if (target.closest('.folderIconContainer').classList.contains('new')) return;
+
                     folderId = target.closest('.folderIconContainer').dataset.folder_id;
 
                     GlobalNoteFolder.updateNavigationHistory(folderId, currentStep);
                     this.updateHistoryNavigationButtons();
                     this.openFolder(folderId);
+                    break;
+
+                //create folder
+                case target.classList.contains('saveNewFolderButton'):
+                    this.saveGlobalNotesFolder(event);
+                    break;
+
+                case target.classList.contains('cancelNewFolderButton'):
+                    this.cancelGlobalNotesFolderCreation(event);
                     break;
             }
         }

@@ -83,7 +83,7 @@ export default class GlobalNotesView {
         const folderNameDivider = blankDiv.cloneNode();
 
         folderContainer.classList.add('folderPathItemContainer');
-        title.classList.add('folderNameWrapper');
+        title.classList.add('folderNameWrapperOnPath');
         folderNameDivider.classList.add('folderNameDivider');
         folderNameDivider.textContent = '/';
 
@@ -93,7 +93,7 @@ export default class GlobalNotesView {
         allParentFolders.forEach(folder => {
             const currentContainer = folderContainer.cloneNode(true);
 
-            currentContainer.querySelector('.folderNameWrapper').textContent = folder.name;
+            currentContainer.querySelector('.folderNameWrapperOnPath').textContent = folder.name;
             currentContainer.dataset.folder_id = folder.id;
 
             fragment.append(currentContainer);
@@ -138,17 +138,26 @@ export default class GlobalNotesView {
         document.querySelector('#globalNoteDialog').close();
     }
 
+    ////////////////////
+    // folder methods //
+    ////////////////////
+
     static getDisplayedFolderId() {
         return Number(document.querySelector('#globalNotesFileContainer').dataset.folder_id)
     }
 
-    static getCurrentNavigationStep() {
-        return document.querySelector('#folderNavigationButtonContainer').dataset.history_step;
+    static getFolderDataFromForm(event) {
+        const folderContainer = event.target.closest('.folderIconContainer');
+
+        return {
+            name: folderContainer.querySelector('#folderNameInput').value,
+            parentFolderId: this.getDisplayedFolderId()
+        }
     }
 
-    static createNewGlobalNoteFolder(){
+    static createNewGlobalNoteFolder() {
         const folderDisplay = document.querySelector('#folderIconContainer');
-        
+
         const blankDiv = document.createElement('div');
         const textarea = document.createElement('textarea');
         const blankButton = document.createElement('button');
@@ -157,6 +166,7 @@ export default class GlobalNotesView {
         const folderContainer = blankDiv.cloneNode();
         const iconWrapper = blankDiv.cloneNode();
         const folderIcon = blankDiv.cloneNode();
+        const textareaWrapper = blankDiv.cloneNode();
         const buttonContainer = blankDiv.cloneNode();
         const saveButton = blankButton.cloneNode();
         const cancelButton = blankButton.cloneNode();
@@ -169,10 +179,11 @@ export default class GlobalNotesView {
 
         textarea.id = 'folderNameInput';
         textarea.placeholder = 'Ordername';
+        textarea.classList.add('alertRing');
 
-        saveButton.classList.add('confirmationButton');
-        cancelButton.classList.add('cancelButton');
-        
+        saveButton.classList.add('confirmationButton', 'saveNewFolderButton');
+        cancelButton.classList.add('cancelButton', 'cancelNewFolderButton');
+
         checkIcon.classList.add('icon', 'checkIcon');
         crossIcon.classList.add('icon', 'crossIcon');
 
@@ -188,6 +199,11 @@ export default class GlobalNotesView {
         folderContainer.append(buttonContainer);
 
         folderDisplay.append(folderContainer);
+        textarea.focus();
+    }
+
+    static getCurrentNavigationStep() {
+        return document.querySelector('#folderNavigationButtonContainer').dataset.history_step;
     }
 
     /////////////
@@ -224,6 +240,17 @@ export default class GlobalNotesView {
         alertRing.classList.add('validationError');
         setTimeout(() => {
             alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertFolderNameInput(event) {
+        const folderIconContainer = event.target.closest('.folderIconContainer');
+        const alertRing = folderIconContainer.querySelector('#folderNameInput');
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+            alertRing.focus();
         }, 300);
     }
 }
