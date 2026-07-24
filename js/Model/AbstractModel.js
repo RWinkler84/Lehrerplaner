@@ -120,6 +120,24 @@ export default class AbstractModel {
         });
     }
 
+    async readAllByIndexFromLocalDB(store, indexName, searchValue) {
+        let db = await this.openIndexedDB();
+        let transaction = db.transaction(store, 'readonly');
+        let objectStore = transaction.objectStore(store);
+        let index = objectStore.index(indexName)
+        let request = index.getAll(searchValue);
+
+        return new Promise((resolve, reject) => {
+            request.onsuccess = () => {
+                resolve(request.result);
+            }
+
+            request.onerror = () => {
+                reject(request.error);
+            }
+        });
+    }
+
     async writeToLocalDB(store, dataToStore) {
         let db = await this.openIndexedDB();
 
@@ -142,7 +160,7 @@ export default class AbstractModel {
             this.markLocalDBUpdated(store);
         }
         transaction.onerror = () => {
-            console.error('storing failed', transaction.error)
+            console.error('storing failed', transaction.error, dataToStore)
         }
     }
 
@@ -223,8 +241,10 @@ export default class AbstractModel {
                         store.createIndex('date', 'date');
                         store = db.createObjectStore('dayNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
-                        db.createObjectStore('globalNotes', { keyPath: 'id' })
-                        db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
+                        store = db.createObjectStore('globalNotes', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
+                        store = db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
 
                         db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
@@ -267,8 +287,10 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedDeletedDayNotes', { keyPath: 'id' });
                         break;
                     case 5:
-                        db.createObjectStore('globalNotes', { keyPath: 'id' })
-                        db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
+                        store = db.createObjectStore('globalNotes', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
+                        store = db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
                         db.createObjectStore('unsyncedGlobalNotes', { keyPath: 'id' })
                         db.createObjectStore('unsyncedGlobalNoteFolders', { keyPath: 'id' })
                         db.createObjectStore('unsyncedDeletedGlobalNotes', { keyPath: 'id' })

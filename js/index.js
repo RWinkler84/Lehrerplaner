@@ -57,6 +57,7 @@ async function startApp() {
     AbstractController.checkVersion();
     SettingsController.setVersion(VERSION);
 
+    // GlobalNotesController.writeMockupData();  // <<<<< delete me after developement
 
     await SettingsController.checkForPendingLogout();
     await abstCtrl.syncData();
@@ -155,6 +156,8 @@ async function startApp() {
             CurriculumController.resizeSpanContentContainers();
         }
     });
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', GlobalNotesController.rightClickHandler)
 
     AbstractController.renderTopMenu();
 

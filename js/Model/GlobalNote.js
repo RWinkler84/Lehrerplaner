@@ -9,6 +9,49 @@ export default class GlobalNote extends AbstractModel {
     #created;
     #lastEdited;
 
+       static mockupFiles = [
+        {
+            id: 1,
+            title: 'Abgabe Hausaufgaben 8a',
+            content: '<p><b>fehlende Abgaben</b></p><p>Ronny Reinemacher</p>',
+            parentFolderId: 0,
+            created: '',
+            lastEdited: ''
+        },
+        {
+            id: 2,
+            title: 'Protokoll Dienstberatung',
+            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
+            parentFolderId: 0,
+            created: '',
+            lastEdited: ''
+        },
+        {
+            id: 3,
+            title: 'Ich bin raus',
+            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
+            parentFolderId: 1,
+            created: '',
+            lastEdited: ''
+        },
+        {
+            id: 4,
+            title: 'Ich bin in der 2',
+            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
+            parentFolderId: 2,
+            created: '',
+            lastEdited: ''
+        }
+    ];
+
+    static writeMockupData() {
+        this.mockupFiles.forEach(noteData => {
+            const note = this.writeDataToInstance(noteData);
+
+            note.save();
+        })
+    }
+
     static async getAllNotes() {
         const globalNote = new GlobalNote;
         const dataArray = await globalNote.readAllFromLocalDB('globalNotes')
@@ -24,16 +67,10 @@ export default class GlobalNote extends AbstractModel {
     }
 
     static async getAllByParentFolderId(parentFolderId) {
-        // this needs to be completely rewritten in the end
-        // search by folder id will be done by a cursor on the indexeddb
+        const note = new GlobalNote;
+        const allNotesOfFolder = await note.readAllByIndexFromLocalDB('globalNotes', 'parentFolderId', parentFolderId);
 
-        const dataArray = await this.getAllNotes();
-
-        dataArray.filter(globalNote => {
-            globalNote.parentFolderId == parentFolderId
-        })
-
-        return dataArray.filter(globalNote => globalNote.parentFolderId == parentFolderId);
+        return allNotesOfFolder;
     }
 
     async save() {

@@ -69,6 +69,9 @@ export default class GlobalNotesController {
 
         await globalNote.save();
         await this.renderGlobalNoteIcons();
+        View.showGlobalNoteSavedMessage();
+        View.updateGlobalNoteDialog(globalNote);
+        View.toggleSaveDayNoteButton(false);
     }
 
     static async updateGlobalNote(globalNoteData) {
@@ -76,6 +79,8 @@ export default class GlobalNotesController {
 
         await globalNote.update();
         await this.renderGlobalNoteIcons();
+        View.showGlobalNoteSavedMessage();
+        View.toggleSaveDayNoteButton(false);
     }
 
     static deleteGlobalNote() { }
@@ -96,27 +101,6 @@ export default class GlobalNotesController {
 
     static createNewGlobalNoteFolder() {
         View.createNewGlobalNoteFolder();
-    }
-
-    static async saveGlobalNoteFolder() {
-        const globalNoteFolderData = View.getDataFromGlobalNoteFolder();
-
-        if (globalNoteFolderData.name == '') {
-            View.alertGlobalNoteFolderNameInput();
-
-            return;
-        }
-
-        if (globalNoteFolderData.id != '') {
-            this.updateGlobalNote(globalNoteFolderData);
-
-            return;
-        }
-
-        const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(globalNoteFolderData)
-
-        await globalNoteFolder.save();
-        await this.renderFolderIcons();
     }
 
     static async saveGlobalNotesFolder(event) {
@@ -142,7 +126,7 @@ export default class GlobalNotesController {
     }
 
     static cancelGlobalNotesFolderCreation(event) {
-
+        View.cancelGlobalNotesFolderCreation(event);
     }
 
     static deleteGlobalNoteFolder() { }
@@ -171,7 +155,7 @@ export default class GlobalNotesController {
     }
 
     static toggleSaveGlobalNoteButton(event) {
-        if (event.target.id == 'globalNoteContentEditor' || event.target.id == 'globalNoteTitle') {
+        if (event.target.id == 'globalNoteContentEditor' || event.target.id == 'globalNoteTitleInput') {
             View.toggleSaveDayNoteButton(true);
         }
     }
@@ -264,4 +248,15 @@ export default class GlobalNotesController {
         }
 
     }
+
+    static rightClickHandler(event) {
+        event.preventDefault();
+        console.log(event.target);
+    }
+
+    static writeMockupData() {
+        GlobalNote.writeMockupData();
+        GlobalNoteFolder.writeMockupData();
+    }
+
 }

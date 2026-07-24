@@ -62,6 +62,7 @@ export default class GlobalNotesView {
             currentFolderContainer.append(folderName);
             currentFolderContainer.setAttribute('tabindex', 0);
             currentFolderContainer.dataset.folder_id = folder.id;
+            currentFolderContainer.dataset.created = folder.created;
 
             fragment.append(currentFolderContainer);
         })
@@ -104,17 +105,6 @@ export default class GlobalNotesView {
         folderPathContainer.append(fragment);
     }
 
-    static getDataFromGlobalNoteDialog() {
-        const dialog = document.querySelector('#globalNoteDialog');
-
-        return {
-            id: dialog.dataset.note_id,
-            title: dialog.querySelector('#globalNoteTitleInput').value,
-            content: Editor.getContent(dialog.querySelector('#globalNoteContentEditor')),
-            parentFolderId: this.getDisplayedFolderId()
-        }
-    }
-
     static openGlobalNoteDialog(globalNote = null) {
         const globalNoteEditorDialog = document.querySelector('#globalNoteDialog');
         const globalNoteTitleInput = document.querySelector('#globalNoteTitleInput');
@@ -122,10 +112,12 @@ export default class GlobalNotesView {
 
         if (globalNote) {
             globalNoteEditorDialog.dataset.note_id = globalNote.id;
+            globalNoteEditorDialog.dataset.created = globalNote.created;
             globalNoteTitleInput.value = globalNote.title;
             globalNoteContentEditor.innerHTML = globalNote.content;
         } else {
             globalNoteEditorDialog.dataset.note_id = '';
+            globalNoteEditorDialog.dataset.created = '';
             globalNoteTitleInput.value = '';
             globalNoteContentEditor.innerHTML = '<p><br></p>';
         }
@@ -136,6 +128,25 @@ export default class GlobalNotesView {
 
     static closeGlobalNoteDialog() {
         document.querySelector('#globalNoteDialog').close();
+    }
+
+    static updateGlobalNoteDialog(globalNote) {
+        const dialog = document.querySelector('#globalNoteDialog');
+
+        dialog.dataset.note_id = globalNote.id;
+        dialog.dataset.created = globalNote.created;
+    }
+
+    static getDataFromGlobalNoteDialog() {
+        const dialog = document.querySelector('#globalNoteDialog');
+
+        return {
+            id: dialog.dataset.note_id,
+            title: dialog.querySelector('#globalNoteTitleInput').value,
+            content: Editor.getContent(dialog.querySelector('#globalNoteContentEditor')),
+            parentFolderId: this.getDisplayedFolderId(),
+            created: dialog.dataset.created
+        }
     }
 
     ////////////////////
@@ -150,7 +161,9 @@ export default class GlobalNotesView {
         const folderContainer = event.target.closest('.folderIconContainer');
 
         return {
+            id: folderContainer.dataset.id,
             name: folderContainer.querySelector('#folderNameInput').value,
+            created: folderContainer.dataset.created,
             parentFolderId: this.getDisplayedFolderId()
         }
     }
@@ -202,6 +215,10 @@ export default class GlobalNotesView {
         textarea.focus();
     }
 
+    static cancelGlobalNotesFolderCreation(event) {
+        event.target.closest('.folderIconContainer').remove();
+    }
+
     static getCurrentNavigationStep() {
         return document.querySelector('#folderNavigationButtonContainer').dataset.history_step;
     }
@@ -231,6 +248,14 @@ export default class GlobalNotesView {
 
         if (navigationData.previousStepAvailable) backwardButton.disabled = false;
         if (navigationData.nextStepAvailable) forwardButton.disabled = false;
+    }
+
+    static showGlobalNoteSavedMessage() {
+        const message = document.querySelector('#globalNoteSavedMessage');
+        message.classList.add('active');
+        setTimeout(() => {
+            message.classList.remove('active');
+        }, 2000);
     }
 
     static alertGlobalNoteTitleInput() {

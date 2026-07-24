@@ -43,14 +43,16 @@
 
 #noteSavedMessage,
 #dayNoteSavedMessage,
-#curriculumNoteSavedMessage {
+#curriculumNoteSavedMessage, 
+#globalNoteSavedMessage {
     visibility: hidden;
     color: var(--matteGreen);
 }
 
 #noteSavedMessage.active,
 #dayNoteSavedMessage.active,
-#curriculumNoteSavedMessage.active {
+#curriculumNoteSavedMessage.active,
+#globalNoteSavedMessage.active{
     visibility: visible;
     animation-name: showSavedMessage;
     animation-duration: 2s;

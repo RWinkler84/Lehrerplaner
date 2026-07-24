@@ -8,6 +8,52 @@ export default class GlobalNoteFolder extends AbstractModel {
     #created;
     #lastEdited;
 
+        static mockupFolders = [
+        {
+            id: 0,
+            name: 'alle Dateien',
+            parentFolderId: undefined,
+            created: '',
+            lastEdited: ''
+        },
+        {
+            id: 1,
+            name: 'alte Daten',
+            parentFolderId: 0,
+            created: '',
+            lastEdited: ''
+        },
+        {
+            id: 2,
+            name: 'neuer Ordner länger',
+            parentFolderId: 0,
+            created: '',
+            lastEdited: ''
+        },
+        {
+            id: 3,
+            name: 'ältere Daten',
+            parentFolderId: 1,
+            created: '',
+            lastEdited: ''
+        },
+        {
+            id: 4,
+            name: 'mittlere Daten',
+            parentFolderId: 1,
+            created: '',
+            lastEdited: ''
+        }
+    ];
+
+        static writeMockupData() {
+        this.mockupFolders.forEach(noteData => {
+            const note = this.writeDataToInstance(noteData);
+
+            note.save();
+        })
+    }
+
     static #navigationHistory = [0];
 
     static async getAllFolders() {
@@ -25,12 +71,10 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     static async getAllByParentFolderId(parentFolderId) {
-        // this needs to be completely rewritten in the end
-        // search by folder id will be done by a cursor on the indexeddb
+        const noteFolder = new GlobalNoteFolder;
+        const allFoldersOfParent = await noteFolder.readAllByIndexFromLocalDB('globalNoteFolders', 'parentFolderId', parentFolderId);
 
-        const dataArray = await this.getAllFolders();
-
-        return dataArray.filter(globalNoteFolder => globalNoteFolder.parentFolderId == parentFolderId);
+        return allFoldersOfParent;
     }
 
     static async getAllParentFolders(folderId, parentFolderArray = []) {
