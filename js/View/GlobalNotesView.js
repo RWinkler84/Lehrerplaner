@@ -26,6 +26,7 @@ export default class GlobalNotesView {
             currentNoteContainer.append(noteTitle);
             currentNoteContainer.setAttribute('tabindex', 0);
             currentNoteContainer.dataset.note_id = globalNote.id;
+            currentNoteContainer.dataset.created = globalNote.created;
 
             fragment.append(currentNoteContainer);
         })
@@ -147,6 +148,71 @@ export default class GlobalNotesView {
             parentFolderId: this.getDisplayedFolderId(),
             created: dialog.dataset.created
         }
+    }
+
+    static openContextMenu(event) {
+        const menuItems = [
+            {   
+                action: 'copy',
+                text: 'kopieren'
+            },
+            {   
+                action: 'move',
+                text: 'verschieben'
+            },
+            {   
+                action: 'paste',
+                text: 'einfügen'
+            },
+            {   
+                action: 'delete',
+                text: 'löschen'
+            },
+        ]
+
+        const globalNotesContainer = document.querySelector('#globalNotesContainer');
+        const navHeight = document.querySelector('nav').getBoundingClientRect().height;
+        const bodyMargin = Number(window.getComputedStyle(document.querySelector('body')).margin[0]);
+
+
+        const offsetY = navHeight + bodyMargin;
+        const offsetX = bodyMargin;
+
+        const sourceContainer = event.srcElement.closest('.folderIconContainer') ?? event.srcElement.closest('.noteIconContainer');
+
+        if (sourceContainer.classList.contains('new')) return;
+
+        sourceContainer.classList.add('marked');
+
+        const blankDiv = document.createElement('div');
+        const blankButton = document.createElement('button');
+
+        const menuContainer = blankDiv.cloneNode()
+        menuContainer.classList.add('globalNoteContextMenu');
+        menuContainer.style.top = event.y - offsetY + 'px';
+        menuContainer.style.left = event.x - offsetX + 'px';
+
+        console.log(event)
+
+        if (sourceContainer.classList.contains('folderIconContainer')) menuContainer.dataset.clicked_item = sourceContainer.dataset.folder_id;
+        if (sourceContainer.classList.contains('noteIconContainer')) menuContainer.dataset.clicked_item = sourceContainer.dataset.note_id;
+
+        menuItems.forEach(item => {
+            const currentItem = blankDiv.cloneNode();
+            const currentButton = blankButton.cloneNode();
+
+            currentButton.classList.add('contextMenuButton');
+            currentButton.textContent = item.text;
+            currentButton.id = `${item.action}Button`;
+
+            menuContainer.append(currentButton);
+        })
+
+        globalNotesContainer.append(menuContainer);
+    }
+
+    static closeAllContextMenus() {
+        while (document.querySelector('.globalNoteContextMenu')) document.querySelector('.globalNoteContextMenu').remove();
     }
 
     ////////////////////

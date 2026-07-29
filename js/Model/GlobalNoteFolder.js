@@ -148,29 +148,28 @@ export default class GlobalNoteFolder extends AbstractModel {
         this.created = this.lastEdited;
 
         await this.writeToLocalDB('globalNoteFolders', this.serialize());
-        // let result = await this.makeAjaxQuery('globalNoteFolder', 'save', [this.serialize()]);
+        let result = await this.makeAjaxQuery('globalNoteFolder', 'save', [this.serialize()]);
 
-        // if (result.status == 'failed') this.writeToLocalDB('unsyncedGlobalNotes', this.serialize());
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedGlobalNoteFolders', this.serialize());
     }
-
 
     async delete() {
         let deletedItem = await this.readFromLocalDB('globalNoteFolders', this.id);
         this.deleteFromLocalDB('globalNoteFolders', this.id);
         this.deleteFromLocalDB('unsyncedGlobalNoteFolders', this.id);
 
-        // let result = await this.makeAjaxQuery('globalNoteFolder', 'delete', [this.serialize()]);
+        let result = await this.makeAjaxQuery('globalNoteFolder', 'delete', [this.serialize()]);
 
-        // if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolders', deletedItem);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolders', deletedItem);
     }
 
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
 
         this.updateOnLocalDB('globalNoteFolders', this.serialize());
-        // let result = await this.makeAjaxQuery('globalNoteFolder', 'update', this.serialize());
+        let result = await this.makeAjaxQuery('globalNoteFolder', 'update', [this.serialize()]);
 
-        // if (result.status == 'failed') this.updateOnLocalDB('unsyncedGlobalNoteFolders', this.serialize());
+        if (result.status == 'failed') this.updateOnLocalDB('unsyncedGlobalNoteFolders', this.serialize());
     }
 
     serialize() {

@@ -10,6 +10,8 @@ use Controller\UserController;
 use Controller\SchoolYearController;
 use Controller\LessonNoteController;
 use Controller\DayNoteController;
+use Controller\GlobalNoteController;
+use Controller\GlobalNoteFolderController;
 
 class AbstractController
 {

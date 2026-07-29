@@ -81,9 +81,9 @@ export default class GlobalNote extends AbstractModel {
         this.created = this.lastEdited;
 
         await this.writeToLocalDB('globalNotes', this.serialize());
-        // let result = await this.makeAjaxQuery('globalNote', 'save', [this.serialize()]);
+        let result = await this.makeAjaxQuery('globalNote', 'save', [this.serialize()]);
 
-        // if (result.status == 'failed') this.writeToLocalDB('unsyncedGlobalNotes', this.serialize());
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedGlobalNotes', this.serialize());
     }
 
     async delete() {
@@ -91,18 +91,18 @@ export default class GlobalNote extends AbstractModel {
         this.deleteFromLocalDB('globalNotes', this.id);
         this.deleteFromLocalDB('unsyncedGlobalNotes', this.id);
 
-        // let result = await this.makeAjaxQuery('globalNote', 'delete', [this.serialize()]);
+        let result = await this.makeAjaxQuery('globalNote', 'delete', [this.serialize()]);
 
-        // if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNotes', deletedItem);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNotes', deletedItem);
     }
 
     async update() {
         this.lastEdited = this.formatDateTime(new Date());
 
         this.updateOnLocalDB('globalNotes', this.serialize());
-        // let result = await this.makeAjaxQuery('globalNote', 'update', this.serialize());
+        let result = await this.makeAjaxQuery('globalNote', 'update', [this.serialize()]);
 
-        // if (result.status == 'failed') this.updateOnLocalDB('unsyncedGlobalNotes', this.serialize());
+        if (result.status == 'failed') this.updateOnLocalDB('unsyncedGlobalNotes', this.serialize());
     }
 
     serialize() {

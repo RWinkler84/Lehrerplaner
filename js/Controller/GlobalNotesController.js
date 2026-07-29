@@ -42,6 +42,14 @@ export default class GlobalNotesController {
         View.closeGlobalNoteDialog();
     }
 
+    static openContextMenu(event) {
+        View.openContextMenu(event);
+    }
+
+    static closeAllContextMenus(){
+        View.closeAllContextMenus();
+    }
+
     //////////////////////////////
     // global note crud methods //
     //////////////////////////////
@@ -191,6 +199,8 @@ export default class GlobalNotesController {
         //global notes view
         if (event.target.closest('#globalNotesContainer')) {
 
+            if (!target.closest('.globalNoteContextMenu')) this.closeAllContextMenus();
+
             switch (target.id) {
                 case 'folderBackwardButton':
                     this.navigateFolderHistory('backward');
@@ -250,8 +260,13 @@ export default class GlobalNotesController {
     }
 
     static rightClickHandler(event) {
+        const target = event.target;
+        if (target.id == 'noteIconContainer' || target.id == 'folderIconContainer') return;
+        
         event.preventDefault();
-        console.log(event.target);
+
+        GlobalNotesController.closeAllContextMenus();
+        GlobalNotesController.openContextMenu(event);
     }
 
     static writeMockupData() {
