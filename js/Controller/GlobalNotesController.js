@@ -46,7 +46,7 @@ export default class GlobalNotesController {
         View.openContextMenu(event);
     }
 
-    static closeAllContextMenus(){
+    static closeAllContextMenus() {
         View.closeAllContextMenus();
     }
 
@@ -91,7 +91,11 @@ export default class GlobalNotesController {
         View.toggleSaveDayNoteButton(false);
     }
 
-    static deleteGlobalNote() { }
+    static async deleteGlobalNote(noteId) {
+        const noteToDelete = await GlobalNote.getById(noteId);
+
+        await noteToDelete.delete();
+     }
 
     /////////////////////////
     // folder crud methods //
@@ -137,7 +141,11 @@ export default class GlobalNotesController {
         View.cancelGlobalNotesFolderCreation(event);
     }
 
-    static deleteGlobalNoteFolder() { }
+    static async deleteGlobalNoteFolder(folderId) {
+        const globalNoteFolder = await GlobalNoteFolder.getById(folderId);
+
+        await globalNoteFolder.delete();
+    }
 
     ///////////////////////
     // folder navigation //
@@ -176,12 +184,30 @@ export default class GlobalNotesController {
         View.toggleNavigationButtons(navigationData);
     }
 
+    static async deleteGlobalItem(event) {
+        const clickedItem = View.getContextMenuInfo(event);
+
+        if (clickedItem.fileType == 'folder') {
+            await this.deleteGlobalNoteFolder(clickedItem.folderId);
+            this.renderFolderIcons();
+            this.closeAllContextMenus();
+        }
+
+        if (clickedItem.fileType == 'note') {
+            await this.deleteGlobalNote(clickedItem.noteId);
+            this.renderGlobalNoteIcons();
+            this.closeAllContextMenus();
+        }
+    }
+
 
     static clickHandler(event) {
         const target = event.target;
 
         const currentStep = View.getCurrentNavigationStep();
         let folderId;
+
+        console.log(target)
 
         //dialog
         if (target.closest('#globalNoteDialog')) {
@@ -216,6 +242,11 @@ export default class GlobalNotesController {
 
                 case 'createGlobalNoteFolder':
                     this.createNewGlobalNoteFolder();
+                    break;
+
+                //context menu
+                case 'deleteGlobalItemButton':
+                    this.deleteGlobalItem(event);
                     break;
             }
 
@@ -262,7 +293,7 @@ export default class GlobalNotesController {
     static rightClickHandler(event) {
         const target = event.target;
         if (target.id == 'noteIconContainer' || target.id == 'folderIconContainer') return;
-        
+
         event.preventDefault();
 
         GlobalNotesController.closeAllContextMenus();

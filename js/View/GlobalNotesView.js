@@ -174,7 +174,6 @@ export default class GlobalNotesView {
         const navHeight = document.querySelector('nav').getBoundingClientRect().height;
         const bodyMargin = Number(window.getComputedStyle(document.querySelector('body')).margin[0]);
 
-
         const offsetY = navHeight + bodyMargin;
         const offsetX = bodyMargin;
 
@@ -192,10 +191,8 @@ export default class GlobalNotesView {
         menuContainer.style.top = event.y - offsetY + 'px';
         menuContainer.style.left = event.x - offsetX + 'px';
 
-        console.log(event)
-
-        if (sourceContainer.classList.contains('folderIconContainer')) menuContainer.dataset.clicked_item = sourceContainer.dataset.folder_id;
-        if (sourceContainer.classList.contains('noteIconContainer')) menuContainer.dataset.clicked_item = sourceContainer.dataset.note_id;
+        if (sourceContainer.classList.contains('folderIconContainer')) menuContainer.dataset.folder_id = sourceContainer.dataset.folder_id;
+        if (sourceContainer.classList.contains('noteIconContainer')) menuContainer.dataset.note_id = sourceContainer.dataset.note_id;
 
         menuItems.forEach(item => {
             const currentItem = blankDiv.cloneNode();
@@ -203,12 +200,22 @@ export default class GlobalNotesView {
 
             currentButton.classList.add('contextMenuButton');
             currentButton.textContent = item.text;
-            currentButton.id = `${item.action}Button`;
+            currentButton.id = `${item.action}GlobalItemButton`;
 
             menuContainer.append(currentButton);
         })
 
         globalNotesContainer.append(menuContainer);
+    }
+
+    static getContextMenuInfo(event) {
+        const clickedContextMenu = event.target.closest('.globalNoteContextMenu');
+
+        return {
+            fileType: clickedContextMenu.dataset.folder_id ? 'folder' : 'note',
+            folderId: clickedContextMenu.dataset.folder_id,
+            noteId: clickedContextMenu.dataset.note_id
+        }
     }
 
     static closeAllContextMenus() {
