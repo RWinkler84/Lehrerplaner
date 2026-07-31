@@ -9,7 +9,9 @@ export default class GlobalNote extends AbstractModel {
     #created;
     #lastEdited;
 
-       static mockupFiles = [
+    static #clipboard = [];
+
+    static mockupFiles = [
         {
             id: 1,
             title: 'Abgabe Hausaufgaben 8a',
@@ -72,6 +74,33 @@ export default class GlobalNote extends AbstractModel {
 
         return allNotesOfFolder;
     }
+
+    ///////////////////////
+    // clipboard methods //
+    ///////////////////////
+
+    /**@param operationType 'move', 'copy'  */
+    static addToClipboard(folderIdArray, operationType) {
+        if (operationType != 'move' && operationType != 'copy') console.error('Unknown operation type!')
+
+        this.clearClipboard();
+
+        folderIdArray.forEach(folderId => this.#clipboard.push({ folderId: folderId, operationType: operationType }));
+
+        console.log(this.#clipboard);
+    }
+
+    static getClipboardContent() {
+        return this.#clipboard;
+    }
+
+    static clearClipboard() {
+        this.#clipboard = [];
+    }
+
+    //////////////////////
+    // instance methods //
+    //////////////////////
 
     async save() {
         let allGlobalNotes = await GlobalNote.getAllNotes();

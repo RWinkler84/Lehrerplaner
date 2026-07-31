@@ -1014,9 +1014,13 @@ dialog .errorMessageDisplay,
             align-items: center;
             overflow: hidden;
 
-            &.marked{
+            &.selected {
                 background-color: var(--lightBlue);
                 border-radius: var(--standardRadius);
+            }
+
+            &.cut {
+                opacity: 0.5;
             }
 
             .fileIcon {
@@ -1035,12 +1039,6 @@ dialog .errorMessageDisplay,
                 cursor: default;
 
             }
-        }
-
-        .folderIconContainer.new {
-            .alertRing {
-                width: 100%;
-            }
 
             textarea {
                 font-size: 0.8rem;
@@ -1048,8 +1046,11 @@ dialog .errorMessageDisplay,
                 field-sizing: content;
                 height: unset;
             }
-        }
 
+            .alertRing {
+                width: 100%;
+            }
+        }
     }
 }
 

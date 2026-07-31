@@ -150,21 +150,25 @@ export default class GlobalNotesView {
         }
     }
 
-    static openContextMenu(event) {
+    static openContextMenu(event, clipboardContent) {
         const menuItems = [
-            {   
+            {
+                action: 'edit',
+                text: 'bearbeiten'
+            },
+            {
                 action: 'copy',
                 text: 'kopieren'
             },
-            {   
-                action: 'move',
-                text: 'verschieben'
+            {
+                action: 'cut',
+                text: 'ausschneiden'
             },
-            {   
+            {
                 action: 'paste',
                 text: 'einfügen'
             },
-            {   
+            {
                 action: 'delete',
                 text: 'löschen'
             },
@@ -177,11 +181,11 @@ export default class GlobalNotesView {
         const offsetY = navHeight + bodyMargin;
         const offsetX = bodyMargin;
 
-        const sourceContainer = event.srcElement.closest('.folderIconContainer') ?? event.srcElement.closest('.noteIconContainer');
+        const sourceContainer = this.getSourceContainerOfContextMenu(event);
 
         if (sourceContainer.classList.contains('new')) return;
 
-        sourceContainer.classList.add('marked');
+        sourceContainer.classList.add('selected');
 
         const blankDiv = document.createElement('div');
         const blankButton = document.createElement('button');
@@ -202,6 +206,8 @@ export default class GlobalNotesView {
             currentButton.textContent = item.text;
             currentButton.id = `${item.action}GlobalItemButton`;
 
+            if (item.action == 'paste' && clipboardContent.length == 0) currentButton.disabled = true;
+
             menuContainer.append(currentButton);
         })
 
@@ -220,6 +226,8 @@ export default class GlobalNotesView {
 
     static closeAllContextMenus() {
         while (document.querySelector('.globalNoteContextMenu')) document.querySelector('.globalNoteContextMenu').remove();
+
+        document.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
     }
 
     ////////////////////
@@ -234,8 +242,8 @@ export default class GlobalNotesView {
         const folderContainer = event.target.closest('.folderIconContainer');
 
         return {
-            id: folderContainer.dataset.id,
-            name: folderContainer.querySelector('#folderNameInput').value,
+            id: folderContainer.dataset.folder_id,
+            name: folderContainer.querySelector('.folderNameInput').value,
             created: folderContainer.dataset.created,
             parentFolderId: this.getDisplayedFolderId()
         }
@@ -263,8 +271,8 @@ export default class GlobalNotesView {
         folderContainer.classList.add('folderIconContainer', 'new');
         buttonContainer.classList.add('flex', 'halfGap');
 
-        textarea.id = 'folderNameInput';
         textarea.placeholder = 'Ordername';
+        textarea.classList.add('folderNameInput');
         textarea.classList.add('alertRing');
 
         saveButton.classList.add('confirmationButton', 'saveNewFolderButton');
@@ -294,6 +302,74 @@ export default class GlobalNotesView {
 
     static getCurrentNavigationStep() {
         return document.querySelector('#folderNavigationButtonContainer').dataset.history_step;
+    }
+
+    static makeFolderEditable(folderId) {
+        const folderIconContainer = document.querySelector(`.folderIconContainer[data-folder_id="${folderId}"]`);
+        const folderNameWrapper = folderIconContainer.querySelector('.folderNameWrapper');
+
+        const textarea = document.createElement('textarea');
+        const blankButton = document.createElement('button');
+        const blankSpan = document.createElement('span');
+
+        const buttonContainer = document.createElement('div');
+        const saveButton = blankButton.cloneNode();
+        const cancelButton = blankButton.cloneNode();
+        const checkIcon = blankSpan.cloneNode()
+        const crossIcon = blankSpan.cloneNode()
+
+        textarea.classList.add('folderNameInput');
+        textarea.value = folderNameWrapper.textContent;
+        textarea.classList.add('alertRing');
+
+        folderIconContainer.classList.add('editable');
+        buttonContainer.classList.add('flex', 'halfGap');
+
+        saveButton.classList.add('confirmationButton', 'saveFolderEditButton');
+        cancelButton.classList.add('cancelButton', 'cancelFolderEditButton');
+
+        checkIcon.classList.add('icon', 'checkIcon');
+        crossIcon.classList.add('icon', 'crossIcon');
+
+        saveButton.append(checkIcon);
+        cancelButton.append(crossIcon);
+        buttonContainer.append(saveButton);
+        buttonContainer.append(cancelButton);
+
+        folderIconContainer.append(textarea);
+        folderIconContainer.append(buttonContainer);
+
+        folderNameWrapper.classList.add('notDisplayed');
+    }
+
+    static removeFolderEditability(event) {
+        const folderIconContainer = event.target.closest('.folderIconContainer');
+        const buttonContainer = event.target.parentElement;
+        const folderNameWrapper = folderIconContainer.querySelector('.folderNameWrapper');
+        const textarea = folderIconContainer.querySelector('textarea');
+
+        if (event.target.classList.contains('saveFolderEditButton')) {
+            folderNameWrapper.textContent = textarea.value;
+        }
+
+        folderIconContainer.classList.remove('editable');
+        folderNameWrapper.classList.remove('notDisplayed');
+        textarea.remove();
+        buttonContainer.remove();
+    }
+
+    //////////
+    // misc //
+    //////////
+
+    static markItemAsCut() {
+        const globalNotesContainer = document.querySelector('#globalNotesContainer');
+        globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.add('cut'));
+    }
+
+    static getSourceContainerOfContextMenu(event) {
+        if (event.srcElement.closest('.folderIconContainer')) return event.srcElement.closest('.folderIconContainer');
+        if (event.srcElement.closest('.noteIconContainer')) return event.srcElement.closest('.noteIconContainer');
     }
 
     /////////////
@@ -343,7 +419,7 @@ export default class GlobalNotesView {
 
     static alertFolderNameInput(event) {
         const folderIconContainer = event.target.closest('.folderIconContainer');
-        const alertRing = folderIconContainer.querySelector('#folderNameInput');
+        const alertRing = folderIconContainer.querySelector('.folderNameInput');
 
         alertRing.classList.add('validationError');
         setTimeout(() => {

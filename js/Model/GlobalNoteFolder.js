@@ -55,6 +55,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     static #navigationHistory = [0];
+    static #clipboard = [];
 
     static async getAllFolders() {
         const noteFolder = new GlobalNoteFolder;
@@ -86,6 +87,10 @@ export default class GlobalNoteFolder extends AbstractModel {
 
         return parentFolderArray;
     }
+
+    ////////////////////////
+    // navigation history //
+    ////////////////////////
 
     static updateNavigationHistory(folderIdToStore, currentStep) {
         currentStep = Number(currentStep);
@@ -139,6 +144,33 @@ export default class GlobalNoteFolder extends AbstractModel {
             nextStepAvailable: false
         }
     }
+
+    ///////////////////////
+    // clipboard methods //
+    ///////////////////////
+    
+    /**@param operationType 'move', 'copy'  */
+    static addToClipboard(folderIdArray, operationType) {
+        if (operationType != 'move' && operationType != 'copy') console.error('Unknown operation type!')
+
+        this.clearClipboard();
+
+        folderIdArray.forEach(folderId => this.#clipboard.push({folderId: folderId, operationType: operationType}));
+
+        console.log(this.#clipboard);
+    }
+
+    static getClipboardContent() {
+        return this.#clipboard;
+    }
+
+    static clearClipboard() {
+        this.#clipboard = [];
+    } 
+    
+    //////////////////////
+    // instance methods //
+    //////////////////////
 
     async save() {
         let allGlobalNoteFolders = await GlobalNoteFolder.getAllFolders();

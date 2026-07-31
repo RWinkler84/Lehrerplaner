@@ -543,7 +543,7 @@ export default class AbstractModel {
     static #removeInvalidAndCanceledLessons(allLessonDates) {
         let entriesToFilterOut = [];
 
-        //filters out regular lesson dates, that have been marked as canceled
+        //filters out regular lesson dates, that have been selected as canceled
         allLessonDates.forEach(lessonDate => {
             if (lessonDate.canceled == 'true') entriesToFilterOut.push(lessonDate);
         });
