@@ -38,7 +38,7 @@ export default class GlobalNotesView {
         container.append(fragment);
     }
 
-    static renderFolderIcons(folderArray) {
+    static renderFolderIcons(folderArray, clipboardContent) {
         const container = document.querySelector('#folderIconContainer')
         const fragment = document.createDocumentFragment();
         const blankDiv = document.createElement('div');
@@ -64,6 +64,10 @@ export default class GlobalNotesView {
             currentFolderContainer.setAttribute('tabindex', 0);
             currentFolderContainer.dataset.folder_id = folder.id;
             currentFolderContainer.dataset.created = folder.created;
+
+            if (clipboardContent[folder.id]) {
+                if (clipboardContent[folder.id].operationType == 'cut') currentFolderContainer.classList.add('cut');
+            }
 
             fragment.append(currentFolderContainer);
         })
@@ -151,28 +155,47 @@ export default class GlobalNotesView {
     }
 
     static openContextMenu(event, clipboardContent) {
-        const menuItems = [
+        //folder or a note is right clicked
+        const itemClickedMenu = [
             {
-                action: 'edit',
+                action: 'editGlobalItem',
                 text: 'bearbeiten'
             },
             {
-                action: 'copy',
+                action: 'copyGlobalItem',
                 text: 'kopieren'
             },
             {
-                action: 'cut',
+                action: 'cutGlobalItem',
                 text: 'ausschneiden'
             },
             {
-                action: 'paste',
+                action: 'pasteGlobalItem',
                 text: 'einfügen'
             },
             {
-                action: 'delete',
+                action: 'deleteGlobalItem',
                 text: 'löschen'
             },
         ]
+
+        //context menu when a blank space is clicked
+        const folderClickedMenu = [
+            {
+                action: 'newGlobalNoteFolder',
+                text: 'neuer Ordner'
+            },
+            {
+                action: 'newGlobalNote',
+                text: 'neue Notiz'
+            },
+            {
+                action: 'pasteGlobalItem',
+                text: 'einfügen'
+            }
+        ];
+
+        let menuToRender = itemClickedMenu;
 
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
         const navHeight = document.querySelector('nav').getBoundingClientRect().height;
@@ -184,8 +207,9 @@ export default class GlobalNotesView {
         const sourceContainer = this.getSourceContainerOfContextMenu(event);
 
         if (sourceContainer.classList.contains('new')) return;
+        if (sourceContainer.classList.contains('cut')) return;
+        if (sourceContainer.id == 'globalNotesFileContainer') menuToRender = folderClickedMenu;
 
-        sourceContainer.classList.add('selected');
 
         const blankDiv = document.createElement('div');
         const blankButton = document.createElement('button');
@@ -197,16 +221,21 @@ export default class GlobalNotesView {
 
         if (sourceContainer.classList.contains('folderIconContainer')) menuContainer.dataset.folder_id = sourceContainer.dataset.folder_id;
         if (sourceContainer.classList.contains('noteIconContainer')) menuContainer.dataset.note_id = sourceContainer.dataset.note_id;
+        if (sourceContainer.id == 'globalNotesFileContainer') menuContainer.dataset.folder_id = sourceContainer.dataset.folder_id;
 
-        menuItems.forEach(item => {
+        sourceContainer.classList.add('selected');
+
+        menuToRender.forEach(item => {
             const currentItem = blankDiv.cloneNode();
             const currentButton = blankButton.cloneNode();
 
             currentButton.classList.add('contextMenuButton');
             currentButton.textContent = item.text;
-            currentButton.id = `${item.action}GlobalItemButton`;
+            currentButton.id = `${item.action}Button`;
 
-            if (item.action == 'paste' && clipboardContent.length == 0) currentButton.disabled = true;
+            if (item.action == 'pasteGlobalItem') {
+                if ((Object.keys(clipboardContent.folders).length == 0 && Object.keys(clipboardContent.notes).length == 0)) currentButton.disabled = true
+            };
 
             menuContainer.append(currentButton);
         })
@@ -364,12 +393,15 @@ export default class GlobalNotesView {
 
     static markItemAsCut() {
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
+        globalNotesContainer.querySelectorAll('.cut').forEach(item => item.classList.remove('cut'));
         globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.add('cut'));
     }
 
     static getSourceContainerOfContextMenu(event) {
         if (event.srcElement.closest('.folderIconContainer')) return event.srcElement.closest('.folderIconContainer');
         if (event.srcElement.closest('.noteIconContainer')) return event.srcElement.closest('.noteIconContainer');
+
+        return document.querySelector('#globalNotesFileContainer');
     }
 
     /////////////

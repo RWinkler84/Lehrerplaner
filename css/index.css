@@ -940,6 +940,8 @@ dialog .errorMessageDisplay,
 #globalNotesContainer {
     flex-grow: 1;
     position: relative;
+    display: flex !important;
+    flex-direction: column;
 
     .globalNoteContextMenu {
         display: flex;
@@ -956,12 +958,20 @@ dialog .errorMessageDisplay,
         button {
             color: var(--bodyBackground);
             padding: 0.25rem 1rem;
-        }
 
-        button:hover {
-            background-color: rgba(256, 256, 256, 0.4);
-        }
+            &:hover {
+                background-color: rgba(256, 256, 256, 0.4);
+            }
 
+            &[disabled] {
+                color: var(--lightgrey);
+                background-color: var(--lightergrey);
+            }
+        }
+    }
+
+    #globalNotesFileContainer {
+        flex-grow: 1;
     }
 
     #globalNotesFileSystemDisplay {

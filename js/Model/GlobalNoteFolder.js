@@ -1,5 +1,6 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
+import GlobalNotesController from "../Controller/GlobalNotesController.js";
 
 export default class GlobalNoteFolder extends AbstractModel {
     #id;
@@ -8,7 +9,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     #created;
     #lastEdited;
 
-        static mockupFolders = [
+    static mockupFolders = [
         {
             id: 0,
             name: 'alle Dateien',
@@ -46,7 +47,7 @@ export default class GlobalNoteFolder extends AbstractModel {
         }
     ];
 
-        static writeMockupData() {
+    static writeMockupData() {
         this.mockupFolders.forEach(noteData => {
             const note = this.writeDataToInstance(noteData);
 
@@ -55,7 +56,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     static #navigationHistory = [0];
-    static #clipboard = [];
+    static #clipboard = {};
 
     static async getAllFolders() {
         const noteFolder = new GlobalNoteFolder;
@@ -75,7 +76,7 @@ export default class GlobalNoteFolder extends AbstractModel {
         const noteFolder = new GlobalNoteFolder;
         const allFoldersOfParent = await noteFolder.readAllByIndexFromLocalDB('globalNoteFolders', 'parentFolderId', parentFolderId);
 
-        return allFoldersOfParent;
+        return allFoldersOfParent.map(entry => this.writeDataToInstance(entry));
     }
 
     static async getAllParentFolders(folderId, parentFolderArray = []) {
@@ -148,16 +149,12 @@ export default class GlobalNoteFolder extends AbstractModel {
     ///////////////////////
     // clipboard methods //
     ///////////////////////
-    
-    /**@param operationType 'move', 'copy'  */
+
+    /**@param operationType 'cut', 'copy'  */
     static addToClipboard(folderIdArray, operationType) {
-        if (operationType != 'move' && operationType != 'copy') console.error('Unknown operation type!')
+        if (operationType != 'cut' && operationType != 'copy') console.error('Unknown operation type!')
 
-        this.clearClipboard();
-
-        folderIdArray.forEach(folderId => this.#clipboard.push({folderId: folderId, operationType: operationType}));
-
-        console.log(this.#clipboard);
+        folderIdArray.forEach(folderId => this.#clipboard[folderId] = { folderId: folderId, operationType: operationType });
     }
 
     static getClipboardContent() {
@@ -165,9 +162,80 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     static clearClipboard() {
-        this.#clipboard = [];
-    } 
-    
+        this.#clipboard = {};
+    }
+
+    static async pasteClipboardContent(targetFolderId) {
+        const foldersToUpdate = [];
+        let allGlobalNotesFolders = [];
+        let itemsToSave = {
+            folders: [],
+            notes: []
+        };
+
+        const model = new GlobalNoteFolder;
+
+        async function copyFolder(folder, itemsToSave) {
+            const allChildFolders = await GlobalNoteFolder.getAllByParentFolderId(folder.id);
+            const allChildNotes = await GlobalNotesController.getAllNotesByParentFolderId(folder.id);
+
+            folder.parentFolderId = Number(targetFolderId);
+            folder.id = Fn.generateId(allGlobalNotesFolders);
+
+            allGlobalNotesFolders.push(folder);
+
+            itemsToSave.folders.push(folder);
+
+            for (const note of allChildNotes) {
+                note.parentFolderId = folder.id;
+
+                itemsToSave.notes.push(note);
+            }
+
+            for (const folder of allChildFolders) {
+                itemsToSave = await copyFolder(folder, itemsToSave)
+            }
+
+            return itemsToSave;
+        }
+
+        for (const id of Object.keys(this.#clipboard)) {
+            const folder = await this.getById(id);
+
+            if (this.#clipboard[id].operationType == 'copy') {
+                allGlobalNotesFolders = await this.getAllFolders();
+                folder.name = `${folder.name} (Kopie)`;
+
+                itemsToSave = await copyFolder(folder, itemsToSave);
+
+                continue;
+
+            }
+
+            folder.parentFolderId = Number(targetFolderId);
+            foldersToUpdate.push(folder);
+        }
+
+        console.log(itemsToSave);
+
+        this.clearClipboard();
+
+        await model.batchSave(itemsToSave.folders, true);
+        await GlobalNotesController.batchSaveGlobalNotes(itemsToSave.notes, true);
+        await model.batchUpdate(foldersToUpdate);
+    }
+
+    static isCut(id) {
+        let match = false;
+        const clipboard = this.#clipboard;
+
+        Object.keys(clipboard).forEach(key => {
+            if (clipboard[key].folderId == id && clipboard[key].operationType == 'cut') match = true;
+        })
+
+        return match;
+    }
+
     //////////////////////
     // instance methods //
     //////////////////////
@@ -186,13 +254,17 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     async delete() {
-        let deletedItem = await this.readFromLocalDB('globalNoteFolders', this.id);
+        //hole alle child folders
+        // rufe delete funktion auf allen kindordnern auf
+        //hole alle notizen im Ornder und lösche sie
+        // sende das gesammelte ergebnis an die Datenbank
+
         this.deleteFromLocalDB('globalNoteFolders', this.id);
         this.deleteFromLocalDB('unsyncedGlobalNoteFolders', this.id);
 
         let result = await this.makeAjaxQuery('globalNoteFolder', 'delete', [this.serialize()]);
 
-        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolders', deletedItem);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolders', this.serialize());
     }
 
     async update() {
@@ -202,6 +274,31 @@ export default class GlobalNoteFolder extends AbstractModel {
         let result = await this.makeAjaxQuery('globalNoteFolder', 'update', [this.serialize()]);
 
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedGlobalNoteFolders', this.serialize());
+    }
+
+    async batchSave(foldersToSave, keepIds) {
+        
+    }
+
+    async batchUpdate(foldersToUpdate) {
+        const serializedFolders = [];
+
+        for (const folder of foldersToUpdate) {
+            folder.lastEdited = this.formatDateTime(new Date());
+
+            let serializedFolder = folder.serialize();
+            serializedFolders.push(serializedFolder);
+
+            await this.updateOnLocalDB('globalNoteFolders', serializedFolder);
+        }
+
+        let result = await this.makeAjaxQuery('globalNoteFolder', 'update', serializedFolders);
+
+        if (result.status == 'failed') {
+            for (const folder of serializedFolders) {
+                this.writeToLocalDB('unsyncedGlobalNoteFolders', folder);
+            }
+        }
     }
 
     serialize() {

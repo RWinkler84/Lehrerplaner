@@ -9,7 +9,7 @@ export default class GlobalNote extends AbstractModel {
     #created;
     #lastEdited;
 
-    static #clipboard = [];
+    static #clipboard = {};
 
     static mockupFiles = [
         {
@@ -72,22 +72,18 @@ export default class GlobalNote extends AbstractModel {
         const note = new GlobalNote;
         const allNotesOfFolder = await note.readAllByIndexFromLocalDB('globalNotes', 'parentFolderId', parentFolderId);
 
-        return allNotesOfFolder;
+        return allNotesOfFolder.map(entry => this.writeDataToInstance(entry));
     }
 
     ///////////////////////
     // clipboard methods //
     ///////////////////////
 
-    /**@param operationType 'move', 'copy'  */
-    static addToClipboard(folderIdArray, operationType) {
-        if (operationType != 'move' && operationType != 'copy') console.error('Unknown operation type!')
+    /**@param operationType 'cut', 'copy'  */
+    static addToClipboard(noteIdArray, operationType) {
+        if (operationType != 'cut' && operationType != 'copy') console.error('Unknown operation type!')
 
-        this.clearClipboard();
-
-        folderIdArray.forEach(folderId => this.#clipboard.push({ folderId: folderId, operationType: operationType }));
-
-        console.log(this.#clipboard);
+        noteIdArray.forEach(noteId => this.#clipboard[noteId] = { noteId: noteId, operationType: operationType });
     }
 
     static getClipboardContent() {
@@ -96,6 +92,20 @@ export default class GlobalNote extends AbstractModel {
 
     static clearClipboard() {
         this.#clipboard = [];
+    }
+
+    static async pasteClipboardContent(targetFolderId) {
+        const notesToUpdate = [];
+        const model = new GlobalNote;
+
+        for (const id of Object.keys(this.#clipboard)) {
+            const globalNote = await this.getById(id);
+
+            globalNote.parentFolderId = Number(targetFolderId);
+            notesToUpdate.push(globalNote);
+        }
+
+        await model.batchUpdate(notesToUpdate);
     }
 
     //////////////////////
@@ -132,6 +142,31 @@ export default class GlobalNote extends AbstractModel {
         let result = await this.makeAjaxQuery('globalNote', 'update', [this.serialize()]);
 
         if (result.status == 'failed') this.updateOnLocalDB('unsyncedGlobalNotes', this.serialize());
+    }
+
+    async batchSave(globalNotesToSave, keepIds = false) {
+
+    }
+
+    async batchUpdate(globalNotesToUpdate) {
+        const serializedNotes = [];
+
+        for (const note of globalNotesToUpdate) {
+            note.lastEdited = this.formatDateTime(new Date());
+
+            let serializedNote = note.serialize();
+            serializedNotes.push(serializedNote);
+
+            await this.updateOnLocalDB('globalNotes', serializedNote);
+        }
+
+        let result = await this.makeAjaxQuery('globalNote', 'update', serializedNotes);
+
+        if (result.status == 'failed') {
+            for (const note of serializedNotes) {
+                this.writeToLocalDB('unsyncedGlobalNotes', note);
+            }
+        }
     }
 
     serialize() {

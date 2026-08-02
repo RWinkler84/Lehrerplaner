@@ -16,8 +16,9 @@ export default class GlobalNotesController {
 
     static async renderFolderIcons() {
         const allFolders = await GlobalNoteFolder.getAllByParentFolderId(View.getDisplayedFolderId());
+        const clipboardContent = GlobalNoteFolder.getClipboardContent();
 
-        View.renderFolderIcons(allFolders);
+        View.renderFolderIcons(allFolders, clipboardContent);
     }
 
     static async renderFolderPath() {
@@ -43,13 +44,13 @@ export default class GlobalNotesController {
     }
 
     static openContextMenu(event) {
-        let clipboardContent = [];
+        let clipboardContent = {
+            folders: GlobalNoteFolder.getClipboardContent(),
+            notes: GlobalNote.getClipboardContent()
+        };
 
         const sourceContainer = View.getSourceContainerOfContextMenu(event);
 
-        if (sourceContainer.classList.contains('folderIconContainer')) clipboardContent = GlobalNoteFolder.getClipboardContent();
-        if (sourceContainer.classList.contains('noteIconContainer')) clipboardContent = GlobalNote.getClipboardContent();
-        
         View.openContextMenu(event, clipboardContent);
     }
 
@@ -89,6 +90,12 @@ export default class GlobalNotesController {
         View.toggleSaveDayNoteButton(false);
     }
 
+    static async batchSaveGlobalNotes(notesToSave, keepIds){
+        const globalNote = new GlobalNote;
+
+        await globalNote.batchSave(notesToSave, keepIds);
+    }
+    
     static async updateGlobalNote(globalNoteData) {
         const globalNote = GlobalNote.writeDataToInstance(globalNoteData)
 
@@ -112,6 +119,7 @@ export default class GlobalNotesController {
         const globalNotesFileContainer = document.querySelector('#globalNotesFileContainer');
 
         if (globalNotesFileContainer.dataset.folder_id == folderId) return;
+        if (GlobalNoteFolder.isCut(folderId)) return;
 
         globalNotesFileContainer.dataset.folder_id = folderId;
 
@@ -231,28 +239,61 @@ export default class GlobalNotesController {
         }
     }
 
-    static async moveGlobalItem(event) {
+    static async cutGlobalItem(event) {
         const clickedItemData = View.getContextMenuInfo(event);
 
         if (clickedItemData.fileType == 'folder') {
-            GlobalNoteFolder.addToClipboard([clickedItemData.folderId], 'move');
+            GlobalNoteFolder.clearClipboard();
             GlobalNote.clearClipboard();
+
+            GlobalNoteFolder.addToClipboard([clickedItemData.folderId], 'cut');
 
             View.markItemAsCut();
             this.closeAllContextMenus();
         }
 
         // if (clickedItemData.fileType == 'note') {
-            // GlobalNote.addToClipboard([clickedItemData.folderId], 'move');
-            // GlobalNoteFolder.clearClipboard();
-            
-            // View.markItemCutOrCopied(clickedItemData);
+        // GlobalNoteFolder.clearClipboard();
+        // GlobalNote.clearClipboard();
+
+        // GlobalNote.addToClipboard([clickedItemData.folderId], 'cut');
+
+
+        // View.markItemAsCut();
+        // this.closeAllContextMenus();
+        // }
+    }
+
+    static async copyGlobalItem(event) {
+        const clickedItemData = View.getContextMenuInfo(event);
+
+        if (clickedItemData.fileType == 'folder') {
+            GlobalNote.clearClipboard();
+            GlobalNoteFolder.clearClipboard();
+
+            GlobalNoteFolder.addToClipboard([clickedItemData.folderId], 'copy');
+
+            this.closeAllContextMenus();
+        }
+
+        // if (clickedItemData.fileType == 'note') {
+        // GlobalNote.clearClipboard();
+        // GlobalNoteFolder.clearClipboard();
+        
+        // GlobalNote.addToClipboard([clickedItemData.folderId], 'copy');
+
         //     this.closeAllContextMenus();
         // }
     }
 
     static async pasteGlobalItem(event) {
+        const contextMenuInfo = View.getContextMenuInfo(event);
 
+        await GlobalNote.pasteClipboardContent(contextMenuInfo.folderId);
+        await GlobalNoteFolder.pasteClipboardContent(contextMenuInfo.folderId);
+
+        this.closeAllContextMenus();
+        this.renderGlobalNotesView();
     }
 
     static async deleteGlobalItem(event) {
@@ -271,12 +312,15 @@ export default class GlobalNotesController {
         }
     }
 
-    static getFolderClipboardContent() {
+    //////////
+    // misc //
+    //////////
 
+    static async getAllNotesByParentFolderId(id) {
+        return await GlobalNote.getAllByParentFolderId(id);
     }
-
-    static getGlobalNoteClipboardContent() {
-
+    static async getAllFoldersByParentFolderId(id) {
+        return await GlobalNoteFolder.getAllByParentFolderId(id);
     }
 
     static clickHandler(event) {
@@ -316,7 +360,7 @@ export default class GlobalNotesController {
                     this.createNewGlobalNote();
                     break;
 
-                case 'createGlobalNoteFolder':
+                case 'createGlobalNoteFolderButton':
                     this.createNewGlobalNoteFolder();
                     break;
 
@@ -326,7 +370,11 @@ export default class GlobalNotesController {
                     break;
 
                 case 'cutGlobalItemButton':
-                    this.moveGlobalItem(event);
+                    this.cutGlobalItem(event);
+                    break;
+
+                case 'copyGlobalItemButton':
+                    this.copyGlobalItem(event);
                     break;
 
                 case 'pasteGlobalItemButton':
@@ -335,6 +383,16 @@ export default class GlobalNotesController {
 
                 case 'deleteGlobalItemButton':
                     this.deleteGlobalItem(event);
+                    break;
+
+                case 'newGlobalNoteButton':
+                    this.closeAllContextMenus();
+                    this.createNewGlobalNote();
+                    break;
+
+                case 'newGlobalNoteFolderButton':
+                    this.closeAllContextMenus()
+                    this.createNewGlobalNoteFolder();
                     break;
             }
 
@@ -389,8 +447,6 @@ export default class GlobalNotesController {
 
     static rightClickHandler(event) {
         const target = event.target;
-        if (target.id == 'noteIconContainer' || target.id == 'folderIconContainer') return;
-
         event.preventDefault();
 
         GlobalNotesController.closeAllContextMenus();
