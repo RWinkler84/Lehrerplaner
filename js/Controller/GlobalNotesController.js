@@ -11,7 +11,9 @@ export default class GlobalNotesController {
 
     static async renderGlobalNoteIcons() {
         const globalNotes = await GlobalNote.getAllByParentFolderId(View.getDisplayedFolderId());
-        View.renderGlobalNoteIcons(globalNotes);
+        const clipboardContent = GlobalNote.getClipboardContent();
+
+        View.renderGlobalNoteIcons(globalNotes, clipboardContent);
     }
 
     static async renderFolderIcons() {
@@ -30,6 +32,8 @@ export default class GlobalNotesController {
     static async openGlobalNoteDialog(noteId = null) {
 
         if (noteId) {
+            if (GlobalNote.isCut(noteId)) return;
+
             const globalNote = await GlobalNote.getById(noteId);
             View.openGlobalNoteDialog(globalNote);
 
@@ -90,12 +94,12 @@ export default class GlobalNotesController {
         View.toggleSaveDayNoteButton(false);
     }
 
-    static async batchSaveGlobalNotes(notesToSave, keepIds){
+    static async batchSaveGlobalNotes(notesToSave, keepIds) {
         const globalNote = new GlobalNote;
 
         await globalNote.batchSave(notesToSave, keepIds);
     }
-    
+
     static async updateGlobalNote(globalNoteData) {
         const globalNote = GlobalNote.writeDataToInstance(globalNoteData)
 
@@ -111,6 +115,10 @@ export default class GlobalNotesController {
         await noteToDelete.delete();
     }
 
+    static async batchDeleteGlobalNote(globalNotesToDelete) {
+        await (new GlobalNote).batchDelete(globalNotesToDelete);
+    }
+
     /////////////////////////
     // folder crud methods //
     /////////////////////////
@@ -119,7 +127,6 @@ export default class GlobalNotesController {
         const globalNotesFileContainer = document.querySelector('#globalNotesFileContainer');
 
         if (globalNotesFileContainer.dataset.folder_id == folderId) return;
-        if (GlobalNoteFolder.isCut(folderId)) return;
 
         globalNotesFileContainer.dataset.folder_id = folderId;
 
@@ -252,16 +259,15 @@ export default class GlobalNotesController {
             this.closeAllContextMenus();
         }
 
-        // if (clickedItemData.fileType == 'note') {
-        // GlobalNoteFolder.clearClipboard();
-        // GlobalNote.clearClipboard();
+        if (clickedItemData.fileType == 'note') {
+            GlobalNoteFolder.clearClipboard();
+            GlobalNote.clearClipboard();
 
-        // GlobalNote.addToClipboard([clickedItemData.folderId], 'cut');
+            GlobalNote.addToClipboard([clickedItemData.noteId], 'cut');
 
-
-        // View.markItemAsCut();
-        // this.closeAllContextMenus();
-        // }
+            View.markItemAsCut();
+            this.closeAllContextMenus();
+        }
     }
 
     static async copyGlobalItem(event) {
@@ -276,14 +282,14 @@ export default class GlobalNotesController {
             this.closeAllContextMenus();
         }
 
-        // if (clickedItemData.fileType == 'note') {
-        // GlobalNote.clearClipboard();
-        // GlobalNoteFolder.clearClipboard();
-        
-        // GlobalNote.addToClipboard([clickedItemData.folderId], 'copy');
+        if (clickedItemData.fileType == 'note') {
+            GlobalNote.clearClipboard();
+            GlobalNoteFolder.clearClipboard();
 
-        //     this.closeAllContextMenus();
-        // }
+            GlobalNote.addToClipboard([clickedItemData.noteId], 'copy');
+
+            this.closeAllContextMenus();
+        }
     }
 
     static async pasteGlobalItem(event) {
@@ -291,6 +297,9 @@ export default class GlobalNotesController {
 
         await GlobalNote.pasteClipboardContent(contextMenuInfo.folderId);
         await GlobalNoteFolder.pasteClipboardContent(contextMenuInfo.folderId);
+
+        GlobalNote.clearClipboard();
+        GlobalNoteFolder.clearClipboard();
 
         this.closeAllContextMenus();
         this.renderGlobalNotesView();
@@ -321,6 +330,10 @@ export default class GlobalNotesController {
     }
     static async getAllFoldersByParentFolderId(id) {
         return await GlobalNoteFolder.getAllByParentFolderId(id);
+    }
+
+    static async getAllGlobalNotes() {
+        return await GlobalNote.getAllNotes();
     }
 
     static clickHandler(event) {
@@ -418,6 +431,8 @@ export default class GlobalNotesController {
                     if (target.closest('.folderIconContainer').classList.contains('editable')) return;
 
                     folderId = target.closest('.folderIconContainer').dataset.folder_id;
+
+                    if (GlobalNoteFolder.isCut(folderId)) return;
 
                     GlobalNoteFolder.updateNavigationHistory(folderId, currentStep);
                     this.updateHistoryNavigationButtons();

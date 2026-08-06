@@ -95,17 +95,33 @@ export default class GlobalNote extends AbstractModel {
     }
 
     static async pasteClipboardContent(targetFolderId) {
+        let allGlobalNotes;
         const notesToUpdate = [];
         const model = new GlobalNote;
 
         for (const id of Object.keys(this.#clipboard)) {
             const globalNote = await this.getById(id);
 
+            if (this.#clipboard[id].operationType == 'copy') {
+                allGlobalNotes = await GlobalNote.getAllNotes();
+
+                globalNote.id = Fn.generateId(allGlobalNotes);
+                globalNote.title = `${globalNote.title}(Kopie)`;
+            }
+
             globalNote.parentFolderId = Number(targetFolderId);
             notesToUpdate.push(globalNote);
         }
 
         await model.batchUpdate(notesToUpdate);
+    }
+
+    static isCut(id) {
+        const clipboard = this.#clipboard;
+
+        if (clipboard[id] && clipboard[id].operationType == 'cut') return true;
+
+        return false;
     }
 
     //////////////////////
@@ -126,13 +142,12 @@ export default class GlobalNote extends AbstractModel {
     }
 
     async delete() {
-        let deletedItem = await this.readFromLocalDB('globalNotes', this.id);
         this.deleteFromLocalDB('globalNotes', this.id);
         this.deleteFromLocalDB('unsyncedGlobalNotes', this.id);
 
         let result = await this.makeAjaxQuery('globalNote', 'delete', [this.serialize()]);
 
-        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNotes', deletedItem);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNotes', this.serialize());
     }
 
     async update() {
@@ -145,7 +160,30 @@ export default class GlobalNote extends AbstractModel {
     }
 
     async batchSave(globalNotesToSave, keepIds = false) {
+        const serializedNotes = [];
+        const allGlobalNotes = await GlobalNote.getAllNotes()
 
+        for (const note of globalNotesToSave) {
+            if (!keepIds) {
+                note.id = Fn.generateId(allGlobalNotes)
+                allGlobalNotes.push(note);
+            }
+
+            note.lastEdited = this.formatDateTime(new Date());
+
+            let serializedNote = note.serialize();
+            serializedNotes.push(serializedNote);
+
+            await this.writeToLocalDB('globalNotes', serializedNote);
+        }
+
+        let result = await this.makeAjaxQuery('globalNote', 'save', serializedNotes);
+
+        if (result.status == 'failed') {
+            for (const note of serializedNotes) {
+                this.writeToLocalDB('unsyncedGlobalNotes', note);
+            }
+        }
     }
 
     async batchUpdate(globalNotesToUpdate) {
@@ -163,10 +201,23 @@ export default class GlobalNote extends AbstractModel {
         let result = await this.makeAjaxQuery('globalNote', 'update', serializedNotes);
 
         if (result.status == 'failed') {
-            for (const note of serializedNotes) {
-                this.writeToLocalDB('unsyncedGlobalNotes', note);
-            }
+            this.writeToLocalDB('unsyncedGlobalNotes', serializedNotes);
         }
+    }
+
+    async batchDelete(globalNotesToDelete) {
+        const serializedNotes = [];
+
+        for (const note of globalNotesToDelete) {
+            serializedNotes.push(note.serialize());
+
+            await this.deleteFromLocalDB('globalNotes', note.id);
+            await this.deleteFromLocalDB('unsyncedGlobalNotes', note.id);
+        }
+
+        let result = await this.makeAjaxQuery('globalNote', 'delete', serializedNotes);
+
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNotes', serializedNotes);
     }
 
     serialize() {

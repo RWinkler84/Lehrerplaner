@@ -1,7 +1,7 @@
 import Editor from "../inc/editor.js";
 
 export default class GlobalNotesView {
-    static renderGlobalNoteIcons(notesArray) {
+    static renderGlobalNoteIcons(notesArray, clipboardContent) {
         const container = document.querySelector('#noteIconContainer')
         const fragment = document.createDocumentFragment();
         const blankDiv = document.createElement('div');
@@ -27,6 +27,10 @@ export default class GlobalNotesView {
             currentNoteContainer.setAttribute('tabindex', 0);
             currentNoteContainer.dataset.note_id = globalNote.id;
             currentNoteContainer.dataset.created = globalNote.created;
+
+            if (clipboardContent[globalNote.id]) {
+                if (clipboardContent[globalNote.id].operationType == 'cut') currentNoteContainer.classList.add('cut');
+            }
 
             fragment.append(currentNoteContainer);
         })
@@ -248,8 +252,8 @@ export default class GlobalNotesView {
 
         return {
             fileType: clickedContextMenu.dataset.folder_id ? 'folder' : 'note',
-            folderId: clickedContextMenu.dataset.folder_id,
-            noteId: clickedContextMenu.dataset.note_id
+            folderId: Number(clickedContextMenu.dataset.folder_id),
+            noteId: Number(clickedContextMenu.dataset.note_id)
         }
     }
 
