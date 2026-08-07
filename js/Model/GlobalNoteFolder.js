@@ -9,63 +9,41 @@ export default class GlobalNoteFolder extends AbstractModel {
     #created;
     #lastEdited;
 
-    static mockupFolders = [
+    static #systemFolders = [
         {
             id: 0,
-            name: 'alle Dateien',
+            name: 'alle',
             parentFolderId: undefined,
             created: '',
             lastEdited: ''
         },
         {
             id: 1,
-            name: 'alte Daten',
+            name: 'Papierkorb',
             parentFolderId: 0,
             created: '',
-            lastEdited: ''
-        },
-        {
-            id: 2,
-            name: 'neuer Ordner länger',
-            parentFolderId: 0,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 3,
-            name: 'ältere Daten',
-            parentFolderId: 1,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 4,
-            name: 'mittlere Daten',
-            parentFolderId: 1,
-            created: '',
-            lastEdited: ''
+            lastEdited: '',
         }
     ];
-
-    static writeMockupData() {
-        this.mockupFolders.forEach(noteData => {
-            const note = this.writeDataToInstance(noteData);
-
-            note.save();
-        })
-    }
 
     static #navigationHistory = [0];
     static #clipboard = {};
 
     static async getAllFolders() {
         const noteFolder = new GlobalNoteFolder;
-        const dataArray = await noteFolder.readAllFromLocalDB('globalNoteFolders')
+        const foldersFromDb = await noteFolder.readAllFromLocalDB('globalNoteFolders');
+        const allFolders = this.#systemFolders.concat(foldersFromDb);
 
-        return dataArray.map(globalNoteFolder => this.writeDataToInstance(globalNoteFolder));
+        return allFolders.map(globalNoteFolder => this.writeDataToInstance(globalNoteFolder));
     }
 
     static async getById(id) {
+        const systemFolder = this.#systemFolders.find(folder => folder.id == id);
+
+        if (systemFolder) {
+            return this.writeDataToInstance(systemFolder);
+        }
+
         const noteFolder = new GlobalNoteFolder;
         const folderData = await noteFolder.readFromLocalDB('globalNoteFolders', id);
 
@@ -74,9 +52,14 @@ export default class GlobalNoteFolder extends AbstractModel {
 
     static async getAllByParentFolderId(parentFolderId) {
         const noteFolder = new GlobalNoteFolder;
-        const allFoldersOfParent = await noteFolder.readAllByIndexFromLocalDB('globalNoteFolders', 'parentFolderId', parentFolderId);
+        const allFoldersFromDB = await noteFolder.readAllByIndexFromLocalDB('globalNoteFolders', 'parentFolderId', parentFolderId);
+        const systemFolders = [];
+            
+        this.#systemFolders.map(folder => {if (folder.parentFolderId == parentFolderId) systemFolders.push(folder)});
 
-        return allFoldersOfParent.map(entry => this.writeDataToInstance(entry));
+        const allFolders = systemFolders.concat(allFoldersFromDB);
+
+        return allFolders.map(entry => this.writeDataToInstance(entry));
     }
 
     static async getAllParentFolders(folderId, parentFolderArray = []) {
@@ -160,7 +143,7 @@ export default class GlobalNoteFolder extends AbstractModel {
             folderContentArrays.folders.push(folder);
 
             allChildNotes.forEach(note => folderContentArrays.notes.push(note));
-            
+
             for (const folder of allChildFolders) {
                 folderContentArrays = await getContents(folder, folderContentArrays);
             }
@@ -169,8 +152,6 @@ export default class GlobalNoteFolder extends AbstractModel {
         }
 
         folderContentArrays = await getContents(folder, folderContentArrays);
-
-        console.log(folderContentArrays)
 
         return folderContentArrays;
     }
@@ -195,6 +176,8 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     static async pasteClipboardContent(targetFolderId) {
+        if (Fn.isEmptyObject(this.#clipboard)) return;
+
         const foldersToUpdate = [];
         let allGlobalNotes = [];
         let allGlobalNotesFolders = [];
@@ -265,9 +248,12 @@ export default class GlobalNoteFolder extends AbstractModel {
     //////////////////////
 
     async save() {
-        let allGlobalNoteFolders = await GlobalNoteFolder.getAllFolders();
+        const allGlobalNoteFolders = await GlobalNoteFolder.getAllFolders();
+        let newId = Fn.generateId(allGlobalNoteFolders);
 
-        this.id = Fn.generateId(allGlobalNoteFolders);
+        if (newId <= 1000) newId = 1001;
+
+        this.id = newId;
         this.lastEdited = this.formatDateTime(new Date());
         this.created = this.lastEdited;
 
@@ -284,10 +270,10 @@ export default class GlobalNoteFolder extends AbstractModel {
         const serializedFolders = [];
 
         for (const folder of foldersToDelete) {
-                serializedFolders.push(folder.serialize());
+            serializedFolders.push(folder.serialize());
 
-                await this.deleteFromLocalDB('globalNoteFolders', folder.id);
-                await this.deleteFromLocalDB('unsyncedGlobalNoteFolders', folder.id);
+            await this.deleteFromLocalDB('globalNoteFolders', folder.id);
+            await this.deleteFromLocalDB('unsyncedGlobalNoteFolders', folder.id);
         }
 
         let result = await this.makeAjaxQuery('globalNoteFolder', 'delete', serializedFolders);
@@ -365,6 +351,8 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     static writeDataToInstance(folderData, instance = null) {
+        if (!folderData) return false;
+
         let model = new AbstractModel;
         if (!instance) instance = new GlobalNoteFolder;
 

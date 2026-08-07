@@ -253,6 +253,42 @@ class AbstractModel
         return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
     }
 
+    public function getAllGlobalNotes()
+    {
+        global $user;
+
+        $userId = $user->getId();
+        $tableName = TABLEPREFIX . 'globalNotes';
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
+        $params = [];
+
+        $dataFromDb = $this->read($query, $params);
+        $dataFromDb = $this->preprocessReadData($dataFromDb);
+
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+
+        return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
+    }
+
+    public function getAllGlobalNoteFolders()
+    {
+        global $user;
+
+        $userId = $user->getId();
+        $tableName = TABLEPREFIX . 'globalNoteFolders';
+
+        $query = "SELECT * FROM $tableName WHERE userId = $userId";
+        $params = [];
+
+        $dataFromDb = $this->read($query, $params);
+        $dataFromDb = $this->preprocessReadData($dataFromDb);
+
+        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+
+        return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
+    }
+
     public function getDbUpdateTimestamps()
     {
         global $user;

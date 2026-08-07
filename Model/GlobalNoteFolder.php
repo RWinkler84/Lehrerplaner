@@ -74,8 +74,8 @@ private $tableName  = TABLEPREFIX . 'globalNoteFolders';
         $storedFolders = $this->read("SELECT * FROM $this->tableName WHERE userId = :userId", ['userId' => $user->getId()]);
         $storedFoldersLookup = [];
 
-        foreach ($storedFolders as $note) {
-            $storedFoldersLookup[$note['itemId']] = $note;
+        foreach ($storedFolders as $folder) {
+            $storedFoldersLookup[$folder['itemId']] = $folder;
         }
 
         foreach ($foldersToSync as $folderToSync) {
@@ -96,7 +96,7 @@ private $tableName  = TABLEPREFIX . 'globalNoteFolders';
             if (!is_null($matchingFolder)) {
                 if ($folderToSync['created'] == $matchingFolder['created'] && $folderToSync['lastEdited'] > $matchingFolder['lastEdited']) {
                     $query = "
-                        UPDATE $this->tableName SET title = :title, content = :content, parentFolderId = :parentFolderId, lastEdited = :lastEdited 
+                        UPDATE $this->tableName SET name = :name, parentFolderId = :parentFolderId, lastEdited = :lastEdited 
                         WHERE userId = :userId AND itemId = :itemId AND created = :created
                     ";
                 }
@@ -108,8 +108,8 @@ private $tableName  = TABLEPREFIX . 'globalNoteFolders';
                     $storedFolders[] = $folderToSync;
 
                     $query = "
-                                INSERT INTO $this->tableName (userId, itemId, title, content, parentFolderId, created, lastEdited)
-                                VALUES (:userId, :itemId, :title, :content, :parentFolderId, :created, :lastEdited)
+                                INSERT INTO $this->tableName (userId, itemId, name, parentFolderId, created, lastEdited)
+                                VALUES (:userId, :itemId, :name, :parentFolderId, :created, :lastEdited)
                             ";
                 }
             }

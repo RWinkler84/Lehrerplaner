@@ -55,7 +55,7 @@ class GlobalNoteFolderController extends AbstractController {
         echo json_encode($finalResult);
     }
 
-    public static function syncDayNotes($globalNoteFolders, $deletedGlobalNoteFolders)
+    public static function syncGlobalNoteFolders($globalNoteFolders, $deletedGlobalNoteFolders)
     {
         $result = [];
         $model = new GlobalNoteFolder;

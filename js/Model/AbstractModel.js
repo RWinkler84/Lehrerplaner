@@ -413,7 +413,9 @@ export default class AbstractModel {
                 tasks: null,
                 lessonNotes: null,
                 schoolYears: null,
-                dayNotes: null
+                dayNotes: null,
+                globalNotes: null,
+                globalNoteFolders: null
             }
         }
 
@@ -427,6 +429,8 @@ export default class AbstractModel {
             dataToStore.lastUpdated.lessonNotes = timestamps.lastUpdated.lessonNotes ? timestamps.lastUpdated.lessonNotes : 0;
             dataToStore.lastUpdated.schoolYears = timestamps.lastUpdated.schoolYears ? timestamps.lastUpdated.schoolYears : 0;
             dataToStore.lastUpdated.dayNotes = timestamps.lastUpdated.dayNotes ? timestamps.lastUpdated.dayNotes : 0;
+            dataToStore.lastUpdated.globalNotes = timestamps.lastUpdated.globalNotes ? timestamps.lastUpdated.globalNotes : 0;
+            dataToStore.lastUpdated.globalNoteFolders = timestamps.lastUpdated.globalNoteFolders ? timestamps.lastUpdated.globalNoteFolders : 0;
         }
 
         switch (store) {
@@ -450,6 +454,12 @@ export default class AbstractModel {
                 break;
             case 'dayNotes':
                 dataToStore.lastUpdated.dayNotes = this.formatDateTime(date);
+                break;
+            case 'globalNotes':
+                dataToStore.lastUpdated.globalNotes = this.formatDateTime(date);
+                break;
+            case 'globalNoteFolders':
+                dataToStore.lastUpdated.globalNoteFolders = this.formatDateTime(date);
                 break;
         }
 
@@ -672,14 +682,27 @@ export default class AbstractModel {
             tasks: false,
             lessonNotes: false,
             schoolYears: false,
-            dayNotes: false
+            dayNotes: false,
+            globalNotes: false,
+            globalNoteFolders: false,
         };
 
 
         if (remoteTimestamps.status == 'failed') return;
 
         if (!localTimestamps) {
-            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true, schoolYears: true, dayNotes: true });
+            await this.updateLocalWithRemoteData(
+                {
+                    subjects: true,
+                    timetable: true,
+                    timetableChanges: true,
+                    tasks: true,
+                    lessonNotes: true,
+                    schoolYears: true,
+                    dayNotes: true,
+                    globalNotes: true,
+                    globalNoteFolders: true,
+                });
         }
 
         //send data with differing timestamps
@@ -724,6 +747,18 @@ export default class AbstractModel {
             tablesToUpdate.dayNotes = true;
         }
 
+        if (remoteTimestamps[0].globalNotes != localTimestamps.globalNotes) {
+            dataToSync['globalNotes'] = await this.readAllFromLocalDB('unsyncedGlobalNotes');
+            dataToSync['deletedGlobalNotes'] = await this.readAllFromLocalDB('unsyncedDeletedGlobalNotes');
+            tablesToUpdate.globalNotes = true;
+        }
+
+        if (remoteTimestamps[0].globalNoteFolders != localTimestamps.globalNoteFolders) {
+            dataToSync['globalNoteFolders'] = await this.readAllFromLocalDB('unsyncedGlobalNoteFolders');
+            dataToSync['deletedGlobalNoteFolders'] = await this.readAllFromLocalDB('unsyncedDeletedGlobalNoteFolders');
+            tablesToUpdate.globalNoteFolders = true;
+        }
+
         let result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
         if (result.status == 'failed') return;
@@ -761,6 +796,16 @@ export default class AbstractModel {
         if (result.dayNotes.status && result.dayNotes.status == 'success') {
             this.clearObjectStore('unsyncedDayNotes');
             this.clearObjectStore('unsyncedDeletedDayNotes');
+        }
+
+        if (result.globalNotes.status && result.globalNotes.status == 'success') {
+            this.clearObjectStore('unsyncedGlobalNotes');
+            this.clearObjectStore('unsyncedDeletedGlobalNotes');
+        }
+
+        if (result.globalNoteFolders.status && result.globalNoteFolders.status == 'success') {
+            this.clearObjectStore('unsyncedGlobalNoteFolders');
+            this.clearObjectStore('unsyncedDeletedGlobalNoteFolders');
         }
 
         await this.updateLocalWithRemoteData(tablesToUpdate);
@@ -811,6 +856,16 @@ export default class AbstractModel {
         if (tablesToUpdate.dayNotes) {
             let dayNotes = await this.makeAjaxQuery('abstract', 'getAllDayNotes');
             if (!dayNotes.status) await this.writeRemoteToLocalDB('dayNotes', dayNotes, remoteTimestamps[0].dayNotes);
+        }
+
+        if (tablesToUpdate.globalNotes) {
+            let globalNotes = await this.makeAjaxQuery('abstract', 'getAllGlobalNotes');
+            if (!globalNotes.status) await this.writeRemoteToLocalDB('globalNotes', globalNotes, remoteTimestamps[0].globalNotes);
+        }
+
+        if (tablesToUpdate.globalNoteFolders) {
+            let globalNoteFolders = await this.makeAjaxQuery('abstract', 'getAllGlobalNoteFolders');
+            if (!globalNoteFolders.status) await this.writeRemoteToLocalDB('globalNoteFolders', globalNoteFolders, remoteTimestamps[0].globalNoteFolders);
         }
 
         AbstractController.renderDataChanges(tablesToUpdate);

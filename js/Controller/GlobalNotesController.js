@@ -125,9 +125,6 @@ export default class GlobalNotesController {
 
     static openFolder(folderId) {
         const globalNotesFileContainer = document.querySelector('#globalNotesFileContainer');
-
-        if (globalNotesFileContainer.dataset.folder_id == folderId) return;
-
         globalNotesFileContainer.dataset.folder_id = folderId;
 
         this.renderGlobalNotesView();
@@ -417,7 +414,9 @@ export default class GlobalNotesController {
 
                 // folder navigation
                 case target.classList.contains('folderNameWrapperOnPath'):
-                    folderId = target.closest('.folderPathItemContainer').dataset.folder_id;
+                    folderId = Number(target.closest('.folderPathItemContainer').dataset.folder_id);
+
+                    if (View.getDisplayedFolderId() == folderId) return;
 
                     GlobalNoteFolder.updateNavigationHistory(folderId, currentStep);
                     this.updateHistoryNavigationButtons();

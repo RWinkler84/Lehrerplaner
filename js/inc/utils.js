@@ -158,7 +158,7 @@ export default class Utils {
         })
 
         if (allIds.length == 0) allIds = [0];
-        return Math.max(...allIds) + 1; //adds 1 to the highest existing lesson id
+        return Math.max(...allIds) + 1; //adds 1 to the highest existing id
     }
 
     static sortByDate(a, b) {
@@ -217,5 +217,11 @@ export default class Utils {
         const unescapedString = string.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 
         return unescapedString;
+    }
+
+    static isEmptyObject(object) {
+        for (const i in object) return false;
+
+        return true;
     }
 }

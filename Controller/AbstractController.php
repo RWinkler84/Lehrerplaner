@@ -92,6 +92,27 @@ class AbstractController
 
         echo json_encode($result);
     }
+ 
+    public function getAllGlobalNotes()
+    {
+        global $user;
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
+
+        $result = $this->db->getAllGlobalNotes();
+
+        echo json_encode($result);
+    }
+
+    public function getAllGlobalNoteFolders()
+    {
+        global $user;
+        if (is_null($user) || $user->isActive() == false) $this->returnUserInactiveMessage($user);
+
+        $result = $this->db->getAllGlobalNoteFolders();
+
+        echo json_encode($result);
+    }
+
 
     public function setDbUpdateTimestamp($updatedTableName, $dateTime)
     {
@@ -125,6 +146,8 @@ class AbstractController
         $lessonNotesResults = [];
         $schoolYearResults = [];
         $dayNotesResults = [];
+        $globalNotesResults = [];
+        $globalNoteFoldersResults = [];
 
         if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
             $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
@@ -154,6 +177,14 @@ class AbstractController
             $dayNotesResults = DayNoteController::syncDayNotes($dataToSync['dayNotes'], $dataToSync['deletedDayNotes']);
         }
 
+        if (!empty($dataToSync['globalNotes']) || !empty($dataToSync['deletedGlobalNotes'])) {
+            $globalNotesResults = GlobalNoteController::syncGlobalNotes($dataToSync['globalNotes'], $dataToSync['deletedGlobalNotes']);
+        }
+
+        if (!empty($dataToSync['globalNoteFolders']) || !empty($dataToSync['deletedGlobalNoteFolders'])) {
+            $globalNoteFoldersResults = GlobalNoteFolderController::syncGlobalNoteFolders($dataToSync['globalNoteFolders'], $dataToSync['deletedGlobalNoteFolders']);
+        }
+
         $result = [
             'subjects' => $subjectsResults,
             'timetable' => $timetableResults,
@@ -161,7 +192,9 @@ class AbstractController
             'tasks' => $taskResults,
             'lessonNotes' => $lessonNotesResults,
             'schoolYears' => $schoolYearResults,
-            'dayNotes' => $dayNotesResults
+            'dayNotes' => $dayNotesResults,
+            'globalNotes' => $globalNotesResults,
+            'globalNoteFolders' => $globalNoteFoldersResults
         ];
 
         echo json_encode($result);

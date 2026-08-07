@@ -57,7 +57,7 @@ class GlobalNoteController extends AbstractController
         echo json_encode($finalResult);
     }
 
-    public static function syncDayNotes($globalNotes, $deletedGlobalNotes)
+    public static function syncGlobalNotes($globalNotes, $deletedGlobalNotes)
     {
         $result = [];
         $model = new GlobalNote;

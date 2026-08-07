@@ -95,6 +95,8 @@ export default class GlobalNote extends AbstractModel {
     }
 
     static async pasteClipboardContent(targetFolderId) {
+        if (Fn.isEmptyObject(this.#clipboard)) return;
+
         let allGlobalNotes;
         const notesToUpdate = [];
         const model = new GlobalNote;
@@ -232,6 +234,8 @@ export default class GlobalNote extends AbstractModel {
     }
 
     static writeDataToInstance(noteData, instance = null) {
+        if (!noteData) return false;
+        
         let model = new AbstractModel;
         if (!instance) instance = new GlobalNote;
 
