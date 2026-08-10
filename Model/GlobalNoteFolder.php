@@ -11,8 +11,8 @@ private $tableName  = TABLEPREFIX . 'globalNoteFolders';
     {
         $globalNoteFolder = $this->preprocessDataToWrite($globalNoteFolder);
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, name, parentFolderId, created, lastEdited)
-            VALUES (:userId, :itemId, :name, :parentFolderId, :created, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, name, parentFolderId, parentIdBeforeDelete, created, lastEdited)
+            VALUES (:userId, :itemId, :name, :parentFolderId, :parentIdBeforeDelete, :created, :lastEdited)
             ";
 
         $result = $this->write($query, $globalNoteFolder);
@@ -25,7 +25,7 @@ private $tableName  = TABLEPREFIX . 'globalNoteFolders';
     {
         $globalNoteFolder = $this->preprocessDataToWrite($globalNoteFolder);
         $query = "
-            UPDATE $this->tableName SET name = :name, parentFolderId = :parentFolderId, lastEdited = :lastEdited 
+            UPDATE $this->tableName SET name = :name, parentFolderId = :parentFolderId , parentIdBeforeDelete = :parentIdBeforeDelete, lastEdited = :lastEdited 
             WHERE userId = :userId AND itemId = :itemId AND created = :created
             ";
 
@@ -96,7 +96,7 @@ private $tableName  = TABLEPREFIX . 'globalNoteFolders';
             if (!is_null($matchingFolder)) {
                 if ($folderToSync['created'] == $matchingFolder['created'] && $folderToSync['lastEdited'] > $matchingFolder['lastEdited']) {
                     $query = "
-                        UPDATE $this->tableName SET name = :name, parentFolderId = :parentFolderId, lastEdited = :lastEdited 
+                        UPDATE $this->tableName SET name = :name, parentFolderId = :parentFolderId, parentIdBeforeDelete = : parentIdBeforeDelete, lastEdited = :lastEdited 
                         WHERE userId = :userId AND itemId = :itemId AND created = :created
                     ";
                 }
@@ -108,8 +108,8 @@ private $tableName  = TABLEPREFIX . 'globalNoteFolders';
                     $storedFolders[] = $folderToSync;
 
                     $query = "
-                                INSERT INTO $this->tableName (userId, itemId, name, parentFolderId, created, lastEdited)
-                                VALUES (:userId, :itemId, :name, :parentFolderId, :created, :lastEdited)
+                                INSERT INTO $this->tableName (userId, itemId, name, parentFolderId, parentIdBeforeDelete, created, lastEdited)
+                                VALUES (:userId, :itemId, :name, :parentFolderId, :parentIdBeforeDelete, :created, :lastEdited)
                             ";
                 }
             }

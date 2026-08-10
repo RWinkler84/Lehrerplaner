@@ -11,8 +11,8 @@ private $tableName  = TABLEPREFIX . 'globalNotes';
     {
         $globalNote = $this->preprocessDataToWrite($globalNote);
         $query = "
-            INSERT INTO $this->tableName (userId, itemId, title, content, parentFolderId, created, lastEdited)
-            VALUES (:userId, :itemId, :title, :content, :parentFolderId, :created, :lastEdited)
+            INSERT INTO $this->tableName (userId, itemId, title, content, parentFolderId, parentIdBeforeDelete, created, lastEdited)
+            VALUES (:userId, :itemId, :title, :content, :parentFolderId, :parentIdBeforeDelete, :created, :lastEdited)
             ";
 
         $result = $this->write($query, $globalNote);
@@ -25,7 +25,7 @@ private $tableName  = TABLEPREFIX . 'globalNotes';
     {
         $globalNote = $this->preprocessDataToWrite($globalNote);
         $query = "
-            UPDATE $this->tableName SET title = :title, content = :content, parentFolderId = :parentFolderId, lastEdited = :lastEdited 
+            UPDATE $this->tableName SET title = :title, content = :content, parentFolderId = :parentFolderId, parentIdBeforeDelete = :parentIdBeforeDelete, lastEdited = :lastEdited 
             WHERE userId = :userId AND itemId = :itemId AND created = :created
             ";
 
@@ -96,7 +96,7 @@ private $tableName  = TABLEPREFIX . 'globalNotes';
             if (!is_null($matchingNote)) {
                 if ($noteToSync['created'] == $matchingNote['created'] && $noteToSync['lastEdited'] > $matchingNote['lastEdited']) {
                     $query = "
-                        UPDATE $this->tableName SET title = :title, content = :content, parentFolderId = :parentFolderId, lastEdited = :lastEdited 
+                        UPDATE $this->tableName SET title = :title, content = :content, parentFolderId = :parentFolderId, parentIdBeforeDelete = :parentIdBeforeDelete, lastEdited = :lastEdited 
                         WHERE userId = :userId AND itemId = :itemId AND created = :created
                     ";
                 }
@@ -108,8 +108,8 @@ private $tableName  = TABLEPREFIX . 'globalNotes';
                     $storedNotes[] = $noteToSync;
 
                     $query = "
-                                INSERT INTO $this->tableName (userId, itemId, title, content, parentFolderId, created, lastEdited)
-                                VALUES (:userId, :itemId, :title, :content, :parentFolderId, :created, :lastEdited)
+                                INSERT INTO $this->tableName (userId, itemId, title, content, parentFolderId, parentIdBeforeDelete, created, lastEdited)
+                                VALUES (:userId, :itemId, :title, :content, :parentFolderId, :parentIdBeforeDelete, :created, :lastEdited)
                             ";
                 }
             }

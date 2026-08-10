@@ -6,6 +6,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     #id;
     #name;
     #parentFolderId;
+    #parentIdBeforeDelete = null;
     #created;
     #lastEdited;
 
@@ -54,8 +55,8 @@ export default class GlobalNoteFolder extends AbstractModel {
         const noteFolder = new GlobalNoteFolder;
         const allFoldersFromDB = await noteFolder.readAllByIndexFromLocalDB('globalNoteFolders', 'parentFolderId', parentFolderId);
         const systemFolders = [];
-            
-        this.#systemFolders.map(folder => {if (folder.parentFolderId == parentFolderId) systemFolders.push(folder)});
+
+        this.#systemFolders.map(folder => { if (folder.parentFolderId == parentFolderId) systemFolders.push(folder) });
 
         const allFolders = systemFolders.concat(allFoldersFromDB);
 
@@ -81,6 +82,10 @@ export default class GlobalNoteFolder extends AbstractModel {
 
         if (currentStep < this.#navigationHistory.length - 1) this.#navigationHistory.splice(currentStep + 1)
         this.#navigationHistory.push(folderIdToStore);
+    }
+
+    static removeFromNavigationHistory(folderIdToRemove) {
+        this.#navigationHistory = this.#navigationHistory.filter(entry => entry != folderIdToRemove);
     }
 
     static getPreviousFolderInHistory(currentStep) {
@@ -129,7 +134,7 @@ export default class GlobalNoteFolder extends AbstractModel {
         }
     }
 
-    static async getFolderContentRecursively(folder) {
+    static async getFolderContentRecursively(folder, includeParent = true) {
         let folderContentArrays = {
             folders: [],
             notes: []
@@ -152,6 +157,10 @@ export default class GlobalNoteFolder extends AbstractModel {
         }
 
         folderContentArrays = await getContents(folder, folderContentArrays);
+
+        if (!includeParent) {
+            folderContentArrays.folders.splice(folderContentArrays.folders.indexOf(folder), 1);
+        }
 
         return folderContentArrays;
     }
@@ -243,6 +252,37 @@ export default class GlobalNoteFolder extends AbstractModel {
         return false;
     }
 
+
+    ///////////////////
+    // trash methods //
+    ///////////////////
+
+    static async batchRestoreTrashedFolders(folderArray) {
+        console.log(folderArray)
+        const model = new GlobalNoteFolder;
+        const foldersToUpdate = folderArray.map(folder => {
+            folder.parentFolderId = folder.parentIdBeforeDelete;
+            folder.parentIdBeforeDelete = null;
+
+            return folder;
+        });
+
+        await model.batchUpdate(foldersToUpdate);
+    }
+
+    static async deleteAllTrashedFolders(allTrashedFolders) {
+        await (new GlobalNoteFolder).batchDelete(allTrashedFolders);
+    }
+
+    static async isTrashEmpty() {
+        const foldersInTrash = await this.getAllByParentFolderId(1);
+        const notesInTrash = await GlobalNotesController.getAllNotesByParentFolderId(1);
+
+        if (foldersInTrash.length == 0 && notesInTrash.length == 0) return true;
+
+        return false;
+    }
+
     //////////////////////
     // instance methods //
     //////////////////////
@@ -261,6 +301,13 @@ export default class GlobalNoteFolder extends AbstractModel {
         let result = await this.makeAjaxQuery('globalNoteFolder', 'save', [this.serialize()]);
 
         if (result.status == 'failed') this.writeToLocalDB('unsyncedGlobalNoteFolders', this.serialize());
+    }
+
+    async moveToTrash() {
+        this.parentIdBeforeDelete = this.parentFolderId;
+        this.parentFolderId = 1;
+
+        await this.update();
     }
 
     async delete() {
@@ -340,11 +387,45 @@ export default class GlobalNoteFolder extends AbstractModel {
         }
     }
 
+    async batchDelete(foldersToDelete) {
+        const uniqueFolders = {};
+        const notesToDelete = [];
+
+        for (const folder of foldersToDelete) {
+            const allChildItems = await GlobalNoteFolder.getFolderContentRecursively(folder, false);
+
+            for (const childFolder of allChildItems.folders) {
+                uniqueFolders[childFolder.id] = childFolder.serialize();
+
+                await this.deleteFromLocalDB('globalNoteFolders', childFolder.id);
+                await this.deleteFromLocalDB('unsyncedGlobalNoteFolders', childFolder.id);
+            }
+
+            uniqueFolders[folder.id] = folder.serialize();
+
+            await this.deleteFromLocalDB('globalNoteFolders', folder.id);
+            await this.deleteFromLocalDB('unsyncedGlobalNoteFolders', folder.id);
+
+            allChildItems.notes.forEach(note => notesToDelete.push(note));
+        }
+
+        const serializedFolders = Object.keys(uniqueFolders).map(key => uniqueFolders[key]);
+
+        serializedFolders.forEach(folder => GlobalNoteFolder.removeFromNavigationHistory(folder.id));
+
+        await GlobalNotesController.batchDeleteGlobalNote(notesToDelete);
+
+        let result = await this.makeAjaxQuery('globalNoteFolder', 'delete', serializedFolders);
+
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolderss', serializedFolders);
+    }
+
     serialize() {
         return {
             id: this.id,
             name: this.name,
             parentFolderId: this.parentFolderId,
+            parentIdBeforeDelete: this.parentIdBeforeDelete,
             created: this.created,
             lastEdited: this.lastEdited
         }
@@ -359,6 +440,7 @@ export default class GlobalNoteFolder extends AbstractModel {
         instance.id = instance.id ?? folderData.id;
         if (folderData.name) instance.name = folderData.name;
         if (folderData.parentFolderId != undefined) { instance.parentFolderId = folderData.parentFolderId };
+        if (folderData.parentIdBeforeDelete != undefined) { instance.parentIdBeforeDelete = folderData.parentIdBeforeDelete };
         if (folderData.created) { instance.created = folderData.created } else { instance.created = model.formatDateTime(new Date()) };
         if (folderData.lastEdited) { instance.lastEdited = folderData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
 
@@ -369,6 +451,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     get id() { return this.#id; }
     get name() { return this.#name; }
     get parentFolderId() { return this.#parentFolderId; }
+    get parentIdBeforeDelete() { return this.#parentIdBeforeDelete; }
     get created() { return this.#created; }
     get lastEdited() { return this.#lastEdited; }
 
@@ -376,6 +459,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     set id(value) { this.#id = value; }
     set name(value) { this.#name = value; }
     set parentFolderId(value) { this.#parentFolderId = value; }
+    set parentIdBeforeDelete(value) { this.#parentIdBeforeDelete = value; }
     set created(value) { this.#created = value; }
     set lastEdited(value) { this.#lastEdited = value; }
 

@@ -940,8 +940,11 @@ dialog .errorMessageDisplay,
 #globalNotesContainer {
     flex-grow: 1;
     position: relative;
-    display: flex !important;
     flex-direction: column;
+
+    &[style="display: block;"] {
+        display: flex !important;
+    }
 
     .globalNoteContextMenu {
         display: flex;
@@ -986,29 +989,36 @@ dialog .errorMessageDisplay,
             gap: 0.5rem;
         }
 
-        #folderPathContainer {
-            .folderPathItemContainer {
-                display: flex;
+        #folderNavigatonContainer {
+            gap: 1rem;
+
+            #folderPathContainer {
                 overflow: hidden;
-                flex-wrap: nowrap;
+                align-items: center;
 
-                .folderNameWrapperOnPath {
+                .folderPathItemContainer {
+                    display: flex;
                     overflow: hidden;
-                    text-overflow: ellipsis;
-                    text-wrap: nowrap;
+                    flex-wrap: nowrap;
 
-                    &:hover {
-                        cursor: default;
-                        text-decoration: underline;
+                    .folderNameWrapperOnPath {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        text-wrap: nowrap;
+
+                        &:hover {
+                            cursor: default;
+                            text-decoration: underline;
+                        }
                     }
-                }
 
-                &:last-child {
-                    min-width: fit-content;
+                    &:last-child {
+                        min-width: fit-content;
 
-                    .folderNameWrapper {
-                        overflow: auto;
-                        text-overflow: unset;
+                        .folderNameWrapper {
+                            overflow: auto;
+                            text-overflow: unset;
+                        }
                     }
                 }
             }
@@ -1047,7 +1057,7 @@ dialog .errorMessageDisplay,
                 text-overflow: ellipsis;
                 text-align: center;
                 cursor: default;
-
+                user-select: none;
             }
 
             textarea {
@@ -1880,7 +1890,16 @@ p {
     }
 }
 
-@media screen and (max-width: 770px) {}
+@media screen and (max-width: 700px) {
+    #topMenuContainer {
+        gap: 0;
+
+        #pageLogo {
+            display: none;
+        }
+    }
+
+}
 
 @media screen and (max-width: 620px) {
     body {
@@ -1890,6 +1909,14 @@ p {
     #topMenuContainer,
     #settingsTitleBar {
         padding: 0.5rem 0.5rem;
+
+        #pageLogo {
+            display: block;
+        }
+    }
+
+    #topMenuContainer {
+        gap: 1rem;
     }
 
     #timetableContainer,
@@ -2062,6 +2089,42 @@ p {
         flex-direction: column-reverse;
     }
 
+    #globalNotesContainer {
+
+        button,
+        .folderPathItemContainer {
+            user-select: none;
+        }
+
+        .globalNoteContextMenu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            animation: contextMenuSlideIn 0.2s ease-out;
+            --contextMenuHeight: attr(data-height px);
+
+            .contextMenuButton {
+                padding: 0.5rem 1rem;
+            }
+        }
+    }
+
+    @keyframes contextMenuSlideIn {
+        from {
+            transform: translateY(var(--contextMenuHeight));
+            /* transform: translateY(100px); */
+        }
+
+        to {
+            transform: translateY(0%);
+        }
+    }
+
+    #globalNoteDialog {
+        height: 100%;
+    }
+
     /* DO NOT DELETE */
 
     /* This is a responsive menu for the settings, that can be used again, if there will be more than just account settings one day */
@@ -2129,6 +2192,14 @@ p {
     }
 }
 
+@media screen and (max-width: 400px) {
+    #topMenuContainer {
+        #pageLogo {
+            display: none;
+        }
+    }
+}
+
 /* svg */
 .icon {
     display: block;
@@ -2159,6 +2230,17 @@ p {
     height: 100%;
 }
 
+.trashIcon {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='none'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='34.65' x2='64.87' y1='14.19' y2='14.25' stroke-linejoin='round' id='svg_5' transform='rotate(-35 49.7609 14.2158)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='51.27' x2='74.01' y1='14.83' y2='14.65' stroke-linejoin='round' transform='rotate(55 62.6409 14.7389)' id='svg_7'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='%23e3e5eb' stroke='%23000000' stroke-width='10' stroke-linejoin='round' d='m93.13,23l-9.74,69l-66.39,0l-10,-69l86.13,0z' id='svg_1'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 3%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='26.71' y1='39.63' x2='33.2' y2='77.63' id='svg_11' transform='rotate(0.825554 29.959 58.6252)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linecap='round' fill-opacity='0' x1='72.87' y1='39.63' x2='66.98' y2='77.63' id='svg_14'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='50' y1='39.63' x2='50' y2='77.63' id='svg_15'/%3E%3C/g%3E%3C/svg%3E");
+    width: 100%;
+    height: 100%;
+}
+
+.trashIconFilled {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='34.65' x2='64.87' y1='14.19' y2='14.25' stroke-linejoin='round' id='svg_5' transform='rotate(-35 49.7609 14.2158)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='51.27' x2='74.01' y1='14.83' y2='14.65' stroke-linejoin='round' transform='rotate(55 62.6409 14.7389)' id='svg_7'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='%23e3e5eb' stroke='%23000000' stroke-width='10' stroke-linejoin='round' d='m93.13,23l-9.74,69l-66.39,0l-10,-69l86.13,0z' id='svg_1'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 3%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='26.71' y1='39.63' x2='33.2' y2='77.63' id='svg_11' transform='rotate(0.825554 29.959 58.6252)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linecap='round' fill-opacity='0' x1='72.87' y1='39.63' x2='66.98' y2='77.63' id='svg_14'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='50' y1='39.63' x2='50' y2='77.63' id='svg_15'/%3E%3C/g%3E%3C/svg%3E");
+    width: 100%;
+    height: 100%;
+}
 
 
 .inProgressIcon {

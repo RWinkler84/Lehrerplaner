@@ -111,6 +111,7 @@ export default class AbstractController {
                 await CurriculumController.renderSchoolYearCurriculumEditor();
             }
             if (updatedElements.dayNotes) await DayNoteController.renderDayNoteIcons();
+            if (updatedElements.globalNotes || updatedElements.globalNoteFolders) await GlobalNotesController.renderGlobalNotesView();
         }
 
         TaskController.renderTaskChanges();

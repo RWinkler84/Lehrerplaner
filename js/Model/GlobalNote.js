@@ -1,58 +1,17 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
+import GlobalNotesController from "../Controller/GlobalNotesController.js";
 
 export default class GlobalNote extends AbstractModel {
     #id;
     #title;
     #content;
     #parentFolderId;
+    #parentIdBeforeDelete = null;
     #created;
     #lastEdited;
 
     static #clipboard = {};
-
-    static mockupFiles = [
-        {
-            id: 1,
-            title: 'Abgabe Hausaufgaben 8a',
-            content: '<p><b>fehlende Abgaben</b></p><p>Ronny Reinemacher</p>',
-            parentFolderId: 0,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 2,
-            title: 'Protokoll Dienstberatung',
-            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
-            parentFolderId: 0,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 3,
-            title: 'Ich bin raus',
-            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
-            parentFolderId: 1,
-            created: '',
-            lastEdited: ''
-        },
-        {
-            id: 4,
-            title: 'Ich bin in der 2',
-            content: '<p><b>War alles ganz toll</b></p><p>Furchtbar...</p>',
-            parentFolderId: 2,
-            created: '',
-            lastEdited: ''
-        }
-    ];
-
-    static writeMockupData() {
-        this.mockupFiles.forEach(noteData => {
-            const note = this.writeDataToInstance(noteData);
-
-            note.save();
-        })
-    }
 
     static async getAllNotes() {
         const globalNote = new GlobalNote;
@@ -126,6 +85,22 @@ export default class GlobalNote extends AbstractModel {
         return false;
     }
 
+    static async batchRestoreTrashedNotes(notesArray) {
+        const model = new GlobalNote;
+        const notesToUpdate = notesArray.map(note => {
+            note.parentFolderId = note.parentIdBeforeDelete;
+            note.parentIdBeforeDelete = null;
+
+            return note;
+        });
+
+        await model.batchUpdate(notesToUpdate);
+    }
+
+    static async deleteAllTrashedNotes(allTrashedNotes) {
+        await (new GlobalNote).batchDelete(allTrashedNotes);
+    }
+
     //////////////////////
     // instance methods //
     //////////////////////
@@ -141,6 +116,13 @@ export default class GlobalNote extends AbstractModel {
         let result = await this.makeAjaxQuery('globalNote', 'save', [this.serialize()]);
 
         if (result.status == 'failed') this.writeToLocalDB('unsyncedGlobalNotes', this.serialize());
+    }
+
+    async moveToTrash() {
+        this.parentIdBeforeDelete = this.parentFolderId;
+        this.parentFolderId = 1;
+
+        await this.update();
     }
 
     async delete() {
@@ -228,6 +210,7 @@ export default class GlobalNote extends AbstractModel {
             title: this.title,
             content: this.content,
             parentFolderId: this.parentFolderId,
+            parentIdBeforeDelete: this.parentIdBeforeDelete,
             created: this.created,
             lastEdited: this.lastEdited
         }
@@ -235,7 +218,7 @@ export default class GlobalNote extends AbstractModel {
 
     static writeDataToInstance(noteData, instance = null) {
         if (!noteData) return false;
-        
+
         let model = new AbstractModel;
         if (!instance) instance = new GlobalNote;
 
@@ -243,6 +226,7 @@ export default class GlobalNote extends AbstractModel {
         if (noteData.title) instance.title = noteData.title;
         if (noteData.content) instance.content = noteData.content;
         if (noteData.parentFolderId != undefined) { instance.parentFolderId = noteData.parentFolderId };
+        if (noteData.parentIdBeforeDelete != undefined) { instance.parentIdBeforeDelete = noteData.parentIdBeforeDelete };
         if (noteData.created) { instance.created = noteData.created } else { instance.created = model.formatDateTime(new Date()) };
         if (noteData.lastEdited) { instance.lastEdited = noteData.lastEdited } else { instance.lastEdited = model.formatDateTime(new Date()) };
 
@@ -254,6 +238,7 @@ export default class GlobalNote extends AbstractModel {
     get title() { return this.#title; }
     get content() { return this.#content; }
     get parentFolderId() { return this.#parentFolderId; }
+    get parentIdBeforeDelete() { return this.#parentIdBeforeDelete; }
     get created() { return this.#created; }
     get lastEdited() { return this.#lastEdited; }
 
@@ -262,6 +247,7 @@ export default class GlobalNote extends AbstractModel {
     set title(value) { this.#title = value; }
     set content(value) { this.#content = value; }
     set parentFolderId(value) { this.#parentFolderId = value; }
+    set parentIdBeforeDelete(value) { this.#parentIdBeforeDelete = value; }
     set created(value) { this.#created = value; }
     set lastEdited(value) { this.#lastEdited = value; }
 

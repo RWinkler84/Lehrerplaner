@@ -30,6 +30,9 @@ export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
 export const VERSION = '0.9.010726a';
 
+export const SF_ID_ROOT = 0;
+export const SF_ID_TRASH = 1;
+
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
 export let unsyncedDeletedTimetableChanges = [];
@@ -56,8 +59,6 @@ async function startApp() {
 
     AbstractController.checkVersion();
     SettingsController.setVersion(VERSION);
-
-    // GlobalNotesController.writeMockupData();  // <<<<< delete me after developement
 
     await SettingsController.checkForPendingLogout();
     await abstCtrl.syncData();

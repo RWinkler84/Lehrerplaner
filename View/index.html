@@ -25,7 +25,7 @@
                 <img id="pageLogo" src="favicon.svg" style="width: 2rem; height: 2rem;">
                 <h1 id="pageHeader">Eduplanio</h1>
             </div>
-            <div id="topMenuButtonContainer" class="flex gap">
+            <div id="topMenuButtonContainer" class="flex">
                 <div id="viewsMenuContainer" class="flex halfGap">
                     <button id="openWeekViewButton" class="selected topMenuButton"><span class="icon weekViewIcon"
                             style="width: 1.5rem; height: 1.5rem;"></span><span
@@ -40,18 +40,21 @@
                             style="width: 1.5rem; height: 1.5rem;"></span><span
                             class="buttonText">Notizen</span></button>
                 </div>
-                <div id="syncIndicator" class="unsynced">
-                    <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem
-                        Internet und melde dich an, um Datenverlust sicher zu vermeiden.</span>
-                </div>
-                <div><button id="openBurgerMenuButton">&#x2630;</button></div>
-                <div id="topMenu" class="flex column justifyCenter ">
-                    <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
-                    <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
-                    <button id="openHelpButton" class="burgerMenuButton">Hilfe</button>
-                    <button id="openLoginButton" class="burgerMenuButton">Login</button>
-                    <button id="createAccountButton" class="burgerMenuButton">Registrieren</button>
-                    <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
+                <div class="flex halfGap alignCenter">
+                    <div id="syncIndicator" class="unsynced">
+                        <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit
+                            dem
+                            Internet und melde dich an, um Datenverlust sicher zu vermeiden.</span>
+                    </div>
+                    <div><button id="openBurgerMenuButton">&#x2630;</button></div>
+                    <div id="topMenu" class="flex column justifyCenter ">
+                        <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
+                        <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
+                        <button id="openHelpButton" class="burgerMenuButton">Hilfe</button>
+                        <button id="openLoginButton" class="burgerMenuButton">Login</button>
+                        <button id="createAccountButton" class="burgerMenuButton">Registrieren</button>
+                        <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
+                    </div>
                 </div>
             </div>
         </div>

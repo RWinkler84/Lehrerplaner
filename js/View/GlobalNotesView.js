@@ -1,4 +1,5 @@
 import Editor from "../inc/editor.js";
+import { SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNotesView {
     static renderGlobalNoteIcons(notesArray, clipboardContent) {
@@ -27,6 +28,8 @@ export default class GlobalNotesView {
             currentNoteContainer.setAttribute('tabindex', 0);
             currentNoteContainer.dataset.note_id = globalNote.id;
             currentNoteContainer.dataset.created = globalNote.created;
+
+            if (globalNote.parentIdBeforeDelete !== null) currentNoteContainer.dataset.parent_id_before_delete = globalNote.parentIdBeforeDelete;
 
             if (clipboardContent[globalNote.id]) {
                 if (clipboardContent[globalNote.id].operationType == 'cut') currentNoteContainer.classList.add('cut');
@@ -69,6 +72,8 @@ export default class GlobalNotesView {
             currentFolderContainer.dataset.folder_id = folder.id;
             currentFolderContainer.dataset.created = folder.created;
 
+            if (folder.parentIdBeforeDelete !== null) currentFolderContainer.dataset.parent_id_before_delete = folder.parentIdBeforeDelete;
+
             if (clipboardContent[folder.id]) {
                 if (clipboardContent[folder.id].operationType == 'cut') currentFolderContainer.classList.add('cut');
             }
@@ -81,6 +86,18 @@ export default class GlobalNotesView {
         }
 
         container.append(fragment);
+    }
+
+    static renderTrashIcon(isEmpty = true) {
+        const trashIcon = document.querySelector('.folderIconContainer[data-folder_id="1"]').querySelector('.fileIcon');
+        if (!trashIcon) return;
+
+        trashIcon.classList.remove('folderIconSolid');
+        trashIcon.classList.remove('trashIcon');
+        trashIcon.classList.remove('trashIconFilled');
+
+        if (isEmpty) trashIcon.classList.add('trashIcon');
+        if (!isEmpty) trashIcon.classList.add('trashIconFilled');
     }
 
     static renderFolderPath(allParentFolders) {
@@ -129,10 +146,12 @@ export default class GlobalNotesView {
             globalNoteEditorDialog.dataset.created = '';
             globalNoteTitleInput.value = '';
             globalNoteContentEditor.innerHTML = '<p><br></p>';
+
         }
 
         Editor.init(globalNoteContentEditor);
         globalNoteEditorDialog.showModal();
+        if (!globalNote) globalNoteTitleInput.focus();
     }
 
     static closeGlobalNoteDialog() {
@@ -158,9 +177,9 @@ export default class GlobalNotesView {
         }
     }
 
-    static openContextMenu(event, clipboardContent) {
+    static openContextMenu(event, clipboardContent, isTrashEmpty = true) {
         //folder or a note is right clicked
-        const itemClickedMenu = [
+        const itemClicked = [
             {
                 action: 'editGlobalItem',
                 text: 'bearbeiten'
@@ -184,7 +203,7 @@ export default class GlobalNotesView {
         ]
 
         //context menu when a blank space is clicked
-        const folderClickedMenu = [
+        const folderClicked = [
             {
                 action: 'newGlobalNoteFolder',
                 text: 'neuer Ordner'
@@ -199,7 +218,44 @@ export default class GlobalNotesView {
             }
         ];
 
-        let menuToRender = itemClickedMenu;
+        const trashClicked = [
+            {
+                action: 'restoreAllTrash',
+                text: 'wiederherstellen'
+            },
+            {
+                action: 'deleteAllTrash',
+                text: 'Papierkorb leeren'
+            }
+        ]
+
+        const trashedItemClicked = [
+            {
+                action: 'restoreItem',
+                text: 'wiederherstellen'
+            },
+            {
+                action: 'deleteItemFromTrash',
+                text: 'endgültig löschen'
+            }
+        ]
+
+        const trashedChildItemClicked = [
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'deleteItemFromTrash',
+                text: 'endgültig löschen'
+            },
+        ]
+
+        let menuToRender = itemClicked;
 
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
         const navHeight = document.querySelector('nav').getBoundingClientRect().height;
@@ -208,26 +264,39 @@ export default class GlobalNotesView {
         const offsetY = navHeight + bodyMargin;
         const offsetX = bodyMargin;
 
-        const sourceContainer = this.getSourceContainerOfContextMenu(event);
+        const sourceElement = this.getSourceElementOfContextMenu(event);
 
-        if (sourceContainer.classList.contains('new')) return;
-        if (sourceContainer.classList.contains('cut')) return;
-        if (sourceContainer.id == 'globalNotesFileContainer') menuToRender = folderClickedMenu;
+        if (sourceElement.classList.contains('new')) return;
+        if (sourceElement.classList.contains('cut')) return;
 
+        // set the menu to render
+        if (sourceElement.id == 'globalNotesFileContainer') menuToRender = folderClicked;
+        if (sourceElement.dataset.folder_id == SF_ID_TRASH) menuToRender = trashClicked;
 
+        if (this.isInTrash()) {
+            if (sourceElement.dataset.parent_id_before_delete) menuToRender = trashedItemClicked;
+            if (sourceElement.dataset.folder_id != SF_ID_TRASH && !sourceElement.dataset.parent_id_before_delete) menuToRender = trashedChildItemClicked;
+        }
+
+        // create the menu element
         const blankDiv = document.createElement('div');
         const blankButton = document.createElement('button');
 
         const menuContainer = blankDiv.cloneNode()
         menuContainer.classList.add('globalNoteContextMenu');
-        menuContainer.style.top = event.y - offsetY + 'px';
-        menuContainer.style.left = event.x - offsetX + 'px';
 
-        if (sourceContainer.classList.contains('folderIconContainer')) menuContainer.dataset.folder_id = sourceContainer.dataset.folder_id;
-        if (sourceContainer.classList.contains('noteIconContainer')) menuContainer.dataset.note_id = sourceContainer.dataset.note_id;
-        if (sourceContainer.id == 'globalNotesFileContainer') menuContainer.dataset.folder_id = sourceContainer.dataset.folder_id;
+        // set the position on screen
+        if (window.innerWidth > 620) {
+            menuContainer.style.top = event.y - offsetY + 'px';
+            menuContainer.style.left = event.x - offsetX + 'px';
+        }
 
-        sourceContainer.classList.add('selected');
+        // set source element infos
+        if (sourceElement.classList.contains('folderIconContainer')) menuContainer.dataset.folder_id = sourceElement.dataset.folder_id;
+        if (sourceElement.classList.contains('noteIconContainer')) menuContainer.dataset.note_id = sourceElement.dataset.note_id;
+        if (sourceElement.id == 'globalNotesFileContainer') menuContainer.dataset.folder_id = sourceElement.dataset.folder_id;
+
+        sourceElement.classList.add('selected');
 
         menuToRender.forEach(item => {
             const currentItem = blankDiv.cloneNode();
@@ -244,7 +313,15 @@ export default class GlobalNotesView {
             menuContainer.append(currentButton);
         })
 
+        if (sourceElement.dataset.folder_id == 1 && isTrashEmpty) {
+            menuContainer.querySelectorAll('button').forEach(button => button.disabled = true);
+        }
+
         globalNotesContainer.append(menuContainer);
+
+        if (window.innerWidth <= 620) {
+            menuContainer.dataset.height = menuContainer.getBoundingClientRect().height;
+        }
     }
 
     static getContextMenuInfo(event) {
@@ -401,11 +478,31 @@ export default class GlobalNotesView {
         globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.add('cut'));
     }
 
-    static getSourceContainerOfContextMenu(event) {
+    static getSourceElementOfContextMenu(event) {
         if (event.srcElement.closest('.folderIconContainer')) return event.srcElement.closest('.folderIconContainer');
         if (event.srcElement.closest('.noteIconContainer')) return event.srcElement.closest('.noteIconContainer');
 
         return document.querySelector('#globalNotesFileContainer');
+    }
+
+    static isInTrash() {
+        const pathItems = document.querySelectorAll('.folderPathItemContainer');
+
+        const trashFound = Array.from(pathItems).find(elem => elem.dataset.folder_id == SF_ID_TRASH);
+
+        if (trashFound) return true;
+
+        return false;
+    }
+
+    static getAllSelectedElements() {
+        const foldersContainer = document.querySelector('#folderIconContainer');
+        const notesContainer = document.querySelector('#noteIconContainer');
+
+        return {
+            folders: Array.from(foldersContainer.querySelectorAll('.selected')),
+            notes: Array.from(notesContainer.querySelectorAll('.selected'))
+        };
     }
 
     /////////////
