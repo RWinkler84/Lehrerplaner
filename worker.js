@@ -1,4 +1,4 @@
-const version = '0.9.140726';
+const version = '0.9.130826';
 
 self.addEventListener('fetch', (event) => {
     event.respondWith(fetchResources(event.request))
@@ -21,8 +21,6 @@ self.addEventListener('message', async (event) => {
 })
 
 self.addEventListener('activate', async (event) => { event.waitUntil(removeOldCaches()) });
-
-
 
 async function fetchResources(request) {
     const cache = await caches.open(`eduplanio_${version}`);
