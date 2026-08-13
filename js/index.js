@@ -129,7 +129,7 @@ async function startApp() {
     document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
     document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
-        if (!event.target.closest('.texteditor')) return;
+        if (!event.target.closest('.textEditor')) return;
         Editor.normalizeInput(event);
         LessonNoteController.toggleSaveLessonNoteButton(event);
         LessonController.toggleSaveCurriculumSpanNoteButton(event);
