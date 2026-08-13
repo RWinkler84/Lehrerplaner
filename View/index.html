@@ -671,11 +671,7 @@
     <!-- global notes -->
     <div id="globalNotesContainer" class="mainViewContainer" style="display: none">
         <div id="globalNotesFileContainer" data-folder_id="0">
-            <div id="globalNoteButtonContainer">
-                <button id="createGlobalNoteButton" class="confirmationButton">Neue Notiz</button>
-                <button id="createGlobalNoteFolderButton" class="confirmationButton">Neuer Ordner</button>
-            </div>
-            <div id="globalNotesFileSystemDisplay" class="marginTop">
+            <div id="globalNotesFileSystemDisplay">
                 <div id="folderNavigatonContainer" class="flex spaceBetween">
                     <div id="folderPathContainer" class="flex"></div>
                     <div id="folderNavigationButtonContainer" class="flex halfGap" data-history_step="0">
@@ -685,6 +681,13 @@
                 </div>
                 <div id="folderIconContainer"></div>
                 <div id="noteIconContainer"></div>
+            </div>
+            <div id="createglobalItemsButtonContainer">
+                <button id="createGlobalNoteButton" class="confirmationButton"><span
+                        class="noteIcon icon"></span></button>
+                <button id="createGlobalNoteFolderButton" class="confirmationButton"><span
+                        class="folderIcon icon"></span></button>
+                <button id="createGlobalItemButton" class="confirmationButton">+</button>
             </div>
         </div>
     </div>
@@ -1220,6 +1223,20 @@
                     senden</button>
                 <button class="confirmationButton closeRevocationDialogButton" id="closeRevocationDialogButton"
                     style="margin-right: 3px; display: none">Schließen</button>
+            </div>
+        </div>
+    </dialog>
+
+        <dialog id="errorMessageDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Etwas ist schiefgelaufen</h3><button class="closeErrorMessageDialogButton closeDialogButton"
+                style="width: 1.5rem" autofocus="false">×</button>
+        </div>
+        <div class="dialogBody flex column">
+            <div class="dialogText">
+            </div>
+            <div class="flex halfGap justifyEnd marginTop">
+                <button class="closeErrorMessageDialogButton confirmationButton">Okay</button>
             </div>
         </div>
     </dialog>

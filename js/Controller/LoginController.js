@@ -2,6 +2,7 @@ import AbstractController from "./AbstractController.js";
 import View from "../View/LoginView.js";
 import Model from "../Model/Login.js";
 import SettingsController from "./SettingsController.js";
+import GlobalNotesController from "./GlobalNotesController.js";
 
 export default class LoginController {
 
@@ -355,9 +356,14 @@ export default class LoginController {
 
             case elementClassList.contains('closeWelcomeDialogButton'):
                 AbstractController.closeWelcomeDialog();
+                break;
 
             case elementClassList.contains('closeRevocationDialogButton'):
                 SettingsController.closeRevocationDialog();
+                break;
+            case elementClassList.contains('closeErrorMessageDialogButton'):
+                GlobalNotesController.closeRestoreErrorMessage();
+                break;
         }
 
         //dialog cancel event

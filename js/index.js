@@ -51,8 +51,14 @@ export let userStatus = {
     firstTimeUser: false
 }
 
-let abstCtrl = new AbstractController();
+//stores the timeout id for rightclick emulation on iOS
+export let contextMenuEvent = {
+    touchstartTimeOutId: null,
+    contextMenuOpened: false
+};
+
 let timeout = false //for resize debouncing
+let abstCtrl = new AbstractController();
 
 async function startApp() {
     await registerWorker();
@@ -158,14 +164,32 @@ async function startApp() {
         }
     });
 
+    // context menu
     document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', GlobalNotesController.rightClickHandler)
+
+    //iOS/iPad OS touch workaround
+    document.querySelector('#globalNotesFileContainer').addEventListener('touchstart', (event) => {
+        contextMenuEvent.touchstartTimeOutId = setTimeout(() => {
+            contextMenuEvent.contextMenuOpened = true;
+            GlobalNotesController.rightClickHandler(event);
+        }, 500);
+    })
+    document.querySelector('#globalNotesFileContainer').addEventListener('touchend', (event) => {
+        if (contextMenuEvent.contextMenuOpened) {
+            event.preventDefault();
+            contextMenuEvent.contextMenuOpened = false;
+        }
+
+        clearTimeout(contextMenuEvent.touchstartTimeOutId);
+        contextMenuEvent.touchstartTimeOutId = null;
+    });
 
     AbstractController.renderTopMenu();
 
     setDateForWeekdays();
     setCalendarWeek();
     setWeekStartAndEndDate();
-    
+
     await DayNoteController.renderDayNoteIcons();
 
     await LessonController.renderCurriculaSelection();

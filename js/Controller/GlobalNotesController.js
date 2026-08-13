@@ -1,4 +1,4 @@
-import { SF_ID_TRASH } from "../index.js";
+import { SF_ID_TRASH, contextMenuEvent } from "../index.js";
 import GlobalNote from "../Model/GlobalNote.js";
 import GlobalNoteFolder from '../Model/GlobalNoteFolder.js';
 import View from "../View/GlobalNotesView.js";
@@ -70,6 +70,14 @@ export default class GlobalNotesController {
         View.closeAllContextMenus();
     }
 
+    static openCreateGlobalItemMenu() {
+        View.openCreateGlobalItemMenu();
+    }
+
+    static closeCreateGlobalItemMenu() {
+        View.closeCreateGlobalItemMenu();
+    }
+
     //////////////////////////////
     // global note crud methods //
     //////////////////////////////
@@ -117,7 +125,6 @@ export default class GlobalNotesController {
         View.toggleSaveDayNoteButton(false);
     }
 
-
     static async deleteGlobalNote(noteId) {
         const noteToDelete = await GlobalNote.getById(noteId);
 
@@ -135,7 +142,9 @@ export default class GlobalNotesController {
     }
 
     static async restoreGlobalNote(notesArray) {
-        await GlobalNote.batchRestoreTrashedNotes(notesArray)
+        const failedRestores = await GlobalNote.batchRestoreTrashedNotes(notesArray);
+
+        if (failedRestores.length != 0) View.openRestoreErrorMessage();
     }
 
     /////////////////////////
@@ -214,7 +223,9 @@ export default class GlobalNotesController {
     }
 
     static async restoreGlobalNoteFolder(folderArray) {
-        await GlobalNoteFolder.batchRestoreTrashedFolders(folderArray);
+        const failedRestores = await GlobalNoteFolder.batchRestoreTrashedFolders(folderArray);
+
+        if (failedRestores.length != 0) View.openRestoreErrorMessage();
     }
 
     ///////////////////////
@@ -391,7 +402,7 @@ export default class GlobalNotesController {
             await (new GlobalNoteFolder).batchDelete(selectedFolders);
             this.renderFolderIcons();
             this.closeAllContextMenus();
-            
+
             View.toggleNavigationButtons(GlobalNoteFolder.getLatestNavigationStep());
         }
 
@@ -403,8 +414,8 @@ export default class GlobalNotesController {
     }
 
     static async restoreAllTrashContent() {
-        await GlobalNoteFolder.batchRestoreTrashedFolders(await GlobalNoteFolder.getAllByParentFolderId(SF_ID_TRASH));
-        await GlobalNote.batchRestoreTrashedNotes(await GlobalNote.getAllByParentFolderId(SF_ID_TRASH));
+        let failedFolders = await this.restoreGlobalNoteFolder(await GlobalNoteFolder.getAllByParentFolderId(SF_ID_TRASH));
+        let failedNotes = await this.restoreGlobalNote(await GlobalNote.getAllByParentFolderId(SF_ID_TRASH));
 
         await this.renderGlobalNotesView();
         this.closeAllContextMenus();
@@ -420,6 +431,10 @@ export default class GlobalNotesController {
         this.closeAllContextMenus();
     }
 
+    static closeRestoreErrorMessage() {
+        View.closeRestoreErrorMessage();
+    };
+
     //////////
     // misc //
     //////////
@@ -434,6 +449,10 @@ export default class GlobalNotesController {
 
     static async getAllGlobalNotes() {
         return await GlobalNote.getAllNotes();
+    }
+
+    static async folderExists(folderId) {
+        return GlobalNoteFolder.folderExists(folderId);
     }
 
     static async getInstancesFromElements(elementArray) {
@@ -479,6 +498,7 @@ export default class GlobalNotesController {
         if (event.target.closest('#globalNotesContainer')) {
 
             if (!target.closest('.globalNoteContextMenu')) this.closeAllContextMenus();
+            if (!target.closest('#createglobalItemsButtonContainer')) this.closeCreateGlobalItemMenu();
 
             switch (target.id) {
                 case 'folderBackwardButton':
@@ -489,12 +509,18 @@ export default class GlobalNotesController {
                     this.navigateFolderHistory('forward');
                     break;
 
+                case 'createGlobalItemButton':
+                    this.openCreateGlobalItemMenu();
+                    break;
+
                 case 'createGlobalNoteButton':
                     this.createNewGlobalNote();
+                    this.closeCreateGlobalItemMenu();
                     break;
 
                 case 'createGlobalNoteFolderButton':
                     this.createNewGlobalNoteFolder();
+                    this.closeCreateGlobalItemMenu();
                     break;
 
                 //context menu

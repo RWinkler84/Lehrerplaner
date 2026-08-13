@@ -89,7 +89,7 @@ export default class GlobalNotesView {
     }
 
     static renderTrashIcon(isEmpty = true) {
-        const trashIcon = document.querySelector('.folderIconContainer[data-folder_id="1"]').querySelector('.fileIcon');
+        const trashIcon = document.querySelector('.folderIconContainer[data-folder_id="1"]')?.querySelector('.fileIcon');
         if (!trashIcon) return;
 
         trashIcon.classList.remove('folderIconSolid');
@@ -285,10 +285,14 @@ export default class GlobalNotesView {
         const menuContainer = blankDiv.cloneNode()
         menuContainer.classList.add('globalNoteContextMenu');
 
-        // set the position on screen
+        // set initial position on screen
         if (window.innerWidth > 620) {
-            menuContainer.style.top = event.y - offsetY + 'px';
-            menuContainer.style.left = event.x - offsetX + 'px';
+            menuContainer.style.top = event.pageY - offsetY + 'px';
+            menuContainer.style.left = event.pageX - offsetX + 'px';
+
+            if (event.type == 'touchstart') {
+                menuContainer.style.transform = 'translate(-100%, -100%)';
+            }
         }
 
         // set source element infos
@@ -319,8 +323,28 @@ export default class GlobalNotesView {
 
         globalNotesContainer.append(menuContainer);
 
+        const menuContainerProps = menuContainer.getBoundingClientRect();
+        const notesContainerProps = globalNotesContainer.getBoundingClientRect();
+
+        // reset pos, if menu extends off screen
+        let translateX = '0%';
+        let translateY = '0%';
+
+        if (event.type == 'touchstart') {
+            translateX = '-100%';
+            translateY = '-100%';
+        }
+
+        if (menuContainerProps.right > notesContainerProps.right) translateX = '-100%';
+        if (menuContainerProps.left < notesContainerProps.left) translateX = '0%';
+        if (menuContainerProps.top < notesContainerProps.top) translateY = '0%';
+        if (menuContainerProps.bottom > notesContainerProps.bottom) translateY = '-100%';
+
+        menuContainer.style.transform = `translate(${translateX}, ${translateY})`;
+
+        // store height info for slide in animation
         if (window.innerWidth <= 620) {
-            menuContainer.dataset.height = menuContainer.getBoundingClientRect().height;
+            menuContainer.dataset.height = menuContainerProps.height;
         }
     }
 
@@ -338,6 +362,14 @@ export default class GlobalNotesView {
         while (document.querySelector('.globalNoteContextMenu')) document.querySelector('.globalNoteContextMenu').remove();
 
         document.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
+    }
+
+    static openCreateGlobalItemMenu() {
+        document.querySelector('#createglobalItemsButtonContainer').classList.add('open');
+    }
+
+    static closeCreateGlobalItemMenu() {
+        document.querySelector('#createglobalItemsButtonContainer').classList.remove('open');
     }
 
     ////////////////////
@@ -559,5 +591,27 @@ export default class GlobalNotesView {
             alertRing.classList.remove('validationError');
             alertRing.focus();
         }, 300);
+    }
+
+    static openRestoreErrorMessage() {
+        const errorDialog = document.querySelector('#errorMessageDialog');
+        const errorDisplay = errorDialog.querySelector('.dialogText');
+
+        let errorMessage = '<p>Die Wiederherstellung ist fehlgeschlagen. Der Ursprungsordner eines Elements existiert nicht mehr.</p><p>Schneide das Element aus und füge es an einem Ort deiner Wahl ein, um es aus dem Papierkorb zu entfernen.</p>'
+
+        if (errorDialog.hasAttribute('open')) {
+            errorMessage = '<p>Die Wiederherstellung ist fehlgeschlagen. Der Ursprungsordner mehrerer Elemente existiert nicht mehr.</p><p>Schneide die Elemente aus und füge sie an einem Ort deiner Wahl ein, um sie aus dem Papierkorb zu entfernen.</p>'
+        }
+
+        errorDisplay.innerHTML = errorMessage;
+        errorDialog.showModal()
+    }
+
+    static closeRestoreErrorMessage() {
+        const errorDialog = document.querySelector('#errorMessageDialog');
+        const errorDisplay = errorDialog.querySelector('.dialogText');
+
+        errorDialog.close();
+        errorDisplay.innerHTML = '';
     }
 }

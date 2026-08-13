@@ -1,6 +1,7 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
 import GlobalNotesController from "../Controller/GlobalNotesController.js";
+import { SF_ID_ROOT } from "../index.js";
 
 export default class GlobalNoteFolder extends AbstractModel {
     #id;
@@ -71,6 +72,21 @@ export default class GlobalNoteFolder extends AbstractModel {
         if (currentFolder.parentFolderId !== undefined) parentFolderArray = await this.getAllParentFolders(currentFolder.parentFolderId, parentFolderArray);
 
         return parentFolderArray;
+    }
+
+    static async folderExists(folderId) {
+        const model = new GlobalNoteFolder;
+        const db = await model.openIndexedDB();
+        let request = db.transaction('globalNoteFolders', 'readonly').objectStore('globalNoteFolders').count(folderId);
+
+        return new Promise((resolve, reject) => {
+            request.onsuccess = () => {
+                console.log(request.result);
+                if (request.result != 0) { resolve(true) }
+                else {resolve(false)}
+            }
+            request.onerror = () => reject(false);
+        })
     }
 
     ////////////////////////
@@ -258,16 +274,29 @@ export default class GlobalNoteFolder extends AbstractModel {
     ///////////////////
 
     static async batchRestoreTrashedFolders(folderArray) {
-        console.log(folderArray)
         const model = new GlobalNoteFolder;
-        const foldersToUpdate = folderArray.map(folder => {
+        const foldersToUpdate = [];
+        const failedRestores = [];
+
+        for (const folder of folderArray) {
+
+            const parentExists = await this.folderExists(folder.parentIdBeforeDelete);
+
+            if (!parentExists && folder.parentIdBeforeDelete !== SF_ID_ROOT) {
+                failedRestores.push(folder);
+
+                continue;
+            }
+
             folder.parentFolderId = folder.parentIdBeforeDelete;
             folder.parentIdBeforeDelete = null;
 
-            return folder;
-        });
+            foldersToUpdate.push(folder);
+        };
 
         await model.batchUpdate(foldersToUpdate);
+
+        return failedRestores;
     }
 
     static async deleteAllTrashedFolders(allTrashedFolders) {
@@ -382,7 +411,7 @@ export default class GlobalNoteFolder extends AbstractModel {
 
         if (result.status == 'failed') {
             for (const folder of serializedFolders) {
-                this.writeToLocalDB('unsyncedGlobalNoteFolders', folder);
+                this.updateOnLocalDB('unsyncedGlobalNoteFolders', folder);
             }
         }
     }

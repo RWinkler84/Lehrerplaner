@@ -1,6 +1,7 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
 import GlobalNotesController from "../Controller/GlobalNotesController.js";
+import { SF_ID_ROOT } from "../index.js";
 
 export default class GlobalNote extends AbstractModel {
     #id;
@@ -87,14 +88,27 @@ export default class GlobalNote extends AbstractModel {
 
     static async batchRestoreTrashedNotes(notesArray) {
         const model = new GlobalNote;
-        const notesToUpdate = notesArray.map(note => {
+        const notesToUpdate = [];
+        const failedRestores = [];
+        
+        for (const note of notesArray) {
+            const parentExists = await GlobalNotesController.folderExists(note.parentIdBeforeDelete);
+            
+            if (!parentExists && note.parentIdBeforeDelete != SF_ID_ROOT) {
+                failedRestores.push(note);
+
+                continue;
+            }
+
             note.parentFolderId = note.parentIdBeforeDelete;
             note.parentIdBeforeDelete = null;
 
-            return note;
-        });
+            notesToUpdate.push(note);
+        }
 
         await model.batchUpdate(notesToUpdate);
+
+        return failedRestores;
     }
 
     static async deleteAllTrashedNotes(allTrashedNotes) {

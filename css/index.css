@@ -684,6 +684,7 @@ dialog .errorMessageDisplay,
     padding: 0.5rem 1rem;
     border-right: solid 1px var(--lightgrey);
     user-select: none;
+    -webkit-user-select: none;
     cursor: default;
 }
 
@@ -941,6 +942,7 @@ dialog .errorMessageDisplay,
     flex-grow: 1;
     position: relative;
     flex-direction: column;
+    padding-top: 0;
 
     &[style="display: block;"] {
         display: flex !important;
@@ -951,16 +953,18 @@ dialog .errorMessageDisplay,
         flex-direction: column;
         gap: 0.25rem;
         position: absolute;
-        z-index: 100;
+        z-index: 50;
         background-color: var(--lightergrey);
         padding: 1rem 0.5rem;
         border-radius: var(--standardRadius);
         box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+        -webkit-user-select: none;
 
 
         button {
             color: var(--bodyBackground);
             padding: 0.25rem 1rem;
+            text-wrap: nowrap;
 
             &:hover {
                 background-color: rgba(256, 256, 256, 0.4);
@@ -973,14 +977,55 @@ dialog .errorMessageDisplay,
         }
     }
 
+
     #globalNotesFileContainer {
+        position: relative;
         flex-grow: 1;
+
+        #createglobalItemsButtonContainer {
+            position: fixed;
+            bottom: 4rem;
+            right: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            button {
+                display: none;
+                -webkit-user-select: none;
+            }
+
+            #createGlobalItemButton {
+                display: block;
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            &.open {
+
+                button {
+                    display: block;
+                    padding: 0.75rem 0.75rem;
+
+                    .icon {
+                        width: 1.75rem;
+                        height: 1.75rem;
+                    }
+                }
+
+                #createGlobalItemButton {
+                    display: none;
+                }
+            }
+        }
     }
 
     #globalNotesFileSystemDisplay {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+        /* prevent ios context menu */
+        -webkit-touch-callout: none;
 
         #folderIconContainer,
         #noteIconContainer {
@@ -991,6 +1036,12 @@ dialog .errorMessageDisplay,
 
         #folderNavigatonContainer {
             gap: 1rem;
+            position: sticky;
+            top: 2rem;
+            padding-top: 2rem;
+            padding-bottom: 0.5rem;
+            background-color: var(--contentContainerBackground);
+            z-index: 49;
 
             #folderPathContainer {
                 overflow: hidden;
@@ -1033,6 +1084,7 @@ dialog .errorMessageDisplay,
             padding: 0.25rem;
             align-items: center;
             overflow: hidden;
+            -webkit-user-select: none;
 
             &.selected {
                 background-color: var(--lightBlue);
@@ -1058,6 +1110,8 @@ dialog .errorMessageDisplay,
                 text-align: center;
                 cursor: default;
                 user-select: none;
+                -webkit-user-select: none;
+
             }
 
             textarea {
@@ -1897,6 +1951,11 @@ p {
         #pageLogo {
             display: none;
         }
+
+        #topMenuButtonContainer {
+            width: 100%;
+            justify-content: space-between;
+        }
     }
 
 }
@@ -2090,10 +2149,19 @@ p {
     }
 
     #globalNotesContainer {
+        padding-top: 0rem;
+
+        #globalNotesFileSystemDisplay {
+            #folderNavigatonContainer {
+                padding-top: 1.5rem;
+
+            }
+        }
 
         button,
         .folderPathItemContainer {
             user-select: none;
+            -webkit-user-select: none;
         }
 
         .globalNoteContextMenu {
@@ -2106,6 +2174,13 @@ p {
 
             .contextMenuButton {
                 padding: 0.5rem 1rem;
+            }
+        }
+
+        #globalNotesFileContainer {
+            #createglobalItemsButtonContainer {
+                bottom: 3rem;
+                right: 0.5rem;
             }
         }
     }
@@ -2194,6 +2269,8 @@ p {
 
 @media screen and (max-width: 400px) {
     #topMenuContainer {
+        gap: unset;
+
         #pageLogo {
             display: none;
         }
