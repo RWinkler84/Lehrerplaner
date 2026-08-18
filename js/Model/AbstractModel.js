@@ -141,7 +141,7 @@ export default class AbstractModel {
     async writeToLocalDB(store, dataToStore) {
         let db = await this.openIndexedDB();
 
-        if (dataToStore.length > 1) {
+        if (Array.isArray(dataToStore)) {
             dataToStore.forEach((entry) => {
                 entry.id = Number(entry.id);
                 let transaction = db.transaction(store, 'readwrite').objectStore(store).add(entry);

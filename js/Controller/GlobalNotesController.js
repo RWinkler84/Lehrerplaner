@@ -1,4 +1,4 @@
-import { SF_ID_TRASH, contextMenuEvent } from "../index.js";
+import { SF_ID_TRASH, contextMenuEvent, globalItemsMultiSelectData } from "../index.js";
 import GlobalNote from "../Model/GlobalNote.js";
 import GlobalNoteFolder from '../Model/GlobalNoteFolder.js';
 import View from "../View/GlobalNotesView.js";
@@ -8,6 +8,8 @@ export default class GlobalNotesController {
         await this.renderFolderPath();
         await this.renderFolderIcons();
         await this.renderGlobalNoteIcons();
+
+        View.toggleGlobalItemCreationButtons(!View.isInTrash())
     }
 
     static async renderGlobalNoteIcons() {
@@ -67,6 +69,7 @@ export default class GlobalNotesController {
     }
 
     static closeAllContextMenus() {
+        console.trace()
         View.closeAllContextMenus();
     }
 
@@ -427,13 +430,37 @@ export default class GlobalNotesController {
         await GlobalNoteFolder.deleteAllTrashedFolders(trashedItems.folders);
         await GlobalNote.deleteAllTrashedNotes(trashedItems.notes);
 
-        View.renderTrashIcon(await GlobalNoteFolder.isTrashEmpty());
+        if (View.getDisplayedFolderId() == SF_ID_TRASH) { this.renderGlobalNotesView() }
+        else { View.renderTrashIcon(await GlobalNoteFolder.isTrashEmpty()); }
+
         this.closeAllContextMenus();
     }
 
     static closeRestoreErrorMessage() {
         View.closeRestoreErrorMessage();
     };
+
+    ////////////////////////
+    // multiple selection //
+    ////////////////////////
+
+    static selectMultipleOnMouseDrag(event) {
+        globalItemsMultiSelectData.ignoreNextClickEvent = true;
+
+        if (globalItemsMultiSelectData.selectables.length == 0) {
+            globalItemsMultiSelectData.selectables = View.getAllSelectableItems();
+
+            View.calculateSelectablePositions();
+        }
+
+        this.closeAllContextMenus();
+        View.drawSelectionRectangle(event);
+        View.markItemsSelected(event);
+    }
+
+    static removeSelectionRectangle() {
+        View.removeSelectionRectangle()
+    }
 
     //////////
     // misc //
@@ -476,6 +503,13 @@ export default class GlobalNotesController {
     ///////////////////
 
     static clickHandler(event) {
+        // prevents selected items from being deselected by the click event after mouse up
+        if (globalItemsMultiSelectData.ignoreNextClickEvent) {
+            globalItemsMultiSelectData.ignoreNextClickEvent = false;
+
+            return;
+        }
+
         const target = event.target;
 
         const currentStep = View.getCurrentNavigationStep();
@@ -631,7 +665,7 @@ export default class GlobalNotesController {
         const target = event.target;
         event.preventDefault();
 
-        GlobalNotesController.closeAllContextMenus();
+        if (View.isContextMenuOpen()) GlobalNotesController.closeAllContextMenus();
         GlobalNotesController.openContextMenu(event);
     }
 }

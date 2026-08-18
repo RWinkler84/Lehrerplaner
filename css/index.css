@@ -977,12 +977,20 @@ dialog .errorMessageDisplay,
         }
     }
 
+    #selectionRectangle {
+        position: fixed;
+        border: 1px dotted black;
+        background-color: var(--lightergrey);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
 
     #globalNotesFileContainer {
         position: relative;
         flex-grow: 1;
 
-        #createglobalItemsButtonContainer {
+        #createGlobalItemsButtonContainer {
             position: fixed;
             bottom: 4rem;
             right: 2.5rem;
@@ -1015,6 +1023,11 @@ dialog .errorMessageDisplay,
 
                 #createGlobalItemButton {
                     display: none;
+                }
+
+                #createGlobalNoteButton {
+                    z-index: 1;
+                    animation: createGlobalNoteButtonSlideUp 0.1s ease-out;
                 }
             }
         }
@@ -2170,7 +2183,6 @@ p {
             left: 0;
             right: 0;
             animation: contextMenuSlideIn 0.2s ease-out;
-            --contextMenuHeight: attr(data-height px);
 
             .contextMenuButton {
                 padding: 0.5rem 1rem;
@@ -2187,8 +2199,7 @@ p {
 
     @keyframes contextMenuSlideIn {
         from {
-            transform: translateY(var(--contextMenuHeight));
-            /* transform: translateY(100px); */
+            transform: translateY(100%);
         }
 
         to {

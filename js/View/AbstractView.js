@@ -379,6 +379,7 @@ export default class AbstractView {
         dialog.querySelector('#supportTicketTopic').value = '';
         dialog.querySelector('#supportTicketContent').value = '';
         dialog.querySelector('#supportTicketAnswer').value = '';
+        dialog.querySelector('#supportTicketErrorMessageDisplay').textContent = '';
 
         this.toggleSupportDialogButtons('close');
 
@@ -412,18 +413,21 @@ export default class AbstractView {
 
         switch (status) {
             case 'sending':
-                submitButton.style.display = 'none';
+                submitButton.disabled = true;
                 break;
 
             case 'success':
-                closeButton.style.display = 'block'
+                closeButton.style.display = 'block';
+                submitButton.style.display = 'none';
+
                 break;
 
             case 'failed':
-                submitButton.style.display = 'block';
+                submitButton.disabled = false;
                 break;
 
             case 'close':
+                submitButton.disabled = false;
                 submitButton.style.display = 'block';
                 closeButton.style.display = 'none';
                 break;

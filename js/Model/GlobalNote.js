@@ -204,6 +204,8 @@ export default class GlobalNote extends AbstractModel {
     }
 
     async batchDelete(globalNotesToDelete) {
+        if (globalNotesToDelete.length == 0) return;
+        
         const serializedNotes = [];
 
         for (const note of globalNotesToDelete) {

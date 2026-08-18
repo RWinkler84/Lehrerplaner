@@ -417,6 +417,8 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     async batchDelete(foldersToDelete) {
+        if (foldersToDelete.length == 0) return;
+
         const uniqueFolders = {};
         const notesToDelete = [];
 
@@ -446,7 +448,7 @@ export default class GlobalNoteFolder extends AbstractModel {
 
         let result = await this.makeAjaxQuery('globalNoteFolder', 'delete', serializedFolders);
 
-        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolderss', serializedFolders);
+        if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolders', serializedFolders);
     }
 
     serialize() {

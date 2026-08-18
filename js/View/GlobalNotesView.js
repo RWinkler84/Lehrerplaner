@@ -1,5 +1,5 @@
 import Editor from "../inc/editor.js";
-import { SF_ID_TRASH } from "../index.js";
+import { globalItemsMultiSelectData, SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNotesView {
     static renderGlobalNoteIcons(notesArray, clipboardContent) {
@@ -218,6 +218,22 @@ export default class GlobalNotesView {
             }
         ];
 
+        const multiSelect = [
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'deleteGlobalItem',
+                text: 'löschen'
+            },
+        ]
+
+        // trash
         const trashClicked = [
             {
                 action: 'restoreAllTrash',
@@ -233,6 +249,14 @@ export default class GlobalNotesView {
             {
                 action: 'restoreItem',
                 text: 'wiederherstellen'
+            },
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
             },
             {
                 action: 'deleteItemFromTrash',
@@ -268,6 +292,9 @@ export default class GlobalNotesView {
 
         if (sourceElement.classList.contains('new')) return;
         if (sourceElement.classList.contains('cut')) return;
+        if (!sourceElement.classList.contains('selected')) {
+            this.removeAllSelections();
+        }
 
         // set the menu to render
         if (sourceElement.id == 'globalNotesFileContainer') menuToRender = folderClicked;
@@ -326,25 +353,22 @@ export default class GlobalNotesView {
         const menuContainerProps = menuContainer.getBoundingClientRect();
         const notesContainerProps = globalNotesContainer.getBoundingClientRect();
 
-        // reset pos, if menu extends off screen
-        let translateX = '0%';
-        let translateY = '0%';
+        if (window.innerWidth > 620) {
+            // reset pos, if menu extends off screen
+            let translateX = '0%';
+            let translateY = '0%';
 
-        if (event.type == 'touchstart') {
-            translateX = '-100%';
-            translateY = '-100%';
-        }
+            if (event.type == 'touchstart') {
+                translateX = '-100%';
+                translateY = '-100%';
+            }
 
-        if (menuContainerProps.right > notesContainerProps.right) translateX = '-100%';
-        if (menuContainerProps.left < notesContainerProps.left) translateX = '0%';
-        if (menuContainerProps.top < notesContainerProps.top) translateY = '0%';
-        if (menuContainerProps.bottom > notesContainerProps.bottom) translateY = '-100%';
+            if (menuContainerProps.right > notesContainerProps.right) translateX = '-100%';
+            if (menuContainerProps.left < notesContainerProps.left) translateX = '0%';
+            if (menuContainerProps.top < notesContainerProps.top) translateY = '0%';
+            if (menuContainerProps.bottom > notesContainerProps.bottom) translateY = '-100%';
 
-        menuContainer.style.transform = `translate(${translateX}, ${translateY})`;
-
-        // store height info for slide in animation
-        if (window.innerWidth <= 620) {
-            menuContainer.dataset.height = menuContainerProps.height;
+            menuContainer.style.transform = `translate(${translateX}, ${translateY})`;
         }
     }
 
@@ -358,18 +382,24 @@ export default class GlobalNotesView {
         }
     }
 
-    static closeAllContextMenus() {
-        while (document.querySelector('.globalNoteContextMenu')) document.querySelector('.globalNoteContextMenu').remove();
+    static isContextMenuOpen() {
+        return document.querySelector('.globalNoteContextMenu') ? true : false;
+    }
 
-        document.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
+    static closeAllContextMenus() {
+        const globalNotesContainer = document.querySelector('#globalNotesContainer');
+
+        while (globalNotesContainer.querySelector('.globalNoteContextMenu')) globalNotesContainer.querySelector('.globalNoteContextMenu').remove();
+
+        globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
     }
 
     static openCreateGlobalItemMenu() {
-        document.querySelector('#createglobalItemsButtonContainer').classList.add('open');
+        document.querySelector('#createGlobalItemsButtonContainer').classList.add('open');
     }
 
     static closeCreateGlobalItemMenu() {
-        document.querySelector('#createglobalItemsButtonContainer').classList.remove('open');
+        document.querySelector('#createGlobalItemsButtonContainer').classList.remove('open');
     }
 
     ////////////////////
@@ -500,6 +530,101 @@ export default class GlobalNotesView {
         buttonContainer.remove();
     }
 
+    ////////////////////
+    // item selection //
+    ////////////////////
+
+    static drawSelectionRectangle(event) {
+        const globalNotesContainer = document.querySelector('#globalNotesContainer');
+
+        let selectionRect = globalNotesContainer.querySelector('#selectionRectangle');
+        let startX = globalItemsMultiSelectData.startX;
+        let startY = globalItemsMultiSelectData.startY;
+        let currentX = event.clientX;
+        let currentY = event.clientY;
+        let translateX = '0';
+        let translateY = '0';
+
+        if (startX > currentX) translateX = '-100%';
+        if (startY > currentY) translateY = '-100%';
+
+        let rectWidth = Math.abs(startX - currentX);
+        let rectHeight = Math.abs(startY - currentY);
+
+        if (!selectionRect) {
+            selectionRect = document.createElement('div');
+            selectionRect.id = 'selectionRectangle';
+        }
+
+        selectionRect.style.top = `${startY}px`;
+        selectionRect.style.left = `${startX}px`;
+        selectionRect.style.width = `${rectWidth}px`;
+        selectionRect.style.height = `${rectHeight}px`;
+        selectionRect.style.transform = `translate(${translateX}, ${translateY})`;
+
+        globalNotesContainer.append(selectionRect);
+    }
+
+    static getAllSelectableItems() {
+        const fileContainer = document.querySelector('#globalNotesFileSystemDisplay');
+
+        const allFolders = fileContainer.querySelectorAll('.folderIconContainer');
+        const allNotes = fileContainer.querySelectorAll('.noteIconContainer');
+
+        return Array.from(allFolders).concat(Array.from(allNotes));
+    }
+
+    static calculateSelectablePositions() {
+        globalItemsMultiSelectData.selectables.forEach((item, index) => {
+            const props = item.getBoundingClientRect();
+
+            globalItemsMultiSelectData.selecatablesPos[index] = {
+                x1: props.x,
+                y1: props.y,
+                x2: props.x + props.width,
+                y2: props.y + props.height
+            }
+        })
+
+    }
+
+    static markItemsSelected() {
+        const selectionRectElem = document.querySelector('#selectionRectangle');
+
+        if (!selectionRectElem) return;
+
+        const selectionRectProps = selectionRectElem.getBoundingClientRect();
+        const selectionRect = {
+            x1: selectionRectProps.x,
+            x2: selectionRectProps.x + selectionRectProps.width,
+            y1: selectionRectProps.y,
+            y2: selectionRectProps.y + selectionRectProps.height
+        }
+
+        Object.keys(globalItemsMultiSelectData.selecatablesPos).forEach(k => {
+            const itemPos = globalItemsMultiSelectData.selecatablesPos[k];
+            globalItemsMultiSelectData.selectables[k].classList.remove('selected');
+
+            if (
+                selectionRect.x1 <= itemPos.x2 && selectionRect.x2 >= itemPos.x1 &&
+                selectionRect.y1 <= itemPos.y2 && selectionRect.y2 >= itemPos.y1
+            ) {
+                if (globalItemsMultiSelectData.selectables[k].dataset.folder_id == SF_ID_TRASH) return;
+
+                globalItemsMultiSelectData.selectables[k].classList.add('selected');
+            }
+        })
+    }
+
+    static removeAllSelections() {
+        const globalNotesContainer = document.querySelector('#globalNotesContainer');
+        globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
+    }
+
+    static removeSelectionRectangle(event) {
+        document.querySelector('#selectionRectangle')?.remove();
+    }
+
     //////////
     // misc //
     //////////
@@ -562,6 +687,25 @@ export default class GlobalNotesView {
 
         if (navigationData.previousStepAvailable) backwardButton.disabled = false;
         if (navigationData.nextStepAvailable) forwardButton.disabled = false;
+    }
+
+    static toggleGlobalItemCreationButtons(activate = true) {
+        const buttonContainer = document.querySelector('#createGlobalItemsButtonContainer');
+        const createGlobalItemButton = buttonContainer.querySelector('#createGlobalItemButton');
+        const createNoteButton = buttonContainer.querySelector('#createGlobalNoteButton');
+        const createFolderButton = buttonContainer.querySelector('#createGlobalNoteFolderButton');
+
+        if (!activate) {
+            createGlobalItemButton.disabled = true;
+            createNoteButton.disabled = true;
+            createFolderButton.disabled = true;
+
+            return;
+        }
+
+        createGlobalItemButton.disabled = false;
+        createNoteButton.disabled = false;
+        createFolderButton.disabled = false;
     }
 
     static showGlobalNoteSavedMessage() {

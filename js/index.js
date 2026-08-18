@@ -57,6 +57,15 @@ export let contextMenuEvent = {
     contextMenuOpened: false
 };
 
+export let globalItemsMultiSelectData = {
+    mouseDown: false,
+    ignoreNextClickEvent: false,
+    startX: null,
+    startY: null,
+    selectables: [],
+    selecatablesPos: {}
+};
+
 let timeout = false //for resize debouncing
 let abstCtrl = new AbstractController();
 
@@ -164,15 +173,51 @@ async function startApp() {
         }
     });
 
+    // global Notes
+    document.querySelector('#globalNotesFileContainer').addEventListener('mousedown', (event) => {
+        globalItemsMultiSelectData.mouseDown = true;
+        globalItemsMultiSelectData.startX = event.clientX;
+        globalItemsMultiSelectData.startY = event.clientY;
+    })
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('mousemove', (event) => {
+        if (globalItemsMultiSelectData.mouseDown) {
+            GlobalNotesController.selectMultipleOnMouseDrag(event);
+        }
+    });
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('mouseup', (event) => {
+        globalItemsMultiSelectData.mouseDown = false;
+        globalItemsMultiSelectData.startX = null;
+        globalItemsMultiSelectData.startY = null;
+        globalItemsMultiSelectData.selectables = [];
+        globalItemsMultiSelectData.selecatablesPos = {};
+
+        GlobalNotesController.removeSelectionRectangle();
+    })
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('click', () => console.log('click'))
+
     // context menu
-    document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', GlobalNotesController.rightClickHandler)
+    document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', (event) => {
+        const mouseUpEvent = new MouseEvent('mouseup', { bubbles: true, cancelable: true })
+        document.querySelector('#globalNotesFileContainer').dispatchEvent(mouseUpEvent);
+        GlobalNotesController.rightClickHandler(event);
+
+        // prevents context menu from firing twice on non iOS divices
+        if (contextMenuEvent.touchstartTimeOutId) {
+            clearTimeout(contextMenuEvent.touchstartTimeOutId);
+            contextMenuEvent.touchstartTimeOutId = null;
+        }
+    })
 
     //iOS/iPad OS touch workaround
     document.querySelector('#globalNotesFileContainer').addEventListener('touchstart', (event) => {
         contextMenuEvent.touchstartTimeOutId = setTimeout(() => {
             contextMenuEvent.contextMenuOpened = true;
             GlobalNotesController.rightClickHandler(event);
-        }, 500);
+
+        }, 600);
     })
     document.querySelector('#globalNotesFileContainer').addEventListener('touchend', (event) => {
         if (contextMenuEvent.contextMenuOpened) {
