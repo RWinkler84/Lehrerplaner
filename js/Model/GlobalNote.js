@@ -1,7 +1,7 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
 import GlobalNotesController from "../Controller/GlobalNotesController.js";
-import { SF_ID_ROOT } from "../index.js";
+import { SF_ID_ROOT, SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNote extends AbstractModel {
     #id;
@@ -57,7 +57,8 @@ export default class GlobalNote extends AbstractModel {
     static async pasteClipboardContent(targetFolderId) {
         if (Fn.isEmptyObject(this.#clipboard)) return;
 
-        let allGlobalNotes;
+        let allGlobalNotes = null;
+        const notesToSaveRemotly = [];
         const notesToUpdate = [];
         const model = new GlobalNote;
 
@@ -65,10 +66,16 @@ export default class GlobalNote extends AbstractModel {
             const globalNote = await this.getById(id);
 
             if (this.#clipboard[id].operationType == 'copy') {
-                allGlobalNotes = await GlobalNote.getAllNotes();
+                if (!allGlobalNotes) allGlobalNotes = await GlobalNote.getAllNotes();
 
                 globalNote.id = Fn.generateId(allGlobalNotes);
                 globalNote.title = `${globalNote.title}(Kopie)`;
+                globalNote.parentFolderId = Number(targetFolderId);
+
+                allGlobalNotes.push(globalNote);
+                notesToSaveRemotly.push(globalNote);
+
+                continue;
             }
 
             globalNote.parentFolderId = Number(targetFolderId);
@@ -76,6 +83,7 @@ export default class GlobalNote extends AbstractModel {
         }
 
         await model.batchUpdate(notesToUpdate);
+        if (notesToSaveRemotly.length != 0) await model.batchSave(notesToSaveRemotly, true);
     }
 
     static isCut(id) {
@@ -90,10 +98,10 @@ export default class GlobalNote extends AbstractModel {
         const model = new GlobalNote;
         const notesToUpdate = [];
         const failedRestores = [];
-        
+
         for (const note of notesArray) {
             const parentExists = await GlobalNotesController.folderExists(note.parentIdBeforeDelete);
-            
+
             if (!parentExists && note.parentIdBeforeDelete != SF_ID_ROOT) {
                 failedRestores.push(note);
 
@@ -140,6 +148,8 @@ export default class GlobalNote extends AbstractModel {
     }
 
     async delete() {
+        this.lastEdited = this.formatDateTime(new Date());
+
         this.deleteFromLocalDB('globalNotes', this.id);
         this.deleteFromLocalDB('unsyncedGlobalNotes', this.id);
 
@@ -159,7 +169,8 @@ export default class GlobalNote extends AbstractModel {
 
     async batchSave(globalNotesToSave, keepIds = false) {
         const serializedNotes = [];
-        const allGlobalNotes = await GlobalNote.getAllNotes()
+        const allGlobalNotes = await GlobalNote.getAllNotes();
+        const now = this.formatDateTime(new Date());
 
         for (const note of globalNotesToSave) {
             if (!keepIds) {
@@ -167,7 +178,7 @@ export default class GlobalNote extends AbstractModel {
                 allGlobalNotes.push(note);
             }
 
-            note.lastEdited = this.formatDateTime(new Date());
+            note.lastEdited = now;
 
             let serializedNote = note.serialize();
             serializedNotes.push(serializedNote);
@@ -186,9 +197,10 @@ export default class GlobalNote extends AbstractModel {
 
     async batchUpdate(globalNotesToUpdate) {
         const serializedNotes = [];
+        const now = this.formatDateTime(new Date());
 
         for (const note of globalNotesToUpdate) {
-            note.lastEdited = this.formatDateTime(new Date());
+            note.lastEdited = now;
 
             let serializedNote = note.serialize();
             serializedNotes.push(serializedNote);
@@ -205,10 +217,13 @@ export default class GlobalNote extends AbstractModel {
 
     async batchDelete(globalNotesToDelete) {
         if (globalNotesToDelete.length == 0) return;
-        
+
+        const now = this.formatDateTime(new Date());
         const serializedNotes = [];
 
         for (const note of globalNotesToDelete) {
+            note.lastEdited = now;
+
             serializedNotes.push(note.serialize());
 
             await this.deleteFromLocalDB('globalNotes', note.id);
@@ -218,6 +233,15 @@ export default class GlobalNote extends AbstractModel {
         let result = await this.makeAjaxQuery('globalNote', 'delete', serializedNotes);
 
         if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNotes', serializedNotes);
+    }
+
+    async batchMoveToTrash(notesToMoveToTrash) {
+        notesToMoveToTrash.forEach(note => {
+            note.parentIdBeforeDelete = note.parentFolderId;
+            note.parentFolderId = SF_ID_TRASH;
+        })
+
+        await this.batchUpdate(notesToMoveToTrash);
     }
 
     serialize() {

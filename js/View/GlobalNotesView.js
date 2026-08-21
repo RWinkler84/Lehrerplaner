@@ -279,6 +279,25 @@ export default class GlobalNotesView {
             },
         ]
 
+        const trashMultiSelect = [
+            {
+                action: 'restoreItem',
+                text: 'wiederherstellen'
+            },
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'deleteItemFromTrash',
+                text: 'endgültig löschen'
+            }
+        ]
+
         let menuToRender = itemClicked;
 
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
@@ -299,10 +318,13 @@ export default class GlobalNotesView {
         // set the menu to render
         if (sourceElement.id == 'globalNotesFileContainer') menuToRender = folderClicked;
         if (sourceElement.dataset.folder_id == SF_ID_TRASH) menuToRender = trashClicked;
+        if (globalNotesContainer.querySelectorAll('.selected').length > 1) menuToRender = multiSelect;
 
         if (this.isInTrash()) {
             if (sourceElement.dataset.parent_id_before_delete) menuToRender = trashedItemClicked;
             if (sourceElement.dataset.folder_id != SF_ID_TRASH && !sourceElement.dataset.parent_id_before_delete) menuToRender = trashedChildItemClicked;
+            if (globalNotesContainer.querySelectorAll('.selected').length > 1) menuToRender = trashMultiSelect;
+
         }
 
         // create the menu element
@@ -376,22 +398,17 @@ export default class GlobalNotesView {
         const clickedContextMenu = event.target.closest('.globalNoteContextMenu');
 
         return {
-            fileType: clickedContextMenu.dataset.folder_id ? 'folder' : 'note',
-            folderId: Number(clickedContextMenu.dataset.folder_id),
-            noteId: Number(clickedContextMenu.dataset.note_id)
+            fileType: clickedContextMenu?.dataset.folder_id ? 'folder' : 'note',
+            folderId: Number(clickedContextMenu?.dataset.folder_id),
+            noteId: Number(clickedContextMenu?.dataset.note_id)
         }
-    }
-
-    static isContextMenuOpen() {
-        return document.querySelector('.globalNoteContextMenu') ? true : false;
     }
 
     static closeAllContextMenus() {
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
 
+        globalNotesContainer.querySelector('#globalNotesFileContainer').classList.remove('selected');
         while (globalNotesContainer.querySelector('.globalNoteContextMenu')) globalNotesContainer.querySelector('.globalNoteContextMenu').remove();
-
-        globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
     }
 
     static openCreateGlobalItemMenu() {
@@ -588,7 +605,7 @@ export default class GlobalNotesView {
 
     }
 
-    static markItemsSelected() {
+    static markItemsInRectangleSelected() {
         const selectionRectElem = document.querySelector('#selectionRectangle');
 
         if (!selectionRectElem) return;
@@ -614,6 +631,83 @@ export default class GlobalNotesView {
                 globalItemsMultiSelectData.selectables[k].classList.add('selected');
             }
         })
+    }
+
+    static editSelectedItemsKeyboardShortcuts(event) {
+        const srcElement = event.target.closest('.folderIconContainer') ?? event.target.closest('.noteIconContainer');
+
+        // ctrl and meta key selection
+        if (event.metaKey || event.ctrlKey) {
+            if (srcElement.classList.contains('selected')) {
+                srcElement.classList.remove('selected');
+
+                return;
+            }
+
+            srcElement.classList.add('selected');
+        }
+
+        // shift key selection
+        if (event.shiftKey) {
+            let allItems = this.getAllSelectableItems();
+            let allSelectedItems = this.getAllSelectedElements();
+            allSelectedItems = allSelectedItems.folders.concat(allSelectedItems.notes);
+
+            if (allSelectedItems.length == 0) {
+                srcElement.classList.add('selected');
+
+                return;
+            }
+
+            //add multiple items to selection
+            //new item sits before first one
+            if (srcElement.compareDocumentPosition(allSelectedItems[0]) == Node.DOCUMENT_POSITION_FOLLOWING) {
+                const indexSrcElement = allItems.indexOf(srcElement);
+                const indexLastElement = allItems.indexOf(allSelectedItems[allSelectedItems.length - 1]);
+
+                for (let i = indexSrcElement; i <= indexLastElement; i++) {
+                    allItems[i].classList.add('selected');
+                }
+
+                return;
+            }
+
+            //new item sits after last one
+            if (srcElement.compareDocumentPosition(allSelectedItems[allSelectedItems.length - 1]) == Node.DOCUMENT_POSITION_PRECEDING) {
+                const indexSrcElement = allItems.indexOf(srcElement);
+                const indexFirstElement = allItems.indexOf(allSelectedItems[0]);
+
+                for (let i = indexFirstElement; i <= indexSrcElement; i++) {
+                    allItems[i].classList.add('selected');
+                }
+
+                return;
+            }
+
+            //remove multiple items from selection
+            //the lower difference decides where to shave off
+
+            const indexSrcElement = allItems.indexOf(srcElement);
+            const indexFirstElement = allItems.indexOf(allSelectedItems[0]);
+            const indexLastElement = allItems.indexOf(allSelectedItems[allSelectedItems.length - 1]);
+
+            const source = indexSrcElement + 1;
+            const first = indexFirstElement + 1;
+            const last = indexLastElement + 1;
+
+            let diffCutStart = source - first;
+            let diffCutEnd = last - source;
+
+            if (diffCutEnd <= diffCutStart) {
+                for (let i = indexSrcElement + 1; i <= indexLastElement; i++) {
+                    allItems[i].classList.remove('selected');
+                }
+            } else {
+                for (let i = indexFirstElement; i < indexSrcElement; i++) {
+                    allItems[i].classList.remove('selected');
+                }
+            }
+        }
     }
 
     static removeAllSelections() {
@@ -650,6 +744,14 @@ export default class GlobalNotesView {
         if (trashFound) return true;
 
         return false;
+    }
+
+    static isContextMenuOpen() {
+        return document.querySelector('.globalNoteContextMenu') ? true : false;
+    }
+
+    static isCreateGlobalItemMenuOpen() {
+        return document.querySelector('#createGlobalItemsButtonContainer').classList.contains('open') ? true : false;
     }
 
     static getAllSelectedElements() {

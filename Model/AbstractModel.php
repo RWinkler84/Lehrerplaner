@@ -140,7 +140,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -157,7 +157,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -174,7 +174,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -192,7 +192,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $this->escapeDbData($dataFromDb);
     }
@@ -210,7 +210,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
     }
@@ -230,7 +230,7 @@ class AbstractModel
             $dataFromDb = $this->preprocessReadData($dataFromDb);
         }
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
     }
@@ -248,7 +248,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
     }
@@ -266,7 +266,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
     }
@@ -284,7 +284,7 @@ class AbstractModel
         $dataFromDb = $this->read($query, $params);
         $dataFromDb = $this->preprocessReadData($dataFromDb);
 
-        if (empty($dataFromDb)) return ['status' => 'success', 'error' => 'No entries found', 'message' => 'Es konnten keine Daten gefunden werden'];
+        if (empty($dataFromDb)) return [];
 
         return $dataFromDb; //not escaped because it and should be html code to allow styling of the text
     }

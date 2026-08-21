@@ -1,7 +1,7 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
 import GlobalNotesController from "../Controller/GlobalNotesController.js";
-import { SF_ID_ROOT } from "../index.js";
+import { SF_ID_ROOT, SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNoteFolder extends AbstractModel {
     #id;
@@ -83,7 +83,7 @@ export default class GlobalNoteFolder extends AbstractModel {
             request.onsuccess = () => {
                 console.log(request.result);
                 if (request.result != 0) { resolve(true) }
-                else {resolve(false)}
+                else { resolve(false) }
             }
             request.onerror = () => reject(false);
         })
@@ -204,8 +204,8 @@ export default class GlobalNoteFolder extends AbstractModel {
         if (Fn.isEmptyObject(this.#clipboard)) return;
 
         const foldersToUpdate = [];
-        let allGlobalNotes = [];
-        let allGlobalNotesFolders = [];
+        let allGlobalNotes = null;
+        let allGlobalNotesFolders = null;
         let itemsToSave = {
             folders: [],
             notes: []
@@ -242,8 +242,8 @@ export default class GlobalNoteFolder extends AbstractModel {
             const folder = await this.getById(id);
 
             if (this.#clipboard[id].operationType == 'copy') {
-                allGlobalNotesFolders = await this.getAllFolders();
-                allGlobalNotes = await GlobalNotesController.getAllGlobalNotes();
+                if (!allGlobalNotesFolders) allGlobalNotesFolders = await this.getAllFolders();
+                if (!allGlobalNotes) allGlobalNotes = await GlobalNotesController.getAllGlobalNotes();
                 folder.name = `${folder.name}(Kopie)`;
 
                 itemsToSave = await copyFolder(folder, targetFolderId, itemsToSave);
@@ -344,8 +344,11 @@ export default class GlobalNoteFolder extends AbstractModel {
         const foldersToDelete = itemsToDelete.folders;
         const notesToDelete = itemsToDelete.notes;
         const serializedFolders = [];
+        const now = this.formatDateTime(new Date());
 
         for (const folder of foldersToDelete) {
+            folder.lastEdited = now;
+            
             serializedFolders.push(folder.serialize());
 
             await this.deleteFromLocalDB('globalNoteFolders', folder.id);
@@ -397,9 +400,10 @@ export default class GlobalNoteFolder extends AbstractModel {
 
     async batchUpdate(foldersToUpdate) {
         const serializedFolders = [];
+        const now = this.formatDateTime(new Date());
 
         for (const folder of foldersToUpdate) {
-            folder.lastEdited = this.formatDateTime(new Date());
+            folder.lastEdited = now;
 
             let serializedFolder = folder.serialize();
             serializedFolders.push(serializedFolder);
@@ -419,6 +423,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     async batchDelete(foldersToDelete) {
         if (foldersToDelete.length == 0) return;
 
+        const now = this.formatDateTime(new Date());
         const uniqueFolders = {};
         const notesToDelete = [];
 
@@ -426,12 +431,14 @@ export default class GlobalNoteFolder extends AbstractModel {
             const allChildItems = await GlobalNoteFolder.getFolderContentRecursively(folder, false);
 
             for (const childFolder of allChildItems.folders) {
+                childFolder.lastEdited = now;
                 uniqueFolders[childFolder.id] = childFolder.serialize();
 
                 await this.deleteFromLocalDB('globalNoteFolders', childFolder.id);
                 await this.deleteFromLocalDB('unsyncedGlobalNoteFolders', childFolder.id);
             }
 
+            folder.lastEdited = now;
             uniqueFolders[folder.id] = folder.serialize();
 
             await this.deleteFromLocalDB('globalNoteFolders', folder.id);
@@ -449,6 +456,15 @@ export default class GlobalNoteFolder extends AbstractModel {
         let result = await this.makeAjaxQuery('globalNoteFolder', 'delete', serializedFolders);
 
         if (result.status == 'failed') this.writeToLocalDB('unsyncedDeletedGlobalNoteFolders', serializedFolders);
+    }
+
+    async batchMoveToTrash(foldersToMoveToTrash) {
+        foldersToMoveToTrash.forEach(folder => {
+            folder.parentIdBeforeDelete = folder.parentFolderId;
+            folder.parentFolderId = SF_ID_TRASH;
+        })
+
+        await this.batchUpdate(foldersToMoveToTrash);
     }
 
     serialize() {

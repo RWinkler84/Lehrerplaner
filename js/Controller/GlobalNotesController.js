@@ -69,7 +69,6 @@ export default class GlobalNotesController {
     }
 
     static closeAllContextMenus() {
-        console.trace()
         View.closeAllContextMenus();
     }
 
@@ -138,10 +137,8 @@ export default class GlobalNotesController {
         await (new GlobalNote).batchDelete(globalNotesToDelete);
     }
 
-    static async moveGlobalNoteToTrash(noteId) {
-        const noteToDelete = await GlobalNote.getById(noteId);
-
-        await noteToDelete.moveToTrash();
+    static async moveGlobalNoteToTrash(notesArray) {
+        await (new GlobalNote).batchMoveToTrash(notesArray)
     }
 
     static async restoreGlobalNote(notesArray) {
@@ -197,6 +194,10 @@ export default class GlobalNotesController {
         await globalNoteFolder.delete();
     }
 
+    static async batchDeleteGlobalNoteFolders(foldersToDelete) {
+        await (new GlobalNoteFolder).batchDelete(foldersToDelete);
+    }
+
     static makeFolderEditable(folderId) {
         View.makeFolderEditable(folderId);
     }
@@ -219,10 +220,8 @@ export default class GlobalNotesController {
         View.removeFolderEditability(event);
     }
 
-    static async moveGlobalNoteFolderToTrash(folderId) {
-        const globalNoteFolder = await GlobalNoteFolder.getById(folderId);
-
-        await globalNoteFolder.moveToTrash();
+    static async moveGlobalNoteFolderToTrash(folderArray) {
+        await (new GlobalNoteFolder).batchMoveToTrash(folderArray)
     }
 
     static async restoreGlobalNoteFolder(folderArray) {
@@ -286,54 +285,45 @@ export default class GlobalNotesController {
         }
     }
 
-    static async cutGlobalItem(event) {
-        const clickedItemData = View.getContextMenuInfo(event);
+    static async cutGlobalItem() {
+        const selectedElements = View.getAllSelectedElements();
 
-        if (clickedItemData.fileType == 'folder') {
+        if (selectedElements.folders.length != 0) {
             GlobalNoteFolder.clearClipboard();
             GlobalNote.clearClipboard();
 
-            GlobalNoteFolder.addToClipboard([clickedItemData.folderId], 'cut');
-
-            View.markItemAsCut();
-            this.closeAllContextMenus();
+            GlobalNoteFolder.addToClipboard(selectedElements.folders.map(folder => folder.dataset.folder_id), 'cut');
         }
 
-        if (clickedItemData.fileType == 'note') {
-            GlobalNoteFolder.clearClipboard();
+        if (selectedElements.notes.length != 0) {
+            if (selectedElements.folders.length == 0) GlobalNoteFolder.clearClipboard();
             GlobalNote.clearClipboard();
 
-            GlobalNote.addToClipboard([clickedItemData.noteId], 'cut');
-
-            View.markItemAsCut();
-            this.closeAllContextMenus();
+            GlobalNote.addToClipboard(selectedElements.notes.map(note => note.dataset.note_id), 'cut');
         }
+
+        View.markItemAsCut();
+        this.closeAllContextMenus();
     }
 
-    static async copyGlobalItem(event) {
-        const clickedItemData = View.getContextMenuInfo(event);
+    static async copyGlobalItem() {
+        const selectedElements = View.getAllSelectedElements();
 
-        if (clickedItemData.fileType == 'folder') {
-            GlobalNote.clearClipboard();
-            GlobalNoteFolder.clearClipboard();
-
-            GlobalNoteFolder.addToClipboard([clickedItemData.folderId], 'copy');
-
-            this.closeAllContextMenus();
+        if (selectedElements.folders.length != 0) {
+            GlobalNoteFolder.addToClipboard(selectedElements.folders.map(folder => folder.dataset.folder_id), 'copy');
         }
 
-        if (clickedItemData.fileType == 'note') {
-            GlobalNote.clearClipboard();
-            GlobalNoteFolder.clearClipboard();
-
-            GlobalNote.addToClipboard([clickedItemData.noteId], 'copy');
-
-            this.closeAllContextMenus();
+        if (selectedElements.notes.length != 0) {
+            GlobalNote.addToClipboard(selectedElements.notes.map(note => note.dataset.note_id), 'copy');
         }
+
+        this.closeAllContextMenus();
     }
 
     static async pasteGlobalItem(event) {
-        const contextMenuInfo = View.getContextMenuInfo(event);
+        let contextMenuInfo = View.getContextMenuInfo(event);
+
+        if (!contextMenuInfo.folderId) contextMenuInfo.folderId = View.getDisplayedFolderId();
 
         await GlobalNote.pasteClipboardContent(contextMenuInfo.folderId);
         await GlobalNoteFolder.pasteClipboardContent(contextMenuInfo.folderId);
@@ -345,17 +335,19 @@ export default class GlobalNotesController {
         this.renderGlobalNotesView();
     }
 
-    static async moveGlobalItemToTrash(event) {
-        const clickedItemData = View.getContextMenuInfo(event);
+    static async moveGlobalItemToTrash() {
+        const selectedElements = View.getAllSelectedElements();
+        const selectedFolders = await this.getInstancesFromElements(selectedElements.folders);
+        const selectedNotes = await this.getInstancesFromElements(selectedElements.notes);
 
-        if (clickedItemData.fileType == 'folder') {
-            await this.moveGlobalNoteFolderToTrash(clickedItemData.folderId);
+        if (selectedElements.folders.length != 0) {
+            await this.moveGlobalNoteFolderToTrash(selectedFolders);
             this.renderFolderIcons();
             this.closeAllContextMenus();
         }
 
-        if (clickedItemData.fileType == 'note') {
-            await this.moveGlobalNoteToTrash(clickedItemData.noteId);
+        if (selectedElements.notes.length != 0) {
+            await this.moveGlobalNoteToTrash(selectedNotes);
             View.renderTrashIcon(false);
             this.renderGlobalNoteIcons();
             this.closeAllContextMenus();
@@ -363,19 +355,21 @@ export default class GlobalNotesController {
     }
 
     static async deleteGlobalItem(event) {
-        const clickedItemData = View.getContextMenuInfo(event);
+        const selectedElements = View.getAllSelectedElements();
+        const selectedFolders = await this.getInstancesFromElements(selectedElements.folders);
+        const selectedNotes = await this.getInstancesFromElements(selectedElements.notes);
 
-        if (clickedItemData.fileType == 'folder') {
-            await this.deleteGlobalNoteFolder(clickedItemData.folderId);
+        if (selectedElements.folders.length != 0) {
+            await this.batchDeleteGlobalNoteFolders(selectedFolders);
             this.renderFolderIcons();
-            this.closeAllContextMenus();
         }
 
-        if (clickedItemData.fileType == 'note') {
-            await this.deleteGlobalNote(clickedItemData.noteId);
+        if (selectedElements.notes.length != 0) {
+            await this.batchDeleteGlobalNote(selectedNotes);
             this.renderGlobalNoteIcons();
-            this.closeAllContextMenus();
         }
+
+        this.closeAllContextMenus();
     }
 
     static async restoreItemsFromTrash() {
@@ -386,14 +380,14 @@ export default class GlobalNotesController {
         if (selectedElements.folders.length != 0) {
             await this.restoreGlobalNoteFolder(selectedFolders);
             this.renderFolderIcons();
-            this.closeAllContextMenus();
         }
 
         if (selectedElements.notes.length != 0) {
             await this.restoreGlobalNote(selectedNotes);
             this.renderGlobalNoteIcons();
-            this.closeAllContextMenus();
         }
+
+        this.closeAllContextMenus();
     }
 
     static async deleteItemsFromTrash() {
@@ -404,7 +398,6 @@ export default class GlobalNotesController {
         if (selectedElements.folders.length != 0) {
             await (new GlobalNoteFolder).batchDelete(selectedFolders);
             this.renderFolderIcons();
-            this.closeAllContextMenus();
 
             View.toggleNavigationButtons(GlobalNoteFolder.getLatestNavigationStep());
         }
@@ -412,8 +405,9 @@ export default class GlobalNotesController {
         if (selectedElements.notes.length != 0) {
             await (new GlobalNote).batchDelete(selectedNotes);
             this.renderGlobalNoteIcons();
-            this.closeAllContextMenus();
         }
+
+        this.closeAllContextMenus();
     }
 
     static async restoreAllTrashContent() {
@@ -425,7 +419,7 @@ export default class GlobalNotesController {
     }
 
     static async deleteAllTrashContent() {
-        const trashedItems = await GlobalNoteFolder.getFolderContentRecursively({ id: 1 }, false);
+        const trashedItems = await GlobalNoteFolder.getFolderContentRecursively({ id: SF_ID_TRASH }, false);
 
         await GlobalNoteFolder.deleteAllTrashedFolders(trashedItems.folders);
         await GlobalNote.deleteAllTrashedNotes(trashedItems.notes);
@@ -455,11 +449,19 @@ export default class GlobalNotesController {
 
         this.closeAllContextMenus();
         View.drawSelectionRectangle(event);
-        View.markItemsSelected(event);
+        View.markItemsInRectangleSelected(event);
+    }
+
+    static removeAllSelections() {
+        View.removeAllSelections();
     }
 
     static removeSelectionRectangle() {
         View.removeSelectionRectangle()
+    }
+
+    static editSelectedItemsKeyboardShortcuts(event) {
+        View.editSelectedItemsKeyboardShortcuts(event);
     }
 
     //////////
@@ -531,8 +533,30 @@ export default class GlobalNotesController {
         //global notes view
         if (event.target.closest('#globalNotesContainer')) {
 
-            if (!target.closest('.globalNoteContextMenu')) this.closeAllContextMenus();
-            if (!target.closest('#createglobalItemsButtonContainer')) this.closeCreateGlobalItemMenu();
+            //determine, what should be closed or deselected
+            switch (true) {
+                case (View.isContextMenuOpen() && !target.closest('.globalNoteContextMenu')):
+                    View.closeAllContextMenus();
+                //dont break!
+
+                case (View.isCreateGlobalItemMenuOpen() && !target.closest('#createglobalItemsButtonContainer')):
+                    View.closeCreateGlobalItemMenu();
+                    break;
+
+                // keep selection
+                case (target.closest('.globalNoteContextMenu') != undefined):
+                    break;
+                case (event.shiftKey):
+                    break;
+                case (event.ctrlKey):
+                    break;
+                case (event.metaKey):
+                    break;
+
+                default:
+                    this.removeAllSelections();
+
+            }
 
             switch (target.id) {
                 case 'folderBackwardButton':
@@ -550,11 +574,13 @@ export default class GlobalNotesController {
                 case 'createGlobalNoteButton':
                     this.createNewGlobalNote();
                     this.closeCreateGlobalItemMenu();
+                    this.removeAllSelections();
                     break;
 
                 case 'createGlobalNoteFolderButton':
                     this.createNewGlobalNoteFolder();
                     this.closeCreateGlobalItemMenu();
+                    this.removeAllSelections();
                     break;
 
                 //context menu
@@ -609,6 +635,13 @@ export default class GlobalNotesController {
             switch (true) {
                 //open files
                 case target.closest('.noteIconContainer') != undefined:
+                    if (event.shiftKey || event.ctrlKey || event.metaKey) {
+                        event.preventDefault();
+
+                        this.editSelectedItemsKeyboardShortcuts(event);
+                        return;
+                    }
+
                     this.openGlobalNoteDialog(target.closest('.noteIconContainer').dataset.note_id);
                     break;
 
@@ -630,6 +663,13 @@ export default class GlobalNotesController {
                 case target.classList.contains('folderNameWrapper'):
                     if (target.closest('.folderIconContainer').classList.contains('new')) return;
                     if (target.closest('.folderIconContainer').classList.contains('editable')) return;
+
+                    if (event.shiftKey || event.ctrlKey || event.metaKey) {
+                        event.preventDefault();
+
+                        this.editSelectedItemsKeyboardShortcuts(event);
+                        return;
+                    }
 
                     folderId = target.closest('.folderIconContainer').dataset.folder_id;
 
@@ -667,5 +707,27 @@ export default class GlobalNotesController {
 
         if (View.isContextMenuOpen()) GlobalNotesController.closeAllContextMenus();
         GlobalNotesController.openContextMenu(event);
+    }
+
+    static handleKeyboardShortcuts(event) {
+        if (event.ctrlKey || event.metaKey) {
+            switch (event.key) {
+                case 'c':
+                    this.copyGlobalItem();
+                    break;
+
+                case 'v':
+                    this.pasteGlobalItem(event);
+                    break;
+
+                case 'x':
+                    this.cutGlobalItem();
+                    break;
+            }
+        }
+
+        if (event.key == 'Backspace' || event.key == 'Delete') {
+            this.moveGlobalItemToTrash();
+        }
     }
 }

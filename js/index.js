@@ -97,6 +97,12 @@ async function startApp() {
         GlobalNotesController.clickHandler(event);
     });
 
+    document.addEventListener('keydown', (event) => {
+        if (event.srcElement.closest('.editorContainer')) Editor.handleKeyDownEvents(event);
+        if (document.querySelector('#globalNotesContainer')?.style.display == 'block') GlobalNotesController.handleKeyboardShortcuts(event);
+    });
+
+
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
         element.addEventListener('mouseenter', AbstractView.showAddLessonButton);
@@ -145,7 +151,7 @@ async function startApp() {
 
     //text editor
     document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('click', Editor.handleClickEvents));
-    document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
+    // document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
     document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
         Editor.normalizeInput(event);
@@ -195,8 +201,6 @@ async function startApp() {
 
         GlobalNotesController.removeSelectionRectangle();
     })
-
-    document.querySelector('#globalNotesFileContainer').addEventListener('click', () => console.log('click'))
 
     // context menu
     document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', (event) => {
