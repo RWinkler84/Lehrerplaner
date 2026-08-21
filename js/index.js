@@ -54,7 +54,8 @@ export let userStatus = {
 //stores the timeout id for rightclick emulation on iOS
 export let contextMenuEvent = {
     touchstartTimeOutId: null,
-    contextMenuOpened: false
+    contextMenuOpened: false,
+    touchScrolled: false
 };
 
 export let globalItemsMultiSelectData = {
@@ -223,14 +224,33 @@ async function startApp() {
 
         }, 600);
     })
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('touchmove', (event) => {
+        clearTimeout(contextMenuEvent.touchstartTimeOutId);
+        contextMenuEvent.touchstartTimeOutId = null;
+        contextMenuEvent.touchScrolled = true;
+    });
+
     document.querySelector('#globalNotesFileContainer').addEventListener('touchend', (event) => {
+        event.preventDefault()
         if (contextMenuEvent.contextMenuOpened) {
-            event.preventDefault();
             contextMenuEvent.contextMenuOpened = false;
+            contextMenuEvent.touchScrolled = false;
+
+            return;
+        }
+
+        if (contextMenuEvent.touchScrolled) {
+            contextMenuEvent.touchScrolled = false;
+
+            return;
         }
 
         clearTimeout(contextMenuEvent.touchstartTimeOutId);
         contextMenuEvent.touchstartTimeOutId = null;
+        contextMenuEvent.touchScrolled = false;
+
+        // GlobalNotesController.handleTouchEvents(event);
     });
 
     AbstractController.renderTopMenu();

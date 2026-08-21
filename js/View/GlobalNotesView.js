@@ -2,6 +2,122 @@ import Editor from "../inc/editor.js";
 import { globalItemsMultiSelectData, SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNotesView {
+    static #contextMenus = {
+        //folder or a note is right clicked
+        itemClicked: [
+            {
+                action: 'editGlobalItem',
+                text: 'bearbeiten'
+            },
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'pasteGlobalItem',
+                text: 'einfügen'
+            },
+            {
+                action: 'deleteGlobalItem',
+                text: 'löschen'
+            },
+        ],
+        //context menu when a blank space is clicked
+        folderClicked: [
+            {
+                action: 'newGlobalNoteFolder',
+                text: 'neuer Ordner'
+            },
+            {
+                action: 'newGlobalNote',
+                text: 'neue Notiz'
+            },
+            {
+                action: 'pasteGlobalItem',
+                text: 'einfügen'
+            }
+        ],
+        multiSelect: [
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'deleteGlobalItem',
+                text: 'löschen'
+            },
+        ],
+        // trash
+        trashClicked: [
+            {
+                action: 'restoreAllTrash',
+                text: 'wiederherstellen'
+            },
+            {
+                action: 'deleteAllTrash',
+                text: 'Papierkorb leeren'
+            }
+        ],
+        trashedItemClicked: [
+            {
+                action: 'restoreItem',
+                text: 'wiederherstellen'
+            },
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'deleteItemFromTrash',
+                text: 'endgültig löschen'
+            }
+        ],
+        trashedChildItemClicked: [
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'deleteItemFromTrash',
+                text: 'endgültig löschen'
+            },
+        ],
+        trashMultiSelect: [
+            {
+                action: 'restoreItem',
+                text: 'wiederherstellen'
+            },
+            {
+                action: 'copyGlobalItem',
+                text: 'kopieren'
+            },
+            {
+                action: 'cutGlobalItem',
+                text: 'ausschneiden'
+            },
+            {
+                action: 'deleteItemFromTrash',
+                text: 'endgültig löschen'
+            }
+        ]
+    }
+
     static renderGlobalNoteIcons(notesArray, clipboardContent) {
         const container = document.querySelector('#noteIconContainer')
         const fragment = document.createDocumentFragment();
@@ -178,127 +294,9 @@ export default class GlobalNotesView {
     }
 
     static openContextMenu(event, clipboardContent, isTrashEmpty = true) {
-        //folder or a note is right clicked
-        const itemClicked = [
-            {
-                action: 'editGlobalItem',
-                text: 'bearbeiten'
-            },
-            {
-                action: 'copyGlobalItem',
-                text: 'kopieren'
-            },
-            {
-                action: 'cutGlobalItem',
-                text: 'ausschneiden'
-            },
-            {
-                action: 'pasteGlobalItem',
-                text: 'einfügen'
-            },
-            {
-                action: 'deleteGlobalItem',
-                text: 'löschen'
-            },
-        ]
-
-        //context menu when a blank space is clicked
-        const folderClicked = [
-            {
-                action: 'newGlobalNoteFolder',
-                text: 'neuer Ordner'
-            },
-            {
-                action: 'newGlobalNote',
-                text: 'neue Notiz'
-            },
-            {
-                action: 'pasteGlobalItem',
-                text: 'einfügen'
-            }
-        ];
-
-        const multiSelect = [
-            {
-                action: 'copyGlobalItem',
-                text: 'kopieren'
-            },
-            {
-                action: 'cutGlobalItem',
-                text: 'ausschneiden'
-            },
-            {
-                action: 'deleteGlobalItem',
-                text: 'löschen'
-            },
-        ]
-
-        // trash
-        const trashClicked = [
-            {
-                action: 'restoreAllTrash',
-                text: 'wiederherstellen'
-            },
-            {
-                action: 'deleteAllTrash',
-                text: 'Papierkorb leeren'
-            }
-        ]
-
-        const trashedItemClicked = [
-            {
-                action: 'restoreItem',
-                text: 'wiederherstellen'
-            },
-            {
-                action: 'copyGlobalItem',
-                text: 'kopieren'
-            },
-            {
-                action: 'cutGlobalItem',
-                text: 'ausschneiden'
-            },
-            {
-                action: 'deleteItemFromTrash',
-                text: 'endgültig löschen'
-            }
-        ]
-
-        const trashedChildItemClicked = [
-            {
-                action: 'copyGlobalItem',
-                text: 'kopieren'
-            },
-            {
-                action: 'cutGlobalItem',
-                text: 'ausschneiden'
-            },
-            {
-                action: 'deleteItemFromTrash',
-                text: 'endgültig löschen'
-            },
-        ]
-
-        const trashMultiSelect = [
-            {
-                action: 'restoreItem',
-                text: 'wiederherstellen'
-            },
-            {
-                action: 'copyGlobalItem',
-                text: 'kopieren'
-            },
-            {
-                action: 'cutGlobalItem',
-                text: 'ausschneiden'
-            },
-            {
-                action: 'deleteItemFromTrash',
-                text: 'endgültig löschen'
-            }
-        ]
-
-        let menuToRender = itemClicked;
+        console.log(event.type);
+        console.trace()
+        // if (event.type == 'touchstart') return;
 
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
         const navHeight = document.querySelector('nav').getBoundingClientRect().height;
@@ -309,23 +307,15 @@ export default class GlobalNotesView {
 
         const sourceElement = this.getSourceElementOfContextMenu(event);
 
+        console.log(sourceElement)
+
         if (sourceElement.classList.contains('new')) return;
         if (sourceElement.classList.contains('cut')) return;
         if (!sourceElement.classList.contains('selected')) {
             this.removeAllSelections();
         }
 
-        // set the menu to render
-        if (sourceElement.id == 'globalNotesFileContainer') menuToRender = folderClicked;
-        if (sourceElement.dataset.folder_id == SF_ID_TRASH) menuToRender = trashClicked;
-        if (globalNotesContainer.querySelectorAll('.selected').length > 1) menuToRender = multiSelect;
-
-        if (this.isInTrash()) {
-            if (sourceElement.dataset.parent_id_before_delete) menuToRender = trashedItemClicked;
-            if (sourceElement.dataset.folder_id != SF_ID_TRASH && !sourceElement.dataset.parent_id_before_delete) menuToRender = trashedChildItemClicked;
-            if (globalNotesContainer.querySelectorAll('.selected').length > 1) menuToRender = trashMultiSelect;
-
-        }
+        const menuData = this.getMenuToRender(sourceElement);
 
         // create the menu element
         const blankDiv = document.createElement('div');
@@ -333,11 +323,12 @@ export default class GlobalNotesView {
 
         const menuContainer = blankDiv.cloneNode()
         menuContainer.classList.add('globalNoteContextMenu');
+        menuContainer.dataset.menu_type = menuData.menuType;
 
         // set initial position on screen
         if (window.innerWidth > 620) {
-            menuContainer.style.top = event.pageY - offsetY + 'px';
-            menuContainer.style.left = event.pageX - offsetX + 'px';
+            menuContainer.style.top = (event.pageY ?? event.changedTouches[0].pageY) - offsetY + 'px';
+            menuContainer.style.left = (event.pageX ?? event.changedTouches[0].pageX) - offsetX + 'px';
 
             if (event.type == 'touchstart') {
                 menuContainer.style.transform = 'translate(-100%, -100%)';
@@ -351,7 +342,7 @@ export default class GlobalNotesView {
 
         sourceElement.classList.add('selected');
 
-        menuToRender.forEach(item => {
+        menuData.menuToRender.forEach(item => {
             const currentItem = blankDiv.cloneNode();
             const currentButton = blankButton.cloneNode();
 
@@ -392,15 +383,67 @@ export default class GlobalNotesView {
 
             menuContainer.style.transform = `translate(${translateX}, ${translateY})`;
         }
+
+        // prevent context menu from covering items on mobile
+        if (window.innerWidth < 620) {
+            globalNotesContainer.style.height = `${menuContainerProps.height + notesContainerProps.height}px`;
+        }
     }
 
-    static getContextMenuInfo(event) {
-        const clickedContextMenu = event.target.closest('.globalNoteContextMenu');
+    /**@param typeOfSwitch 'singleToMultiItem', 'multiToSingleItem' */
+    static switchContextMenu(typeOfSwitch) {
+
+    }
+
+    static getMenuToRender(sourceElement) {
+        let menuData = {
+            menuType: 'itemClicked',
+            menuToRender: this.#contextMenus.itemClicked
+        };
+
+        if (sourceElement.id == 'globalNotesFileContainer') {
+            menuData.menuToRender = this.#contextMenus.folderClicked;
+            menuData.menuType = 'folderClicked';
+        }
+
+        if (sourceElement.dataset.folder_id == SF_ID_TRASH) {
+            menuData.menuToRender = this.#contextMenus.trashClicked;
+            menuData.menuType = 'trashClicked';
+
+        }
+        if (globalNotesContainer.querySelectorAll('.selected').length > 1) {
+            menuData.menuToRender = this.#contextMenus.multiSelect
+            menuData.menuType = 'trashClicked';
+        };
+
+        if (this.isInTrash()) {
+            if (sourceElement.dataset.parent_id_before_delete) {
+                menuData.menuToRender = this.#contextMenus.trashedItemClicked;
+                menuData.menuType = 'trashedItemClicked';
+
+            }
+            if (sourceElement.dataset.folder_id != SF_ID_TRASH && !sourceElement.dataset.parent_id_before_delete) {
+                menuData.menuToRender = this.#contextMenus.trashedChildItemClicked;
+                menuData.menuType = 'trashedChildItemClicked';
+
+            }
+            if (globalNotesContainer.querySelectorAll('.selected').length > 1) {
+                menuData.menuToRender = this.#contextMenus.trashMultiSelect;
+                menuData.menuType = 'trashMultiSelect';
+            }
+        }
+
+        return menuData;
+    }
+
+    static getContextMenuInfo() {
+        const openContextMenu = document.querySelector('.globalNoteContextMenu');
 
         return {
-            fileType: clickedContextMenu?.dataset.folder_id ? 'folder' : 'note',
-            folderId: Number(clickedContextMenu?.dataset.folder_id),
-            noteId: Number(clickedContextMenu?.dataset.note_id)
+            menuType: openContextMenu?.dataset.menu_type,
+            fileType: openContextMenu?.dataset.folder_id ? 'folder' : 'note',
+            folderId: Number(openContextMenu?.dataset.folder_id),
+            noteId: Number(openContextMenu?.dataset.note_id)
         }
     }
 
@@ -408,6 +451,8 @@ export default class GlobalNotesView {
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
 
         globalNotesContainer.querySelector('#globalNotesFileContainer').classList.remove('selected');
+        globalNotesContainer.style.height = '';
+
         while (globalNotesContainer.querySelector('.globalNoteContextMenu')) globalNotesContainer.querySelector('.globalNoteContextMenu').remove();
     }
 
@@ -633,6 +678,31 @@ export default class GlobalNotesView {
         })
     }
 
+    static selectMultipleByTouch(event) {
+        const srcElement = event.target.closest('.folderIconContainer') ?? event.target.closest('.noteIconContainer');
+        const allSelectedItems = this.getAllSelectedElements(true);
+        const contextMenuInfo = this.getContextMenuInfo();
+        const selectedItemsCount = {
+            before: allSelectedItems.length,
+            after: allSelectedItems.length
+        };
+
+        if (srcElement.dataset.folder_id == SF_ID_TRASH) return selectedItemsCount;
+        if (contextMenuInfo.menuType == 'trashClicked') return selectedItemsCount;
+
+        if (srcElement.classList.contains('selected') && allSelectedItems.length > 1) {
+            srcElement.classList.remove('selected');
+            selectedItemsCount.after = selectedItemsCount.before--;
+
+            return selectedItemsCount;
+        }
+
+        srcElement.classList.add('selected');
+        selectedItemsCount.after = selectedItemsCount.before++;
+
+        return selectedItemsCount;
+    }
+
     static editSelectedItemsKeyboardShortcuts(event) {
         const srcElement = event.target.closest('.folderIconContainer') ?? event.target.closest('.noteIconContainer');
 
@@ -650,8 +720,7 @@ export default class GlobalNotesView {
         // shift key selection
         if (event.shiftKey) {
             let allItems = this.getAllSelectableItems();
-            let allSelectedItems = this.getAllSelectedElements();
-            allSelectedItems = allSelectedItems.folders.concat(allSelectedItems.notes);
+            let allSelectedItems = this.getAllSelectedElements(true);
 
             if (allSelectedItems.length == 0) {
                 srcElement.classList.add('selected');
@@ -666,6 +735,7 @@ export default class GlobalNotesView {
                 const indexLastElement = allItems.indexOf(allSelectedItems[allSelectedItems.length - 1]);
 
                 for (let i = indexSrcElement; i <= indexLastElement; i++) {
+                    if (allItems[i].dataset.folder_id == SF_ID_TRASH) continue;
                     allItems[i].classList.add('selected');
                 }
 
@@ -678,6 +748,7 @@ export default class GlobalNotesView {
                 const indexFirstElement = allItems.indexOf(allSelectedItems[0]);
 
                 for (let i = indexFirstElement; i <= indexSrcElement; i++) {
+                    if (allItems[i].dataset.folder_id == SF_ID_TRASH) continue;
                     allItems[i].classList.add('selected');
                 }
 
@@ -754,9 +825,21 @@ export default class GlobalNotesView {
         return document.querySelector('#createGlobalItemsButtonContainer').classList.contains('open') ? true : false;
     }
 
-    static getAllSelectedElements() {
+    static isItemSelected() {
+        return this.getAllSelectedElements(true).length > 0 ? true : false;
+    }
+
+    static isMultiSelected() {
+        return this.getAllSelectedElements(true).length > 1 ? true : false;
+    }
+
+    static getAllSelectedElements(mergeToSingleArray = false) {
         const foldersContainer = document.querySelector('#folderIconContainer');
         const notesContainer = document.querySelector('#noteIconContainer');
+
+        if (mergeToSingleArray) {
+            return Array.from(foldersContainer.querySelectorAll('.selected')).concat(Array.from(notesContainer.querySelectorAll('.selected')));
+        }
 
         return {
             folders: Array.from(foldersContainer.querySelectorAll('.selected')),

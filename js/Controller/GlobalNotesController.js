@@ -63,9 +63,14 @@ export default class GlobalNotesController {
 
         const sourceContainer = View.getSourceElementOfContextMenu(event);
         let isTrashEmpty;
-        if (sourceContainer.dataset.folder_id == 1) isTrashEmpty = await GlobalNoteFolder.isTrashEmpty();
+        if (sourceContainer.dataset.folder_id == SF_ID_TRASH) isTrashEmpty = await GlobalNoteFolder.isTrashEmpty();
 
         View.openContextMenu(event, clipboardContent, isTrashEmpty);
+    }
+
+    /**@param typeOfSwitch 'singleToMultiItem', 'multiToSingleItem' */
+    static switchContextMenu(typeOfSwitch) {
+        View.switchContextMenu(typeOfSwitch);
     }
 
     static closeAllContextMenus() {
@@ -452,6 +457,10 @@ export default class GlobalNotesController {
         View.markItemsInRectangleSelected(event);
     }
 
+    static selectMultipleByTouch(event) {
+        return View.selectMultipleByTouch(event);
+    }
+
     static removeAllSelections() {
         View.removeAllSelections();
     }
@@ -461,6 +470,7 @@ export default class GlobalNotesController {
     }
 
     static editSelectedItemsKeyboardShortcuts(event) {
+        event.preventDefault();
         View.editSelectedItemsKeyboardShortcuts(event);
     }
 
@@ -656,6 +666,7 @@ export default class GlobalNotesController {
                     this.openFolder(folderId);
                     break;
 
+                // open folder
                 case target.classList.contains('folderIconContainer'):
                 case target.classList.contains('folderIconSolid'):
                 case target.classList.contains('trashIcon'):
@@ -664,6 +675,7 @@ export default class GlobalNotesController {
                     if (target.closest('.folderIconContainer').classList.contains('new')) return;
                     if (target.closest('.folderIconContainer').classList.contains('editable')) return;
 
+                    // mark selected instead of opening
                     if (event.shiftKey || event.ctrlKey || event.metaKey) {
                         event.preventDefault();
 
@@ -671,6 +683,7 @@ export default class GlobalNotesController {
                         return;
                     }
 
+                    // actually open it
                     folderId = target.closest('.folderIconContainer').dataset.folder_id;
 
                     if (GlobalNoteFolder.isCut(folderId)) return;
@@ -728,6 +741,55 @@ export default class GlobalNotesController {
 
         if (event.key == 'Backspace' || event.key == 'Delete') {
             this.moveGlobalItemToTrash();
+        }
+    }
+
+    // this function only handles cases where the user tries to select items via touch, while an context menu is open
+    // normally the context menu would be closed and the item opened, but with touch it should be selected
+    // all else is handled via the normal clickHandler
+    static handleTouchEvents(event) {
+        const target = event.target;
+        let selectedItemsCount;
+
+        if (View.isContextMenuOpen()) {
+            event.preventDefault();
+
+            switch (true) {
+                case target.closest('.folderIconContainer') != undefined:
+                    if (target.closest('.folderIconContainer').classList.contains('new')) return;
+                    if (target.closest('.folderIconContainer').classList.contains('editable')) return;
+                    if ((View.getContextMenuInfo())?.menuType == 'folderClicked') return;
+
+                    selectedItemsCount = this.selectMultipleByTouch(event);
+
+                    // if (selectedItemsCount.before < selectedItemsCount.after && selectedItemsCount.before == 1) {
+                        // this.switchContextMenu('singleToMultiItem ');
+                        // this.closeAllContextMenus();
+                        this.openContextMenu(event);
+                    // }
+
+                    if (selectedItemsCount.before > selectedItemsCount.after && selectedItemsCount.after == 1) {
+                        // this.switchContextMenu('multiToSingleItem ');
+                        this.openContextMenu(event);
+
+                    }
+                    break;
+
+                case target.closest('.noteIconContainer') != undefined:
+                    if ((View.getContextMenuInfo())?.menuType == 'folderClicked') return;
+
+                    this.selectMultipleByTouch(event);
+                    break;
+
+                case target.closest('#globalNotesContainer') != undefined:
+                    if (View.isContextMenuOpen()) {
+                        this.closeAllContextMenus();
+                        this.removeAllSelections();
+                    }
+                    break;
+            }
+
+
         }
     }
 }

@@ -1099,6 +1099,10 @@ dialog .errorMessageDisplay,
             overflow: hidden;
             -webkit-user-select: none;
 
+            &:focus-visible {
+                outline: none;
+            }
+
             &.selected {
                 background-color: var(--lightBlue);
                 border-radius: var(--standardRadius);
