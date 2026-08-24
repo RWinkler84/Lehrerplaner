@@ -33,6 +33,8 @@ export const VERSION = '0.9.010726a';
 export const SF_ID_ROOT = 0;
 export const SF_ID_TRASH = 1;
 
+export const MOBILE_VIEW_WIDTH = 620;
+
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
 export let unsyncedDeletedTimetableChanges = [];
@@ -51,11 +53,15 @@ export let userStatus = {
     firstTimeUser: false
 }
 
-//stores the timeout id for rightclick emulation on iOS
+//stores the necessary for rightclick on touch 
 export let contextMenuEvent = {
     touchstartTimeOutId: null,
+    touchEndTimeOutId: null,
     contextMenuOpened: false,
-    touchScrolled: false
+    touchEndFired: false,
+    touchScrolled: false,
+    touchStartX: null,
+    touchStartY: null,
 };
 
 export let globalItemsMultiSelectData = {
@@ -181,6 +187,7 @@ async function startApp() {
     });
 
     // global Notes
+    // rectangle selection
     document.querySelector('#globalNotesFileContainer').addEventListener('mousedown', (event) => {
         globalItemsMultiSelectData.mouseDown = true;
         globalItemsMultiSelectData.startX = event.clientX;
@@ -205,34 +212,64 @@ async function startApp() {
 
     // context menu
     document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', (event) => {
+        // touch context menus are handled by ios workaround on all plattforms to prevent event duplication
+        if (event.pointerType == 'touch') {
+            event.preventDefault();
+
+            return;
+        }
+
+        // prevents unwanted rectangle selection on right clicks
         const mouseUpEvent = new MouseEvent('mouseup', { bubbles: true, cancelable: true })
         document.querySelector('#globalNotesFileContainer').dispatchEvent(mouseUpEvent);
-        GlobalNotesController.rightClickHandler(event);
 
-        // prevents context menu from firing twice on non iOS divices
-        if (contextMenuEvent.touchstartTimeOutId) {
-            clearTimeout(contextMenuEvent.touchstartTimeOutId);
-            contextMenuEvent.touchstartTimeOutId = null;
-        }
+        GlobalNotesController.rightClickHandler(event);
     })
 
     //iOS/iPad OS touch workaround
     document.querySelector('#globalNotesFileContainer').addEventListener('touchstart', (event) => {
         contextMenuEvent.touchstartTimeOutId = setTimeout(() => {
             contextMenuEvent.contextMenuOpened = true;
+            contextMenuEvent.touchStartX = event.touches[0].clientX;
+            contextMenuEvent.touchStartY = event.touches[0].clientY;
             GlobalNotesController.rightClickHandler(event);
 
         }, 600);
+
+        // in some cases touchend does not fire and needs to be dispatched manually to prevent unwanted
+        // context menu calls
+        contextMenuEvent.touchEndFired = false;
+
+        contextMenuEvent.touchEndTimeOutId = setTimeout(() => {
+            if (contextMenuEvent.touchEndFired == false) {
+                const touchEndEvent = new TouchEvent('touchend', { bubbles: true, cancelable: true })
+                document.querySelector('#globalNotesFileContainer').dispatchEvent(touchEndEvent);
+            }
+        }, 2000)
     })
 
     document.querySelector('#globalNotesFileContainer').addEventListener('touchmove', (event) => {
+        const deltaX = Math.abs(event.touches[0].clientX - contextMenuEvent.touchStartX);
+        const deltaY = Math.abs(event.touches[0].clientY - contextMenuEvent.touchStartY);
+
+        if (deltaX >= 10 || deltaY >= 10) {
+        console.log('moved')
         clearTimeout(contextMenuEvent.touchstartTimeOutId);
         contextMenuEvent.touchstartTimeOutId = null;
         contextMenuEvent.touchScrolled = true;
+        }
     });
 
     document.querySelector('#globalNotesFileContainer').addEventListener('touchend', (event) => {
-        event.preventDefault()
+        console.log(event);
+        console.log(contextMenuEvent.touchScrolled);
+
+        clearTimeout(contextMenuEvent.touchEndTimeOutId);
+        contextMenuEvent.touchEndFired = true;
+        contextMenuEvent.touchEndTimeOutId = null;
+
+        if (!event.isTrusted) event.preventDefault();
+
         if (contextMenuEvent.contextMenuOpened) {
             contextMenuEvent.contextMenuOpened = false;
             contextMenuEvent.touchScrolled = false;
@@ -240,6 +277,7 @@ async function startApp() {
             return;
         }
 
+        // if user scrolls during a touch event, no items should be opened or newly selected after the touch ends
         if (contextMenuEvent.touchScrolled) {
             contextMenuEvent.touchScrolled = false;
 
@@ -250,7 +288,7 @@ async function startApp() {
         contextMenuEvent.touchstartTimeOutId = null;
         contextMenuEvent.touchScrolled = false;
 
-        // GlobalNotesController.handleTouchEvents(event);
+        GlobalNotesController.handleTouchEvents(event);
     });
 
     AbstractController.renderTopMenu();

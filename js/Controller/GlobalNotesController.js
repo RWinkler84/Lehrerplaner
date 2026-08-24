@@ -68,11 +68,6 @@ export default class GlobalNotesController {
         View.openContextMenu(event, clipboardContent, isTrashEmpty);
     }
 
-    /**@param typeOfSwitch 'singleToMultiItem', 'multiToSingleItem' */
-    static switchContextMenu(typeOfSwitch) {
-        View.switchContextMenu(typeOfSwitch);
-    }
-
     static closeAllContextMenus() {
         View.closeAllContextMenus();
     }
@@ -715,6 +710,7 @@ export default class GlobalNotesController {
     }
 
     static rightClickHandler(event) {
+        console.log(event.type);
         const target = event.target;
         event.preventDefault();
 
@@ -759,26 +755,35 @@ export default class GlobalNotesController {
                     if (target.closest('.folderIconContainer').classList.contains('new')) return;
                     if (target.closest('.folderIconContainer').classList.contains('editable')) return;
                     if ((View.getContextMenuInfo())?.menuType == 'folderClicked') return;
-
+                    
                     selectedItemsCount = this.selectMultipleByTouch(event);
 
-                    // if (selectedItemsCount.before < selectedItemsCount.after && selectedItemsCount.before == 1) {
-                        // this.switchContextMenu('singleToMultiItem ');
-                        // this.closeAllContextMenus();
+                    if (selectedItemsCount.before < selectedItemsCount.after && selectedItemsCount.before == 1) {
+                        this.closeAllContextMenus();
                         this.openContextMenu(event);
-                    // }
+                    }
 
                     if (selectedItemsCount.before > selectedItemsCount.after && selectedItemsCount.after == 1) {
-                        // this.switchContextMenu('multiToSingleItem ');
+                        this.closeAllContextMenus();
                         this.openContextMenu(event);
-
                     }
+
                     break;
 
                 case target.closest('.noteIconContainer') != undefined:
                     if ((View.getContextMenuInfo())?.menuType == 'folderClicked') return;
+                    selectedItemsCount = this.selectMultipleByTouch(event);
 
-                    this.selectMultipleByTouch(event);
+                    if (selectedItemsCount.before < selectedItemsCount.after && selectedItemsCount.before == 1) {
+                        this.closeAllContextMenus();
+                        this.openContextMenu(event);
+                    }
+
+                    if (selectedItemsCount.before > selectedItemsCount.after && selectedItemsCount.after == 1) {
+                        this.closeAllContextMenus();
+                        this.openContextMenu(event);
+                    }
+
                     break;
 
                 case target.closest('#globalNotesContainer') != undefined:

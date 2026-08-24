@@ -1044,7 +1044,6 @@ dialog .errorMessageDisplay,
         #noteIconContainer {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
         }
 
         #folderNavigatonContainer {
@@ -1095,6 +1094,9 @@ dialog .errorMessageDisplay,
             flex-direction: column;
             gap: 0.25rem;
             padding: 0.25rem;
+            border: 0.25rem solid var(--contentContainerBackground);
+            /* border-radius: var(--standardRadius); */
+            border-radius: 10px;
             align-items: center;
             overflow: hidden;
             -webkit-user-select: none;
@@ -1105,7 +1107,6 @@ dialog .errorMessageDisplay,
 
             &.selected {
                 background-color: var(--lightBlue);
-                border-radius: var(--standardRadius);
             }
 
             &.cut {

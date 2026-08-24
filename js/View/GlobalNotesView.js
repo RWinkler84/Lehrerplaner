@@ -1,5 +1,5 @@
 import Editor from "../inc/editor.js";
-import { globalItemsMultiSelectData, SF_ID_TRASH } from "../index.js";
+import { globalItemsMultiSelectData, MOBILE_VIEW_WIDTH, SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNotesView {
     static #contextMenus = {
@@ -294,10 +294,6 @@ export default class GlobalNotesView {
     }
 
     static openContextMenu(event, clipboardContent, isTrashEmpty = true) {
-        console.log(event.type);
-        console.trace()
-        // if (event.type == 'touchstart') return;
-
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
         const navHeight = document.querySelector('nav').getBoundingClientRect().height;
         const bodyMargin = Number(window.getComputedStyle(document.querySelector('body')).margin[0]);
@@ -306,8 +302,6 @@ export default class GlobalNotesView {
         const offsetX = bodyMargin;
 
         const sourceElement = this.getSourceElementOfContextMenu(event);
-
-        console.log(sourceElement)
 
         if (sourceElement.classList.contains('new')) return;
         if (sourceElement.classList.contains('cut')) return;
@@ -326,11 +320,11 @@ export default class GlobalNotesView {
         menuContainer.dataset.menu_type = menuData.menuType;
 
         // set initial position on screen
-        if (window.innerWidth > 620) {
+        if (window.innerWidth > MOBILE_VIEW_WIDTH) {
             menuContainer.style.top = (event.pageY ?? event.changedTouches[0].pageY) - offsetY + 'px';
             menuContainer.style.left = (event.pageX ?? event.changedTouches[0].pageX) - offsetX + 'px';
 
-            if (event.type == 'touchstart') {
+            if (event.pointerType == 'touch') {
                 menuContainer.style.transform = 'translate(-100%, -100%)';
             }
         }
@@ -366,12 +360,12 @@ export default class GlobalNotesView {
         const menuContainerProps = menuContainer.getBoundingClientRect();
         const notesContainerProps = globalNotesContainer.getBoundingClientRect();
 
-        if (window.innerWidth > 620) {
+        if (window.innerWidth > MOBILE_VIEW_WIDTH) {
             // reset pos, if menu extends off screen
             let translateX = '0%';
             let translateY = '0%';
 
-            if (event.type == 'touchstart') {
+            if (event.type == 'touchstart' || event.type == 'touchend') {
                 translateX = '-100%';
                 translateY = '-100%';
             }
@@ -385,14 +379,9 @@ export default class GlobalNotesView {
         }
 
         // prevent context menu from covering items on mobile
-        if (window.innerWidth < 620) {
+        if (window.innerWidth < MOBILE_VIEW_WIDTH) {
             globalNotesContainer.style.height = `${menuContainerProps.height + notesContainerProps.height}px`;
         }
-    }
-
-    /**@param typeOfSwitch 'singleToMultiItem', 'multiToSingleItem' */
-    static switchContextMenu(typeOfSwitch) {
-
     }
 
     static getMenuToRender(sourceElement) {
@@ -413,7 +402,7 @@ export default class GlobalNotesView {
         }
         if (globalNotesContainer.querySelectorAll('.selected').length > 1) {
             menuData.menuToRender = this.#contextMenus.multiSelect
-            menuData.menuType = 'trashClicked';
+            menuData.menuType = 'multiClicked';
         };
 
         if (this.isInTrash()) {
