@@ -1,5 +1,6 @@
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
+import { runWeekSwitchAnimation, cancelWeekSwitchAnimation, ONEDAY } from '../index.js';
 
 export default class AbstractView {
 
@@ -113,7 +114,8 @@ export default class AbstractView {
             taskRow.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
         });
     }
-    static async greyOutHolidaysAndPassedDays(schoolYears) {
+
+    static greyOutHolidaysAndPassedDays(schoolYears) {
         const mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         const sundayDate = document.querySelector('.weekday[data-weekday_number="6"]').dataset.date;
 
@@ -251,6 +253,163 @@ export default class AbstractView {
         });
     }
 
+    // FIDDLING WITH DATE
+
+    static setCalendarWeek(referenceDate = null) {
+        referenceDate = referenceDate ? new Date(referenceDate) : new Date();
+
+        let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
+        let weekCounter = 1;
+        let currentYear = referenceDate.getFullYear();
+        let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
+        let monday = firstThursday - ONEDAY * 3
+        let sunday = firstThursday + ONEDAY * 3;
+
+        referenceDate = referenceDate.setHours(12, 0, 0, 0);
+
+        //checks, if the reference date lies in the current week. if not, tests against the next week
+        while (monday < referenceDate && sunday < referenceDate) {
+            monday += ONEDAY * 7; // + 7 days
+            sunday += ONEDAY * 7; // + 7 days
+            weekCounter++;
+        }
+
+        //check whether the year changes and reset weekcounter, if so
+        calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
+    }
+
+    static setDateForWeekdays(referenceDate = null) {
+        referenceDate = referenceDate ? new Date(referenceDate) : new Date();
+
+        const curriculaDisplayWeekdays = document.querySelectorAll('.curriculaDisplayWeekday');
+        const weekdays = document.querySelectorAll('.weekday');
+
+        let todayUnix = referenceDate.setHours(12, 0, 0, 0);
+
+        //go back to monday of given week
+        while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;
+
+        for (let i = 0; i < weekdays.length; i++) {
+            curriculaDisplayWeekdays[i].dataset.date = new Date(todayUnix).toString();
+            weekdays[i].dataset.date = new Date(todayUnix).toString();
+
+            todayUnix += ONEDAY;
+        }
+
+        this.setDateOnWeekdayLabel();
+        AbstractController.greyOutHolidaysAndPassedDays(); //needs to be called via Controller for additional data
+        this.setIsTodayDot();
+        this.scrollToCurrentDay();
+    }
+
+    static setDateOnWeekViewDatePicker() {
+        const datePicker = document.querySelector('#weekSwitcherDatePicker');
+        const mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]')?.dataset.date).setHours(12, 0, 0, 0);
+        const sundayDate = new Date(document.querySelector('.weekday[data-weekday_number="0"]')?.dataset.date).setHours(12, 0, 0, 0);
+        const today = new Date().setHours(12, 0, 0, 0);
+
+        let selectedDate;
+
+        if (mondayDate <= today && today <= sundayDate) {
+            selectedDate = Fn.formatDateSqlCompatible(today);
+        } else {
+            selectedDate = Fn.formatDateSqlCompatible(mondayDate);
+        }
+
+        datePicker.value = selectedDate;
+    }
+
+    static getDateFromWeekViewPicker() {
+        return document.querySelector('#weekSwitcherDatePicker').value;
+    }
+
+    static setWeekStartAndEndDate() {
+        let startDateSpan = document.querySelector('#weekStartDate');
+        let endDateSpan = document.querySelector('#weekEndDate');
+        let mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
+        let sundayDate = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
+
+        mondayDate = new Date(mondayDate);
+        sundayDate = new Date(sundayDate);
+
+        startDateSpan.innerText = Fn.formatDate(mondayDate);
+        endDateSpan.innerText = Fn.formatDate(sundayDate);
+    }
+
+    static switchToPreviousWeek() {
+
+        cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
+        runWeekSwitchAnimation(false)
+
+        // iterates over all weekday columns and adjusts date of weekdays
+        document.querySelectorAll('.weekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate - ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate - ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        this.setDateOnWeekdayLabel();
+        AbstractController.greyOutHolidaysAndPassedDays(); //needs to be called via Controller for additional data
+        this.toggleIsCurrentWeekDot();
+        this.setWeekStartAndEndDate();
+        this.calcCalendarWeek(false);
+        this.setIsTodayDot();
+        this.scrollToCurrentDay();
+    }
+
+    static switchToNextWeek() {
+
+        cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
+        runWeekSwitchAnimation(true);
+
+        // iterates over all weekday columns and adjusts date of weekdays
+        document.querySelectorAll('.weekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).getTime();
+            let newDate = currentDate + ONEDAY * 7; // +7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate + ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        this.setDateOnWeekdayLabel();
+        AbstractController.greyOutHolidaysAndPassedDays(); //needs to be called via Controller for additional data
+        this.toggleIsCurrentWeekDot();
+        this.setWeekStartAndEndDate();
+        this.calcCalendarWeek(true);
+        this.setIsTodayDot();
+        this.scrollToCurrentDay();
+    }
+
+    static calcCalendarWeek(countUp = true) {
+        let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
+        let weekCounter = document.querySelector('#calendarWeekCounter').innerText;
+
+        let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
+
+        let weeksPerYear = Fn.getNumberOfWeeksPerYear(mondayDate.getFullYear());
+
+        countUp ? weekCounter++ : weekCounter--;
+
+        if (weekCounter < 1) weekCounter = weeksPerYear;
+        if (weekCounter > weeksPerYear) weekCounter = 1;
+
+        calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
+    }
+
     static scrollToCurrentDay() {
         if (window.innerWidth <= 620) {
             const timetable = document.querySelector('#weekOverviewContainer');
@@ -291,6 +450,23 @@ export default class AbstractView {
                 });
             }, 350);
         }
+    }
+
+    static showWeekViewDateSelector() {
+        const dateDisplay = document.querySelector('#currentWeekDateSpanWrapper');
+        const datePickerWrapper = document.querySelector('#weekSwitcherDatePickerWrapper');
+
+        datePickerWrapper.classList.remove('notDisplayed');
+        dateDisplay.classList.add('notDisplayed');
+    }
+
+    static hideWeekViewDateSelector() {
+        const dateDisplay = document.querySelector('#currentWeekDateSpanWrapper');
+        const datePickerWrapper = document.querySelector('#weekSwitcherDatePickerWrapper');
+
+        dateDisplay.classList.remove('notDisplayed');
+        datePickerWrapper.classList.add('notDisplayed');
+
     }
 
     static setSyncIndicatorStatus(status, errorMessage = null) {

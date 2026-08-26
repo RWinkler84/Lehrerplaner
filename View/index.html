@@ -67,8 +67,14 @@
                     </div>
                     <div class="flex gap" id="weekSwitcher">
                         <button id="weekBackwardButton" class="triangleButton">&#9664</button>
-                        <div id="dateSpan" class="flex alignEnd"><span
-                                id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span id="weekEndDate">Sonntag</span></div>
+                        <div id="weekSwitcherDateSpan" class="flex alignEnd">
+                            <div id="currentWeekDateSpanWrapper">
+                                <span id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span id="weekEndDate">Sonntag</span>
+                            </div>
+                            <div id="weekSwitcherDatePickerWrapper" class="notDisplayed">
+                                <input type="date" id="weekSwitcherDatePicker">
+                            </div>
+                        </div>
                         <button id="weekForwardButton" class="triangleButton">&#9654</button>
                     </div>
                 </div>
@@ -381,7 +387,7 @@
                         <label>gültig ab: </label>
                         <div class="flex gap">
                             <button id="timetableBackwardButton" class="triangleButton">&#9664</button>
-                            <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span>
+                            <div class="flex alignEnd"><span id="validFrom" data-date="">-</span>
                             </div>
                             <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
                                 <div class="alertRing"><input type="date" name="validFromPicker" id="validFromPicker">
@@ -728,10 +734,10 @@
                             </div>
                         </div>
                     </div>
-                        <div id="accountNeededForPlusMessage" class="marginTop">
-                            *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
-                        <div id="loginNeededForPlusMessage" class="marginTop">*Du
-                            musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div>
+                    <div id="accountNeededForPlusMessage" class="marginTop">
+                        *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
+                    <div id="loginNeededForPlusMessage" class="marginTop">*Du
+                        musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div>
 
                     <div id="eduplanioPlusAdvantagesList">
                         <label class="marginBottom">Diese Vorteile bietet dir Eduplanio Plus:</label>

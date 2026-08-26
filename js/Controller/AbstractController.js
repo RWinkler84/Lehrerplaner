@@ -10,6 +10,7 @@ import LessonController from "./LessonController.js";
 import { ONEDAY, tourStatus, userStatus } from "../index.js";
 import Tour from "../tour.js";
 import DayNoteController from "./DayNoteController.js";
+import LessonNoteController from "./LessonNoteController.js";
 
 export default class AbstractController {
 
@@ -161,7 +162,7 @@ export default class AbstractController {
             if (expirationWarningLastUpdated && expirationWarningLastUpdated <= plusExpirationDate && today > plusExpirationDate) AbstractController.openPlusExpirationDialog(-1)
         }
 
-        if (userInfo.accountType != 'registeredUser') return; 
+        if (userInfo.accountType != 'registeredUser') return;
 
         //set the syncIndicator to unsynced, if activeUntil is expired
         if (plusExpirationDate && today > plusExpirationDate) {
@@ -240,13 +241,68 @@ export default class AbstractController {
 
     static async togglePlusStatus(isActive) {
         const db = new Model;
-        
+
         await db.togglePlusStatus(isActive);
     }
 
-    static async topMenuClickEventHandler(event) {
+    static setDateForWeekdays(referenceDate = null) {
+        View.setDateForWeekdays(referenceDate);
+    }
+
+    static setCalendarWeek(referenceDate = null) {
+        View.setCalendarWeek(referenceDate);
+    }
+
+    static setWeekStartAndEndDate() {
+        View.setWeekStartAndEndDate()
+    }
+
+    static setDateOnWeekViewDatePicker() {
+        View.setDateOnWeekViewDatePicker();
+    }
+
+    static async switchToSelectedWeek() {
+        const selectedDate = View.getDateFromWeekViewPicker();
+
+        AbstractController.setCalendarWeek(selectedDate);
+        AbstractController.setDateForWeekdays(selectedDate);
+        AbstractController.setWeekStartAndEndDate();
+        AbstractController.toggleIsCurrentWeekDot();
+
+        AbstractController.hideWeekViewDateSelector();
+
+        await LessonController.renderLesson();
+        await DayNoteController.renderDayNoteIcons();
+    }
+
+    static switchToPreviousWeek() {
+        View.switchToPreviousWeek();
+        DayNoteController.renderDayNoteIcons();
+    }
+
+    static switchToNextWeek() {
+        View.switchToNextWeek();
+        DayNoteController.renderDayNoteIcons();
+    }
+
+    static toggleIsCurrentWeekDot() {
+        View.toggleIsCurrentWeekDot();
+    }
+
+    static showWeekViewDateSelector() {
+        View.setDateOnWeekViewDatePicker();
+        View.showWeekViewDateSelector();
+    }
+
+    static hideWeekViewDateSelector() {
+        View.hideWeekViewDateSelector();
+    }
+
+    static async clickEventHandler(event) {
+        if (!event.target.closest('nav') && !event.target.closest('#weekSwitcher')) return;
         let target = event.target;
 
+        // top menu
         switch (target.id) {
             case 'openWeekViewButton':
                 LessonController.renderSelectedCurricula();
@@ -299,6 +355,20 @@ export default class AbstractController {
 
             case 'updateNowLink':
                 AbstractController.runUpdate();
+                break;
+        }
+
+        // week switcher
+        switch (target.id) {
+            case 'weekBackwardButton':
+                AbstractController.switchToPreviousWeek();
+                break;
+            case 'weekForwardButton':
+                AbstractController.switchToNextWeek();
+                break;
+
+            case 'currentWeekDateSpanWrapper':
+                AbstractController.showWeekViewDateSelector();
                 break;
         }
     }

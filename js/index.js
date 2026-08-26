@@ -27,7 +27,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.130826';
+export const VERSION = '0.9.260826';
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
@@ -70,6 +70,7 @@ async function startApp() {
     setInterval(abstCtrl.syncData.bind(abstCtrl), ONEMIN * 15);
 
     document.addEventListener('click', (event) => {
+        AbstractController.clickEventHandler(event);
         LoginController.dialogEventHandler(event);
         LessonController.timetableClickHandler(event);
         SettingsController.settingsClickEventHandler(event);
@@ -87,17 +88,13 @@ async function startApp() {
         element.addEventListener('click', LessonView.createLessonForm);
     });
 
-    // handlers for switching between weeks
-    document.querySelector('#weekBackwardButton').addEventListener('click', switchToPreviousWeek);
-    document.querySelector('#weekForwardButton').addEventListener('click', switchToNextWeek);
-
     //handler for weekday label
     document.querySelectorAll('.weekdayLabel').forEach(label => {
         label.addEventListener('mouseenter', AbstractView.removeAddLessonButton);
     })
 
-    //top menu handlers
-    document.querySelector('nav').addEventListener('click', AbstractController.topMenuClickEventHandler)
+    //weekView datepicker
+    document.querySelector('#weekSwitcherDatePicker').addEventListener('change', AbstractController.switchToSelectedWeek);
 
     //handler for task tables
     document.querySelector('#upcomingTasksTable tbody').addEventListener('click', TaskController.tasksTableEventHandler);
@@ -160,9 +157,10 @@ async function startApp() {
 
     AbstractController.renderTopMenu();
 
-    setDateForWeekdays();
-    setCalendarWeek();
-    setWeekStartAndEndDate();
+    AbstractController.setDateForWeekdays();
+    AbstractController.setCalendarWeek();
+    AbstractController.setWeekStartAndEndDate();
+    AbstractController.setDateOnWeekViewDatePicker();
 
     await DayNoteController.renderDayNoteIcons();
 
@@ -178,206 +176,75 @@ async function startApp() {
     LoginController.isRegister();
     LoginController.isReset();
 
-    // FIDDLING WITH DATE
 
-    function setCalendarWeek() {
-        let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
-        let weekCounter = 1;
-        let currentYear = new Date().getFullYear();
-        let referenceDate = new Date().setHours(12, 0, 0, 0);
-        let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
-        let monday = firstThursday - ONEDAY * 3
-        let sunday = firstThursday + ONEDAY * 3;
+}
 
-        //checks, if the reference date lies in the current week. if not, tests against the next week
-        while (monday < referenceDate && sunday < referenceDate) {
-            monday += ONEDAY * 7; // + 7 days
-            sunday += ONEDAY * 7; // + 7 days
-            weekCounter++;
-        }
+// ANIMATION FUNCTIONS
 
-        //check whether the year changes and reset weekcounter, if so
-        calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
-    }
+export function runWeekSwitchAnimation(nextWeek = true) {
+    let timetableContainer = document.querySelector('#timetableContainer');
+    let timetableContainerInitialHeight = timetableContainer.getBoundingClientRect().height;
+    let weekOverview = document.querySelector('#weekOverviewContainer');
+    let weekOverviewPosition = weekOverview.getBoundingClientRect();
+    let blankWeekTable = weekOverview.cloneNode(true);
+    let verticalOffset;
 
-    function setDateForWeekdays() {
-        const curriculaDisplayWeekdays = document.querySelectorAll('.curriculaDisplayWeekday');
-        const weekdays = document.querySelectorAll('.weekday');
+    //should blankWeekTable come in from left or right?
+    if (nextWeek == true) verticalOffset = window.innerWidth;
+    if (nextWeek == false) verticalOffset = window.innerWidth * -1;
 
-        let todayUnix = new Date().setHours(12, 0, 0, 0);
+    LessonView.removeAllLessons(blankWeekTable);
+    LessonController.removeAllCurriculumSpans(blankWeekTable);
 
-        //go back to monday of given week
-        while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;
+    //setup for the animation
+    weekOverview.style.left = '0px';
+    blankWeekTable.style.position = 'relative';
+    blankWeekTable.classList.add('blankWeekTable');
+    blankWeekTable.style.top = -1 * weekOverviewPosition.height + 'px';
+    blankWeekTable.style.left = verticalOffset + 'px';
+    blankWeekTable.style.width = weekOverviewPosition.width + 'px';
+    blankWeekTable.style.height = weekOverviewPosition.height + 'px';
 
-        for (let i = 0; i < weekdays.length; i++) {
-            curriculaDisplayWeekdays[i].dataset.date = new Date(todayUnix).toString();
-            weekdays[i].dataset.date = new Date(todayUnix).toString();
+    timetableContainer.append(blankWeekTable);
 
-            todayUnix += ONEDAY;
-        }
+    timetableContainer.style.height = timetableContainerInitialHeight + 'px';
 
-        AbstractView.setDateOnWeekdayLabel();
-        AbstractController.greyOutHolidaysAndPassedDays();
-        AbstractView.setIsTodayDot();
-        AbstractView.scrollToCurrentDay();
-    }
+    setTimeout(() => {
+        blankWeekTable.style.left = '0px';
+        weekOverview.style.left = verticalOffset * -1 + 'px';
+    }, 10);
+    setTimeout(() => {
+        blankWeekTable.remove()
+        weekOverview.style.left = 'auto';
+        timetableContainer.style.height = '';
 
-    function setWeekStartAndEndDate() {
-        let startDateSpan = document.querySelector('#weekStartDate');
-        let endDateSpan = document.querySelector('#weekEndDate');
-        let mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
-        let sundayDate = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
+        LessonView.renderLesson();
+        LessonController.renderCurriculaSelection();
+        LessonController.renderSelectedCurricula();
 
-        mondayDate = new Date(mondayDate);
-        sundayDate = new Date(sundayDate);
-
-        startDateSpan.innerText = Fn.formatDate(mondayDate);
-        endDateSpan.innerText = Fn.formatDate(sundayDate);
-    }
-
-    function switchToPreviousWeek() {
-
-        cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
-        runWeekSwitchAnimation(false);
-
-        // iterates over all weekday columns and adjusts date of weekdays
-        document.querySelectorAll('.weekday').forEach((weekday) => {
-            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
-            let newDate = currentDate - ONEDAY * 7; // -7 days
-
-            weekday.dataset.date = new Date(newDate).toString();
+        weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
+            lesson.style.opacity = '0';
+            lesson.style.transition = 'all 1s ease-out';
         });
+    }, 350);
 
-        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
-            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
-            let newDate = currentDate - ONEDAY * 7; // -7 days
-
-            weekday.dataset.date = new Date(newDate).toString();
+    setTimeout(() => {
+        weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
+            lesson.style.opacity = '1';
         });
+    }, 360);
 
-        AbstractView.setDateOnWeekdayLabel();
-        AbstractController.greyOutHolidaysAndPassedDays();
-        AbstractView.toggleIsCurrentWeekDot();
-        setWeekStartAndEndDate();
-        calcCalendarWeek(false);
-        AbstractView.setIsTodayDot();
-        AbstractView.scrollToCurrentDay();
-        DayNoteController.renderDayNoteIcons();
-    }
-
-    function switchToNextWeek() {
-
-        cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
-        runWeekSwitchAnimation(true);
-
-        // iterates over all weekday columns and adjusts date of weekdays
-        document.querySelectorAll('.weekday').forEach((weekday) => {
-            let currentDate = new Date(weekday.dataset.date).getTime();
-            let newDate = currentDate + ONEDAY * 7; // +7 days
-
-            weekday.dataset.date = new Date(newDate).toString();
+    setTimeout(() => {
+        weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
+            lesson.removeAttribute('style');
         });
+    }, 560);
+}
 
-        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
-            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
-            let newDate = currentDate + ONEDAY * 7; // -7 days
-
-            weekday.dataset.date = new Date(newDate).toString();
-        });
-
-        AbstractView.setDateOnWeekdayLabel();
-        AbstractController.greyOutHolidaysAndPassedDays();
-        AbstractView.toggleIsCurrentWeekDot();
-        setWeekStartAndEndDate();
-        calcCalendarWeek(true);
-        AbstractView.setIsTodayDot();
-        AbstractView.scrollToCurrentDay();
-        DayNoteController.renderDayNoteIcons();
-    }
-
-    function calcCalendarWeek(countUp = true) {
-        let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
-        let weekCounter = document.querySelector('#calendarWeekCounter').innerText;
-
-        let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
-
-        let weeksPerYear = Fn.getNumberOfWeeksPerYear(mondayDate.getFullYear());
-
-        countUp ? weekCounter++ : weekCounter--;
-
-        if (weekCounter < 1) weekCounter = weeksPerYear;
-        if (weekCounter > weeksPerYear) weekCounter = 1;
-
-        calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
-    }
-
-    // ANIMATION FUNCTIONS
-
-    function runWeekSwitchAnimation(nextWeek = true) {
-        let timetableContainer = document.querySelector('#timetableContainer');
-        let timetableContainerInitialHeight = timetableContainer.getBoundingClientRect().height;
-        let weekOverview = document.querySelector('#weekOverviewContainer');
-        let weekOverviewPosition = weekOverview.getBoundingClientRect();
-        let blankWeekTable = weekOverview.cloneNode(true);
-        let verticalOffset;
-
-        //should blankWeekTable come in from left or right?
-        if (nextWeek == true) verticalOffset = window.innerWidth;
-        if (nextWeek == false) verticalOffset = window.innerWidth * -1;
-
-        LessonView.removeAllLessons(blankWeekTable);
-        LessonController.removeAllCurriculumSpans(blankWeekTable);
-
-        //setup for the animation
-        weekOverview.style.left = '0px';
-        blankWeekTable.style.position = 'relative';
-        blankWeekTable.classList.add('blankWeekTable');
-        blankWeekTable.style.top = -1 * weekOverviewPosition.height + 'px';
-        blankWeekTable.style.left = verticalOffset + 'px';
-        blankWeekTable.style.width = weekOverviewPosition.width + 'px';
-        blankWeekTable.style.height = weekOverviewPosition.height + 'px';
-
-        timetableContainer.append(blankWeekTable);
-
-        timetableContainer.style.height = timetableContainerInitialHeight + 'px';
-
-        setTimeout(() => {
-            blankWeekTable.style.left = '0px';
-            weekOverview.style.left = verticalOffset * -1 + 'px';
-        }, 10);
-        setTimeout(() => {
-            blankWeekTable.remove()
-            weekOverview.style.left = 'auto';
-            timetableContainer.style.height = '';
-
-            LessonView.renderLesson();
-            LessonController.renderCurriculaSelection();
-            LessonController.renderSelectedCurricula();
-
-            weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
-                lesson.style.opacity = '0';
-                lesson.style.transition = 'all 1s ease-out';
-            });
-        }, 350);
-
-        setTimeout(() => {
-            weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
-                lesson.style.opacity = '1';
-            });
-        }, 360);
-
-        setTimeout(() => {
-            weekOverview.querySelectorAll('.lesson').forEach((lesson) => {
-                lesson.removeAttribute('style');
-            });
-        }, 560);
-    }
-
-    function cancelWeekSwitchAnimation() {
-        if (document.querySelector('.blankWeekTable')) {
-            document.querySelector('.blankWeekTable').remove();
-            document.querySelector('#weekOverviewContainer').style.left = 'auto';
-        }
+export function cancelWeekSwitchAnimation() {
+    if (document.querySelector('.blankWeekTable')) {
+        document.querySelector('.blankWeekTable').remove();
+        document.querySelector('#weekOverviewContainer').style.left = 'auto';
     }
 }
 

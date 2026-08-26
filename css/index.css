@@ -220,6 +220,23 @@ main {
     overflow-y: hidden;
     scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
     scrollbar-width: none;
+
+    #calendarWeekContainer {
+        #weekSwitcher {
+
+            #weekSwitcherDateSpan {
+                #currentWeekDateSpanWrapper {
+                    cursor: pointer;
+                }
+
+                #weekStartDate,
+                #weekEndDate {
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+
 }
 
 #isCurrentWeekDot {
@@ -707,7 +724,7 @@ dialog .errorMessageDisplay,
     }
 
     &:has(textarea) {
-        padding: 0  !important;
+        padding: 0 !important;
     }
 
     textarea {
