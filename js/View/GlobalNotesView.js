@@ -118,6 +118,8 @@ export default class GlobalNotesView {
         ]
     }
 
+    static #hideContextMenuTimerId = null;
+
     static renderGlobalNoteIcons(notesArray, clipboardContent) {
         const container = document.querySelector('#noteIconContainer')
         const fragment = document.createDocumentFragment();
@@ -295,12 +297,6 @@ export default class GlobalNotesView {
 
     static openContextMenu(event, clipboardContent, isTrashEmpty = true) {
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
-        const navHeight = document.querySelector('nav').getBoundingClientRect().height;
-        const bodyMargin = Number(window.getComputedStyle(document.querySelector('body')).margin[0]);
-
-        const offsetY = navHeight + bodyMargin;
-        const offsetX = bodyMargin;
-
         const sourceElement = this.getSourceElementOfContextMenu(event);
 
         if (sourceElement.classList.contains('new')) return;
@@ -318,16 +314,6 @@ export default class GlobalNotesView {
         const menuContainer = blankDiv.cloneNode()
         menuContainer.classList.add('globalNoteContextMenu');
         menuContainer.dataset.menu_type = menuData.menuType;
-
-        // set initial position on screen
-        if (window.innerWidth > MOBILE_VIEW_WIDTH) {
-            menuContainer.style.top = (event.pageY ?? event.changedTouches[0].pageY) - offsetY + 'px';
-            menuContainer.style.left = (event.pageX ?? event.changedTouches[0].pageX) - offsetX + 'px';
-
-            if (event.pointerType == 'touch') {
-                menuContainer.style.transform = 'translate(-100%, -100%)';
-            }
-        }
 
         // set source element infos
         if (sourceElement.classList.contains('folderIconContainer')) menuContainer.dataset.folder_id = sourceElement.dataset.folder_id;
@@ -355,32 +341,73 @@ export default class GlobalNotesView {
             menuContainer.querySelectorAll('button').forEach(button => button.disabled = true);
         }
 
+        if (window.innerWidth > MOBILE_VIEW_WIDTH) {
+            const navHeight = document.querySelector('nav').getBoundingClientRect().height;
+            const bodyMargin = Number(window.getComputedStyle(document.querySelector('body')).margin[0]);
+            const offsetY = navHeight + bodyMargin;
+            const offsetX = bodyMargin;
+
+            menuContainer.style.top = (event.pageY ?? event.changedTouches[0].pageY) - offsetY + 'px';
+            menuContainer.style.left = (event.pageX ?? event.changedTouches[0].pageX) - offsetX + 'px';
+        }
+
         globalNotesContainer.append(menuContainer);
 
-        const menuContainerProps = menuContainer.getBoundingClientRect();
-        const notesContainerProps = globalNotesContainer.getBoundingClientRect();
-
-        if (window.innerWidth > MOBILE_VIEW_WIDTH) {
-            // reset pos, if menu extends off screen
-            let translateX = '0%';
-            let translateY = '0%';
-
-            if (event.type == 'touchstart' || event.type == 'touchend') {
-                translateX = '-100%';
-                translateY = '-100%';
-            }
-
-            if (menuContainerProps.right > notesContainerProps.right) translateX = '-100%';
-            if (menuContainerProps.left < notesContainerProps.left) translateX = '0%';
-            if (menuContainerProps.top < notesContainerProps.top) translateY = '0%';
-            if (menuContainerProps.bottom > notesContainerProps.bottom) translateY = '-100%';
-
-            menuContainer.style.transform = `translate(${translateX}, ${translateY})`;
-        }
+        this.setContextMenuPosition(event, menuContainer);
 
         // prevent context menu from covering items on mobile
         if (window.innerWidth < MOBILE_VIEW_WIDTH) {
+            const menuContainerProps = menuContainer.getBoundingClientRect();
+            const notesContainerProps = globalNotesContainer.getBoundingClientRect();
+
             globalNotesContainer.style.height = `${menuContainerProps.height + notesContainerProps.height}px`;
+        }
+    }
+
+    static setContextMenuPosition(event, contextMenuElement = null) {
+        contextMenuElement = contextMenuElement ?? document.querySelector('.globalNoteContextMenu');
+
+        if (contextMenuElement) {
+            const menuElemProps = contextMenuElement.getBoundingClientRect();
+            const notesContainerProps = document.querySelector('#globalNotesContainer')?.getBoundingClientRect();
+            const navHeight = document.querySelector('nav').getBoundingClientRect().height;
+            const bodyMargin = Number(window.getComputedStyle(document.querySelector('body')).margin[0]);
+
+            const offsetY = navHeight + bodyMargin;
+            const offsetX = bodyMargin;
+
+            // get coordinates
+            const containerX1 = notesContainerProps.left;
+            const containerX2 = notesContainerProps.left + notesContainerProps.width - offsetX;
+            const containerY1 = notesContainerProps.top;
+            const containerY2 = notesContainerProps.top + notesContainerProps.height - offsetY;
+
+            let menuX1 = (event.pageX ?? event.changedTouches[0].pageX) - offsetX;
+            let menuY1 = (event.pageY ?? event.changedTouches[0].pageY) - offsetY;
+            let menuX2 = menuX1 + menuElemProps.width;
+            let menuY2 = menuY1 + menuElemProps.height;
+
+            if (window.innerWidth > MOBILE_VIEW_WIDTH) {
+                contextMenuElement.style.left = menuX1 + 'px';
+                contextMenuElement.style.top = menuY1 + 'px';
+
+                let translateX = '0%';
+                let translateY = '0%';
+
+                if (event.type == 'touchstart' || event.type == 'touchend') {
+                    translateX = '-100%';
+                    translateY = '-100%';
+
+                    // reset pos, if menu extends off screen
+                    if ((menuX1 - menuElemProps.width) < containerX1) translateX = '0%';
+                    if ((menuY1 - menuElemProps.height) < containerY1) translateY = '0%';
+                } else {
+                    if (menuX2 > containerX2) translateX = '-100%';
+                    if (menuY2 >= containerY2) translateY = '-100%';
+                }
+
+                contextMenuElement.style.transform = `translate(${translateX}, ${translateY})`;
+            }
         }
     }
 
@@ -434,6 +461,24 @@ export default class GlobalNotesView {
             folderId: Number(openContextMenu?.dataset.folder_id),
             noteId: Number(openContextMenu?.dataset.note_id)
         }
+    }
+
+    static hideAllContextMenus(durationInMs) {
+        if (window.innerWidth < MOBILE_VIEW_WIDTH) return;
+
+        if (this.#hideContextMenuTimerId) clearTimeout(this.#hideContextMenuTimerId);
+
+        const allContextMenus = document.querySelectorAll('.globalNoteContextMenu');
+
+        allContextMenus.forEach(menu => {
+            menu.classList.add('hidden');
+        })
+
+        this.#hideContextMenuTimerId = setTimeout(() => {
+            allContextMenus.forEach(menu => {
+                menu.classList.remove('hidden');
+            })
+        }, durationInMs);
     }
 
     static closeAllContextMenus() {

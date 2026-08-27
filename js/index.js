@@ -253,7 +253,6 @@ async function startApp() {
         const deltaY = Math.abs(event.touches[0].clientY - contextMenuEvent.touchStartY);
 
         if (deltaX >= 10 || deltaY >= 10) {
-        console.log('moved')
         clearTimeout(contextMenuEvent.touchstartTimeOutId);
         contextMenuEvent.touchstartTimeOutId = null;
         contextMenuEvent.touchScrolled = true;
@@ -261,9 +260,6 @@ async function startApp() {
     });
 
     document.querySelector('#globalNotesFileContainer').addEventListener('touchend', (event) => {
-        console.log(event);
-        console.log(contextMenuEvent.touchScrolled);
-
         clearTimeout(contextMenuEvent.touchEndTimeOutId);
         contextMenuEvent.touchEndFired = true;
         contextMenuEvent.touchEndTimeOutId = null;

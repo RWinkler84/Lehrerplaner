@@ -68,6 +68,14 @@ export default class GlobalNotesController {
         View.openContextMenu(event, clipboardContent, isTrashEmpty);
     }
 
+    static setContextMenuPosition(event, contextMenuElement = null) {
+        View.setContextMenuPosition(event, contextMenuElement);
+    }
+
+    static hideAllContextMenus(durationInMs) {
+        View.hideAllContextMenus(durationInMs);
+    }
+
     static closeAllContextMenus() {
         View.closeAllContextMenus();
     }
@@ -710,7 +718,6 @@ export default class GlobalNotesController {
     }
 
     static rightClickHandler(event) {
-        console.log(event.type);
         const target = event.target;
         event.preventDefault();
 
@@ -768,6 +775,9 @@ export default class GlobalNotesController {
                         this.openContextMenu(event);
                     }
 
+                    this.hideAllContextMenus(750);
+                    this.setContextMenuPosition(event);
+
                     break;
 
                 case target.closest('.noteIconContainer') != undefined:
@@ -783,6 +793,9 @@ export default class GlobalNotesController {
                         this.closeAllContextMenus();
                         this.openContextMenu(event);
                     }
+
+                    this.hideAllContextMenus(750);
+                    this.setContextMenuPosition(event);
 
                     break;
 
