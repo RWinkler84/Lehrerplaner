@@ -363,6 +363,7 @@ export default class AbstractView {
         this.calcCalendarWeek(false);
         this.setIsTodayDot();
         this.scrollToCurrentDay();
+        this.setDateOnWeekViewDatePicker();
     }
 
     static switchToNextWeek() {
@@ -392,6 +393,7 @@ export default class AbstractView {
         this.calcCalendarWeek(true);
         this.setIsTodayDot();
         this.scrollToCurrentDay();
+        this.setDateOnWeekViewDatePicker();
     }
 
     static calcCalendarWeek(countUp = true) {

@@ -273,6 +273,8 @@ export default class AbstractController {
 
         await LessonController.renderLesson();
         await DayNoteController.renderDayNoteIcons();
+        await LessonController.renderCurriculaSelection();
+        await LessonController.renderSelectedCurricula();
     }
 
     static switchToPreviousWeek() {
