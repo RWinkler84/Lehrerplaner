@@ -379,7 +379,7 @@ export default class GlobalNotesView {
             // get coordinates
             const containerX1 = notesContainerProps.left;
             const containerX2 = notesContainerProps.left + notesContainerProps.width - offsetX;
-            const containerY1 = notesContainerProps.top;
+            const containerY1 = notesContainerProps.top - offsetY;
             const containerY2 = notesContainerProps.top + notesContainerProps.height - offsetY;
 
             let menuX1 = (event.pageX ?? event.changedTouches[0].pageX) - offsetX;
