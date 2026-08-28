@@ -13,6 +13,7 @@ import SchoolYearController from './Controller/SchoolYearController.js';
 import Editor from './inc/editor.js';
 import TimetableController from './Controller/TimetableController.js';
 import DayNoteController from './Controller/DayNoteController.js';
+import GlobalNotesController from './Controller/GlobalNotesController.js';
 
 //tour stuff
 export let tourStatus = {
@@ -28,6 +29,11 @@ export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
 export const VERSION = '0.9.260826';
+
+export const SF_ID_ROOT = 0;
+export const SF_ID_TRASH = 1;
+
+export const MOBILE_VIEW_WIDTH = 620;
 
 export let unsyncedDeletedSubjects = [];
 export let unsyncedDeletedTasks = [];
@@ -47,15 +53,34 @@ export let userStatus = {
     firstTimeUser: false
 }
 
-let abstCtrl = new AbstractController();
+//stores the necessary for rightclick on touch 
+export let contextMenuEvent = {
+    touchstartTimeOutId: null,
+    touchEndTimeOutId: null,
+    contextMenuOpened: false,
+    touchEndFired: false,
+    touchScrolled: false,
+    touchStartX: null,
+    touchStartY: null,
+};
+
+export let globalItemsMultiSelectData = {
+    mouseDown: false,
+    ignoreNextClickEvent: false,
+    startX: null,
+    startY: null,
+    selectables: [],
+    selecatablesPos: {}
+};
+
 let timeout = false //for resize debouncing
+let abstCtrl = new AbstractController();
 
 async function startApp() {
     await registerWorker();
 
     AbstractController.checkVersion();
     SettingsController.setVersion(VERSION);
-
 
     await SettingsController.checkForPendingLogout();
     await abstCtrl.syncData();
@@ -77,7 +102,14 @@ async function startApp() {
         SchoolYearController.clickEventHandler(event);
         TimetableController.timetableClickEventHandler(event);
         DayNoteController.clickHandler(event);
+        GlobalNotesController.clickHandler(event);
     });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.srcElement.closest('.editorContainer')) Editor.handleKeyDownEvents(event);
+        if (document.querySelector('#globalNotesContainer')?.style.display == 'block') GlobalNotesController.handleKeyboardShortcuts(event);
+    });
+
 
     // handlers for empty timeslots
     document.querySelectorAll('.timeslot').forEach((element) => {
@@ -123,7 +155,7 @@ async function startApp() {
 
     //text editor
     document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('click', Editor.handleClickEvents));
-    document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
+    // document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
     document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
         if (!event.target.closest('.textEditor')) return;
@@ -131,6 +163,7 @@ async function startApp() {
         LessonNoteController.toggleSaveLessonNoteButton(event);
         LessonController.toggleSaveCurriculumSpanNoteButton(event);
         DayNoteController.toggleSaveDayNoteButton(event);
+        GlobalNotesController.toggleSaveGlobalNoteButton(event);
     });
 
     document.addEventListener('selectionchange', (event) => {
@@ -153,6 +186,107 @@ async function startApp() {
         if (curriculumSettingsView.style.display == 'block') {
             CurriculumController.resizeSpanContentContainers();
         }
+    });
+
+    // global Notes
+    // rectangle selection
+    document.querySelector('#globalNotesFileContainer').addEventListener('mousedown', (event) => {
+        globalItemsMultiSelectData.mouseDown = true;
+        globalItemsMultiSelectData.startX = event.clientX;
+        globalItemsMultiSelectData.startY = event.clientY;
+    })
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('mousemove', (event) => {
+        if (globalItemsMultiSelectData.mouseDown) {
+            GlobalNotesController.selectMultipleOnMouseDrag(event);
+        }
+    });
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('mouseup', (event) => {
+        globalItemsMultiSelectData.mouseDown = false;
+        globalItemsMultiSelectData.startX = null;
+        globalItemsMultiSelectData.startY = null;
+        globalItemsMultiSelectData.selectables = [];
+        globalItemsMultiSelectData.selecatablesPos = {};
+
+        GlobalNotesController.removeSelectionRectangle();
+    })
+
+    // context menu
+    document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', (event) => {
+        // touch context menus are handled by ios workaround on all plattforms to prevent event duplication
+        if (event.pointerType == 'touch') {
+            event.preventDefault();
+
+            return;
+        }
+
+        // prevents unwanted rectangle selection on right clicks
+        const mouseUpEvent = new MouseEvent('mouseup', { bubbles: true, cancelable: true })
+        document.querySelector('#globalNotesFileContainer').dispatchEvent(mouseUpEvent);
+
+        GlobalNotesController.rightClickHandler(event);
+    })
+
+    //iOS/iPad OS touch workaround
+    document.querySelector('#globalNotesFileContainer').addEventListener('touchstart', (event) => {
+        contextMenuEvent.touchstartTimeOutId = setTimeout(() => {
+            contextMenuEvent.contextMenuOpened = true;
+            contextMenuEvent.touchStartX = event.touches[0].clientX;
+            contextMenuEvent.touchStartY = event.touches[0].clientY;
+            GlobalNotesController.rightClickHandler(event);
+
+        }, 600);
+
+        // in some cases touchend does not fire and needs to be dispatched manually to prevent unwanted
+        // context menu calls
+        contextMenuEvent.touchEndFired = false;
+
+        contextMenuEvent.touchEndTimeOutId = setTimeout(() => {
+            if (contextMenuEvent.touchEndFired == false) {
+                const touchEndEvent = new TouchEvent('touchend', { bubbles: true, cancelable: true })
+                document.querySelector('#globalNotesFileContainer').dispatchEvent(touchEndEvent);
+            }
+        }, 2000)
+    })
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('touchmove', (event) => {
+        const deltaX = Math.abs(event.touches[0].clientX - contextMenuEvent.touchStartX);
+        const deltaY = Math.abs(event.touches[0].clientY - contextMenuEvent.touchStartY);
+
+        if (deltaX >= 10 || deltaY >= 10) {
+        clearTimeout(contextMenuEvent.touchstartTimeOutId);
+        contextMenuEvent.touchstartTimeOutId = null;
+        contextMenuEvent.touchScrolled = true;
+        }
+    });
+
+    document.querySelector('#globalNotesFileContainer').addEventListener('touchend', (event) => {
+        clearTimeout(contextMenuEvent.touchEndTimeOutId);
+        contextMenuEvent.touchEndFired = true;
+        contextMenuEvent.touchEndTimeOutId = null;
+
+        if (!event.isTrusted) event.preventDefault();
+
+        if (contextMenuEvent.contextMenuOpened) {
+            contextMenuEvent.contextMenuOpened = false;
+            contextMenuEvent.touchScrolled = false;
+
+            return;
+        }
+
+        // if user scrolls during a touch event, no items should be opened or newly selected after the touch ends
+        if (contextMenuEvent.touchScrolled) {
+            contextMenuEvent.touchScrolled = false;
+
+            return;
+        }
+
+        clearTimeout(contextMenuEvent.touchstartTimeOutId);
+        contextMenuEvent.touchstartTimeOutId = null;
+        contextMenuEvent.touchScrolled = false;
+
+        GlobalNotesController.handleTouchEvents(event);
     });
 
     AbstractController.renderTopMenu();

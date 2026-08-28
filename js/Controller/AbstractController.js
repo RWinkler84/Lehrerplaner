@@ -10,6 +10,7 @@ import LessonController from "./LessonController.js";
 import { ONEDAY, tourStatus, userStatus } from "../index.js";
 import Tour from "../tour.js";
 import DayNoteController from "./DayNoteController.js";
+import GlobalNotesController from "./GlobalNotesController.js";
 import LessonNoteController from "./LessonNoteController.js";
 
 export default class AbstractController {
@@ -111,6 +112,7 @@ export default class AbstractController {
                 await CurriculumController.renderSchoolYearCurriculumEditor();
             }
             if (updatedElements.dayNotes) await DayNoteController.renderDayNoteIcons();
+            if (updatedElements.globalNotes || updatedElements.globalNoteFolders) await GlobalNotesController.renderGlobalNotesView();
         }
 
         TaskController.renderTaskChanges();
@@ -326,6 +328,11 @@ export default class AbstractController {
 
                 SchoolYearController.openSchoolYearSettings();
                 break
+
+            case 'openGlobalNotesViewButton':
+                GlobalNotesController.renderGlobalNotesView();
+                View.openGlobalNotesView();
+                break;
 
             case 'logoutButton':
                 SettingsController.logout();

@@ -8,30 +8,48 @@ export default class AbstractView {
         document.querySelector('#openWeekViewButton').classList.add('selected');
         document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
         document.querySelector('#openTimetableViewButton').classList.remove('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.remove('selected');
 
         document.querySelector('#weekViewContainer').style.display = 'block';
         document.querySelector('#timetableViewContainer').style.display = 'none';
         document.querySelector('#schoolYearViewContainer').style.display = 'none';
+        document.querySelector('#globalNotesContainer').style.display = 'none';
     }
 
     static openTimetableSettings() {
         document.querySelector('#openWeekViewButton').classList.remove('selected');
         document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
         document.querySelector('#openTimetableViewButton').classList.add('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.remove('selected');
 
         document.querySelector('#weekViewContainer').style.display = 'none';
         document.querySelector('#timetableViewContainer').style.display = 'block';
         document.querySelector('#schoolYearViewContainer').style.display = 'none';
+        document.querySelector('#globalNotesContainer').style.display = 'none';
+    }
+
+    static openGlobalNotesView() {
+        document.querySelector('#openWeekViewButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
+        document.querySelector('#openTimetableViewButton').classList.remove('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.add('selected');
+
+        document.querySelector('#weekViewContainer').style.display = 'none';
+        document.querySelector('#timetableViewContainer').style.display = 'none';
+        document.querySelector('#schoolYearViewContainer').style.display = 'none';
+        document.querySelector('#globalNotesContainer').style.display = 'block';
     }
 
     static openSchoolYearSettings() {
         document.querySelector('#openWeekViewButton').classList.remove('selected');
         document.querySelector('#openTimetableViewButton').classList.remove('selected');
         document.querySelector('#openSchoolYearViewButton').classList.add('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.remove('selected');
 
         document.querySelector('#weekViewContainer').style.display = 'none';
         document.querySelector('#timetableViewContainer').style.display = 'none';
         document.querySelector('#schoolYearViewContainer').style.display = 'block';
+        document.querySelector('#globalNotesContainer').style.display = 'none';
     }
 
     static async getSubjectSelectHTML(event = undefined) {
@@ -539,6 +557,7 @@ export default class AbstractView {
         dialog.querySelector('#supportTicketTopic').value = '';
         dialog.querySelector('#supportTicketContent').value = '';
         dialog.querySelector('#supportTicketAnswer').value = '';
+        dialog.querySelector('#supportTicketErrorMessageDisplay').textContent = '';
 
         this.toggleSupportDialogButtons('close');
 
@@ -572,18 +591,21 @@ export default class AbstractView {
 
         switch (status) {
             case 'sending':
-                submitButton.style.display = 'none';
+                submitButton.disabled = true;
                 break;
 
             case 'success':
-                closeButton.style.display = 'block'
+                closeButton.style.display = 'block';
+                submitButton.style.display = 'none';
+
                 break;
 
             case 'failed':
-                submitButton.style.display = 'block';
+                submitButton.disabled = false;
                 break;
 
             case 'close':
+                submitButton.disabled = false;
                 submitButton.style.display = 'block';
                 closeButton.style.display = 'none';
                 break;

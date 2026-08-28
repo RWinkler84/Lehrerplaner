@@ -25,7 +25,7 @@
                 <img id="pageLogo" src="favicon.svg" style="width: 2rem; height: 2rem;">
                 <h1 id="pageHeader">Eduplanio</h1>
             </div>
-            <div id="topMenuButtonContainer" class="flex gap">
+            <div id="topMenuButtonContainer" class="flex">
                 <div id="viewsMenuContainer" class="flex halfGap">
                     <button id="openWeekViewButton" class="selected topMenuButton"><span class="icon weekViewIcon"
                             style="width: 1.5rem; height: 1.5rem;"></span><span
@@ -36,19 +36,25 @@
                     <button id="openSchoolYearViewButton" class="topMenuButton"><span class="icon schoolYearViewIcon"
                             style="width: 1.5rem; height: 1.5rem;"></span><span
                             class="buttonText">Schuljahr</span></button>
+                    <button id="openGlobalNotesViewButton" class="topMenuButton"><span class="icon noteIcon"
+                            style="width: 1.5rem; height: 1.5rem;"></span><span
+                            class="buttonText">Notizen</span></button>
                 </div>
-                <div id="syncIndicator" class="unsynced">
-                    <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem
-                        Internet und melde dich an, um Datenverlust sicher zu vermeiden.</span>
-                </div>
-                <div><button id="openBurgerMenuButton">&#x2630;</button></div>
-                <div id="topMenu" class="flex column justifyCenter ">
-                    <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
-                    <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
-                    <button id="openHelpButton" class="burgerMenuButton">Hilfe</button>
-                    <button id="openLoginButton" class="burgerMenuButton">Login</button>
-                    <button id="createAccountButton" class="burgerMenuButton">Registrieren</button>
-                    <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
+                <div class="flex halfGap alignCenter">
+                    <div id="syncIndicator" class="unsynced">
+                        <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit
+                            dem
+                            Internet und melde dich an, um Datenverlust sicher zu vermeiden.</span>
+                    </div>
+                    <div><button id="openBurgerMenuButton">&#x2630;</button></div>
+                    <div id="topMenu" class="flex column justifyCenter ">
+                        <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
+                        <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
+                        <button id="openHelpButton" class="burgerMenuButton">Hilfe</button>
+                        <button id="openLoginButton" class="burgerMenuButton">Login</button>
+                        <button id="createAccountButton" class="burgerMenuButton">Registrieren</button>
+                        <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -668,6 +674,30 @@
         </div>
     </div>
 
+    <!-- global notes -->
+    <div id="globalNotesContainer" class="mainViewContainer" style="display: none">
+        <div id="globalNotesFileContainer" data-folder_id="0">
+            <div id="globalNotesFileSystemDisplay">
+                <div id="folderNavigatonContainer" class="flex spaceBetween">
+                    <div id="folderPathContainer" class="flex"></div>
+                    <div id="folderNavigationButtonContainer" class="flex halfGap" data-history_step="0">
+                        <button class="confirmationButton" id="folderBackwardButton" disabled>&#8617;</button>
+                        <button class="confirmationButton" id="folderForwardButton" disabled>&#8618;</button>
+                    </div>
+                </div>
+                <div id="folderIconContainer"></div>
+                <div id="noteIconContainer"></div>
+            </div>
+            <div id="createGlobalItemsButtonContainer">
+                <button id="createGlobalNoteButton" class="confirmationButton"><span
+                        class="noteIcon icon"></span></button>
+                <button id="createGlobalNoteFolderButton" class="confirmationButton"><span
+                        class="folderIcon icon"></span></button>
+                <button id="createGlobalItemButton" class="confirmationButton">+</button>
+            </div>
+        </div>
+    </div>
+
     <settings>
         <!-- Settings Menu -->
         <dialog id="settingsContainer">
@@ -685,10 +715,13 @@
 
             <!-- account settings -->
             <div id="accountSettingsContainer" class="settingsSubContainer">
-                <div id="eduplanioPlusContainer">
+                <div id="accountInformationContainer">
                     <label class="marginBottom">Kontoinformation:</label>
                     <div>Kontoart: <span id="accountTypeSpan">Gast</span></div>
                     <div>Login-Status: <span id="loginStatusSpan">-</span></div>
+                </div>
+
+                <div id="eduplanioPlusContainer">
                     <label class="marginBottom marginTop">Eduplanio Plus:</label>
                     <div id="eduplanioPlusNotLoggedInMessage">
                         <p>Um deine Eduplanio Plus-Lizenz verwalten zu können, musst du angemeldet sein.</p>
@@ -696,10 +729,7 @@
                     <div>Lizenzstatus: <span id="eduplanioPlusStatusSpan">-</span></div>
                     <div>läuft ab: <span id="eduplanioPlusExpirationDateSpan">-</span></div>
                     <label class="marginTop marginBottom">aktivieren oder verlängern:</label>
-                    <!-- <div class="errorMessageDisplay" id="accountNeededForPlusMessage" style="font-weight: bold;">
-                        *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
-                    <div class="errorMessageDisplay" id="loginNeededForPlusMessage" style="font-weight: bold;">*Du
-                        musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div> -->
+
                     <p>Beim Kauf von Eduplanio Plus stehen dir die Monats- und die
                         Jahreslizenz zur Wahl. Nach Abschluss des Kaufs sind die Eduplanio Plus-Vorteile sofort
                         verfügbar. Endet der Lizenzzeitraum kannst du Eduplanio weiterhin in der Gratisversion
@@ -1103,6 +1133,37 @@
         </div>
     </dialog>
 
+    <dialog id="globalNoteDialog" data-note_id>
+        <div class="headline flex spaceBetween">
+            <h3>allgemeine Notiz <span id="dayNoteDateSpan"></span></h3><button id="closeGlobalNoteButton"
+                class="closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <div id="globalNoteEditorContainer" class="flex column halfGap marginTop editorContainer">
+                <div class="alertRing">
+                    <input type="text" id="globalNoteTitleInput" placeholder="Titel">
+                </div>
+                <div id="globalNoteEditorButtonContainer" class="flex spaceBetween editorButtonContainer">
+                    <div class="flex halfGap">
+                        <button class="boldButton" style="font-weight: bold;">b</button>
+                        <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                        <button class="unorderedListButton"><span class="icon ulIcon"></span></button>
+                    </div>
+                    <div class="flex halfGap">
+                        <button class="revertChangeButton">&#8617;</button>
+                        <button class="redoChangeButton">&#8618;</button>
+                    </div>
+                </div>
+                <div id="globalNoteContentEditor" class="textEditor" contenteditable="true" data-noteversion>
+                </div>
+                <div class="flex halfGap spaceBetween">
+                    <div id="globalNoteSavedMessage">gespeichert</div><button id="saveGlobalNoteButton"
+                        class="confirmationButton" disabled>Speichern</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
     <dialog id="plusExpirationDialog">
         <div class="headline flex spaceBetween">
             <h3>Eduplanio Plus läuft bald ab</h3><button class="closePlusExpirationDialogButton closeDialogButton"
@@ -1168,6 +1229,20 @@
                     senden</button>
                 <button class="confirmationButton closeRevocationDialogButton" id="closeRevocationDialogButton"
                     style="margin-right: 3px; display: none">Schließen</button>
+            </div>
+        </div>
+    </dialog>
+
+        <dialog id="errorMessageDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Etwas ist schiefgelaufen</h3><button class="closeErrorMessageDialogButton closeDialogButton"
+                style="width: 1.5rem" autofocus="false">×</button>
+        </div>
+        <div class="dialogBody flex column">
+            <div class="dialogText">
+            </div>
+            <div class="flex halfGap justifyEnd marginTop">
+                <button class="closeErrorMessageDialogButton confirmationButton">Okay</button>
             </div>
         </div>
     </dialog>

@@ -95,6 +95,7 @@ export default class Editor {
     }
 
     static updateButtonStatus(event) {
+        if (!event.srcElement.activeElement) return;
         if (event.srcElement.activeElement && !event.srcElement.activeElement.classList.contains('textEditor')) return;
 
         const selection = document.getSelection();

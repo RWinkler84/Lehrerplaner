@@ -14,6 +14,8 @@ require_once './Controller/UserController.php';
 require_once './Controller/LessonNoteController.php';
 require_once './Controller/SchoolYearController.php';
 require_once './Controller/DayNoteController.php';
+require_once './Controller/GlobalNoteController.php';
+require_once './Controller/GlobalNoteFolderController.php';
 
 //Models
 require_once './Model/AbstractModel.php';
@@ -24,6 +26,8 @@ require_once './Model/User.php';
 require_once './Model/LessonNote.php';
 require_once './Model/SchoolYear.php';
 require_once './Model/DayNote.php';
+require_once './Model/GlobalNote.php';
+require_once './Model/GlobalNoteFolder.php';
 
 //stripe
 require_once './stripe/createCheckoutSession.php';
