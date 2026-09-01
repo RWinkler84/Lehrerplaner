@@ -30,6 +30,8 @@
     --labelgrey: rgb(106, 106, 106);
     --fadedgrey: rgb(240, 240, 240);
 
+    --lightBlue: rgb(227, 229, 235);
+
     --standardRadius: 5px;
     --smallRadius: 3px;
 }
@@ -38,6 +40,8 @@ body {
     background-color: var(--bodyBackground);
     display: flex;
     flex-direction: column;
+    position: relative;
+    min-height: 98vh;
 }
 
 footer {
@@ -171,6 +175,8 @@ main {
 #settingsTimetableContainer,
 #schoolYearInfoContainer,
 #curriculumContainer,
+#globalNotesContainer,
+#accountInformationContainer,
 #eduplanioPlusContainer,
 #deleteAccountContainer,
 #timetableContainer,
@@ -195,7 +201,13 @@ main {
 
     &[open] {
         display: flex;
+    }
 
+    #oneMonthEduplanioPlusButton,
+    #oneYearEduplanioPlusButton {
+        &[disabled]::after {
+            content: "*";
+        }
     }
 }
 
@@ -214,6 +226,23 @@ main {
     overflow-y: hidden;
     scrollbar-color: var(--lightgrey) var(--contentContainerBackground);
     scrollbar-width: none;
+
+    #calendarWeekContainer {
+        #weekSwitcher {
+
+            #weekSwitcherDateSpan {
+                #currentWeekDateSpanWrapper {
+                    cursor: pointer;
+                }
+
+                #weekStartDate,
+                #weekEndDate {
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+
 }
 
 #isCurrentWeekDot {
@@ -310,7 +339,7 @@ dialog .errorMessageDisplay,
     min-width: 50vw !important;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     scrollbar-color: var(--lightgrey) transparent;
 
@@ -431,13 +460,20 @@ dialog .errorMessageDisplay,
 .weekdayLabel {
     font-weight: bold;
     color: var(--labelgrey);
+
+    .smallDate {
+        font-weight: normal;
+        font-size: 0.8rem;
+        color: var(--lightText);
+    }
+
+    .dayNoteIndicator {
+        width: 0.75rem;
+        height: 0.75rem;
+        background-color: var(--lightgrey);
+    }
 }
 
-.smallDate {
-    font-weight: normal;
-    font-size: 0.8rem;
-    color: var(--lightText);
-}
 
 .weekday,
 .curriculaDisplayWeekday,
@@ -639,6 +675,7 @@ dialog .errorMessageDisplay,
     padding: 0.5rem 1rem;
     border-right: solid 1px var(--lightgrey);
     user-select: none;
+    -webkit-user-select: none;
     cursor: default;
 }
 
@@ -690,6 +727,21 @@ dialog .errorMessageDisplay,
 
     &[contenteditable] {
         background-color: white;
+        height: 10rem;
+    }
+
+    &:has(textarea) {
+        padding: 0 !important;
+    }
+
+    textarea {
+        resize: none;
+        field-sizing: content;
+        height: unset;
+        width: calc(100% - 10px);
+        min-height: 3rem;
+        padding: 8px 16px;
+        margin: 0 5px;
     }
 }
 
@@ -709,20 +761,44 @@ dialog .errorMessageDisplay,
     flex-wrap: wrap;
 }
 
-tr[data-new] {
-    background-color: var(--lightergrey);
-}
 
-tr[data-new] td {
-    border-color: var(--contentContainerBackground) !important;
-}
 
-tr[data-new] td.taskAdditionalInfo {
-    border-color: var(--lightergrey) !important;
-}
+.taskList {
+    tr {
 
-tr[data-new]:has(td[data-taskDescription]) td {
-    border-top: solid 1px var(--contentContainerBackground);
+        position: relative;
+        background-color: var(--contentContainerBackground);
+
+        &.transitioning {
+            transition: all 0.3s ease-out;
+        }
+    }
+
+    tr[data-taskid] {
+        z-index: 1;
+    }
+
+    tr[data-checkboxtr] {
+        z-index: 0;
+    }
+
+    tr[data-new] {
+        background-color: var(--lightergrey);
+    }
+
+    tr[data-new] td {
+        border-color: var(--contentContainerBackground) !important;
+    }
+
+    tr[data-new] td.taskAdditionalInfo {
+        border-color: var(--lightergrey) !important;
+    }
+
+    tr[data-new]:has(td[data-taskDescription]) td {
+        border-top: solid 1px var(--contentContainerBackground);
+    }
+
+
 }
 
 /* Settings Container */
@@ -867,6 +943,215 @@ tr[data-new]:has(td[data-taskDescription]) td {
     border-radius: var(--standardRadius);
 }
 
+/* globalNotes */
+#globalNotesContainer {
+    flex-grow: 1;
+    position: relative;
+    flex-direction: column;
+    padding-top: 0;
+
+    &[style="display: block;"] {
+        display: flex !important;
+    }
+
+    .globalNoteContextMenu {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        position: absolute;
+        z-index: 50;
+        background-color: var(--lightergrey);
+        padding: 1rem 0.5rem;
+        border-radius: var(--standardRadius);
+        box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
+        -webkit-user-select: none;
+
+
+        button {
+            color: var(--bodyBackground);
+            padding: 0.25rem 1rem;
+            text-wrap: nowrap;
+
+            &:hover {
+                background-color: rgba(256, 256, 256, 0.4);
+            }
+
+            &[disabled] {
+                color: var(--lightgrey);
+                background-color: var(--lightergrey);
+            }
+        }
+    }
+
+    #selectionRectangle {
+        position: fixed;
+        border: 1px dotted black;
+        background-color: var(--lightergrey);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+
+    #globalNotesFileContainer {
+        position: relative;
+        flex-grow: 1;
+
+        #createGlobalItemsButtonContainer {
+            position: fixed;
+            bottom: 4rem;
+            right: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            button {
+                display: none;
+                -webkit-user-select: none;
+            }
+
+            #createGlobalItemButton {
+                display: block;
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            &.open {
+
+                button {
+                    display: block;
+                    padding: 0.75rem 0.75rem;
+
+                    .icon {
+                        width: 1.75rem;
+                        height: 1.75rem;
+                    }
+                }
+
+                #createGlobalItemButton {
+                    display: none;
+                }
+
+                #createGlobalNoteButton {
+                    z-index: 1;
+                    animation: createGlobalNoteButtonSlideUp 0.1s ease-out;
+                }
+            }
+        }
+    }
+
+    #globalNotesFileSystemDisplay {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        /* prevent ios context menu */
+        -webkit-touch-callout: none;
+
+        #folderIconContainer,
+        #noteIconContainer {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #folderNavigatonContainer {
+            gap: 1rem;
+            position: sticky;
+            top: 2rem;
+            padding-top: 2rem;
+            padding-bottom: 0.5rem;
+            background-color: var(--contentContainerBackground);
+            z-index: 49;
+
+            #folderPathContainer {
+                overflow: hidden;
+                align-items: center;
+
+                .folderPathItemContainer {
+                    display: flex;
+                    overflow: hidden;
+                    flex-wrap: nowrap;
+
+                    .folderNameWrapperOnPath {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        text-wrap: nowrap;
+
+                        &:hover {
+                            cursor: default;
+                            text-decoration: underline;
+                        }
+                    }
+
+                    &:last-child {
+                        min-width: fit-content;
+
+                        .folderNameWrapper {
+                            overflow: auto;
+                            text-overflow: unset;
+                        }
+                    }
+                }
+            }
+        }
+
+        .folderIconContainer,
+        .noteIconContainer {
+            width: 6.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            border: 0.25rem solid var(--contentContainerBackground);
+            /* border-radius: var(--standardRadius); */
+            border-radius: 10px;
+            align-items: center;
+            overflow: hidden;
+            -webkit-user-select: none;
+
+            &:focus-visible {
+                outline: none;
+            }
+
+            &.selected {
+                background-color: var(--lightBlue);
+            }
+
+            &.cut {
+                opacity: 0.5;
+            }
+
+            .fileIcon {
+                width: 2rem;
+                height: 2rem;
+            }
+
+            .folderNameWrapper,
+            .folderNameWrapperOnPath,
+            .fileNameWrapper {
+                max-width: 100%;
+                font-size: 0.8rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                cursor: default;
+                user-select: none;
+                -webkit-user-select: none;
+
+            }
+
+            textarea {
+                font-size: 0.8rem;
+                resize: none;
+                field-sizing: content;
+                height: unset;
+            }
+
+            .alertRing {
+                width: 100%;
+            }
+        }
+    }
+}
+
 /* Buttons */
 button:disabled,
 button:disabled:hover {
@@ -977,6 +1262,7 @@ button:disabled:hover {
 .deleteLessonButton,
 .topMenuButton,
 .settingsMenuButton,
+.contextMenuButton,
 #closeSettingsButton,
 #openBurgerMenuButton,
 #openSettingsMenuButton {
@@ -992,7 +1278,7 @@ button:disabled:hover {
 .deleteItemButton:hover,
 .closeDialogButton:hover,
 .deleteLessonButton:hover,
-#closeSettingsButton:hover,
+x#closeSettingsButton:hover,
 #timetableSettingsButton:hover,
 #accountSettingsButton:hover,
 #openBurgerMenuButton:hover,
@@ -1290,6 +1576,10 @@ h4 {
 
 .hidden {
     visibility: hidden;
+}
+
+.transitioning {
+    transition: all 0.3s ease-out;
 }
 
 /* Lesson Colors */
@@ -1650,7 +1940,7 @@ p {
 
     #upcomingTasksContainer,
     #inProgressTasksContainer {
-        flex: 1 1 100%;
+        flex: unset;
         max-width: 100%;
     }
 }
@@ -1678,7 +1968,21 @@ p {
     }
 }
 
-@media screen and (max-width: 770px) {}
+@media screen and (max-width: 700px) {
+    #topMenuContainer {
+        gap: 0;
+
+        #pageLogo {
+            display: none;
+        }
+
+        #topMenuButtonContainer {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+
+}
 
 @media screen and (max-width: 620px) {
     body {
@@ -1688,6 +1992,14 @@ p {
     #topMenuContainer,
     #settingsTitleBar {
         padding: 0.5rem 0.5rem;
+
+        #pageLogo {
+            display: block;
+        }
+    }
+
+    #topMenuContainer {
+        gap: 1rem;
     }
 
     #timetableContainer,
@@ -1696,6 +2008,7 @@ p {
     #settingsTimetableContainer,
     #schoolYearInfoContainer,
     #curriculumContainer,
+    #globalNotesContainer,
     #eduplanioPlusContainer,
     #deleteAccountContainer {
         padding: 1.5rem 0.5rem;
@@ -1795,10 +2108,17 @@ p {
         display: none;
     }
 
-    tr {
-        position: relative;
-        display: block;
-        margin-bottom: 2rem;
+    .taskList {
+        tr {
+            position: relative;
+            display: block;
+            margin-bottom: 2rem;
+        }
+
+        tr[data-taskid]:not(:has(~ tr[data-taskid])),
+        tr:last-of-type {
+            margin-bottom: 0;
+        }
     }
 
     td {
@@ -1819,6 +2139,7 @@ p {
         min-width: 100%;
         max-width: 100%;
         padding-bottom: 1rem;
+        overflow-y: auto;
     }
 
     .responsiveButtonsTr {
@@ -1850,6 +2171,56 @@ p {
     /* responsive settings */
     #settingsSubjectsContainer {
         flex-direction: column-reverse;
+    }
+
+    #globalNotesContainer {
+        padding-top: 0rem;
+
+        #globalNotesFileSystemDisplay {
+            #folderNavigatonContainer {
+                padding-top: 1.5rem;
+
+            }
+        }
+
+        button,
+        .folderPathItemContainer {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .globalNoteContextMenu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            animation: contextMenuSlideIn 0.2s ease-out;
+
+            .contextMenuButton {
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        #globalNotesFileContainer {
+            #createGlobalItemsButtonContainer {
+                bottom: 3rem;
+                right: 0.5rem;
+            }
+        }
+    }
+
+    @keyframes contextMenuSlideIn {
+        from {
+            transform: translateY(100%);
+        }
+
+        to {
+            transform: translateY(0%);
+        }
+    }
+
+    #globalNoteDialog {
+        height: 100%;
     }
 
     /* DO NOT DELETE */
@@ -2220,6 +2591,16 @@ p {
     }
 }
 
+@media screen and (max-width: 400px) {
+    #topMenuContainer {
+        gap: unset;
+
+        #pageLogo {
+            display: none;
+        }
+    }
+}
+
 /* svg */
 .icon {
     display: block;
@@ -2235,6 +2616,33 @@ p {
     width: 100%;
     height: 100%;
 }
+
+.folderIcon {
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23494747' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='none' stroke='%23000000' stroke-width='10' d='m6,17.02c0,-4.35 3.68,-8 8.06,-8c6.39,0 14.37,-0.14 20.76,-0.14c5.02,0 7.93,18.56 14.2,20.88l19.85,-0.03l17.45,0.21c-1.92,0.37 7.59,-1.58 7.63,5.92l-0.32,50.16c0,4.35 -3.68,8 -8.06,8l-71.52,0c-4.38,0 -8.06,-3.65 -8.06,-8l0,-69z' id='svg_7' transform='matrix(1 0 0 1 0 0)'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23494747' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='none' stroke='%23000000' stroke-width='10' d='m6,17.02c0,-4.35 3.68,-8 8.06,-8c6.39,0 14.37,-0.14 20.76,-0.14c5.02,0 7.93,18.56 14.2,20.88l19.85,-0.03l17.45,0.21c-1.92,0.37 7.59,-1.58 7.63,5.92l-0.32,50.16c0,4.35 -3.68,8 -8.06,8l-71.52,0c-4.38,0 -8.06,-3.65 -8.06,-8l0,-69z' id='svg_7' transform='matrix(1 0 0 1 0 0)'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: currentColor;
+    width: 100%;
+    height: 100%;
+}
+
+.folderIconSolid {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23494747' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23494747' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' id='svg_2' stroke='%23000000' stroke-width='10' x1='40.27' x2='91.25' y1='12.63' y2='12.69' stroke-linejoin='round'/%3E%3Cline fill='none' id='svg_6' stroke='%23000000' stroke-width='10' x1='74.18' x2='98.23' y1='21.57' y2='21.39' stroke-linejoin='round' transform='rotate(-90 86.2074 21.4803)'/%3E%3C/g%3E%3Cg class='layer'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='%2381366a' stroke='%23000000' stroke-width='10' d='m6,17.02c0,-4.35 3.68,-8 8.06,-8c6.39,0 14.37,-0.14 20.76,-0.14c5.02,0 7.93,18.56 14.2,20.88l19.85,-0.03l17.45,0.21c-1.92,0.37 7.59,-1.58 7.63,5.92l-0.32,50.16c0,4.35 -3.68,8 -8.06,8l-71.52,0c-4.38,0 -8.06,-3.65 -8.06,-8l0,-69z' id='svg_7' transform='matrix(1 0 0 1 0 0)'/%3E%3C/g%3E%3C/svg%3E%3C/g%3E%3C/svg%3E");
+    width: 100%;
+    height: 100%;
+}
+
+.trashIcon {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='none'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='34.65' x2='64.87' y1='14.19' y2='14.25' stroke-linejoin='round' id='svg_5' transform='rotate(-35 49.7609 14.2158)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='51.27' x2='74.01' y1='14.83' y2='14.65' stroke-linejoin='round' transform='rotate(55 62.6409 14.7389)' id='svg_7'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='%23e3e5eb' stroke='%23000000' stroke-width='10' stroke-linejoin='round' d='m93.13,23l-9.74,69l-66.39,0l-10,-69l86.13,0z' id='svg_1'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 3%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='26.71' y1='39.63' x2='33.2' y2='77.63' id='svg_11' transform='rotate(0.825554 29.959 58.6252)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linecap='round' fill-opacity='0' x1='72.87' y1='39.63' x2='66.98' y2='77.63' id='svg_14'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='50' y1='39.63' x2='50' y2='77.63' id='svg_15'/%3E%3C/g%3E%3C/svg%3E");
+    width: 100%;
+    height: 100%;
+}
+
+.trashIconFilled {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='34.65' x2='64.87' y1='14.19' y2='14.25' stroke-linejoin='round' id='svg_5' transform='rotate(-35 49.7609 14.2158)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='10' x1='51.27' x2='74.01' y1='14.83' y2='14.65' stroke-linejoin='round' transform='rotate(55 62.6409 14.7389)' id='svg_7'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 2%3C/title%3E%3Cpath fill='%23e3e5eb' stroke='%23000000' stroke-width='10' stroke-linejoin='round' d='m93.13,23l-9.74,69l-66.39,0l-10,-69l86.13,0z' id='svg_1'/%3E%3C/g%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 3%3C/title%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='26.71' y1='39.63' x2='33.2' y2='77.63' id='svg_11' transform='rotate(0.825554 29.959 58.6252)'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linecap='round' fill-opacity='0' x1='72.87' y1='39.63' x2='66.98' y2='77.63' id='svg_14'/%3E%3Cline fill='none' stroke='%23000000' stroke-width='7' stroke-linejoin='round' stroke-linecap='round' fill-opacity='0' x1='50' y1='39.63' x2='50' y2='77.63' id='svg_15'/%3E%3C/g%3E%3C/svg%3E");
+    width: 100%;
+    height: 100%;
+}
+
 
 .inProgressIcon {
     mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3C!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit--%3E%3Cg class='layer' display='inline'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect fill='%23000000' fill-opacity='0' height='45' id='svg_1' rx='5' ry='5' stroke='%23000000' stroke-width='9' width='90' x='5' y='27.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_2' stroke='%23000000' stroke-width='16' x1='23.16' x2='23.16' y1='38.86' y2='61.79'/%3E%3Cline fill='none' fill-opacity='0' id='svg_4' stroke='%23000000' stroke-width='16' x1='46' x2='46' y1='38.82' y2='61.82'/%3E%3Cline fill='none' fill-opacity='0' id='svg_31' stroke='%23000000' stroke-width='9' x1='65.46' x2='65.46' y1='38.86' y2='61.79'/%3E%3C/g%3E%3C/svg%3E");

@@ -10,7 +10,7 @@ export default class LessonNoteController {
         let note;
 
         if (noteId) note = await this.getLessonNoteById(noteId);
-        
+
         await LessonNoteView.renderLessonNotesModal(note, lessonData);
         if (note) Editor.init(document.querySelector('#noteContentEditor'));
     }
@@ -36,10 +36,9 @@ export default class LessonNoteController {
 
         if (noteData.content.trim() == '<p><br></p>' && noteData.id) {
             LessonNoteController.deleteLessonNote(noteData.id);
-            LessonNoteView.removeIdAndCreatedFromLessonNoteDialog();
             return;
-        } 
-        
+        }
+
         if (noteData.id) {
             LessonNoteController.updateLessonNote(noteData);
             return;
@@ -68,6 +67,9 @@ export default class LessonNoteController {
         let note = await LessonNote.getById(id);
 
         note.delete();
+        LessonNoteView.removeIdAndCreatedFromLessonNoteDialog();
+        LessonNoteView.toggleSaveLessonNoteButton(false);
+        LessonNoteView.showLessonNoteSavedMessage();
         LessonController.renderLesson();
     }
 

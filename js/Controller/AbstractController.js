@@ -1,15 +1,17 @@
 import Model from "../Model/AbstractModel.js";
 import View from "../View/AbstractView.js";
 import SettingsController from "./SettingsController.js";
-import LessonController from "./LessonController.js";
 import TaskController from "./TaskController.js";
 import LoginController from "./LoginController.js";
-import AbstractModel from "../Model/AbstractModel.js";
 import SchoolYearController from "./SchoolYearController.js";
 import CurriculumController from "./CurriculumController.js";
 import TimetableController from "./TimetableController.js";
-import { ONEDAY, tourStatus } from "../index.js";
+import LessonController from "./LessonController.js";
+import { ONEDAY, tourStatus, userStatus } from "../index.js";
 import Tour from "../tour.js";
+import DayNoteController from "./DayNoteController.js";
+import GlobalNotesController from "./GlobalNotesController.js";
+import LessonNoteController from "./LessonNoteController.js";
 
 export default class AbstractController {
 
@@ -50,15 +52,16 @@ export default class AbstractController {
     }
 
     /** @param status 'synced', 'unsynced' */
+    /** @param errorMessage 'Plus licence expired' to display, if the synchronizations was stopped because of this */
     static setSyncIndicatorStatus(status, errorMessage = null) {
         View.setSyncIndicatorStatus(status, errorMessage);
     }
 
     static async checkVersion() {
         const db = new Model;
-        const versions =  await db.checkVersion();
+        const versions = await db.checkVersion();
 
-        setTimeout(() => {this.checkVersion()}, ONEDAY / 2);
+        setTimeout(() => { this.checkVersion() }, ONEDAY / 2);
 
         if (!versions) return;
 
@@ -68,15 +71,10 @@ export default class AbstractController {
     }
 
     static showUpdateNotification() {
-
         View.showUpdateNotification();
     }
 
     static async runUpdate() {
-        if ('caches' in window) {
-            caches.delete('eduplanio');
-        }
-
         if ('serviceWorker' in navigator) {
             const registrations = await navigator.serviceWorker.getRegistrations();
 
@@ -87,7 +85,7 @@ export default class AbstractController {
                     continue;
                 }
 
-                registration.unregister();
+                await registration.unregister();
             }
         }
 
@@ -113,6 +111,8 @@ export default class AbstractController {
                 await LessonController.renderSelectedCurricula();
                 await CurriculumController.renderSchoolYearCurriculumEditor();
             }
+            if (updatedElements.dayNotes) await DayNoteController.renderDayNoteIcons();
+            if (updatedElements.globalNotes || updatedElements.globalNoteFolders) await GlobalNotesController.renderGlobalNotesView();
         }
 
         TaskController.renderTaskChanges();
@@ -126,13 +126,63 @@ export default class AbstractController {
     }
 
     static async getUserInfo() {
-        let db = new AbstractModel;
+        let db = new Model;
         const userInfo = await db.getUserInfo();
 
-        //set the syncIndicator to unsynced, if activeUntil is expired
-        if (new Date().setHours(12, 0, 0, 0) > new Date(userInfo.activeUntil).setHours(12, 0, 0, 0)) AbstractController.setSyncIndicatorStatus('unsynced');
+        //warn, if Plus is about to expire
+        this.checkForPlusExpiration(userInfo);
 
         return userInfo;
+    }
+
+    static async checkForFirstTimeUser() {
+        if (!userStatus.firstTimeUser) return;
+        const db = new Model;
+
+        const isFirstTimer = await db.checkForFirstTimeUser();
+
+        if (isFirstTimer) this.openWelcomeDialog();
+    }
+
+    static openWelcomeDialog() {
+        View.openWelcomeDialog();
+    }
+
+    static async checkForPlusExpiration(userInfo) {
+        const today = new Date().setHours(12, 0, 0, 0);
+        const plusExpirationDate = userInfo.activeUntil ? new Date(userInfo.activeUntil).setHours(12, 0, 0, 0) : null;
+        const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
+        const expirationWarningLastUpdated = expirationWarningStatus ? new Date(expirationWarningStatus.lastUpdated).setHours(12, 0, 0, 0) : null;
+
+        if (!expirationWarningStatus || expirationWarningLastUpdated != today) SettingsController.setExpirationWarningDismissedStatus(false);
+
+        if (!expirationWarningStatus || expirationWarningStatus.expirationWarningDismissed == false) {
+            if (plusExpirationDate - (ONEDAY * 7) == today) AbstractController.openPlusExpirationDialog(7);
+            if (plusExpirationDate - ONEDAY == today) AbstractController.openPlusExpirationDialog(1);
+            if (plusExpirationDate == today) AbstractController.openPlusExpirationDialog(0);
+            //show warning one last time, after plus is expired
+            if (expirationWarningLastUpdated && expirationWarningLastUpdated <= plusExpirationDate && today > plusExpirationDate) AbstractController.openPlusExpirationDialog(-1)
+        }
+
+        if (userInfo.accountType != 'registeredUser') return;
+
+        //set the syncIndicator to unsynced, if activeUntil is expired
+        if (plusExpirationDate && today > plusExpirationDate) {
+            AbstractController.setSyncIndicatorStatus('unsynced', 'Plus licence expired');
+        } else {
+            await AbstractController.togglePlusStatus(true);
+        }
+    }
+
+    static async openPlusExpirationDialog(daysLeft) {
+        const expirationWarningStatus = await SettingsController.getExpirationWarningDismissedStatus();
+
+        if (!expirationWarningStatus || expirationWarningStatus.expirationWarningDismissed == false) View.openPlusExpirationDialog(daysLeft);
+    }
+
+    static closePlusExpirationDialog() {
+        SettingsController.setExpirationWarningDismissedStatus(true);
+        View.closePlusExpirationDialog();
     }
 
     static openSupportDialog() {
@@ -141,6 +191,10 @@ export default class AbstractController {
 
     static closeSupportDialog() {
         View.closeSupportDialog();
+    }
+
+    static closeWelcomeDialog() {
+        View.closeWelcomeDialog();
     }
 
     static openHelpDialog() {
@@ -173,7 +227,7 @@ export default class AbstractController {
 
         View.toggleSupportDialogButtons('sending');
 
-        let db = new AbstractModel;
+        let db = new Model;
         let result = await db.sendSupportTicket(formData);
 
         if (result.status == 'success') {
@@ -187,9 +241,72 @@ export default class AbstractController {
         }
     }
 
-    static async topMenuClickEventHandler(event) {
+    static async togglePlusStatus(isActive) {
+        const db = new Model;
+
+        await db.togglePlusStatus(isActive);
+    }
+
+    static setDateForWeekdays(referenceDate = null) {
+        View.setDateForWeekdays(referenceDate);
+    }
+
+    static setCalendarWeek(referenceDate = null) {
+        View.setCalendarWeek(referenceDate);
+    }
+
+    static setWeekStartAndEndDate() {
+        View.setWeekStartAndEndDate()
+    }
+
+    static setDateOnWeekViewDatePicker() {
+        View.setDateOnWeekViewDatePicker();
+    }
+
+    static async switchToSelectedWeek() {
+        const selectedDate = View.getDateFromWeekViewPicker();
+
+        AbstractController.setCalendarWeek(selectedDate);
+        AbstractController.setDateForWeekdays(selectedDate);
+        AbstractController.setWeekStartAndEndDate();
+        AbstractController.toggleIsCurrentWeekDot();
+
+        AbstractController.hideWeekViewDateSelector();
+
+        await LessonController.renderLesson();
+        await DayNoteController.renderDayNoteIcons();
+        await LessonController.renderCurriculaSelection();
+        await LessonController.renderSelectedCurricula();
+    }
+
+    static switchToPreviousWeek() {
+        View.switchToPreviousWeek();
+        DayNoteController.renderDayNoteIcons();
+    }
+
+    static switchToNextWeek() {
+        View.switchToNextWeek();
+        DayNoteController.renderDayNoteIcons();
+    }
+
+    static toggleIsCurrentWeekDot() {
+        View.toggleIsCurrentWeekDot();
+    }
+
+    static showWeekViewDateSelector() {
+        View.setDateOnWeekViewDatePicker();
+        View.showWeekViewDateSelector();
+    }
+
+    static hideWeekViewDateSelector() {
+        View.hideWeekViewDateSelector();
+    }
+
+    static async clickEventHandler(event) {
+        if (!event.target.closest('nav') && !event.target.closest('#weekSwitcher')) return;
         let target = event.target;
 
+        // top menu
         switch (target.id) {
             case 'openWeekViewButton':
                 LessonController.renderSelectedCurricula();
@@ -210,6 +327,11 @@ export default class AbstractController {
                 }
 
                 SchoolYearController.openSchoolYearSettings();
+                break;
+
+            case 'openGlobalNotesViewButton':
+                GlobalNotesController.renderGlobalNotesView();
+                View.openGlobalNotesView();
                 break;
 
             case 'logoutButton':
@@ -235,13 +357,27 @@ export default class AbstractController {
             case 'openSupportDialogButton':
                 AbstractController.openSupportDialog();
                 break;
-            
+
             case 'openHelpButton':
                 AbstractController.openHelpDialog();
                 break;
 
             case 'updateNowLink':
                 AbstractController.runUpdate();
+                break;
+        }
+
+        // week switcher
+        switch (target.id) {
+            case 'weekBackwardButton':
+                AbstractController.switchToPreviousWeek();
+                break;
+            case 'weekForwardButton':
+                AbstractController.switchToNextWeek();
+                break;
+
+            case 'currentWeekDateSpanWrapper':
+                AbstractController.showWeekViewDateSelector();
                 break;
         }
     }

@@ -94,7 +94,10 @@ export default class Editor {
         })
     }
 
-    static updateButtonStatus() {
+    static updateButtonStatus(event) {
+        if (!event.srcElement.activeElement) return;
+        if (event.srcElement.activeElement && !event.srcElement.activeElement.classList.contains('textEditor')) return;
+
         const selection = document.getSelection();
         const focusElement = selection.focusNode.nodeType == Node.TEXT_NODE ? selection.focusNode.parentElement : selection.focusNode;
         const editor = focusElement.closest('.textEditor');
@@ -722,9 +725,12 @@ export default class Editor {
     static trackNoteChanges(editor) {
         let currentContent = Editor.serializeNodeContent(editor, true);
         let noteVersion = editorChangesArray.length;
+        let previousVersion = editorChangesArray[noteVersion - 1];
 
-        editorChangesArray.push({ version: noteVersion, content: currentContent });
-        Editor.setDisplayedNoteVersion(editor, noteVersion);
+        if (!previousVersion || currentContent != editorChangesArray[editor.dataset.noteversion]['content']) {
+            editorChangesArray.push({ version: noteVersion, content: currentContent });
+            Editor.setDisplayedNoteVersion(editor, noteVersion);
+        }
     }
 
     static updateEditorContent(editor, content) {
@@ -797,6 +803,7 @@ export default class Editor {
 
             //change edit version forward/backward
             case clickedElement.classList.contains('revertChangeButton'):
+                Editor.trackNoteChanges(editor);
                 Editor.changeNoteVersion(editor, 'revert');
                 break;
             case clickedElement.classList.contains('redoChangeButton'):

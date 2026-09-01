@@ -5,6 +5,7 @@ import LessonController from './LessonController.js';
 import LessonNoteController from './LessonNoteController.js';
 import TaskController from './TaskController.js';
 import Settings from '../Model/Settings.js';
+import DayNoteController from "./DayNoteController.js";
 
 
 /** The timetable has no own model. It is managed by the settings model for historic reasons */
@@ -225,6 +226,10 @@ export default class TimetableController {
         switch (true) {
             case event.target.classList.contains('deleteSubjectButton'):
                 View.deleteSubject(event);
+                break;
+            
+            case event.target.classList.contains('dayNoteIndicator'):
+                DayNoteController.openDayNote(event);
                 break;
         }
     }

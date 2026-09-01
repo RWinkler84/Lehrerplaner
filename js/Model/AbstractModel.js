@@ -1,4 +1,4 @@
-import { ONEDAY, TODAY, VERSION } from "../index.js";
+import { ONEDAY, TODAY, userStatus, VERSION } from "../index.js";
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
 
@@ -6,17 +6,27 @@ export default class AbstractModel {
 
     async makeAjaxQuery(controller, action, content = '') {
         let response;
-        let isRegisteredUser = await this.isRegisteredUser();
+        let userInfo = await this.getLocalUserInfo();
         let allowedActionsUnregisteredUser = [
             'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
-            'sendPasswortResetMail', 'sendSupportTicket'
+            'sendPasswortResetMail', 'sendSupportTicket', 'sendPlusRevocation'
+        ];
+        let allowedActionsPlusExpired = [
+            'getUserInfo', 'login', 'logout', 'authenticateMail', 'resendAuthMail', 'resetPassword', 'sendPasswortResetMail',
+            'sendSupportTicket', 'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate', 'getDbUpdateTimestamps',
+            'delete', 'saveTimetableUpdates', 'sendPlusRevocation'
         ];
 
-        if (!allowedActionsUnregisteredUser.includes(action)) {
-            if (!isRegisteredUser) {
-                AbstractController.openLoginDialog();
-                return { status: 'failed', error: 'unregistered user' }
-            };
+
+        if (!allowedActionsUnregisteredUser.includes(action) && userInfo.accountType != 'registeredUser') {
+
+            AbstractController.openLoginDialog();
+
+            return { status: 'failed', error: 'unregistered user' }
+        }
+
+        if (!allowedActionsPlusExpired.includes(action) && userInfo.plusActive == false) {
+            return { status: 'failed', error: 'Plus licence expired' }
         }
 
         try {
@@ -52,11 +62,20 @@ export default class AbstractModel {
             return { status: 'failed', message: error.message };
         }
 
-        if (result.status == 'failed' && result.error == 'User not logged in') {
-            await AbstractController.toggleTemperaryOfflineUsage(false);
-            AbstractController.openLoginDialog();
-            AbstractController.setSyncIndicatorStatus('unsynced');
-        } else if (result.status == 'failed') {
+        if (result.status == 'failed') {
+            if (result.error == 'User not logged in') {
+
+                await AbstractController.toggleTemperaryOfflineUsage(false);
+                AbstractController.openLoginDialog();
+                AbstractController.setSyncIndicatorStatus('unsynced');
+
+                return result;
+            }
+
+            if (result.error == 'Plus licence expired') {
+                await this.togglePlusStatus(false);
+            }
+
             AbstractController.setSyncIndicatorStatus('unsynced', result.error);
         } else {
             AbstractController.setSyncIndicatorStatus('synced');
@@ -101,15 +120,33 @@ export default class AbstractModel {
         });
     }
 
+    async readAllByIndexFromLocalDB(store, indexName, searchValue) {
+        let db = await this.openIndexedDB();
+        let transaction = db.transaction(store, 'readonly');
+        let objectStore = transaction.objectStore(store);
+        let index = objectStore.index(indexName)
+        let request = index.getAll(searchValue);
+
+        return new Promise((resolve, reject) => {
+            request.onsuccess = () => {
+                resolve(request.result);
+            }
+
+            request.onerror = () => {
+                reject(request.error);
+            }
+        });
+    }
+
     async writeToLocalDB(store, dataToStore) {
         let db = await this.openIndexedDB();
 
-        if (dataToStore.length > 1) {
+        if (Array.isArray(dataToStore)) {
             dataToStore.forEach((entry) => {
                 entry.id = Number(entry.id);
                 let transaction = db.transaction(store, 'readwrite').objectStore(store).add(entry);
                 transaction.onsuccess = () => {
-                    this.markLocalDBUpdated();
+                    this.markLocalDBUpdated(store);
                 }
             });
 
@@ -123,7 +160,7 @@ export default class AbstractModel {
             this.markLocalDBUpdated(store);
         }
         transaction.onerror = () => {
-            console.error('storing failed', transaction.error)
+            console.error('storing failed', transaction.error, dataToStore)
         }
     }
 
@@ -139,7 +176,10 @@ export default class AbstractModel {
                     let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
                     transaction.onsuccess = () => {
                         this.markLocalDBUpdated(store);
-                        resolve();
+                        resolve({status: 'success'});
+                        transaction.onerror = () => {
+                            resolve({ status: 'failed' })
+                        }
                     }
                 })
             });
@@ -153,7 +193,10 @@ export default class AbstractModel {
         return new Promise(resolve => {
             transaction.onsuccess = () => {
                 this.markLocalDBUpdated(store)
-                resolve();
+                resolve({status: 'success'});
+                transaction.onerror = () => {
+                    resolve({ status: 'failed' })
+                }
             }
         })
     }
@@ -181,7 +224,7 @@ export default class AbstractModel {
 
     async openIndexedDB() {
         return new Promise((resolve, reject) => {
-            let request = window.indexedDB.open('eduplanio_demo', 4);
+            let request = window.indexedDB.open('eduplanio_demo', 6);
             let store;
 
             request.onupgradeneeded = (event) => {
@@ -193,9 +236,15 @@ export default class AbstractModel {
                         db.createObjectStore('tasks', { keyPath: 'id' });
                         db.createObjectStore('subjects', { keyPath: 'id' });
                         db.createObjectStore('settings', { keyPath: 'id' });
+                        db.createObjectStore('schoolYears', { keyPath: 'id' });
                         store = db.createObjectStore('lessonNotes', { keyPath: 'id' });
                         store.createIndex('date', 'date');
-                        db.createObjectStore('schoolYears', { keyPath: 'id' });
+                        store = db.createObjectStore('dayNotes', { keyPath: 'id' });
+                        store.createIndex('date', 'date');
+                        store = db.createObjectStore('globalNotes', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
+                        store = db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
 
                         db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTasks', { keyPath: 'id' });
@@ -203,12 +252,21 @@ export default class AbstractModel {
                         db.createObjectStore('unsyncedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedTimetables', { keyPath: 'id' });
                         db.createObjectStore('unsyncedLessonNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDayNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedGlobalNoteFolders', { keyPath: 'id' })
 
                         db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSubjects', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTasks', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedTimetableChanges', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedLessonNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedDayNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedDeletedGlobalNoteFolders', { keyPath: 'id' })
+
+                        //add first time user flag
+                        userStatus.firstTimeUser = true;
                         break;
                     //case 1 was skipped
                     case 2:
@@ -221,6 +279,22 @@ export default class AbstractModel {
                         db.createObjectStore('schoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedSchoolYears', { keyPath: 'id' });
                         db.createObjectStore('unsyncedDeletedSchoolYears', { keyPath: 'id' });
+                        break;
+                    case 4:
+                        store = db.createObjectStore('dayNotes', { keyPath: 'id' });
+                        store.createIndex('date', 'date');
+                        db.createObjectStore('unsyncedDayNotes', { keyPath: 'id' });
+                        db.createObjectStore('unsyncedDeletedDayNotes', { keyPath: 'id' });
+                        break;
+                    case 5:
+                        store = db.createObjectStore('globalNotes', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
+                        store = db.createObjectStore('globalNoteFolders', { keyPath: 'id' })
+                        store.createIndex('parentFolderId', 'parentFolderId')
+                        db.createObjectStore('unsyncedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedGlobalNoteFolders', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedDeletedGlobalNotes', { keyPath: 'id' })
+                        db.createObjectStore('unsyncedDeletedGlobalNoteFolders', { keyPath: 'id' })
                         break;
                 }
             }
@@ -248,6 +322,28 @@ export default class AbstractModel {
         let userInfo = await this.readFromLocalDB('settings', 1);
 
         if (!userInfo || userInfo.accountType == 'guestUser') return false;
+
+        return true;
+    }
+
+    async checkForFirstTimeUser() {
+        const timestamps = await this.getLocalUpdateTimestamps();
+
+        let updatedTimestampFound = false;
+
+        if (timestamps) {
+            Object.keys(timestamps.lastUpdated).forEach(key => {
+                const timestamp = timestamps.lastUpdated[key];
+                if (timestamp != null && timestamp != 0) updatedTimestampFound = true;
+            })
+        }
+
+        // if the a timestamp is not null or 0, it was updated, therefore it is not a new user
+        if (updatedTimestampFound) {
+            userStatus.firstTimeUser = false;
+
+            return false
+        }
 
         return true;
     }
@@ -281,6 +377,10 @@ export default class AbstractModel {
         return userInfo;
     }
 
+    async togglePlusStatus(isActive) {
+        await this.updateOnLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: isActive })
+    }
+
     async checkVersion() {
         const response = await this.makeAjaxQuery('versionCheck', '');
 
@@ -292,6 +392,12 @@ export default class AbstractModel {
         }
 
         return false;
+    }
+
+    async getLocalUpdateTimestamps() {
+        const timestamps = await this.readFromLocalDB('settings', 0);
+
+        return timestamps || false;
     }
 
     async markLocalDBUpdated(store, date = null) {
@@ -306,7 +412,10 @@ export default class AbstractModel {
                 timetableChanges: null,
                 tasks: null,
                 lessonNotes: null,
-                schoolYears: null
+                schoolYears: null,
+                dayNotes: null,
+                globalNotes: null,
+                globalNoteFolders: null
             }
         }
 
@@ -319,6 +428,9 @@ export default class AbstractModel {
             dataToStore.lastUpdated.tasks = timestamps.lastUpdated.tasks ? timestamps.lastUpdated.tasks : 0;
             dataToStore.lastUpdated.lessonNotes = timestamps.lastUpdated.lessonNotes ? timestamps.lastUpdated.lessonNotes : 0;
             dataToStore.lastUpdated.schoolYears = timestamps.lastUpdated.schoolYears ? timestamps.lastUpdated.schoolYears : 0;
+            dataToStore.lastUpdated.dayNotes = timestamps.lastUpdated.dayNotes ? timestamps.lastUpdated.dayNotes : 0;
+            dataToStore.lastUpdated.globalNotes = timestamps.lastUpdated.globalNotes ? timestamps.lastUpdated.globalNotes : 0;
+            dataToStore.lastUpdated.globalNoteFolders = timestamps.lastUpdated.globalNoteFolders ? timestamps.lastUpdated.globalNoteFolders : 0;
         }
 
         switch (store) {
@@ -339,6 +451,16 @@ export default class AbstractModel {
                 break;
             case 'schoolYears':
                 dataToStore.lastUpdated.schoolYears = this.formatDateTime(date);
+                break;
+            case 'dayNotes':
+                dataToStore.lastUpdated.dayNotes = this.formatDateTime(date);
+                break;
+            case 'globalNotes':
+                dataToStore.lastUpdated.globalNotes = this.formatDateTime(date);
+                break;
+            case 'globalNoteFolders':
+                dataToStore.lastUpdated.globalNoteFolders = this.formatDateTime(date);
+                break;
         }
 
         db.transaction('settings', 'readwrite').objectStore('settings').put(dataToStore)
@@ -348,6 +470,12 @@ export default class AbstractModel {
         formData.sendAt = this.formatDateTime(new Date());
         return await this.makeAjaxQuery('abstract', 'sendSupportTicket', formData);
     }
+
+    async sendPlusRevocation(formData) {
+        formData.sendAt = this.formatDateTime(new Date());
+        return await this.makeAjaxQuery('abstract', 'sendPlusRevocation', formData);
+    }
+
 
     static async calculateAllLessonDates(className, subject, endDate, startDate = null, timetable = null, lessonChanges = null) {
 
@@ -425,7 +553,7 @@ export default class AbstractModel {
     static #removeInvalidAndCanceledLessons(allLessonDates) {
         let entriesToFilterOut = [];
 
-        //filters out regular lesson dates, that have been marked as canceled
+        //filters out regular lesson dates, that have been selected as canceled
         allLessonDates.forEach(lessonDate => {
             if (lessonDate.canceled == 'true') entriesToFilterOut.push(lessonDate);
         });
@@ -464,8 +592,8 @@ export default class AbstractModel {
     }
 
     //In some situations lessons can have multiple entries in allLessonDates, being canceled and reactiveted later on
-    //Canceled lessons need to be removed, but with reactivated once, the latest entry needs to be kept as it holds the final 
-    //cancelation state
+    //Canceled lessons need to be removed, but with reactivated ones, the latest entry needs to be kept as it holds the final 
+    //cancelation state.
     //if a date must be kept, the function returns the lesson, else it returns false
     static checkForLessonToKeep(lessonToRemove, allLessonDates) {
         let lessonEntries = [];
@@ -553,13 +681,28 @@ export default class AbstractModel {
             timetableChanges: false,
             tasks: false,
             lessonNotes: false,
-            schoolYears: false
+            schoolYears: false,
+            dayNotes: false,
+            globalNotes: false,
+            globalNoteFolders: false,
         };
+
 
         if (remoteTimestamps.status == 'failed') return;
 
         if (!localTimestamps) {
-            await this.updateLocalWithRemoteData({ subjects: true, timetable: true, timetableChanges: true, tasks: true, lessonNotes: true, schoolYears: true });
+            await this.updateLocalWithRemoteData(
+                {
+                    subjects: true,
+                    timetable: true,
+                    timetableChanges: true,
+                    tasks: true,
+                    lessonNotes: true,
+                    schoolYears: true,
+                    dayNotes: true,
+                    globalNotes: true,
+                    globalNoteFolders: true,
+                });
         }
 
         //send data with differing timestamps
@@ -598,9 +741,29 @@ export default class AbstractModel {
             tablesToUpdate.schoolYears = true;
         }
 
+        if (remoteTimestamps[0].dayNotes != localTimestamps.dayNotes) {
+            dataToSync['dayNotes'] = await this.readAllFromLocalDB('unsyncedDayNotes');
+            dataToSync['deletedDayNotes'] = await this.readAllFromLocalDB('unsyncedDeletedDayNotes');
+            tablesToUpdate.dayNotes = true;
+        }
+
+        if (remoteTimestamps[0].globalNotes != localTimestamps.globalNotes) {
+            dataToSync['globalNotes'] = await this.readAllFromLocalDB('unsyncedGlobalNotes');
+            dataToSync['deletedGlobalNotes'] = await this.readAllFromLocalDB('unsyncedDeletedGlobalNotes');
+            tablesToUpdate.globalNotes = true;
+        }
+
+        if (remoteTimestamps[0].globalNoteFolders != localTimestamps.globalNoteFolders) {
+            dataToSync['globalNoteFolders'] = await this.readAllFromLocalDB('unsyncedGlobalNoteFolders');
+            dataToSync['deletedGlobalNoteFolders'] = await this.readAllFromLocalDB('unsyncedDeletedGlobalNoteFolders');
+            tablesToUpdate.globalNoteFolders = true;
+        }
+
         let result = await this.makeAjaxQuery('abstract', 'syncDatabase', dataToSync);
 
-        //check the results and clear data that has been synced
+        if (result.status == 'failed') return;
+
+        //check the results and clear stores for unsynced data, if sync was successful
         if (result.subjects.status && result.subjects.status == 'success') {
             this.clearObjectStore('unsyncedSubjects');
             this.clearObjectStore('unsyncedDeletedSubjects');
@@ -630,6 +793,21 @@ export default class AbstractModel {
             this.clearObjectStore('unsyncedDeletedSchoolYears');
         }
 
+        if (result.dayNotes.status && result.dayNotes.status == 'success') {
+            this.clearObjectStore('unsyncedDayNotes');
+            this.clearObjectStore('unsyncedDeletedDayNotes');
+        }
+
+        if (result.globalNotes.status && result.globalNotes.status == 'success') {
+            this.clearObjectStore('unsyncedGlobalNotes');
+            this.clearObjectStore('unsyncedDeletedGlobalNotes');
+        }
+
+        if (result.globalNoteFolders.status && result.globalNoteFolders.status == 'success') {
+            this.clearObjectStore('unsyncedGlobalNoteFolders');
+            this.clearObjectStore('unsyncedDeletedGlobalNoteFolders');
+        }
+
         await this.updateLocalWithRemoteData(tablesToUpdate);
     }
 
@@ -638,27 +816,27 @@ export default class AbstractModel {
 
         if (tablesToUpdate.subjects) {
             let subjects = await this.makeAjaxQuery('abstract', 'getSubjects');
-            await this.writeRemoteToLocalDB('subjects', subjects, remoteTimestamps[0].subjects);
+            if (!subjects.status) await this.writeRemoteToLocalDB('subjects', subjects, remoteTimestamps[0].subjects);
         }
 
         if (tablesToUpdate.timetable) {
             let timetable = await this.makeAjaxQuery('abstract', 'getTimetable');
-            await this.writeRemoteToLocalDB('timetable', timetable, remoteTimestamps[0].timetable);
+            if (!timetable.status) await this.writeRemoteToLocalDB('timetable', timetable, remoteTimestamps[0].timetable);
         }
 
         if (tablesToUpdate.timetableChanges) {
             let timetableChanges = await this.makeAjaxQuery('abstract', 'getTimetableChanges');
-            await this.writeRemoteToLocalDB('timetableChanges', timetableChanges, remoteTimestamps[0].timetableChanges);
+            if (!timetableChanges.status) await this.writeRemoteToLocalDB('timetableChanges', timetableChanges, remoteTimestamps[0].timetableChanges);
         }
 
         if (tablesToUpdate.tasks) {
             let tasks = await this.makeAjaxQuery('abstract', 'getAllTasks');
-            await this.writeRemoteToLocalDB('tasks', tasks, remoteTimestamps[0].tasks);
+            if (!tasks.status) await this.writeRemoteToLocalDB('tasks', tasks, remoteTimestamps[0].tasks);
         }
 
         if (tablesToUpdate.lessonNotes) {
             let lessonNotes = await this.makeAjaxQuery('abstract', 'getAllLessonNotes');
-            await this.writeRemoteToLocalDB('lessonNotes', lessonNotes, remoteTimestamps[0].lessonNotes);
+            if (!lessonNotes.status) await this.writeRemoteToLocalDB('lessonNotes', lessonNotes, remoteTimestamps[0].lessonNotes);
         }
 
         if (tablesToUpdate.schoolYears) {
@@ -675,14 +853,39 @@ export default class AbstractModel {
             }
         }
 
+        if (tablesToUpdate.dayNotes) {
+            let dayNotes = await this.makeAjaxQuery('abstract', 'getAllDayNotes');
+            if (!dayNotes.status) await this.writeRemoteToLocalDB('dayNotes', dayNotes, remoteTimestamps[0].dayNotes);
+        }
+
+        if (tablesToUpdate.globalNotes) {
+            let globalNotes = await this.makeAjaxQuery('abstract', 'getAllGlobalNotes');
+            if (!globalNotes.status) await this.writeRemoteToLocalDB('globalNotes', globalNotes, remoteTimestamps[0].globalNotes);
+        }
+
+        if (tablesToUpdate.globalNoteFolders) {
+            let globalNoteFolders = await this.makeAjaxQuery('abstract', 'getAllGlobalNoteFolders');
+            if (!globalNoteFolders.status) await this.writeRemoteToLocalDB('globalNoteFolders', globalNoteFolders, remoteTimestamps[0].globalNoteFolders);
+        }
+
         AbstractController.renderDataChanges(tablesToUpdate);
     }
 
     async writeRemoteToLocalDB(objectStore, dataToStore, newLocalTimestamp) {
+        if (dataToStore.status && dataToStore.status == 'failed') return;
+
+        let previousData = await this.readAllFromLocalDB(objectStore);
         let result = await this.clearObjectStore(objectStore);
 
-        if (result.status == 'success' && !dataToStore.status) {
-            await this.updateOnLocalDB(objectStore, dataToStore);
+        if (result.status == 'success') {
+            let isUpdated = await this.updateOnLocalDB(objectStore, dataToStore);
+
+            if (isUpdated.status == 'failed') {
+                await this.updateOnLocalDB(objectStore, previousData);
+
+                return;
+            }
+
             this.markLocalDBUpdated(objectStore, newLocalTimestamp);
         }
     }

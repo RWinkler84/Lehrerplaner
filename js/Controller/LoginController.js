@@ -2,6 +2,7 @@ import AbstractController from "./AbstractController.js";
 import View from "../View/LoginView.js";
 import Model from "../Model/Login.js";
 import SettingsController from "./SettingsController.js";
+import GlobalNotesController from "./GlobalNotesController.js";
 
 export default class LoginController extends AbstractController{
 
@@ -36,8 +37,23 @@ export default class LoginController extends AbstractController{
 
     static closeLoginDialog() {
         View.closeLoginDialog();
+
+        AbstractController.checkForFirstTimeUser();
     }
 
+    static closeSendResetPasswordMailDialog() {
+        View.closeSendResetPasswordMailDialog();
+    }
+
+    static closeCreateAccountDialog() {
+        View.closeCreateAccountDialog();
+
+        AbstractController.checkForFirstTimeUser();
+    }
+
+    static closeResetPasswordDialog() {
+        View.closeResetPasswordDialog();
+    }
     static closeSendResetPasswordMailDialog() {
         View.closeSendResetPasswordMailDialog();
     }
@@ -63,12 +79,10 @@ export default class LoginController extends AbstractController{
         if (result.status == 'success') {
             let abstCtrl = new AbstractController;
 
-            View.closeLoginDialog();
-            await AbstractController.renderTopMenu();
             await abstCtrl.syncData();
-            await AbstractController.greyOutHolidaysAndPassedDays();
-            
-            window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`)
+
+            window.history.replaceState('', '', `${window.location.origin}${window.location.pathname}`);
+            window.location.reload();
         } else {
             View.showLoginErrorMessage(result.error, result.message);
         }
@@ -139,6 +153,7 @@ export default class LoginController extends AbstractController{
         let db = new Model;
         await db.createGuestAccount();
         AbstractController.renderTopMenu();
+        this.closeLoginDialog()
     }
 
     static async sendResetPasswordMail(event) {
@@ -232,10 +247,10 @@ export default class LoginController extends AbstractController{
     static async toggleTemperaryOfflineUsage(offlineStatus, event = null) {
         if (event) {
             event.preventDefault();
-            View.closeLoginDialog();
-            View.closeCreateAccountDialog();
-            View.closeResetPasswordDialog();
-            View.closeSendResetPasswordMailDialog();
+            this.closeLoginDialog();
+            this.closeCreateAccountDialog();
+            this.closeResetPasswordDialog();
+            this.closeSendResetPasswordMailDialog();
         }
 
         let db = new Model;
@@ -287,16 +302,28 @@ export default class LoginController extends AbstractController{
                 break;
 
             //eduplanio plus shopping
-            case 'startRegistrationButton':
-                SettingsController.closeRegistrationNeededDialog();
-                LoginController.openCreateAccountDialog();
-                break;
             case 'closeCheckoutDialogButton':
                 SettingsController.closeCheckoutDialog();
                 break;
 
+            //eduplanio plus expires dialog
+            case 'goToAccoutSettingsButton':
+                AbstractController.closePlusExpirationDialog();
+                SettingsController.openSettings();
+                break;
+
+            //plus revocation
+            case 'closeRevocationDialogButton':
+                SettingsController.closeRevocationDialog();
+                SettingsController.
+                break;
+            case 'sendRevocationFormButton':
+                SettingsController.attemptPlusRevocation();
+                break;
+
             //links
             case 'continueAsGuest':
+                event.preventDefault();
                 LoginController.createGuestAccount();
                 break;
             case 'createAccount':
@@ -323,8 +350,19 @@ export default class LoginController extends AbstractController{
                 AbstractController.closeSupportDialog();
                 break;
 
-            case elementClassList.contains('closeRegistrationNeededDialogButton'):
-                SettingsController.closeRegistrationNeededDialog();
+            case elementClassList.contains('closePlusExpirationDialogButton'):
+                AbstractController.closePlusExpirationDialog();
+                break;
+
+            case elementClassList.contains('closeWelcomeDialogButton'):
+                AbstractController.closeWelcomeDialog();
+                break;
+
+            case elementClassList.contains('closeRevocationDialogButton'):
+                SettingsController.closeRevocationDialog();
+                break;
+            case elementClassList.contains('closeErrorMessageDialogButton'):
+                GlobalNotesController.closeRestoreErrorMessage();
                 break;
         }
 

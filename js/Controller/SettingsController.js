@@ -2,6 +2,8 @@ import Settings from "../Model/Settings.js";
 import View from "../View/SettingsView.js";
 import AbstractController from "./AbstractController.js";
 import LessonController from "./LessonController.js";
+import Fn from '../inc/utils.js';
+import AbstractModel from "../Model/AbstractModel.js";
 
 
 export default class SettingsController {
@@ -30,24 +32,8 @@ export default class SettingsController {
     static async attemptEduplanioPlusPurchase(clickedPurchaseButton, newWindow) {
         const userInfo = await AbstractController.getUserInfo();
 
-        if (userInfo.accountType != 'registeredUser') {
-            newWindow.close();
-            this.openRegistrationNeededDialog();
-
-            return;
-        }
-
         View.openCheckout(clickedPurchaseButton, newWindow);
     }
-
-    static openRegistrationNeededDialog() {
-        View.openRegistrationNeededDialog();
-    }
-
-    static closeRegistrationNeededDialog() {
-        View.closeRegistrationNeededDialog();
-    }
-
 
     static setVersion(version) {
         View.setVersionDisplay(version);
@@ -80,8 +66,65 @@ export default class SettingsController {
         };
     }
 
+    /**  @param status: boolean true or false */
+    static setExpirationWarningDismissedStatus(status) {
+        const model = new Settings();
+        model.setExpirationWarningDismissedStatus(status);
+    }
+
+    static async getExpirationWarningDismissedStatus() {
+        const model = new Settings();
+        return await model.getExpirationWarningDismissedStatus();
+    }
+
     static async getAllRegularLessons() {
         return await LessonController.getAllRegularLessons();
+    }
+
+    static async attemptPlusRevocation() {
+        const formData = View.getRevocationFormData();
+
+        if (!formData.userName) {
+            View.alertRevocationDialogUserNameInput();
+            return;
+        }
+
+        if (!formData.email || !Fn.isValidEmail(formData.email)) {
+            View.alertRevocationDialogEmailInput();
+            return;
+        }
+
+        if (!formData.invoiceId) {
+            View.alertRevocationInvoiceIdInput();
+            return;
+        }
+
+        View.toggleRevocationDialogButtons('sending');
+
+        const db = new AbstractModel;
+        const result = await db.sendPlusRevocation(formData);
+
+        if (result.status == 'success') {
+            result.message = 'Dein Widerruf wurde erfolgreich übermittelt und eine Bestätigungsmail an die von dir angegeben Adresse gesendet. Wir melden uns schnellstmöglich bei dir.'
+            View.toggleRevocationDialogButtons('success');
+            View.displayMessageOnRevocationDialog(result);
+        } else if (result.error == 'Admin mail could not be send') {
+            result.message = 'Da ist etwas schief gelaufen. Dein Widerruf wurde vom System nicht korrekt verarbeitet. Versuche es bitte später noch einmal. Sollte das Problem bestehen bleiben, wende dich direkt an support@eduplanio.app.'
+            View.toggleRevocationDialogButtons('failed');
+            View.displayMessageOnRevocationDialog(result);
+        } else {
+            result.message = 'Da ist etwas schief gelaufen. Versuche es bitte später noch einmal. Sollte das Problem bestehen bleiben, wende dich direkt an support@eduplanio.app.'
+            View.toggleRevocationDialogButtons('failed');
+            View.displayMessageOnRevocationDialog(result);
+        }
+    }
+
+    static openRevocationDialog() {
+        View.openRevocationDialog();
+    }
+
+    static closeRevocationDialog() {
+        View.closeRevocationDialog();
     }
 
     static async settingsClickEventHandler(event) {
@@ -111,19 +154,23 @@ export default class SettingsController {
                 SettingsController.attemptEduplanioPlusPurchase(target, newWindow);
                 break;
 
+            case 'revokePlusButton':
+                SettingsController.openRevocationDialog();
+                break;
+
             case 'deleteAccountButton':
-                View.toogleAccountDeletionMenu(event);
+                View.toggleAccountDeletionMenu(event);
                 break;
 
             case 'approveAccountDeletionButton':
                 SettingsController.deleteAccount();
 
             case 'cancelAccountDeletionButton':
-                View.toogleAccountDeletionMenu(event);
+                View.toggleAccountDeletionMenu(event);
                 break;
 
             case 'cancelFailedAccountDeletionButton':
-                View.toogleAccountDeletionMenu(event);
+                View.toggleAccountDeletionMenu(event);
                 break;
         }
     }

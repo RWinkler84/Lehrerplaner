@@ -1,6 +1,7 @@
 /Controller
 /Model
 /vendor
+/core
 /core/mailconfig.php
 /core/stripeConfig.php
 composer.json

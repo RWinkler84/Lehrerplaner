@@ -1,6 +1,7 @@
 import { TODAY } from '../index.js';
 import Fn from '../inc/utils.js';
 import AbstractController from "../Controller/AbstractController.js";
+import { runWeekSwitchAnimation, cancelWeekSwitchAnimation, ONEDAY } from '../index.js';
 
 export default class AbstractView {
 
@@ -8,30 +9,48 @@ export default class AbstractView {
         document.querySelector('#openWeekViewButton').classList.add('selected');
         document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
         document.querySelector('#openTimetableViewButton').classList.remove('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.remove('selected');
 
         document.querySelector('#weekViewContainer').style.display = 'block';
         document.querySelector('#timetableViewContainer').style.display = 'none';
         document.querySelector('#schoolYearViewContainer').style.display = 'none';
+        document.querySelector('#globalNotesContainer').style.display = 'none';
     }
 
     static openTimetableSettings() {
         document.querySelector('#openWeekViewButton').classList.remove('selected');
         document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
         document.querySelector('#openTimetableViewButton').classList.add('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.remove('selected');
 
         document.querySelector('#weekViewContainer').style.display = 'none';
         document.querySelector('#timetableViewContainer').style.display = 'block';
         document.querySelector('#schoolYearViewContainer').style.display = 'none';
+        document.querySelector('#globalNotesContainer').style.display = 'none';
+    }
+
+    static openGlobalNotesView() {
+        document.querySelector('#openWeekViewButton').classList.remove('selected');
+        document.querySelector('#openSchoolYearViewButton').classList.remove('selected');
+        document.querySelector('#openTimetableViewButton').classList.remove('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.add('selected');
+
+        document.querySelector('#weekViewContainer').style.display = 'none';
+        document.querySelector('#timetableViewContainer').style.display = 'none';
+        document.querySelector('#schoolYearViewContainer').style.display = 'none';
+        document.querySelector('#globalNotesContainer').style.display = 'block';
     }
 
     static openSchoolYearSettings() {
         document.querySelector('#openWeekViewButton').classList.remove('selected');
         document.querySelector('#openTimetableViewButton').classList.remove('selected');
         document.querySelector('#openSchoolYearViewButton').classList.add('selected');
+        document.querySelector('#openGlobalNotesViewButton').classList.remove('selected');
 
         document.querySelector('#weekViewContainer').style.display = 'none';
         document.querySelector('#timetableViewContainer').style.display = 'none';
         document.querySelector('#schoolYearViewContainer').style.display = 'block';
+        document.querySelector('#globalNotesContainer').style.display = 'none';
     }
 
     static async getSubjectSelectHTML(event = undefined) {
@@ -114,7 +133,8 @@ export default class AbstractView {
             taskRow.nextElementSibling.style.backgroundColor = 'var(--contentContainerBackground)';
         });
     }
-    static async greyOutHolidaysAndPassedDays(schoolYears) {
+
+    static greyOutHolidaysAndPassedDays(schoolYears) {
         const mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
         const sundayDate = document.querySelector('.weekday[data-weekday_number="6"]').dataset.date;
 
@@ -164,7 +184,7 @@ export default class AbstractView {
         })
     }
 
-    static toogleIsCurrentWeekDot() {
+    static toggleIsCurrentWeekDot() {
         let today = new Date(TODAY);
         let mondayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="1"').dataset.date;
         let sundayOfDisplayedWeek = document.querySelector('.weekday[data-weekday_number="0"').dataset.date;
@@ -252,6 +272,165 @@ export default class AbstractView {
         });
     }
 
+    // FIDDLING WITH DATE
+
+    static setCalendarWeek(referenceDate = null) {
+        referenceDate = referenceDate ? new Date(referenceDate) : new Date(TODAY);
+
+        let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
+        let weekCounter = 1;
+        let currentYear = referenceDate.getFullYear();
+        let firstThursday = Fn.getFirstThirsdayOfTheYear(currentYear);
+        let monday = firstThursday - ONEDAY * 3
+        let sunday = firstThursday + ONEDAY * 3;
+
+        referenceDate = referenceDate.setHours(12, 0, 0, 0);
+
+        //checks, if the reference date lies in the current week. if not, tests against the next week
+        while (monday < referenceDate && sunday < referenceDate) {
+            monday += ONEDAY * 7; // + 7 days
+            sunday += ONEDAY * 7; // + 7 days
+            weekCounter++;
+        }
+
+        //check whether the year changes and reset weekcounter, if so
+        calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
+    }
+
+    static setDateForWeekdays(referenceDate = null) {
+        referenceDate = referenceDate ? new Date(referenceDate) : new Date(TODAY);
+
+        const curriculaDisplayWeekdays = document.querySelectorAll('.curriculaDisplayWeekday');
+        const weekdays = document.querySelectorAll('.weekday');
+
+        let todayUnix = referenceDate.setHours(12, 0, 0, 0);
+
+        //go back to monday of given week
+        while (new Date(todayUnix).getDay() != 1) todayUnix -= ONEDAY;
+
+        for (let i = 0; i < weekdays.length; i++) {
+            curriculaDisplayWeekdays[i].dataset.date = new Date(todayUnix).toString();
+            weekdays[i].dataset.date = new Date(todayUnix).toString();
+
+            todayUnix += ONEDAY;
+        }
+
+        this.setDateOnWeekdayLabel();
+        AbstractController.greyOutHolidaysAndPassedDays(); //needs to be called via Controller for additional data
+        this.setIsTodayDot();
+        this.scrollToCurrentDay();
+    }
+
+    static setDateOnWeekViewDatePicker() {
+        const datePicker = document.querySelector('#weekSwitcherDatePicker');
+        const mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]')?.dataset.date).setHours(12, 0, 0, 0);
+        const sundayDate = new Date(document.querySelector('.weekday[data-weekday_number="0"]')?.dataset.date).setHours(12, 0, 0, 0);
+        const today = new Date().setHours(12, 0, 0, 0);
+
+        let selectedDate;
+
+        if (mondayDate <= today && today <= sundayDate) {
+            selectedDate = Fn.formatDateSqlCompatible(today);
+        } else {
+            selectedDate = Fn.formatDateSqlCompatible(mondayDate);
+        }
+
+        datePicker.value = selectedDate;
+    }
+
+    static getDateFromWeekViewPicker() {
+        return document.querySelector('#weekSwitcherDatePicker').value;
+    }
+
+    static setWeekStartAndEndDate() {
+        let startDateSpan = document.querySelector('#weekStartDate');
+        let endDateSpan = document.querySelector('#weekEndDate');
+        let mondayDate = document.querySelector('.weekday[data-weekday_number="1"]').dataset.date;
+        let sundayDate = document.querySelector('.weekday[data-weekday_number="0"]').dataset.date;
+
+        mondayDate = new Date(mondayDate);
+        sundayDate = new Date(sundayDate);
+
+        startDateSpan.innerText = Fn.formatDate(mondayDate);
+        endDateSpan.innerText = Fn.formatDate(sundayDate);
+    }
+
+    static switchToPreviousWeek() {
+
+        cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
+        runWeekSwitchAnimation(false)
+
+        // iterates over all weekday columns and adjusts date of weekdays
+        document.querySelectorAll('.weekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate - ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate - ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        this.setDateOnWeekdayLabel();
+        AbstractController.greyOutHolidaysAndPassedDays(); //needs to be called via Controller for additional data
+        this.toggleIsCurrentWeekDot();
+        this.setWeekStartAndEndDate();
+        this.calcCalendarWeek(false);
+        this.setIsTodayDot();
+        this.scrollToCurrentDay();
+        this.setDateOnWeekViewDatePicker();
+    }
+
+    static switchToNextWeek() {
+
+        cancelWeekSwitchAnimation(); //necessary to prevent animation from bugging out, if week is switched multipe times fast
+        runWeekSwitchAnimation(true);
+
+        // iterates over all weekday columns and adjusts date of weekdays
+        document.querySelectorAll('.weekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).getTime();
+            let newDate = currentDate + ONEDAY * 7; // +7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        document.querySelectorAll('.curriculaDisplayWeekday').forEach((weekday) => {
+            let currentDate = new Date(weekday.dataset.date).setHours(12, 0, 0, 0);
+            let newDate = currentDate + ONEDAY * 7; // -7 days
+
+            weekday.dataset.date = new Date(newDate).toString();
+        });
+
+        this.setDateOnWeekdayLabel();
+        AbstractController.greyOutHolidaysAndPassedDays(); //needs to be called via Controller for additional data
+        this.toggleIsCurrentWeekDot();
+        this.setWeekStartAndEndDate();
+        this.calcCalendarWeek(true);
+        this.setIsTodayDot();
+        this.scrollToCurrentDay();
+        this.setDateOnWeekViewDatePicker();
+    }
+
+    static calcCalendarWeek(countUp = true) {
+        let calendarWeekCounterDiv = document.querySelector('#calendarWeekCounter');
+        let weekCounter = document.querySelector('#calendarWeekCounter').innerText;
+
+        let mondayDate = new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date);
+
+        let weeksPerYear = Fn.getNumberOfWeeksPerYear(mondayDate.getFullYear());
+
+        countUp ? weekCounter++ : weekCounter--;
+
+        if (weekCounter < 1) weekCounter = weeksPerYear;
+        if (weekCounter > weeksPerYear) weekCounter = 1;
+
+        calendarWeekCounterDiv.innerText = String(weekCounter).padStart(2, '0');
+    }
+
     static scrollToCurrentDay() {
         if (window.innerWidth <= 620) {
             const timetable = document.querySelector('#weekOverviewContainer');
@@ -296,6 +475,23 @@ export default class AbstractView {
         }
     }
 
+    static showWeekViewDateSelector() {
+        const dateDisplay = document.querySelector('#currentWeekDateSpanWrapper');
+        const datePickerWrapper = document.querySelector('#weekSwitcherDatePickerWrapper');
+
+        datePickerWrapper.classList.remove('notDisplayed');
+        dateDisplay.classList.add('notDisplayed');
+    }
+
+    static hideWeekViewDateSelector() {
+        const dateDisplay = document.querySelector('#currentWeekDateSpanWrapper');
+        const datePickerWrapper = document.querySelector('#weekSwitcherDatePickerWrapper');
+
+        dateDisplay.classList.remove('notDisplayed');
+        datePickerWrapper.classList.add('notDisplayed');
+
+    }
+
     static setSyncIndicatorStatus(status, errorMessage = null) {
         let syncIndicator = document.querySelector('#syncIndicator');
         let tooltipText = syncIndicator.querySelector('span');
@@ -311,7 +507,7 @@ export default class AbstractView {
                 syncIndicator.classList.add('unsynced');
                 let infoText = 'Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.';
 
-                if (errorMessage == 'Plus licence expired') infoText = 'Es sieht so aus als wäre deine Plus-Lizenz abgelaufen. Deine Daten werden nur lokal gespeichert. Erneuere die Lizenz, um Datenverlust sicher zu vermeiden.'
+                if (errorMessage == 'Plus licence expired') infoText = 'Deine Eduplanio Plus-Lizenz ist abgelaufen. Deine Daten werden nur lokal gespeichert. Erneuere die Lizenz, um Datenverlust sicher zu vermeiden.'
 
                 tooltipText.textContent = infoText;
                 break;
@@ -320,6 +516,36 @@ export default class AbstractView {
 
     static showUpdateNotification() {
         document.querySelector('#updateNotifcation').classList.remove('notDisplayed');
+    }
+
+    static openPlusExpirationDialog(daysLeft) {
+        const dialog = document.querySelector('#plusExpirationDialog');
+        const daysLeftSpan = dialog.querySelector('#plusDaysRemainingSpan');
+        const daysLeftString = {
+            0: 'heute',
+            1: 'in einem Tag',
+            7: 'in sieben Tagen'
+        }
+
+        if (daysLeft == -1) {
+            dialog.querySelector('h3').textContent = 'Eduplanio Plus abgelaufen'
+            dialog.querySelector('.dialogText').innerHTML = `
+                <p>Deine Eduplanio Plus-Lizenz ist <strong>abgelaufen</strong>.</p>
+                <p>Du kannst Eduplanio weiter verwenden, musst aber auf die Cloud-Backups und auf die Synchronisation zwischen mehreren Geräten verzichten. 
+                Deine Lizenz kannst du in den Kontoeinstellungen verlängern.</p>
+            `;
+            dialog.showModal();
+
+            return;
+        }
+
+        daysLeftSpan.textContent = daysLeftString[daysLeft];
+
+        dialog.showModal();
+    }
+
+    static closePlusExpirationDialog() {
+        const dialog = document.querySelector('#plusExpirationDialog').close();
     }
 
     static openSupportDialog() {
@@ -334,11 +560,21 @@ export default class AbstractView {
         dialog.querySelector('#supportTicketTopic').value = '';
         dialog.querySelector('#supportTicketContent').value = '';
         dialog.querySelector('#supportTicketAnswer').value = '';
+        dialog.querySelector('#supportTicketErrorMessageDisplay').textContent = '';
 
         this.toggleSupportDialogButtons('close');
 
         dialog.close();
     }
+
+    static openWelcomeDialog() {
+        document.querySelector('#welcomeDialog').showModal();
+    }
+
+    static closeWelcomeDialog() {
+        document.querySelector('#welcomeDialog').close();
+    }
+
 
     static getSupportTicketContentFromForm() {
         let dialog = document.querySelector('#supportDialog');
@@ -358,18 +594,21 @@ export default class AbstractView {
 
         switch (status) {
             case 'sending':
-                submitButton.style.display = 'none';
+                submitButton.disabled = true;
                 break;
 
             case 'success':
-                closeButton.style.display = 'block'
+                closeButton.style.display = 'block';
+                submitButton.style.display = 'none';
+
                 break;
 
             case 'failed':
-                submitButton.style.display = 'block';
+                submitButton.disabled = false;
                 break;
 
             case 'close':
+                submitButton.disabled = false;
                 submitButton.style.display = 'block';
                 closeButton.style.display = 'none';
                 break;
@@ -394,6 +633,7 @@ export default class AbstractView {
         if (document.querySelector('#weekViewContainer').style.display == 'block') return 'weekOverview';
         if (document.querySelector('#timetableViewContainer').style.display == 'block') return 'timetableOverview';
         if (document.querySelector('#schoolYearViewContainer').style.display == 'block') return 'yearOverview';
+        // if (document.querySelector('#globalNotesContainer').style.display == 'block') return 'globalNotesOverview';
     }
 
     //support ticket alerts

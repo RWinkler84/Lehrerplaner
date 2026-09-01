@@ -320,14 +320,18 @@ export default class CurriculumView extends AbstractView {
             this.disableSaveCurriculumButton();
             document.querySelector('#yearContainer').classList.add('notDisplayed');
             document.querySelector('#dayNameContainer').classList.add('notDisplayed');
+
+            container.classList.remove('notDisplayed');
         }
 
         if (!subjectGradeSelect) {
             errorMessageDisplay.classList.remove('notDisplayed');
-            errorText = 'Um einen Stoffverteilungsplan anlegen zu können, musst du sowohl deine unterrichteten Klassenstufen als auch die unterrichteten Fächer angelegt haben. Letzteres ist in den Einstellungen unter "Stundenplan" möglich.';
+            errorText = 'Um einen Stoffverteilungsplan anlegen zu können, musst du sowohl deine unterrichteten Klassenstufen als auch die unterrichteten Fächer angelegt haben. Letzteres ist unter "Stundenplan" möglich.';
 
             this.disableSaveCurriculumButton();
             document.querySelector('#yearContainer').classList.add('notDisplayed');
+
+            container.classList.remove('notDisplayed');
         }
 
         errorMessageDisplay.textContent = errorText;

@@ -1,4 +1,4 @@
-import { ONEDAY } from '../index.js';
+import { ONEDAY, TODAY } from '../index.js';
 import Task from '../Model/Task.js';
 import View from '../View/TaskView.js';
 import LessonController from './LessonController.js';
@@ -58,7 +58,6 @@ export default class TaskController {
         task.reoccuring = taskData.reoccuring;
         task.reoccuringInterval = taskData.reoccuringInterval;
 
-
         if (task.reoccuring && task.reoccuringInterval == '') {
             View.alertReoccuringIntervalSelect(event);
             return false;
@@ -69,7 +68,7 @@ export default class TaskController {
         await task.save();
         LessonController.renderLesson();
 
-        return true;
+        return task;
     }
 
     static async getById(id) {
@@ -103,12 +102,13 @@ export default class TaskController {
 
         task.update();
 
-        this.renderTaskChanges();
-        LessonController.renderLesson();
         
         View.removeEditability(event);
         View.showSetDoneOrInProgressButtons(event);
 
+        this.renderTaskChanges();
+        LessonController.renderLesson();
+        
         return true;
     }
 
@@ -124,7 +124,7 @@ export default class TaskController {
     static async setTaskDone(id, event) {
         let task = await Task.getById(id);
 
-        await View.runRemoveTaskAnimation(event);
+        await View.runRemoveTaskAnimation(event, task);
         task.setDone();
         this.renderTaskChanges();
 
@@ -138,6 +138,7 @@ export default class TaskController {
     }
 
     static revertTaskChanges(event) {
+
         View.removeEditability(event);
         View.showSetDoneOrInProgressButtons(event);
         View.renderTasks();
@@ -152,7 +153,7 @@ export default class TaskController {
     static async tasksTableEventHandler(event) {
         if (event.type == 'dblclick') {
             let taskData = View.getTaskDataFromTr(event);
-            let upcomingLessons = await Task.calculateAllLessonDates(taskData.class, taskData.subject, new Date().setHours(12) + ONEDAY * 60);
+            let upcomingLessons = await Task.calculateAllLessonDates(taskData.class, taskData.subject, new Date(TODAY).setHours(12) + ONEDAY * 60);
 
             View.makeEditable(event, upcomingLessons);
             return;

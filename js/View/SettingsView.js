@@ -601,7 +601,11 @@ export default class SettingsView {
             const notLoggedInMessage = accountSettingsContainer.querySelector('#eduplanioPlusNotLoggedInMessage');
             const eduplanioPlusStatusSpan = document.querySelector('#eduplanioPlusStatusSpan');
             const eduplanioPlusExpirationDateSpan = document.querySelector('#eduplanioPlusExpirationDateSpan');
+            const accountTypeSpan = document.querySelector('#accountTypeSpan');
+            const loginStatusSpan = document.querySelector('#loginStatusSpan');
 
+            let accountTypeString = 'Gast';
+            let loginStatusString = '-';
             let expirationDateString = '-';
             let statusString = 'inaktiv';
             let statusTextClass = 'redText';
@@ -621,11 +625,41 @@ export default class SettingsView {
                 expirationDateString = Fn.formatDateWithFullYear(expirationDate);
             }
 
+            if (userInfo.accountType == 'registeredUser') {
+                accountTypeString = 'registrierter Nutzer';
+                loginStatusString = userInfo.loggedIn ? 'eingeloggt' : 'ausgeloggt';
+            }
+
+            accountTypeSpan.textContent = accountTypeString;
+            loginStatusSpan.textContent = loginStatusString;
             eduplanioPlusStatusSpan.textContent = statusString;
             eduplanioPlusExpirationDateSpan.textContent = expirationDateString;
 
-            notLoggedInMessage.classList.add('notDisplayed');
             eduplanioPlusStatusSpan.classList.add(statusTextClass);
+            userInfo.loggedIn ? notLoggedInMessage.classList.add('notDisplayed') : notLoggedInMessage.classList.remove('notDisplayed');
+
+            //eduplanio plus purchase buttons
+            const buyMonthButton = accountSettingsContainer.querySelector('#oneMonthEduplanioPlusButton');
+            const buyYearButton = accountSettingsContainer.querySelector('#oneYearEduplanioPlusButton');
+            const loginNeededMessage = accountSettingsContainer.querySelector('#loginNeededForPlusMessage');
+            const accountNeededMessage = accountSettingsContainer.querySelector('#accountNeededForPlusMessage');
+
+            buyMonthButton.disabled = false;
+            buyYearButton.disabled = false;
+            accountNeededMessage.style.display = 'none';
+            loginNeededMessage.style.display = 'none';
+
+            if (userInfo.accountType == 'guestUser') {
+                buyMonthButton.disabled = true;
+                buyYearButton.disabled = true;
+                accountNeededMessage.style.display = 'block';
+            }
+
+            if (userInfo.accountType == 'registeredUser' && !userInfo.loggedIn) {
+                buyMonthButton.disabled = true;
+                buyYearButton.disabled = true;
+                loginNeededMessage.style.display = 'block';
+            }
         }
 
         //make account settings visible
@@ -640,7 +674,7 @@ export default class SettingsView {
         return false;
     }
 
-    static toogleAccountDeletionMenu(event) {
+    static toggleAccountDeletionMenu(event) {
         let deleteAccountMenu = document.querySelector('#approveAccountDeletionContainer');
         let requestDeletionMenu = document.querySelector('#requestDeletionContainer');
         let deletionErrorDisplay = document.querySelector('#deletionErrorDisplay');
@@ -680,12 +714,38 @@ export default class SettingsView {
         document.querySelector('#versionDisplay').textContent = version;
     }
 
-    static openRegistrationNeededDialog() {
-        document.querySelector('#registrationNeededDialog').showModal();
+    static getRevocationFormData() {
+        const formElement = document.querySelector('#revocationForm');
+
+        return {
+            userName: formElement.querySelector('#revocationUserName').value,
+            email: formElement.querySelector('#revocationUserEmail').value,
+            invoiceId: formElement.querySelector('#revocationInvoiceId').value,
+            revocationReason: formElement.querySelector('#invocationReason').value
+        }
     }
 
-    static closeRegistrationNeededDialog() {
-        document.querySelector('#registrationNeededDialog').close();
+    static openRevocationDialog() {
+        document.querySelector('#revocationDialog').showModal();
+    }
+
+    static closeRevocationDialog() {
+        const dialog = document.querySelector('#revocationDialog');
+
+        //reset inputs
+        dialog.querySelector('#revocationUserName').value = '';
+        dialog.querySelector('#revocationUserEmail').value = '';
+        dialog.querySelector('#revocationInvoiceId').value = '';
+        dialog.querySelector('#invocationReason').value = '';
+
+        //reset message container
+        dialog.querySelector('#revocationErrorMessageDisplay').textContent = '';
+
+        //reset buttons
+        dialog.querySelector('#sendRevocationFormButton').style.display = 'block';
+        dialog.querySelector('#closeRevocationDialogButton').style.display = 'none';
+
+        dialog.close();
     }
 
     static openCheckout(clickedPurchaseButton, newWindow) {
@@ -698,5 +758,72 @@ export default class SettingsView {
 
         newWindow.location.href = `${baselink}?item=${purchaseItem}`;
         window.focus();
+    }
+
+    static toggleRevocationDialogButtons(status) {
+        const sendButton = document.querySelector('#sendRevocationFormButton');
+        const closeButton = document.querySelector('#closeRevocationDialogButton');
+
+        switch (status) {
+            case 'sending':
+                sendButton.disabled = true;
+                sendButton.textContent = 'Wird gesendet';
+                break;
+
+            case 'success':
+                sendButton.disabled = false;
+                sendButton.textContent = 'Widerruf senden';
+                sendButton.style.display = 'none';
+                closeButton.style.display = 'block';
+                break;
+
+            case 'failed':
+                sendButton.disabled = false;
+                sendButton.textContent = 'Erneut senden';
+                break;
+        }
+    }
+
+    static displayMessageOnRevocationDialog(result) {
+        let errorMessageDisplay = document.querySelector('#revocationErrorMessageDisplay');
+
+        if (result.status == 'success') {
+            errorMessageDisplay.textContent = result.message;
+            errorMessageDisplay.style.color = 'var(--matteGreen)';
+        }
+
+        if (result.status == 'failed') {
+            errorMessageDisplay.textContent = result.message;
+            if (errorMessageDisplay.hasAttribute('style')) errorMessageDisplay.removeAttribute('style');
+        }
+    }
+
+    //form validation errors
+
+    static alertRevocationDialogUserNameInput() {
+        let alertRing = document.querySelector('#revocationUserName').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertRevocationDialogEmailInput() {
+        let alertRing = document.querySelector('#revocationUserEmail').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
+    }
+
+    static alertRevocationInvoiceIdInput() {
+        let alertRing = document.querySelector('#revocationInvoiceId').parentElement;
+
+        alertRing.classList.add('validationError');
+        setTimeout(() => {
+            alertRing.classList.remove('validationError');
+        }, 300);
     }
 }

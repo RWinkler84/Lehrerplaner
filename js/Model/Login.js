@@ -27,7 +27,8 @@ export default class Login extends AbstractModel {
         let data = {
             id: 1,
             accountType: 'guestUser',
-            temporarilyOffline: true
+            temporarilyOffline: true,
+            plusActive: false
         }
 
         await this.writeToLocalDB('settings', data);
@@ -118,6 +119,20 @@ export default class Login extends AbstractModel {
 
         await this.writeRemoteToLocalDB('schoolYears', data);
 
+        data = {id: 1, date: '2025-06-27', content: '<p>7c Wandertag</p><p><b>Abwesenheit:</b></p><p>Emily (6b) freigestellt</p>', created: '2026-09-01 09:51:28', lastEdited: '2026-09-01 10:00:07'};
+
+        await this.writeRemoteToLocalDB('dayNotes', data);
+
+        data = [
+            {content: "<p>TOP 1 & 2: Zeugnisse, Notenschluss & Gutachten</p><ul><li><p><b>Noteneingabe-Deadline:</b> Absolut letzer Termin ist der <b>08.07., 12:00 Uhr</b>! Das System wird pünktlich gesperrt – wer danach noch was ändern muss, muss direkt zu Weber ins Büro.</p></li><li><p><b>Zeugniskonferenzen:</b> Läuft ab nächsten Montag. Räume im A-Trakt beachten, wurden wegen der Hitze verlegt.</p></li><li><p><b>Bemerkungen & Arbeits-/Sozialverhalten:</b> Neumann erinnert noch mal nachdrücklich: Keine Textbausteine doppeln bei Geschwistern und Notizen sachlich halten! Bei gefährdeten Versetzungen müssen die Akten vollständig sein.</p></li><li><p><b>Fehlzeiten:</b> Bitte bei allen Klassen noch einmal die Entschuldigungen abgleichen. Unentschuldigte Tage müssen korrekt auf dem Zeugnis stehen.</p></li></ul><p>TOP 3: Rückgabe, Inventar & Raumwechsel</p><ul><li><p><b>Schulbücher:</b> Rücknahme läuft nächste Woche nach Sonderplan (Weber hängt den Aushang morgen früh ins Treppenhaus).</p></li><li><p><b>Fachräume:</b> Inventarlisten (v. a. Physik/Chemie und Kunst) müssen bis <b>15.07.</b> abgegeben werden.</p></li><li><p><b>Klassenraumwechsel:</b> Tische und Stühle am vorletzten Schultag bitte hochstellen und persönliche Sachen aus den Fachschränken ausräumen. Die Reinigungsfirma kommt direkt am ersten Ferientag!</p></li></ul><p>TOP 4: Letzte Schulwoche & Schuljahresabschluss</p><ul><li><p><b>Sportfest / Wandertag:</b> Dienstag Wandertag (Wetterberichte beobachten – bei über 30 Grad greift die Hitze-Regelung, dann nur kurze Touren!).</p></li><li><p><b>Zeugnisausgabe (Freitag):</b> Unterricht endet nach der 3. Stunde.</p></li><li><p><b>Kollegiumsabschluss:</b> Freitag ab 12:30 Uhr kleines Grillen auf dem Schulhof. Organisation liegt bei der Fachschaft Sport (Getränkeliste hängt an der Pinnwand – bitte noch eintragen!).</p></li></ul><p>TOP 5: Ausblick aufs neue Schuljahr (Vorläufiges)</p><ul><li><p><b>Personalsituation:</b> Die Vertretungsstelle für Kunst/Geo ist immer noch nicht final ausgeschrieben… Könnte zu Schuljahresbeginn eng werden.</p></li><li><p><b>Präsenztage:</b> Erster Präsenztag nach den Sommerferien ist der <b>10.08.</b> um 09:00 Uhr.</p></li></ul>", created: "2026-09-01 10:04:18",id: 1, lastEdited: "2026-09-01 10:09:09", parentFolderId: 1001, parentIdBeforeDelete: null, title: "09.06.2025"},
+            {content : "<p>Hey,</p><p>schön, dass du Interesse an Eduplanio hast. Die App wird entwickelt, um dir als Lehrperson das Leben etwas leichter zu machen. Sie hilft dir, deinen Arbeitstag zu strukturieren und deinen Papierkram entrümpelt. Praktisch dafür sind unter anderem die Notizfunktionen. </p><p>Hier in der Notizansicht kannst du zum Beispiel längere Protokolle, Ideensammlungen oder Listen anlegen und in Ordnern sortieren. Das ist ideal für alles, was nicht direkt mit einer Stunde oder einem Unterrichtstag zusammenhängt. Für solche Themen gibt es Stunden- und Tagesnotizen, die du über die Hauptansicht anlegen und bearbeiten kannst.</p><p>Damit du die Übersicht nicht verlierst, wird es bald eine Suchfunktion geben, die all deine Notizen durchsuchbar macht. Die App ist ständig im Wandel. Falls du etwas vermisst oder ein Problem entdeckst, schreib mir gern eine Mail an support@eduplanio.app. Dein Feedback hilft mir, Eduplanio noch besser zu machen.</p><p>Viel Spaß mit der Demo</p><p>Ralf</p>", created : "2026-09-01 10:28:07", id : 2, lastEdited : "2026-09-01 10:28:07", parentFolderId : 0, parentIdBeforeDelete : null, title : "Willkommen"}
+            ]
+
+        await this.writeRemoteToLocalDB('globalNotes', data);
+
+        data = {created : "2026-09-01 10:14:16", id : 1001, lastEdited : "2026-09-01 10:14:16", name : "Dienstberatungen", parentFolderId : 0, parentIdBeforeDelete : null}
+
+        await this.writeRemoteToLocalDB('globalNoteFolders', data);
     }
 
     async updateAccountType() {
@@ -125,14 +140,14 @@ export default class Login extends AbstractModel {
 
         if (accountInfo.status == 'failed' || accountInfo.accountType == 'guestUser') {
             let db = await this.openIndexedDB();
-            db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 1, accountType: 'registeredUser', temporarilyOffline: false });
+            db.transaction('settings', 'readwrite').objectStore('settings').put({ id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: true  });
         }
     }
 
     async attemptAccountCreation(accountData) {
 
         let result = await this.makeAjaxQuery('user', 'createAccount', accountData);
-        if (result.status == 'success') this.updateOnLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false })
+        if (result.status == 'success') this.updateOnLocalDB('settings', { id: 1, accountType: 'registeredUser', temporarilyOffline: false, plusActive: true })
 
         return result;
     }

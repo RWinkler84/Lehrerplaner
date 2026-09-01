@@ -126,14 +126,37 @@ export default class LessonNote extends AbstractModel {
         this.lastEdited = this.formatDateTime(new Date());
 
         await this.updateOnLocalDB('lessonNotes', this.serialize());
-        let result = await this.makeAjaxQuery('lessonNote', 'update', this.serialize());
+        let result = await this.makeAjaxQuery('lessonNote', 'update', [this.serialize()]);
 
         if (result.status == 'failed') {
             await this.updateOnLocalDB('unsyncedLessonNotes', this.serialize());
         }
     }
 
+    async batchUpdate(notesToUpdate) {
+        const serializedNotes = [];
+
+        for (const note of notesToUpdate) {
+            note.lastEdited = this.formatDateTime(new Date());
+
+            let serializedNote = note.serialize();
+            serializedNotes.push(serializedNote);
+
+            await this.updateOnLocalDB('lessonNotes', serializedNote);
+        }
+
+        let result = await this.makeAjaxQuery('lessonNote', 'update', serializedNotes);
+
+        if (result.status == 'failed') {
+            for (const note of serializedNotes) {
+                this.writeToLocalDB('unsyncedLessonNotes', note);
+            }
+        }
+    }
+
     async delete() {
+        this.lastEdited = this.formatDateTime(new Date());
+
         await this.deleteFromLocalDB('lessonNotes', this.id);
         await this.deleteFromLocalDB('unsyncedLessonNotes', this.id);
         let result = await this.makeAjaxQuery('lessonNote', 'delete', this.serialize());
@@ -146,11 +169,12 @@ export default class LessonNote extends AbstractModel {
     static async reorderLessonNotes(oldTimetable, oldTimetableChanges) {
         const allLessonNotes = await this.getAllLessonNotes();
         const allAffectedNotes = [];
+        const notesToUpdate = [];
 
         allLessonNotes.forEach(note => {
             if (new Date(note.date).setHours(12,0,0,0) < new Date(TODAY).setHours(12,0,0,0)) return;
             if (note.fixedDate) return;
-            
+
             allAffectedNotes.push(note);
         });
 
@@ -206,11 +230,13 @@ export default class LessonNote extends AbstractModel {
                         if (allNewLessonDates[indexInOldDates]) {
                             note.date = allNewLessonDates[indexInOldDates].date;
                             note.timeslot = allNewLessonDates[indexInOldDates].timeslot;
-                            note.update();
+                            notesToUpdate.push(note);
                         }
                     });
                 }
             }
+
+            await (new LessonNote).batchUpdate(notesToUpdate);
         }
     }
 

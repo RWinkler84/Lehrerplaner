@@ -26,7 +26,7 @@
                 <img id="pageLogo" src="favicon.svg" style="width: 2rem; height: 2rem;">
                 <h1 id="pageHeader">Eduplanio</h1>
             </div>
-            <div id="topMenuButtonContainer" class="flex gap">
+            <div id="topMenuButtonContainer" class="flex">
                 <div id="viewsMenuContainer" class="flex halfGap">
                     <button id="openWeekViewButton" class="selected topMenuButton"><span class="icon weekViewIcon"
                             style="width: 1.5rem; height: 1.5rem;"></span><span
@@ -37,19 +37,25 @@
                     <button id="openSchoolYearViewButton" class="topMenuButton"><span class="icon schoolYearViewIcon"
                             style="width: 1.5rem; height: 1.5rem;"></span><span
                             class="buttonText">Schuljahr</span></button>
+                    <button id="openGlobalNotesViewButton" class="topMenuButton"><span class="icon noteIcon"
+                            style="width: 1.5rem; height: 1.5rem;"></span><span
+                            class="buttonText">Notizen</span></button>
                 </div>
-                <div id="syncIndicator" class="unsynced">
-                    <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem
-                        Internet und melde dich an, um Datenverlust sicher zu vermeiden.</span>
-                </div>
-                <div><button id="openBurgerMenuButton">&#x2630;</button></div>
-                <div id="topMenu" class="flex column justifyCenter ">
-                    <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
-                    <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
-                    <button id="openHelpButton" class="burgerMenuButton">Hilfe</button>
-                    <button id="openLoginButton" class="burgerMenuButton">Login</button>
-                    <button id="createAccountButton" class="burgerMenuButton">Registrieren</button>
-                    <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
+                <div class="flex halfGap alignCenter">
+                    <div id="syncIndicator" class="unsynced">
+                        <span class="tooltipTextLeft">Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit
+                            dem
+                            Internet und melde dich an, um Datenverlust sicher zu vermeiden.</span>
+                    </div>
+                    <div><button id="openBurgerMenuButton">&#x2630;</button></div>
+                    <div id="topMenu" class="flex column justifyCenter ">
+                        <button id="openSettingsButton" class="burgerMenuButton">Konto</button>
+                        <button id="openSupportDialogButton" class="burgerMenuButton">Support</button>
+                        <button id="openHelpButton" class="burgerMenuButton">Hilfe</button>
+                        <button id="openLoginButton" class="burgerMenuButton notDisplayed">Login</button>
+                        <button id="createAccountButton" class="burgerMenuButton notDisplayed">Registrieren</button>
+                        <button id="logoutButton" class="burgerMenuButton">Abmelden</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -68,8 +74,14 @@
                     </div>
                     <div class="flex gap" id="weekSwitcher">
                         <button id="weekBackwardButton" class="triangleButton">&#9664</button>
-                        <div id="dateSpan" class="flex alignEnd"><span
-                                id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span id="weekEndDate">Sonntag</span></div>
+                        <div id="weekSwitcherDateSpan" class="flex alignEnd">
+                            <div id="currentWeekDateSpanWrapper">
+                                <span id="weekStartDate">Montag</span>&nbsp;-&nbsp;<span id="weekEndDate">Sonntag</span>
+                            </div>
+                            <div id="weekSwitcherDatePickerWrapper" class="notDisplayed">
+                                <input type="date" id="weekSwitcherDatePicker">
+                            </div>
+                        </div>
                         <button id="weekForwardButton" class="triangleButton">&#9654</button>
                     </div>
                 </div>
@@ -120,7 +132,11 @@
                         </div>
 
                         <div class="weekday" data-weekday_number="1" data-date="">
-                            <div class="weekdayLabel">Mo<span class="isTodayDot"></span>
+                            <div class="weekdayLabel">
+                                <div class="flex spaceBetween">
+                                    <div>Mo<span class="isTodayDot"></span></div>
+                                    <div class="noteIcon dayNoteIndicator"></div>
+                                </div>
                                 <div class="smallDate"></div>
                             </div>
                             <div class="timeslot" data-timeslot="1"></div>
@@ -135,7 +151,11 @@
                         </div>
 
                         <div class="weekday" data-weekday_number="2" data-date="">
-                            <div class="weekdayLabel">Di<span class="isTodayDot"></span>
+                            <div class="weekdayLabel">
+                                <div class="flex spaceBetween">
+                                    <div>Di<span class="isTodayDot"></span></div>
+                                    <div class="noteIcon dayNoteIndicator"></div>
+                                </div>
                                 <div class="smallDate"></div>
                             </div>
                             <div class="timeslot" data-timeslot="1"></div>
@@ -150,7 +170,11 @@
                         </div>
 
                         <div class="weekday" data-weekday_number="3" data-date="">
-                            <div class="weekdayLabel">Mi<span class="isTodayDot"></span>
+                            <div class="weekdayLabel">
+                                <div class="flex spaceBetween">
+                                    <div>Mi<span class="isTodayDot"></span></div>
+                                    <div class="noteIcon dayNoteIndicator"></div>
+                                </div>
                                 <div class="smallDate"></div>
                             </div>
 
@@ -166,7 +190,11 @@
                         </div>
 
                         <div class="weekday" data-weekday_number="4" data-date="">
-                            <div class="weekdayLabel">Do<span class="isTodayDot"></span>
+                            <div class="weekdayLabel">
+                                <div class="flex spaceBetween">
+                                    <div>Do<span class="isTodayDot"></span></div>
+                                    <div class="noteIcon dayNoteIndicator"></div>
+                                </div>
                                 <div class="smallDate"></div>
                             </div>
 
@@ -182,7 +210,11 @@
                         </div>
 
                         <div class="weekday" data-weekday_number="5" data-date="">
-                            <div class="weekdayLabel">Fr<span class="isTodayDot"></span>
+                            <div class="weekdayLabel">
+                                <div class="flex spaceBetween">
+                                    <div>Fr<span class="isTodayDot"></span></div>
+                                    <div class="noteIcon dayNoteIndicator"></div>
+                                </div>
                                 <div class="smallDate"></div>
                             </div>
                             <div class="timeslot" data-timeslot="1"></div>
@@ -197,7 +229,11 @@
                         </div>
 
                         <div class="weekday" data-weekday_number="6" data-date="">
-                            <div class="weekdayLabel">Sa<span class="isTodayDot"></span>
+                            <div class="weekdayLabel">
+                                <div class="flex spaceBetween">
+                                    <div>Sa<span class="isTodayDot"></span></div>
+                                    <div class="noteIcon dayNoteIndicator"></div>
+                                </div>
                                 <div class="smallDate"></div>
                             </div>
                             <div class="timeslot" data-timeslot="1"></div>
@@ -212,7 +248,11 @@
                         </div>
 
                         <div class="weekday" data-weekday_number="0" data-date="">
-                            <div class="weekdayLabel">So<span class="isTodayDot"></span>
+                            <div class="weekdayLabel">
+                                <div class="flex spaceBetween">
+                                    <div>So<span class="isTodayDot"></span></div>
+                                    <div class="noteIcon dayNoteIndicator"></div>
+                                </div>
                                 <div class="smallDate"></div>
                             </div>
                             <div class="timeslot" data-timeslot="1"></div>
@@ -354,7 +394,7 @@
                         <label>gültig ab: </label>
                         <div class="flex gap">
                             <button id="timetableBackwardButton" class="triangleButton">&#9664</button>
-                            <div id="dateSpan" class="flex alignEnd"><span id="validFrom" data-date="">-</span>
+                            <div class="flex alignEnd"><span id="validFrom" data-date="">-</span>
                             </div>
                             <div id="validFromPickerWrapper" class="flex alignCenter" style="position: relative;">
                                 <div class="alertRing"><input type="date" name="validFromPicker" id="validFromPicker">
@@ -635,6 +675,30 @@
         </div>
     </div>
 
+    <!-- global notes -->
+    <div id="globalNotesContainer" class="mainViewContainer" style="display: none">
+        <div id="globalNotesFileContainer" data-folder_id="0">
+            <div id="globalNotesFileSystemDisplay">
+                <div id="folderNavigatonContainer" class="flex spaceBetween">
+                    <div id="folderPathContainer" class="flex"></div>
+                    <div id="folderNavigationButtonContainer" class="flex halfGap" data-history_step="0">
+                        <button class="confirmationButton" id="folderBackwardButton" disabled>&#8617;</button>
+                        <button class="confirmationButton" id="folderForwardButton" disabled>&#8618;</button>
+                    </div>
+                </div>
+                <div id="folderIconContainer"></div>
+                <div id="noteIconContainer"></div>
+            </div>
+            <div id="createGlobalItemsButtonContainer">
+                <button id="createGlobalNoteButton" class="confirmationButton"><span
+                        class="noteIcon icon"></span></button>
+                <button id="createGlobalNoteFolderButton" class="confirmationButton"><span
+                        class="folderIcon icon"></span></button>
+                <button id="createGlobalItemButton" class="confirmationButton">+</button>
+            </div>
+        </div>
+    </div>
+
     <settings>
         <!-- Settings Menu -->
         <dialog id="settingsContainer">
@@ -652,14 +716,21 @@
 
             <!-- account settings -->
             <div id="accountSettingsContainer" class="settingsSubContainer">
+                <div id="accountInformationContainer">
+                    <label class="marginBottom">Kontoinformation:</label>
+                    <div>Kontoart: <span id="accountTypeSpan">Gast</span></div>
+                    <div>Login-Status: <span id="loginStatusSpan">-</span></div>
+                </div>
+
                 <div id="eduplanioPlusContainer">
-                    <label class="marginBottom">Eduplanio Plus:</label>
+                    <label class="marginBottom marginTop">Eduplanio Plus:</label>
                     <div id="eduplanioPlusNotLoggedInMessage">
                         <p>Um deine Eduplanio Plus-Lizenz verwalten zu können, musst du angemeldet sein.</p>
                     </div>
                     <div>Lizenzstatus: <span id="eduplanioPlusStatusSpan">-</span></div>
                     <div>läuft ab: <span id="eduplanioPlusExpirationDateSpan">-</span></div>
                     <label class="marginTop marginBottom">aktivieren oder verlängern:</label>
+
                     <p>Beim Kauf von Eduplanio Plus stehen dir die Monats- und die
                         Jahreslizenz zur Wahl. Nach Abschluss des Kaufs sind die Eduplanio Plus-Vorteile sofort
                         verfügbar. Endet der Lizenzzeitraum kannst du Eduplanio weiterhin in der Gratisversion
@@ -694,6 +765,10 @@
                             </div>
                         </div>
                     </div>
+                    <div id="accountNeededForPlusMessage" class="marginTop">
+                        *Gastnutzer können keine Eduplanio Plus-Lizenz kaufen. Registriere dich zuerst.</div>
+                    <div id="loginNeededForPlusMessage" class="marginTop">*Du
+                        musst eingeloggt sein, um eine Eduplanio Plus-Lizenz zu kaufen. Logge dich zuerst ein.</div>
 
                     <div id="eduplanioPlusAdvantagesList">
                         <label class="marginBottom">Diese Vorteile bietet dir Eduplanio Plus:</label>
@@ -721,6 +796,15 @@
                             Verlust geschützt. So kannst du nahtlos weiterarbeiten, selbst wenn dein Rechner, Tablet
                             oder Handy unerwartet den Geist aufgibt oder du unabsichtlich den Speicher deines Browsers
                             löschst.</p>
+                    </div>
+                    <div>
+                        <label class="marginBottom marginTop">Eduplanio Plus-Kauf widerrufen</label>
+                        <p>Solltest du mit deiner Eduplanio Plus-Lizenz unzufrieden sein, kannst du deine Bestellung den
+                            <a href="https://eduplanio.app/planer/agb.html" target="_blank">Widerrufsbestimmungen</a>
+                            folgend widerrufen.
+                        </p>
+
+                        <div><button id="revokePlusButton" class="cancelButton">Widerruf starten</button></div>
                     </div>
                 </div>
 
@@ -1022,17 +1106,144 @@
         </div>
     </dialog>
 
-    <dialog id="registrationNeededDialog">
+    <dialog id="dayNoteDialog" data-note_id>
         <div class="headline flex spaceBetween">
-            <h3>Anmeldung erforderlich <span id="curriclumNoteInfo"></span></h3><button
-                class="closeRegistrationNeededDialogButton closeDialogButton" style="width: 1.5rem">×</button>
+            <h3>Tagesnotiz <span id="dayNoteDateSpan"></span></h3><button id="closeDayNoteButton"
+                class="closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <div id="dayNoteEditorContainer" class="flex column halfGap marginTop editorContainer">
+                <div id="dayNoteEditorButtonContainer" class="flex spaceBetween editorButtonContainer">
+                    <div class="flex halfGap">
+                        <button class="boldButton" style="font-weight: bold;">b</button>
+                        <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                        <button class="unorderedListButton"><span class="icon ulIcon"></span></button>
+                    </div>
+                    <div class="flex halfGap">
+                        <button class="revertChangeButton">&#8617;</button>
+                        <button class="redoChangeButton">&#8618;</button>
+                    </div>
+                </div>
+                <div id="dayNoteContentEditor" class="textEditor" contenteditable="true" data-noteversion>
+                </div>
+                <div class="flex halfGap spaceBetween">
+                    <div id="dayNoteSavedMessage">gespeichert</div><button id="saveDayNoteButton"
+                        class="confirmationButton" disabled>Speichern</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="globalNoteDialog" data-note_id>
+        <div class="headline flex spaceBetween">
+            <h3>allgemeine Notiz <span id="dayNoteDateSpan"></span></h3><button id="closeGlobalNoteButton"
+                class="closeDialogButton" style="width: 1.5rem">×</button>
+        </div>
+        <div class="dialogBody">
+            <div id="globalNoteEditorContainer" class="flex column halfGap marginTop editorContainer">
+                <div class="alertRing">
+                    <input type="text" id="globalNoteTitleInput" placeholder="Titel">
+                </div>
+                <div id="globalNoteEditorButtonContainer" class="flex spaceBetween editorButtonContainer">
+                    <div class="flex halfGap">
+                        <button class="boldButton" style="font-weight: bold;">b</button>
+                        <button class="orderedListButton"><span class="icon olIcon"></span></button>
+                        <button class="unorderedListButton"><span class="icon ulIcon"></span></button>
+                    </div>
+                    <div class="flex halfGap">
+                        <button class="revertChangeButton">&#8617;</button>
+                        <button class="redoChangeButton">&#8618;</button>
+                    </div>
+                </div>
+                <div id="globalNoteContentEditor" class="textEditor" contenteditable="true" data-noteversion>
+                </div>
+                <div class="flex halfGap spaceBetween">
+                    <div id="globalNoteSavedMessage">gespeichert</div><button id="saveGlobalNoteButton"
+                        class="confirmationButton" disabled>Speichern</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="plusExpirationDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Eduplanio Plus läuft bald ab</h3><button class="closePlusExpirationDialogButton closeDialogButton"
+                style="width: 1.5rem" autofocus="false">×</button>
         </div>
         <div class="dialogBody flex column">
-            <p>Es sieht so aus, als hättest du Eduplanio bisher mit einem Gastkonto genutzt. Um Eduplanio Plus nutzen zu
-                können, musst du dich zuerst registrieren.</p>
-            <div class="flex halfGap justifyEnd">
-                <button id="startRegistrationButton" class="confirmationButton">Jetzt registrieren</button>
-                <button class="closeRegistrationNeededDialogButton cancelButton">Abbrechen</button>
+            <div class="dialogText">
+                <p>Deine Eduplanio Plus-Lizenz läuft <span id="plusDaysRemainingSpan" style="font-weight: bold;"></span>
+                    ab.
+                </p>
+                <p>Du kannst Eduplanio danach weiter verwenden, musst aber auf die Cloud-Backups und auf die
+                    Synchronisation
+                    zwischen mehreren Geräten verzichten. Deine Lizenz kannst du in den Kontoeinstellungen verlängern.
+                </p>
+            </div>
+            <div class="flex halfGap justifyEnd marginTop">
+                <button id="goToAccoutSettingsButton" class="confirmationButton">Jetzt verlängern</button>
+                <button class="closePlusExpirationDialogButton confirmationButton">Okay</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="revocationDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Widerrufsformular</h3><button class="closeDialogButton closeRevocationDialogButton"
+                style="width: 1.5rem" autofocus="false">×</button>
+        </div>
+        <div class="dialogBody flex column">
+            <form id="revocationForm">
+                <div class="flex column halfGap marginTop" class="formBody">
+                    <div class="dialogText">
+                        <p>Fülle dafür bitte das unten stehende Formular aus. Mit * gekennzeichnete Felder sind
+                            Pflichtfelder.</p>
+                    </div>
+                    <div>
+                        <label for="revocationUserName" style="display: block">Name*</label>
+                        <div class="alertRing"><input type="text" name="revocationUserName" id="revocationUserName"
+                                autofocus>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="revocationUserEmail" style="display: block">E-Mail-Adresse*</label>
+                        <div class="alertRing"><input type="email" name="revocationUserEmail" id="revocationUserEmail">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="revocationInvoiceId" style="display: block">Rechnungsnummer*</label>
+                        <div class="alertRing"><input type="text" name="revocationInvoiceId" id="revocationInvoiceId">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="invocationReason" style="display: block">Warum möchtest die Bestellung
+                            widerrufen?</label>
+                        <div class="alertRing"><textarea name="invocationReason" id="invocationReason"
+                                placeholder="Wir würden uns freuen, zu erfahren, warum du dich gegen Eduplanio Plus entschieden hast, um unseren Service weiter verbessern zu können."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div id="revocationErrorMessageDisplay" class="errorMessageDisplay alertRing"></div>
+            </form>
+            <div class="flex justifyEnd alignEnd marginTop navigation">
+                <button id="sendRevocationFormButton" class="confirmationButton" style="margin-right: 3px">Widerruf
+                    senden</button>
+                <button class="confirmationButton closeRevocationDialogButton" id="closeRevocationDialogButton"
+                    style="margin-right: 3px; display: none">Schließen</button>
+            </div>
+        </div>
+    </dialog>
+
+        <dialog id="errorMessageDialog">
+        <div class="headline flex spaceBetween">
+            <h3>Etwas ist schiefgelaufen</h3><button class="closeErrorMessageDialogButton closeDialogButton"
+                style="width: 1.5rem" autofocus="false">×</button>
+        </div>
+        <div class="dialogBody flex column">
+            <div class="dialogText">
+            </div>
+            <div class="flex halfGap justifyEnd marginTop">
+                <button class="closeErrorMessageDialogButton confirmationButton">Okay</button>
             </div>
         </div>
     </dialog>
@@ -1072,6 +1283,51 @@
     </dialog>
 
     <div id="minimizedTourIcon"><strong>Tour</strong></div>
+
+    <!-- welcome dialog -->
+    <dialog id="welcomeDialog">
+        <div class="header">
+            <h2 id="tourDialogHeadline" class="marginBottom">Neu hier? Nimm dir kurz Zeit...</h2>
+        </div>
+
+        <div class="body">
+            <div id="tourImageContainer" class="flex justifyCenter"><img id="tourImage" src="" alt=""></div>
+            <div class="tourText">
+                <p>Hey, scheint so, als würdest du Eduplanio zum ersten Mal besuchen!</p>
+                <p>Solltest du die Tour auf dem <a href="https://eduplanio.app/livedemo">Demokonto</a> noch nicht
+                    angeschaut haben, empfehlen wir dir, das nachzuholen, um dich mit den Funktionen von Eduplanio
+                    vertraut zu machen.</p>
+                <img src="./img/eduplanio_stundenplan_menu_mobil.jpg" class="mobileScreens">
+                <img src="./img/eduplanio_stundenplan_menu.jpg" class="largeScreens">
+                <p>Du kannst natürlich trotzdem sofort loslegen. Trage dann in jedem Fall zuerst deine Fächer und deinen
+                    Stundenplan unter "Stundenplan" ein. Danach taucht dein Stundenplan in der Wochenübersicht auf und
+                    du kannst beginnen, Aufgaben und Stundennotizen anzulegen und deinen Wochenplan zu verwalten.
+                    Verzichtest du darauf, deine Fächer und deinen Stundenplan einzutragen, wirst du Eduplanio nicht
+                    sinnvoll einsetzen können. Aber keine Sorge: Die Einrichtung braucht keine fünf Minuten.</p>
+                <p>Falls während der Nutzung doch etwas unklar ist, kannst du über das Menü rechts oben eine Hilfe zu
+                    jedem Abschnitt der App öffnen. Darin wird dir die Verwendung erklärt. Oder schau dir unseren <a
+                        href="https://eduplanio.app/blog/?eduplanio-erste-schritte" target="_blank">Erste
+                        Schritte</a>-Artikel an.</p>
+                <img src="./img/eduplanio_hilfe_menu_mobil.jpg" class="mobileScreens">
+                <img src="./img/eduplanio_hilfe_menu.jpg" class="largeScreens">
+                <h3>Nicht neu hier?</h3>
+                <p>Sollte dir dieses Fenster anzeigt werden, obwohl du bereits seit längerem Eduplanio
+                    verwendest, hast du vermutlich versucht, dich auf einem neuen Gerät einzuloggen und deine
+                    Daten wurden nicht synchronisiert. Das ist der Fall, wenn deine Eduplanio Plus-Lizenz
+                    abgelaufen ist oder du gerade keine Internetverbindung hast. Deine Lizenz kannst du
+                    jederzeit im Menü unter "Konto" verlängern.</p>
+                <div class="divider"></div>
+                <div class="flex justifyCenter"><button class="confirmationButton closeWelcomeDialogButton">Alles
+                        klar!</button></div>
+            </div>
+            <div class="divider"></div>
+        </div>
+
+        <div id="tourButtonContainer" class="flex spaceBetween notDisplayed">
+            <button id="goBackBtn" class="navigationButton">&#x276E;</button>
+            <button id="goForwardBtn" class="navigationButton">&#x276F;</button>
+        </div>
+    </dialog>
 
     <footer><a id="imprintLink" href="./../impressum.html">Impressum</a></footer>
     <script src="./js/index.js" type="module"></script>

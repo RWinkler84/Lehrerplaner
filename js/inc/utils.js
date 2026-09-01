@@ -2,7 +2,6 @@ import { ONEDAY } from "../index.js";
 
 export default class Utils {
 
-
     static hasLesson(element) {
         let bool = false;
 
@@ -29,6 +28,12 @@ export default class Utils {
         return false;
     }
 
+    static isValidEmail(mailString) {
+        const mailRegEx = /^[^@]+@[^@]+\.[^@]+$/;
+
+        return mailRegEx.test(mailString);
+    }
+
     static formatSubjectName(name) {
         let reformated = []
 
@@ -52,7 +57,8 @@ export default class Utils {
     }
 
     static formatDate(date) {
-        date = new Date(date);
+        if (date instanceof Date == false) date = new Date(date); 
+        
         let formatter = new Intl.DateTimeFormat('de-DE', {
             month: '2-digit',
             day: '2-digit'
@@ -63,14 +69,14 @@ export default class Utils {
 
     static formatDateWithFullYear(date) {
         date = new Date(date);
-        if  (isNaN(date)) throw new TypeError('The given data could not be converted to a day object.');
+        if (isNaN(date)) throw new TypeError('The given data could not be converted to a day object.');
 
         return `${(date.getDate().toString().padStart(2, '0'))}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
     }
 
     static formatDateSqlCompatible(date) {
         let dateObject = new Date(date);
-        if  (isNaN(dateObject)) throw new TypeError('The given data could not be converted to a day object.');
+        if (isNaN(dateObject)) throw new TypeError('The given data could not be converted to a day object.');
 
         let timeString = dateObject.getFullYear() + '-' + (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' + dateObject.getDate().toString().padStart(2, '0');
 
@@ -96,10 +102,10 @@ export default class Utils {
     //find the first thursday of the year, which marks the first calendar week
     static getFirstThirsdayOfTheYear(year) {
         let firstDay = new Date(year + '-01-01');
-        
-        firstDay.setHours(12,0,0,0);
 
-        firstDay.setHours(12,0,0,0);
+        firstDay.setHours(12, 0, 0, 0);
+
+        firstDay.setHours(12, 0, 0, 0);
 
         if (firstDay.getDay() != 4) {
             while (firstDay.getDay() != 4) {
@@ -152,7 +158,7 @@ export default class Utils {
         })
 
         if (allIds.length == 0) allIds = [0];
-        return Math.max(...allIds) + 1; //adds 1 to the highest existing lesson id
+        return Math.max(...allIds) + 1; //adds 1 to the highest existing id
     }
 
     static sortByDate(a, b) {
@@ -200,9 +206,22 @@ export default class Utils {
         return match;
     }
 
-    static unescapeHTMLSpecialChars(string) {
-       const unescapedString = string.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+    static getDatesOfCurrentlyDisplayedWeek() {
+        return {
+            'monday': new Date(document.querySelector('.weekday[data-weekday_number="1"]').dataset.date),
+            'sunday': new Date(document.querySelector('.weekday[data-weekday_number="0"]').dataset.date)
+        }
+    }
 
-       return unescapedString;
+    static unescapeHTMLSpecialChars(string) {
+        const unescapedString = string.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
+        return unescapedString;
+    }
+
+    static isEmptyObject(object) {
+        for (const i in object) return false;
+
+        return true;
     }
 }

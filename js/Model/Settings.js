@@ -252,4 +252,18 @@ export default class Settings extends AbstractModel {
     async getAllSubjects() {
         return await this.readAllFromLocalDB('subjects');
     }
+
+    async setExpirationWarningDismissedStatus(status) {
+        const data = {
+            id: 2,
+            expirationWarningDismissed: status,
+            lastUpdated: this.formatDate(new Date())
+        };
+
+        this.updateOnLocalDB('settings', data);
+    }
+
+    async getExpirationWarningDismissedStatus(status) {
+        return this.readFromLocalDB('settings', 2);
+    }
 }

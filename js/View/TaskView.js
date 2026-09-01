@@ -28,6 +28,8 @@ export default class TaskView extends AbstractView {
         let allOpenTaskIds = [];
         let allInProgressTaskIds = [];
 
+        let inititalPositions = [];
+
         if (allOpenTasks.length > 0) {
             openTaskTable.querySelector('thead').removeAttribute('style');
             openTaskTable.querySelector('td[data-noentriesfound]').style.display = 'none';
@@ -58,10 +60,12 @@ export default class TaskView extends AbstractView {
         document.querySelectorAll('.taskList')
             .forEach(taskList => taskList.querySelectorAll('tr')
                 .forEach(tr => {
+                    inititalPositions.push(tr.getBoundingClientRect().top);
                     allRenderedTaskTrs.push(tr);
-                    tr.remove();
                 })
             );
+
+        allRenderedTaskTrs.forEach(tr => tr.remove()); //only remove after initial positions are saved
 
         allOpenTaskIds.forEach(taskId => {
             if (taskId == 0) return;
@@ -84,7 +88,7 @@ export default class TaskView extends AbstractView {
                 }
             });
 
-            //no element was found, because the task wasn't rendered yet (added by a syncing data from another device)                
+            //no element was found, because the task wasn't rendered yet (added by syncing data from another device)                
             if (!taskElement) {
                 let task = allOpenTasks.find(task => task.id == taskId);
                 taskElement = this.getTaskTrHTML(task);
@@ -133,7 +137,10 @@ export default class TaskView extends AbstractView {
 
             inProgressTaskTableBody.insertBefore(taskElement, inProgressTaskTableBody.children[allOpenTaskIds.indexOf(taskId)]);
             inProgressTaskTableBody.insertBefore(checkBoxElement, taskElement.nextElementSibling);
+
         })
+
+        this.runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions);
     }
 
     static updateTaskElement(taskElement, task) {
@@ -216,6 +223,7 @@ export default class TaskView extends AbstractView {
 
         let formTr = this.getTaskTrHTML(task);;
         let checkBoxTR = this.getCheckboxTR();
+        const textarea = document.createElement('textarea');
 
         checkBoxTR.setAttribute('data-new', '');
         checkBoxTR.removeAttribute('style');
@@ -225,7 +233,7 @@ export default class TaskView extends AbstractView {
         formTr.setAttribute('data-date', task.date);
         formTr.setAttribute('data-timeslot', task.timeslot);
 
-        formTr.querySelector('.taskDescription').contentEditable = true;
+        formTr.querySelector('.taskDescription').append(textarea);
         formTr.querySelectorAll('.taskDone>div').forEach(div => {
             if (div.classList.contains('editableTask')) {
                 div.style.display = 'flex';
@@ -236,6 +244,8 @@ export default class TaskView extends AbstractView {
 
         taskTable.append(formTr);
         taskTable.append(checkBoxTR);
+
+        textarea.focus();
 
         if (taskTable.parentElement.querySelector('td[data-noentriesfound]').style.display == 'table-cell') {
             taskTable.parentElement.querySelector('thead').removeAttribute('style');
@@ -265,7 +275,7 @@ export default class TaskView extends AbstractView {
                     <div class="smallDate">${subjectDate}</div>
                     <div class="taskDateSelectWrapper"></div>
                 </td>
-                <td class="taskDescription" data-taskDescription="" data-heading="Beschreibung:">${task.description}</td>
+                <td class="taskDescription" data-taskDescription="" data-heading="Beschreibung:" autocorrect="off" autocapitalize="off" spellcheck="false">${task.description}</td>
                 <td class="taskDone">
                     <div class="openTask">
                         <button class="confirmationButton setTaskDoneButton" title="erledigt"><span class="icon checkIcon"></span></button>
@@ -310,7 +320,7 @@ export default class TaskView extends AbstractView {
                     <div>
                         <label><input type="checkbox" name="fixedDate" value="fixed">fester Termin?</label>
                     </div>
-                    <div class="flex alignCenter reoccuringTaskContainer" >
+                    <div class="flex alignCenter halfGap reoccuringTaskContainer" >
                         <label><input type="checkbox" name="reoccuringTask" value="reoccuring">wiederholen?</label>
                         <div class="alertRing">
                             <select name="reoccuringIntervalSelect" class="reoccuringIntervalSelect" disabled>
@@ -392,13 +402,17 @@ export default class TaskView extends AbstractView {
             'subject': taskElement.querySelector('td[data-subject]').dataset.subject,
             'date': taskElement.dataset.date,
             'timeslot': taskElement.dataset.timeslot,
-            'description': taskElement.querySelector('td[data-taskDescription]').innerText,
+            // 'description': taskElement.querySelector('td[data-taskDescription]').innerText,
+            'description': taskElement.querySelector('textarea').value,
             'fixedTime': checkBoxElement.querySelector('input[name="fixedDate"]').checked,
             'reoccuring': checkBoxElement.querySelector('input[name="reoccuringTask"]').checked,
             'reoccuringInterval': checkBoxElement.querySelector('select').value
         }
 
-        if (await Controller.saveTask(taskData, event)) {
+        let task = await Controller.saveTask(taskData, event);
+
+        if (task) {
+            taskElement.dataset.taskid = task.id;
 
             TaskView.removeNewDataset(event);
             TaskView.removeEditability(event);
@@ -418,7 +432,7 @@ export default class TaskView extends AbstractView {
             'class': classTd.dataset.class,
             'date': taskTr.querySelector('.taskDateSelect').value,
             'subject': subjectTd.dataset.subject,
-            'description': taskTr.querySelector('td[data-taskdescription]').innerText,
+            'description': taskTr.querySelector('textarea').value,
             'fixedTime': taskTr.nextElementSibling.querySelector('input[type="checkbox"]').checked,
             'reoccuring': taskTr.nextElementSibling.querySelector('input[name="reoccuringTask"]').checked,
             'reoccuringInterval': taskTr.nextElementSibling.querySelector('select').value
@@ -432,33 +446,46 @@ export default class TaskView extends AbstractView {
     static makeEditable(event, upcomingLessons) {
 
         if (event.target.classList.contains('taskDone') || event.target.dataset.noEntriesFound) return;
-        if (event.target.closest('tr').querySelector('td[data-taskdescription]').hasAttribute('contenteditable')) return;
+        if (event.target.closest('tr').querySelector('td[data-taskdescription] textarea')) return;
 
         this.#backupTaskData(event);
 
-        let parentTr = event.target.closest('tr');
-        let dateSelect = this.getDateSelectHTML(parentTr, upcomingLessons);
+        let taskElement = event.target.closest('tr');
+        let checkboxTr = taskElement.nextElementSibling;
+        let dateSelect = this.getDateSelectHTML(taskElement, upcomingLessons);
 
         if (window.innerWidth > 620) {
-            parentTr.nextElementSibling.style.display = 'table-row';
+            checkboxTr.style.display = 'table-row';
+
+            this.runOpenTaskFormAnimation(checkboxTr);
         } else {
-            parentTr.nextElementSibling.style.display = 'block';
-            parentTr.nextElementSibling.style.marginTop = '-2rem';
+            checkboxTr.style.display = 'block';
+
+            // last checkboxTr must not have a margin or animations will be buggy
+            if (checkboxTr.nextElementSibling) checkboxTr.style.marginTop = '-2rem';
+
+            this.runOpenTaskFormAnimation(checkboxTr);
         }
 
-        parentTr.querySelector('td[data-taskdescription]').setAttribute('contenteditable', '');
-        parentTr.querySelector('td[data-taskdescription]').focus();
+        const textarea = document.createElement('textarea');
+        textarea.value = taskElement.querySelector('td[data-taskdescription]').textContent;
 
-        parentTr.querySelector('.taskDateSelectWrapper').append(dateSelect);
-        parentTr.querySelector('.taskDateSelectWrapper').style.display = "block";
-        parentTr.querySelector('.smallDate').style.display = 'none';
+        // taskElement.querySelector('td[data-taskdescription]').setAttribute('contenteditable', 'true');
+        // taskElement.querySelector('td[data-taskdescription]').focus();
 
-        window.getSelection().removeAllRanges();
+        taskElement.querySelector('td[data-taskdescription]').textContent = '';
+        taskElement.querySelector('td[data-taskdescription]').append(textarea);
+        textarea.focus();
+
+        taskElement.querySelector('.taskDateSelectWrapper').append(dateSelect);
+        taskElement.querySelector('.taskDateSelectWrapper').style.display = "block";
+        taskElement.querySelector('.smallDate').style.display = 'none';
+
         TaskView.showSaveOrDiscardChangesButtons(event);
 
-        parentTr.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
-        parentTr.nextElementSibling.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
-        parentTr.nextElementSibling.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
+        taskElement.removeEventListener('dblclick', (event) => TaskView.makeEditable(event));
+        checkboxTr.addEventListener('mouseenter', this.highlightCheckboxTrPreviousSibling);
+        checkboxTr.addEventListener('mouseleave', this.removeHighlightCheckboxTrPreviousSibling);
     }
 
     static getDateSelectHTML(taskElement, upcomingLessons) {
@@ -511,7 +538,8 @@ export default class TaskView extends AbstractView {
             class: taskElement.querySelector('.taskClassName').dataset.class,
             subject: taskElement.querySelector('.taskSubjectContainer').dataset.subject,
             date: taskElement.dataset.date,
-            description: taskElement.querySelector('.taskDescription').innerText
+            // description: taskElement.querySelector('.taskDescription').innerText
+            description: taskElement.querySelector('textarea') ? taskElement.querySelector('textarea').value : taskElement.querySelector('.taskDescription').innerText
         };
     }
 
@@ -523,28 +551,30 @@ export default class TaskView extends AbstractView {
         event.target.closest('tr').previousElementSibling.removeAttribute('style');
     }
 
-    static removeEditability(event) {
-
+    static async removeEditability(event) {
         let taskTr = event.target.closest('tr');
+        let checkBoxElement = taskTr.nextElementSibling;
+        const textarea = taskTr.querySelector('textarea');
 
         taskTr.querySelector('td[data-taskdescription]').removeAttribute('contenteditable');
-        taskTr.nextElementSibling.style.display = "none";
+        taskTr.querySelector('td[data-taskdescription]').textContent = textarea.value;
+
+        textarea.remove();
+        
+        this.runCloseTaskFormAnimation(checkBoxElement, checkBoxElement.getBoundingClientRect().height);
+        checkBoxElement.style.display = 'none';
     }
 
+    //removes 'new' dataset of the given task form, after it was saved
     static removeNewDataset(event) {
-        //removes 'new' dataset of the given task form, after it was saved
-
         let buttonWrapper = event.target.closest('td');
         let fixedDateTr = buttonWrapper.closest('tr').nextElementSibling;
 
-
         buttonWrapper.closest('tr').removeAttribute('data-new');
         fixedDateTr.removeAttribute('data-new');
-        fixedDateTr.style.display = 'none';
     }
 
     static removeTaskForm(event) {
-
         let taskTr = event.target.closest('tr');
 
         if (!taskTr.hasAttribute('data-new')) {
@@ -553,6 +583,8 @@ export default class TaskView extends AbstractView {
         }
 
         let tableBody = event.target.closest('tbody');
+
+        this.runCloseTaskFormAnimation(taskTr.nextElementSibling, taskTr.getBoundingClientRect().height + taskTr.nextElementSibling.getBoundingClientRect().height);
 
         taskTr.nextElementSibling.remove();
         taskTr.remove();
@@ -629,9 +661,93 @@ export default class TaskView extends AbstractView {
         }
     }
 
+    // animations 
+
+    static runOpenTaskFormAnimation(checkboxElement) {
+        const listContainer = checkboxElement.closest('div');
+        const checkboxElementHeight = checkboxElement.getBoundingClientRect().height;
+        const listContainerHeight = listContainer.getBoundingClientRect().height;
+        const allListItems = Array.from(checkboxElement.closest('.taskList').children);
+        const index = allListItems.indexOf(checkboxElement);
+
+        checkboxElement.style.transform = `translateY(-${checkboxElementHeight}px)`;
+        listContainer.style.height = `${listContainerHeight - checkboxElementHeight}px`;
+
+        for (let i = index; i < allListItems.length; i++) {
+            allListItems[i].style.transform = `translateY(-${checkboxElementHeight}px)`;
+        }
+
+        requestAnimationFrame(() => {
+            listContainer.classList.add('transitioning');
+            listContainer.style.height = `${listContainerHeight}px`;
+
+            checkboxElement.classList.add('transitioning');
+            checkboxElement.style.transform = '';
+
+            for (let i = index; i < allListItems.length; i++) {
+                allListItems[i].classList.add('transitioning');
+                allListItems[i].style.transform = '';
+            }
+        })
+
+        setTimeout(() => {
+            listContainer.classList.remove('transitioning');
+            listContainer.style.height = '';
+            
+            allListItems.forEach(tr => tr.classList.remove('transitioning'));
+
+        }, ANIMATIONRUNTIME)
+    }
+
+    static runCloseTaskFormAnimation(checkboxElement, delta) {
+        const listContainer = checkboxElement.closest('div');
+        const listContainerHeight = listContainer.getBoundingClientRect().height;
+
+        listContainer.style.height = `${listContainerHeight}px`;
+
+        requestAnimationFrame(() => {
+            listContainer.classList.add('transitioning');
+            listContainer.style.height = `${listContainerHeight - delta}px`;
+        })
+
+        setTimeout(() => {
+            listContainer.style.height = '';
+            listContainer.classList.remove('transitioning');
+        }, ANIMATIONRUNTIME)
+    }
+
+    static runTaskShuffleAnimation(allRenderedTaskTrs, inititalPositions) {
+        const finalPositions = allRenderedTaskTrs.map(tr => tr.getBoundingClientRect().top);
+
+        allRenderedTaskTrs.forEach((tr, index) => {
+            if (inititalPositions[index] != finalPositions[index]) {
+                const delta = inititalPositions[index] - finalPositions[index];
+
+                tr.style.transform = `translateY(${delta}px)`;
+
+                requestAnimationFrame(() => {
+                    tr.classList.add('transitioning')
+                    tr.style.transform = '';
+                });
+            }
+        })
+
+
+        setTimeout(() => {
+            allRenderedTaskTrs.forEach((tr, index) => {
+                if (inititalPositions[index] != finalPositions[index]) {
+                    const delta = inititalPositions[index] - finalPositions[index];
+
+                    tr.classList.remove('transitioning');
+                }
+            })
+        }, ANIMATIONRUNTIME)
+
+    }
+
     static async runSetInProgressAnimation(event) {
         const taskElement = event.target.closest('tr');
-        
+
         taskElement.classList.add('fadeOut');
 
         setTimeout(() => {
@@ -646,12 +762,46 @@ export default class TaskView extends AbstractView {
         })
     }
 
-    static async runRemoveTaskAnimation(event) {
+    static async runRemoveTaskAnimation(event, task) {
         const taskElement = event.target.closest('tr');
+        const taskElementList = taskElement.closest('.taskList');
+        const listContainer = taskElement.closest('div');
+        const taskElementHeight = taskElement.getBoundingClientRect().height;
+        const otherElementPos = [];
+
+        const allTaskElementsInList = Array.from(taskElementList.children);
+
+        let taskElementIndex = allTaskElementsInList.indexOf(taskElement);
+
+        if (task.reoccuring) {
+            this.renderTasks();
+            return;
+        }
+
+        //let affected elements slide to their new position
+        for (let i = taskElementIndex + 1; i < allTaskElementsInList.length; i++) {
+            allTaskElementsInList[i].classList.add('transitioning');
+            allTaskElementsInList[i].style.transform = `translateY(-${taskElementHeight}px)`;
+        }
+
+        //let the list container shrink
+        listContainer.classList.add('transitioning');
+        listContainer.style.height = `${listContainer.getBoundingClientRect().height}px`;
+
+        requestAnimationFrame(() => listContainer.style.height = `${listContainer.getBoundingClientRect().height - taskElementHeight}px`);
+
         taskElement.classList.add('shrink');
 
         setTimeout(() => {
             taskElement.classList.remove('shrink');
+            listContainer.classList.remove('transitioning');
+            listContainer.style.height = '';
+
+            for (let i = taskElementIndex + 1; i < allTaskElementsInList.length; i++) {
+                allTaskElementsInList[i].classList.remove('transitioning');
+                allTaskElementsInList[i].style.transform = '';
+
+            }
         }, ANIMATIONRUNTIME);
 
         return new Promise((resolve) => {

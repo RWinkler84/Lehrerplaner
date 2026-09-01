@@ -1,3 +1,4 @@
+import AbstractController from "./Controller/AbstractController.js";
 import { tourStatus } from "./index.js";
 
 export default class Tour {
@@ -128,6 +129,11 @@ export default class Tour {
                 this.openSlide('backward');
                 break;
 
+            case 'openSupportDialogLink': 
+                event.preventDefault();
+                AbstractController.openSupportDialog();
+                break;
+
             //top menu clicks
             case 'openWeekViewButton':
                 Tour.setOpenedViewOnDialog('weekOverview');
@@ -142,6 +148,12 @@ export default class Tour {
 
             case 'openSchoolYearViewButton':
                 Tour.setOpenedViewOnDialog('yearOverview');
+                Tour.setSlideIdOnDialog(0);
+                Tour.openSlide();
+                break;
+
+            case 'openSchoolYearViewButton': ///////////////////////////////////
+                Tour.setOpenedViewOnDialog('yearOverview'); 
                 Tour.setSlideIdOnDialog(0);
                 Tour.openSlide();
                 break;
@@ -499,6 +511,22 @@ export default class Tour {
                 forwardBtn: false,
                 backwardBtn: true
             },
+        ],
+        undefined: [
+            {
+                headline: 'Sorry!',
+                image: '',
+                text: `
+                    <p>
+                    Dieser Teil von Eduplanio scheint neu zu sein und wurde in der Hilfe noch nicht dokumentiert. Informationen zu neuen Features 
+                    findest du normalerweise auch im <a href="https://eduplanio.app/blog/" target="_blank">Blog</a> und auf unserem 
+                    <a href="https://www.youtube.com/channel/UCVVVkQTEYd9kWVTONDjU1Rg/" target="_blank">Youtube-Kanal</a>. Schau doch mal dort vorbei.
+                    </p>
+                    <p>In dringenden Fällen kannst du dich an den <a href="" id="openSupportDialogLink">Support</a> wenden</p>
+                `,
+                forwardBtn: false,
+                backwardBtn: false
+            }
         ]
     };
 }
