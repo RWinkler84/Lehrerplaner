@@ -504,7 +504,7 @@ export default class AbstractView {
                 syncIndicator.classList.add('unsynced');
                 let infoText = 'Deine Daten werden nur lokal gespeichert. Verbinde dein Gerät mit dem Internet und melde dich an, um Datenverlust zu vermeiden.';
 
-                if (errorMessage == 'Plus licence expired') infoText = 'Es sieht so aus als wäre deine Plus-Lizenz abgelaufen. Deine Daten werden nur lokal gespeichert. Erneuere die Lizenz, um Datenverlust sicher zu vermeiden.'
+                if (errorMessage == 'Plus licence expired') infoText = 'Deine Eduplanio Plus-Lizenz ist abgelaufen. Deine Daten werden nur lokal gespeichert. Erneuere die Lizenz, um Datenverlust sicher zu vermeiden.'
 
                 tooltipText.textContent = infoText;
                 break;
@@ -630,6 +630,7 @@ export default class AbstractView {
         if (document.querySelector('#weekViewContainer').style.display == 'block') return 'weekOverview';
         if (document.querySelector('#timetableViewContainer').style.display == 'block') return 'timetableOverview';
         if (document.querySelector('#schoolYearViewContainer').style.display == 'block') return 'yearOverview';
+        // if (document.querySelector('#globalNotesContainer').style.display == 'block') return 'globalNotesOverview';
     }
 
     //support ticket alerts

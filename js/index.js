@@ -28,7 +28,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.260826';
+export const VERSION = '0.9.280826';
 
 export const SF_ID_ROOT = 0;
 export const SF_ID_TRASH = 1;

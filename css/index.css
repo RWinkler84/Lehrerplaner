@@ -333,32 +333,6 @@ dialog .errorMessageDisplay,
     padding: 1rem 0;
 }
 
-/* global notes dialog */
-
-#globalNoteDialog {
-    width: 80%;
-    height: 80%;
-    max-width: 900px;
-
-    &[open] {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .dialogBody {
-        display: flex;
-        flex-grow: 1;
-
-        #globalNoteEditorContainer {
-            flex-grow: 1;
-        }
-    }
-
-    /* .textEditor {
-        height: 100%;
-    } */
-}
-
 /* stripe html pages*/
 #checkoutDialog {
     position: relative;
@@ -2228,7 +2202,7 @@ p {
         }
 
         #globalNotesFileContainer {
-            #createglobalItemsButtonContainer {
+            #createGlobalItemsButtonContainer {
                 bottom: 3rem;
                 right: 0.5rem;
             }

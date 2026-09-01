@@ -76,6 +76,20 @@
     overflow: hidden;
 }
 
+/* global notes dialog */
+
+#globalNoteDialog {
+    width: 80%;
+    height: 80%;
+    max-width: 900px;
+    overflow: hidden;
+
+    &[open] {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 #lessonNoteDialog[open],
 #dayNoteDialog[open],
 #curriculumNoteDialog[open] {
@@ -85,7 +99,8 @@
 
 #lessonNoteDialog .dialogBody,
 #dayNoteDialog .dialogBody,
-#curriculumNoteDialog .dialogBody {
+#curriculumNoteDialog .dialogBody,
+#globalNoteDialog .dialogBody {
     display: flex;
     flex-direction: column;
     flex: 1 1 100%;
@@ -99,7 +114,8 @@
 
 #noteEditorContainer,
 #dayNoteEditorContainer,
-#curriculumNoteEditorContainer {
+#curriculumNoteEditorContainer,
+#globalNoteEditorContainer {
     display: flex;
     flex-direction: column;
     flex: 1 1 100%;
