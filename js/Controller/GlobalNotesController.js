@@ -460,6 +460,11 @@ export default class GlobalNotesController {
         View.markItemsInRectangleSelected(event);
     }
 
+    static selectAll() {
+        this.closeAllContextMenus();
+        View.selectAll();
+    }
+
     static selectMultipleByTouch(event) {
         return View.selectMultipleByTouch(event);
     }
@@ -739,6 +744,11 @@ export default class GlobalNotesController {
                 case 'x':
                     this.cutGlobalItem();
                     break;
+                
+                case 'a':
+                    event.preventDefault();
+                    this.selectAll();
+                break;
             }
         }
 

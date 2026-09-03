@@ -737,6 +737,15 @@ export default class GlobalNotesView {
         return selectedItemsCount;
     }
 
+    static selectAll() {
+        const selectables = this.getAllSelectableItems();
+
+        selectables.forEach(item => {
+            if (item.dataset.folder_id == SF_ID_TRASH) return;
+            item.classList.add('selected');
+        })
+    }
+
     static editSelectedItemsKeyboardShortcuts(event) {
         const srcElement = event.target.closest('.folderIconContainer') ?? event.target.closest('.noteIconContainer');
 
