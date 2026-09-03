@@ -630,7 +630,7 @@ export default class AbstractView {
         if (document.querySelector('#weekViewContainer').style.display == 'block') return 'weekOverview';
         if (document.querySelector('#timetableViewContainer').style.display == 'block') return 'timetableOverview';
         if (document.querySelector('#schoolYearViewContainer').style.display == 'block') return 'yearOverview';
-        // if (document.querySelector('#globalNotesContainer').style.display == 'block') return 'globalNotesOverview';
+        if (document.querySelector('#globalNotesContainer').style.display == 'block') return 'globalNotesOverview';
     }
 
     //support ticket alerts

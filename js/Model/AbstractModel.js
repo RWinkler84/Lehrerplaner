@@ -176,7 +176,7 @@ export default class AbstractModel {
                     let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
                     transaction.onsuccess = () => {
                         this.markLocalDBUpdated(store);
-                        resolve();
+                        resolve({status: 'success'});
                         transaction.onerror = () => {
                             resolve({ status: 'failed' })
                         }
@@ -193,7 +193,7 @@ export default class AbstractModel {
         return new Promise(resolve => {
             transaction.onsuccess = () => {
                 this.markLocalDBUpdated(store)
-                resolve();
+                resolve({status: 'success'});
                 transaction.onerror = () => {
                     resolve({ status: 'failed' })
                 }

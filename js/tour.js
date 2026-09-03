@@ -44,6 +44,8 @@ export default class Tour {
         const viewName = this.dialog.dataset.viewname;
         let nextSlide = currentSlide;
 
+        console.log(viewName)
+
         if (direction) nextSlide = direction == 'forward' ? currentSlide + 1 : currentSlide - 1;
 
         const slideData = this.slides[viewName][nextSlide];
@@ -150,8 +152,8 @@ export default class Tour {
                 Tour.openSlide();
                 break;
 
-            case 'openSchoolYearViewButton': ///////////////////////////////////
-                Tour.setOpenedViewOnDialog('yearOverview'); 
+            case 'openGlobalNotesViewButton':
+                Tour.setOpenedViewOnDialog('globalNotesOverview'); 
                 Tour.setSlideIdOnDialog(0);
                 Tour.openSlide();
                 break;
@@ -501,6 +503,116 @@ export default class Tour {
                     <p>
                     Damit bist du mit den wichtigsten Funktionen der Jahresansicht vertraut. 
                     </p>
+                `,
+                forwardBtn: false,
+                backwardBtn: true
+            },
+        ],
+        globalNotesOverview: [
+            {
+                headline: 'Die Notizansicht',
+                image: './tour_img/ansicht_allgemeine_Notizen.jpg',
+                text: `
+                    <p>
+                    Mit der Notiz-Ansicht bietet Eduplanio dir eine umfangreiche Notizfunktion für alle Dinge, die nicht in eine Stunden- oder Tagesnotiz passen.
+                    Willst du zum Beispiel vergessene Hausaufgaben oder Stichpunkte für ein Gespräch notieren, ist hier der richtige Platz. Um die Übersicht zu
+                    bewahren, kannst du deine Notizen in Ordnern organisieren.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: false
+            },
+            {
+                headline: 'Allgemeine Notizen 1',
+                image: './tour_img/notiz_erstellen.gif',
+                text: `
+                    <p>
+                    Eine Notiz kannst du auf zwei Wegen anlegen. Entweder verwendest du das Anlegen-Menü am rechten unteren Bildschirmrand und wählst dort das 
+                    Notiz-Symbol aus. Oder du öffnest das Kontext-Menü des jeweilgen Ordners durch einen Rechtsklick auf einen freien Bereich und klickst auf 
+                    "neue Notiz". Im Anschluss öffnet sich der Notiz-Editor.
+                    </p>
+                    <p>Auf Touch-Geräten hältst du den Finger etwa eine halbe Sekunde ohne ihn zu bewegen auf das Display, um dieses Menü zu öffnen.</p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Allgemeine Notizen 2',
+                image: './tour_img/notiz_speichern.gif',
+                text: `
+                    <p>
+                    Nach dem Erstellen kannst du Notizen im Notiz-Editor bearbeiten. Gespeichert werden können sie aber nur, wenn du ihnen einen Titel 
+                    gibst, der anschließend auch als Name der jeweiligen Notiz dient. 
+                    </p>
+                    <p>
+                    Nach dem Speichern findest du deine Notiz als Datei im vorher geöffneten Ordner. Um sie zu lesen und erneut zu bearbeiten, 
+                    klickst du sie einfach an.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Ordner 1',
+                image: './tour_img/ordner_erstellen.gif',
+                text: `
+                    <p>
+                    Neue Ordner anzulegen ist ähnlich einfach wie das Erstellen von Notizen. Auch hier kannst du das Anlegen-Menü am rechten unteren Rand des 
+                    Bildschirms nutzen oder per Rechtsklick (oder langes Drücken des Touchscreens) auf eine freie Stelle das Kontext-Menü des aktuell offenen Ordners 
+                    öffnen. Dort wählst du anschließend "neuer Ordner" aus.
+                    </p>
+                    <p>
+                    Es erscheint ein neues Ordner-Symbol, dem du einen Namen geben musst. Gespeichert wird er danach über den <button class="confirmationButton" style="padding: 0 0.5rem"><span class="icon checkIcon"></span></button> -
+                    Button.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Ordner 2',
+                image: './tour_img/notizen_verwalten.gif',
+                text: `
+                    <p>
+                    Dank der Ordner kannst du deine Notizen genau so nach Themen sortieren, wie du es von Aufzeichnungen auf Papier und 
+                    Aktenordnern gewohnt bist. Entweder erstellst du deine Notizen direkt im richtigen Ordner oder "heftest" sie um, wenn 
+                    ihr aktueller Speicherort nicht mehr passt. Bei Bedarf kannst du aber auch Kopien erstellen oder sie über den Papierkorb entsorgen.
+                    </p>
+                    <p>
+                    Für diese Aktionen nutzt du wieder das über Rechtsklick zu erreichende Kontext-Menü. Je nachdem wie viele Ordner oder Notizen du 
+                    ausgewählt hast, stehen dir verschiedene Optionen zur Verfügung.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Ordner 3',
+                image: './tour_img/allgemeine_notizen_mehrfachauswahl.jpg',
+                text: `
+                    <p>
+                    Wie bereits erwähnt, kannst du gleich mehrere Ordner oder Notizen auswählen und sie dann gemeinsam kopieren, verschieben oder 
+                    löschen. Eduplanio unterstützt dabei sowohl die Auswahl per Mausrahmen als auch die üblichen Keyboard-Shortcuts. 
+                    </p>
+                    <p>
+                    Auf Touchscreen-Geräten ist die multiple Auswahl ebenfalls möglich. In diesem Fall musst du das Kontext-Menü eines Ordners 
+                    oder einer Datei öffnen. Tippst du anschließend auf einen anderen Ordner oder eine Notiz, werden diese der Auswahl hinzugefügt.
+                    </p>
+                `,
+                forwardBtn: true,
+                backwardBtn: true
+            },
+            {
+                headline: 'Ordner 4',
+                image: './tour_img/ordner_navigieren.gif',
+                text: `
+                    <p>
+                    Um zwischen Ordnern hin- und herzuwechseln hast du zwei Möglichkeiten: Am rechten oberen Bildschirmrand findest du zwei Pfeil-
+                    Buttons, mit denen du durch deine Ordner-Historie vor- und zurücknavigieren kannst. Alternativ findest du auf der linken Seite 
+                    eine Breadcrumb-Navigation, die alle Überordner des jeweils geöffneteten Ordners anzeigt. Klickst du auf einen der dortigen 
+                    Einträge, wechselst du in den gewählten Ordner.
+                    </p>
+                    <p>Die Notiz-Ansicht funktioniert damit ähnlich, wie du es vom Explorer (Windows) oder Finder (MacOS) kennst.</p>
                 `,
                 forwardBtn: false,
                 backwardBtn: true
