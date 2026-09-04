@@ -12,19 +12,19 @@ export default class GlobalNotesController {
         View.toggleGlobalItemCreationButtons(!View.isInTrash())
     }
 
-    static async renderGlobalNoteIcons() {
+    static async renderGlobalNoteIcons(noteIdsToPreselect = null) {
         const globalNotes = await GlobalNote.getAllByParentFolderId(View.getDisplayedFolderId());
         const clipboardContent = GlobalNote.getClipboardContent();
 
-        View.renderGlobalNoteIcons(globalNotes, clipboardContent);
+        View.renderGlobalNoteIcons(globalNotes, clipboardContent, noteIdsToPreselect);
     }
 
-    static async renderFolderIcons() {
+    static async renderFolderIcons(folderIdsToPreselect = null) {
         const displayedFolder = View.getDisplayedFolderId();
         const allFolders = await GlobalNoteFolder.getAllByParentFolderId(displayedFolder);
         const clipboardContent = GlobalNoteFolder.getClipboardContent();
 
-        View.renderFolderIcons(allFolders, clipboardContent);
+        View.renderFolderIcons(allFolders, clipboardContent, folderIdsToPreselect);
 
         if (displayedFolder == 0) {
             View.renderTrashIcon(await GlobalNoteFolder.isTrashEmpty())
@@ -114,7 +114,7 @@ export default class GlobalNotesController {
         const globalNote = GlobalNote.writeDataToInstance(globalNoteData)
 
         await globalNote.save();
-        await this.renderGlobalNoteIcons();
+        await this.renderGlobalNoteIcons([globalNote.id]);
         View.showGlobalNoteSavedMessage();
         View.updateGlobalNoteDialog(globalNote);
         View.toggleSaveDayNoteButton(false);
@@ -182,14 +182,14 @@ export default class GlobalNotesController {
         const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(noteFolderData);
 
         await globalNoteFolder.save();
-        await this.renderFolderIcons();
+        await this.renderFolderIcons([globalNoteFolder.id]);
     }
 
     static async updateGlobalNoteFolder(globalNoteFolderData) {
         const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(globalNoteFolderData)
 
         await globalNoteFolder.update();
-        await this.renderFolderIcons();
+        await this.renderFolderIcons([globalNoteFolder.id]);
     }
 
     static cancelGlobalNotesFolderCreation(event) {
@@ -446,6 +446,10 @@ export default class GlobalNotesController {
     // multiple selection //
     ////////////////////////
 
+    static markItemAsSelected(element) {
+        View.markItemAsSelected(element);
+    }
+
     static selectMultipleOnMouseDrag(event) {
         globalItemsMultiSelectData.ignoreNextClickEvent = true;
 
@@ -559,6 +563,12 @@ export default class GlobalNotesController {
 
                 case (View.isCreateGlobalItemMenuOpen() && !target.closest('#createglobalItemsButtonContainer')):
                     View.closeCreateGlobalItemMenu();
+                    break;
+
+                // change selection
+                case (target.classList.contains('folderNameInput')):
+                    this.removeAllSelections();
+                    this.markItemAsSelected(target.closest('.folderIconContainer'));
                     break;
 
                 // keep selection

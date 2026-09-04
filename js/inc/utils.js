@@ -57,8 +57,8 @@ export default class Utils {
     }
 
     static formatDate(date) {
-        if (date instanceof Date == false) date = new Date(date); 
-        
+        if (date instanceof Date == false) date = new Date(date);
+
         let formatter = new Intl.DateTimeFormat('de-DE', {
             month: '2-digit',
             day: '2-digit'
@@ -192,6 +192,13 @@ export default class Utils {
             });
             grouped[key].forEach(entry => sorted.push(entry));
         });
+
+        return sorted;
+    }
+
+    static sortByProperty(arrayToSort, propertyName) {
+        const collator = new Intl.Collator([], { numeric: true });
+        let sorted = arrayToSort.sort((a, b) => collator.compare(a[propertyName], b[propertyName]));
 
         return sorted;
     }

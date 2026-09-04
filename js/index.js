@@ -79,6 +79,8 @@ let abstCtrl = new AbstractController();
 async function startApp() {
     await registerWorker();
 
+    AbstractController.getPersistentStorage();
+
     AbstractController.checkVersion();
     SettingsController.setVersion(VERSION);
 

@@ -33,7 +33,10 @@ export default class GlobalNoteFolder extends AbstractModel {
 
     static async getAllFolders() {
         const noteFolder = new GlobalNoteFolder;
-        const foldersFromDb = await noteFolder.readAllFromLocalDB('globalNoteFolders');
+        let foldersFromDb = await noteFolder.readAllFromLocalDB('globalNoteFolders');
+
+        foldersFromDb = Fn.sortByProperty(foldersFromDb, 'name');
+
         const allFolders = this.#systemFolders.concat(foldersFromDb);
 
         return allFolders.map(globalNoteFolder => this.writeDataToInstance(globalNoteFolder));
@@ -54,10 +57,11 @@ export default class GlobalNoteFolder extends AbstractModel {
 
     static async getAllByParentFolderId(parentFolderId) {
         const noteFolder = new GlobalNoteFolder;
-        const allFoldersFromDB = await noteFolder.readAllByIndexFromLocalDB('globalNoteFolders', 'parentFolderId', parentFolderId);
+        let allFoldersFromDB = await noteFolder.readAllByIndexFromLocalDB('globalNoteFolders', 'parentFolderId', parentFolderId);
         const systemFolders = [];
 
         this.#systemFolders.map(folder => { if (folder.parentFolderId == parentFolderId) systemFolders.push(folder) });
+        allFoldersFromDB = Fn.sortByProperty(allFoldersFromDB, 'name');
 
         const allFolders = systemFolders.concat(allFoldersFromDB);
 

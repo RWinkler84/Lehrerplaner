@@ -120,7 +120,7 @@ export default class GlobalNotesView {
 
     static #hideContextMenuTimerId = null;
 
-    static renderGlobalNoteIcons(notesArray, clipboardContent) {
+    static renderGlobalNoteIcons(notesArray, clipboardContent, noteIdsToPreselect = null) {
         const container = document.querySelector('#noteIconContainer')
         const fragment = document.createDocumentFragment();
         const blankDiv = document.createElement('div');
@@ -128,6 +128,12 @@ export default class GlobalNotesView {
         const noteContainer = blankDiv.cloneNode();
         const iconWrapper = blankDiv.cloneNode();
         const noteIcon = blankDiv.cloneNode();
+
+        const preselectLookup = {}
+
+        if (noteIdsToPreselect) {
+            noteIdsToPreselect.forEach(id => preselectLookup[id] = true);
+        }
 
         noteIcon.classList.add('noteIcon', 'fileIcon');
 
@@ -153,6 +159,8 @@ export default class GlobalNotesView {
                 if (clipboardContent[globalNote.id].operationType == 'cut') currentNoteContainer.classList.add('cut');
             }
 
+            if (preselectLookup[globalNote.id]) currentNoteContainer.classList.add('selected');
+
             fragment.append(currentNoteContainer);
         })
 
@@ -163,7 +171,7 @@ export default class GlobalNotesView {
         container.append(fragment);
     }
 
-    static renderFolderIcons(folderArray, clipboardContent) {
+    static renderFolderIcons(folderArray, clipboardContent, folderIdsToPreselect = null) {
         const container = document.querySelector('#folderIconContainer')
         const fragment = document.createDocumentFragment();
         const blankDiv = document.createElement('div');
@@ -171,6 +179,12 @@ export default class GlobalNotesView {
         const folderContainer = blankDiv.cloneNode();
         const iconWrapper = blankDiv.cloneNode();
         const folderIcon = blankDiv.cloneNode();
+
+        const preselectLookup = {};
+
+        if (folderIdsToPreselect) {
+            folderIdsToPreselect.forEach(id => preselectLookup[id] = true);
+        }
 
         folderIcon.classList.add('folderIconSolid', 'fileIcon');
 
@@ -195,6 +209,8 @@ export default class GlobalNotesView {
             if (clipboardContent[folder.id]) {
                 if (clipboardContent[folder.id].operationType == 'cut') currentFolderContainer.classList.add('cut');
             }
+
+            if (preselectLookup[folder.id]) currentFolderContainer.classList.add('selected');
 
             fragment.append(currentFolderContainer);
         })
@@ -528,7 +544,6 @@ export default class GlobalNotesView {
         const folderContainer = blankDiv.cloneNode();
         const iconWrapper = blankDiv.cloneNode();
         const folderIcon = blankDiv.cloneNode();
-        const textareaWrapper = blankDiv.cloneNode();
         const buttonContainer = blankDiv.cloneNode();
         const saveButton = blankButton.cloneNode();
         const cancelButton = blankButton.cloneNode();
@@ -622,6 +637,8 @@ export default class GlobalNotesView {
 
         folderIconContainer.classList.remove('editable');
         folderNameWrapper.classList.remove('notDisplayed');
+
+        folderIconContainer.classList.add('selected');
         textarea.remove();
         buttonContainer.remove();
     }
@@ -629,6 +646,10 @@ export default class GlobalNotesView {
     ////////////////////
     // item selection //
     ////////////////////
+
+    static markItemAsSelected(element) {
+        element.classList.add('selected');
+    }
 
     static drawSelectionRectangle(event) {
         const globalNotesContainer = document.querySelector('#globalNotesContainer');

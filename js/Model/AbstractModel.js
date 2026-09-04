@@ -9,12 +9,13 @@ export default class AbstractModel {
         let userInfo = await this.getLocalUserInfo();
         let allowedActionsUnregisteredUser = [
             'login', 'createAccount', 'authenticateMail', 'resendAuthMail', 'resetPassword',
-            'sendPasswortResetMail', 'sendSupportTicket', 'sendPlusRevocation'
+            'sendPasswortResetMail', 'sendSupportTicket', 'sendPlusRevocation', 'versionCheck'
         ];
         let allowedActionsPlusExpired = [
             'getUserInfo', 'login', 'logout', 'authenticateMail', 'resendAuthMail', 'resetPassword', 'sendPasswortResetMail',
             'sendSupportTicket', 'processPurchase', 'createStripeSession', 'receivePaymentStatusUpdate', 'getDbUpdateTimestamps',
-            'delete', 'saveTimetableUpdates', 'sendPlusRevocation'
+            'delete', 'saveTimetableUpdates', 'sendPlusRevocation',
+            'versionCheck'
         ];
 
 
@@ -24,7 +25,7 @@ export default class AbstractModel {
 
             return { status: 'failed', error: 'unregistered user' }
         }
-
+        
         if (!allowedActionsPlusExpired.includes(action) && userInfo.plusActive == false) {
             return { status: 'failed', error: 'Plus licence expired' }
         }
@@ -382,7 +383,7 @@ export default class AbstractModel {
     }
 
     async checkVersion() {
-        const response = await this.makeAjaxQuery('versionCheck', '');
+        const response = await this.makeAjaxQuery('versionCheck', 'versionCheck');
 
         if (response.status == 'success') {
             return {
