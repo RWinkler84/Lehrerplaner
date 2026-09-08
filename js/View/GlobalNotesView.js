@@ -1,4 +1,5 @@
 import Editor from "../inc/editor.js";
+import Fn from '../inc/utils.js';
 import { globalItemsMultiSelectData, MOBILE_VIEW_WIDTH, SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNotesView {
@@ -37,6 +38,10 @@ export default class GlobalNotesView {
                 text: 'neue Notiz'
             },
             {
+                action: 'openSortingMenu',
+                text: 'sortieren nach:'
+            },
+            {
                 action: 'pasteGlobalItem',
                 text: 'einfügen'
             }
@@ -57,6 +62,20 @@ export default class GlobalNotesView {
         ],
         // trash
         trashClicked: [
+            {
+                action: 'restoreAllTrash',
+                text: 'wiederherstellen'
+            },
+            {
+                action: 'deleteAllTrash',
+                text: 'Papierkorb leeren'
+            },
+            {
+                action: 'openSortingMenu',
+                text: 'sortieren nach:'
+            }
+        ],
+        trashItemClicked: [
             {
                 action: 'restoreAllTrash',
                 text: 'wiederherstellen'
@@ -97,6 +116,10 @@ export default class GlobalNotesView {
                 action: 'deleteItemFromTrash',
                 text: 'endgültig löschen'
             },
+            {
+                action: 'openSortingMenu',
+                text: 'sortieren nach:'
+            },
         ],
         trashMultiSelect: [
             {
@@ -114,6 +137,20 @@ export default class GlobalNotesView {
             {
                 action: 'deleteItemFromTrash',
                 text: 'endgültig löschen'
+            }
+        ],
+        sortingMenu: [
+            {
+                action: 'byName',
+                text: 'Name'
+            },
+            {
+                action: 'byCreated',
+                text: 'Erstellung'
+            },
+            {
+                action: 'byLastEdited',
+                text: 'Änderung'
             }
         ]
     }
@@ -152,6 +189,7 @@ export default class GlobalNotesView {
             currentNoteContainer.setAttribute('tabindex', 0);
             currentNoteContainer.dataset.note_id = globalNote.id;
             currentNoteContainer.dataset.created = globalNote.created;
+            currentNoteContainer.dataset.last_edited = globalNote.lastEdited;
 
             if (globalNote.parentIdBeforeDelete !== null) currentNoteContainer.dataset.parent_id_before_delete = globalNote.parentIdBeforeDelete;
 
@@ -203,6 +241,7 @@ export default class GlobalNotesView {
             currentFolderContainer.setAttribute('tabindex', 0);
             currentFolderContainer.dataset.folder_id = folder.id;
             currentFolderContainer.dataset.created = folder.created;
+            currentFolderContainer.dataset.last_edited = folder.lastEdited;
 
             if (folder.parentIdBeforeDelete !== null) currentFolderContainer.dataset.parent_id_before_delete = folder.parentIdBeforeDelete;
 
@@ -343,7 +382,7 @@ export default class GlobalNotesView {
             const currentButton = blankButton.cloneNode();
 
             currentButton.classList.add('contextMenuButton');
-            currentButton.textContent = item.text;
+            currentButton.innerHTML = item.text;
             currentButton.id = `${item.action}Button`;
 
             if (item.action == 'pasteGlobalItem') {
@@ -353,6 +392,12 @@ export default class GlobalNotesView {
             menuContainer.append(currentButton);
         })
 
+        // disable buttons if necessary 
+        if (menuData.menuType == 'sortingMenu') {
+            document.querySelectorAll('.globalNoteContextMenu[data-menu_type="folderClicked"] button').forEach(button => button.disabled = true)
+            document.querySelectorAll('.globalNoteContextMenu[data-menu_type="trashClicked"] button').forEach(button => button.disabled = true)
+        }
+        // trash context menu
         if (sourceElement.dataset.folder_id == 1 && isTrashEmpty) {
             menuContainer.querySelectorAll('button').forEach(button => button.disabled = true);
         }
@@ -428,6 +473,7 @@ export default class GlobalNotesView {
     }
 
     static getMenuToRender(sourceElement) {
+        console.log(sourceElement);
         let menuData = {
             menuType: 'itemClicked',
             menuToRender: this.#contextMenus.itemClicked
@@ -442,7 +488,12 @@ export default class GlobalNotesView {
             menuData.menuToRender = this.#contextMenus.trashClicked;
             menuData.menuType = 'trashClicked';
 
+            if (sourceElement.classList.contains('folderIconContainer')) {
+                menuData.menuToRender = this.#contextMenus.trashItemClicked;
+                menuData.menuType = 'trashItemClicked'
+            };
         }
+
         if (globalNotesContainer.querySelectorAll('.selected').length > 1) {
             menuData.menuToRender = this.#contextMenus.multiSelect
             menuData.menuType = 'multiClicked';
@@ -462,6 +513,40 @@ export default class GlobalNotesView {
             if (globalNotesContainer.querySelectorAll('.selected').length > 1) {
                 menuData.menuToRender = this.#contextMenus.trashMultiSelect;
                 menuData.menuType = 'trashMultiSelect';
+            }
+        }
+
+        if (sourceElement.id == 'openSortingMenuButton') {
+            menuData.menuToRender = this.#contextMenus.sortingMenu;
+            menuData.menuType = 'sortingMenu';
+
+            const sortationInfo = this.getSortationInfo();
+
+            // add to up or down arrow to the option
+            if (sortationInfo.order == 'normal') {
+                menuData.menuToRender = menuData.menuToRender.map(option => {
+                    let text = option.text;
+                    console.log(option)
+                    if (option.action == sortationInfo.mode) text = option.text + ' &#8593;';
+
+                    return {
+                        text: text,
+                        action: option.action
+                    }
+                })
+            }
+
+            if (sortationInfo.order == 'reverse') {
+                menuData.menuToRender = menuData.menuToRender.map(option => {
+                    let text = option.text;
+
+                    if (option.action == sortationInfo.mode) text = option.text + ' &#8595;';
+
+                    return {
+                        text: text,
+                        action: option.action
+                    }
+                })
             }
         }
 
@@ -682,13 +767,20 @@ export default class GlobalNotesView {
         globalNotesContainer.append(selectionRect);
     }
 
-    static getAllSelectableItems() {
+    static getAllSelectableItems(mergeToSingleArray = true) {
         const fileContainer = document.querySelector('#globalNotesFileSystemDisplay');
 
         const allFolders = fileContainer.querySelectorAll('.folderIconContainer');
         const allNotes = fileContainer.querySelectorAll('.noteIconContainer');
 
-        return Array.from(allFolders).concat(Array.from(allNotes));
+        if (mergeToSingleArray) {
+            return Array.from(allFolders).concat(Array.from(allNotes));
+        } else {
+            return {
+                folders: Array.from(allFolders),
+                notes: Array.from(allNotes)
+            };
+        }
     }
 
     static calculateSelectablePositions() {
@@ -864,7 +956,95 @@ export default class GlobalNotesView {
         globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.add('cut'));
     }
 
+    static sortItems(sortingMode) {
+        const fileContainer = document.querySelector('#globalNotesFileContainer');
+        const folderItemContainer = fileContainer.querySelector('#folderIconContainer');
+        const noteItemContainer = fileContainer.querySelector('#noteIconContainer');
+        const sortationInfo = this.getSortationInfo();
+
+        let sortingOrder = 'normal';
+        let sortedFolders;
+        let sortedNotes;
+
+        if (sortationInfo.mode == sortingMode) {
+            sortingOrder = sortationInfo.order == 'normal' ? 'reverse' : 'normal';
+        }
+
+        fileContainer.dataset.sort_order = sortingOrder;
+        fileContainer.dataset.sorted_by = sortingMode;
+        
+        const allItems = this.getAllSelectableItems(false);
+        allItems.folders.splice(allItems.folders.findIndex(item => item.dataset.folder_id == SF_ID_TRASH), 1); // remove trash element
+
+        let foldersToSort = allItems.folders.map(item => {
+            return {
+                item: item,
+                name: item.querySelector('.folderNameWrapper')?.textContent,
+                lastEdited: new Date(item.dataset.last_edited).getTime(),
+                created: new Date(item.dataset.created).getTime(),
+            }
+        })
+
+        let notesToSort = allItems.notes.map(item => {
+            return {
+                item: item,
+                name: item.querySelector('.fileNameWrapper')?.textContent,
+                lastEdited: new Date(item.dataset.last_edited).getTime(),
+                created: new Date(item.dataset.created).getTime(),
+            }
+        })
+
+        switch (sortingMode) {
+            case 'byName':
+                sortedFolders = Fn.sortByProperty(foldersToSort, 'name');
+                sortedNotes = Fn.sortByProperty(notesToSort, 'name');
+                break;
+
+            case 'byLastEdited':
+                sortedFolders = Fn.sortByProperty(foldersToSort, 'lastEdited');
+                sortedNotes = Fn.sortByProperty(notesToSort, 'lastEdited');
+                break;
+
+            case 'byCreated':
+                sortedFolders = Fn.sortByProperty(foldersToSort, 'created');
+                sortedNotes = Fn.sortByProperty(notesToSort, 'created');
+                break;
+        }
+
+        if (sortingOrder == 'normal') {
+            sortedFolders.forEach(entry => {
+                folderItemContainer.append(entry.item);
+            })
+
+            sortedNotes.forEach(entry => {
+                noteItemContainer.append(entry.item);
+            })
+
+            return;
+        }
+
+        if (sortingOrder == 'reverse') {
+            for (let i = sortedFolders.length - 1; i >= 0; i--) {
+                folderItemContainer.append(sortedFolders[i].item);
+            }
+
+            for (let i = sortedNotes.length - 1; i >= 0; i--) {
+                noteItemContainer.append(sortedNotes[i].item);
+            }
+        }
+    }
+
+    static getSortationInfo() {
+        const container = document.querySelector('#globalNotesFileContainer');
+
+        return {
+            mode: container.dataset.sorted_by,
+            order: container.dataset.sort_order
+        }
+    }
+
     static getSourceElementOfContextMenu(event) {
+        if (event.target.id == 'openSortingMenuButton') return event.target;
         if (event.srcElement.closest('.folderIconContainer')) return event.srcElement.closest('.folderIconContainer');
         if (event.srcElement.closest('.noteIconContainer')) return event.srcElement.closest('.noteIconContainer');
 
@@ -915,7 +1095,7 @@ export default class GlobalNotesView {
     // buttons //
     /////////////
 
-    static toggleSaveDayNoteButton(activate = false) {
+    static toggleSaveGlobalNoteButton(activate = false) {
         const saveGlobalNoteButton = document.querySelector('#saveGlobalNoteButton');
 
         if (activate) {
@@ -957,6 +1137,7 @@ export default class GlobalNotesView {
         createFolderButton.disabled = false;
     }
 
+    // alerts
     static showGlobalNoteSavedMessage() {
         const message = document.querySelector('#globalNoteSavedMessage');
         message.classList.add('active');
