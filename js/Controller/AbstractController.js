@@ -47,6 +47,18 @@ export default class AbstractController {
         await View.greyOutHolidaysAndPassedDays(schoolYears);
     }
 
+    static async getPersistentStorage() {
+        if (navigator.storage) {
+            const persisted = await navigator.storage.persisted();
+
+            console.log('persistent storage: ', persisted);
+
+            if (!persisted) {
+                navigator.storage.persist();
+            }
+        }
+    }
+
     static openLoginDialog() {
         LoginController.openLoginDialog();
     }

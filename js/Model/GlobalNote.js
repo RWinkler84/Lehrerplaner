@@ -16,7 +16,9 @@ export default class GlobalNote extends AbstractModel {
 
     static async getAllNotes() {
         const globalNote = new GlobalNote;
-        const dataArray = await globalNote.readAllFromLocalDB('globalNotes')
+        let dataArray = await globalNote.readAllFromLocalDB('globalNotes')
+
+        dataArray = Fn.sortByProperty(dataArray, 'title');
 
         return dataArray.map(noteData => this.writeDataToInstance(noteData));
     }
@@ -30,7 +32,9 @@ export default class GlobalNote extends AbstractModel {
 
     static async getAllByParentFolderId(parentFolderId) {
         const note = new GlobalNote;
-        const allNotesOfFolder = await note.readAllByIndexFromLocalDB('globalNotes', 'parentFolderId', parentFolderId);
+        let allNotesOfFolder = await note.readAllByIndexFromLocalDB('globalNotes', 'parentFolderId', parentFolderId);
+
+        allNotesOfFolder = Fn.sortByProperty(allNotesOfFolder, 'title');
 
         return allNotesOfFolder.map(entry => this.writeDataToInstance(entry));
     }

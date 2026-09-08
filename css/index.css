@@ -966,6 +966,9 @@ dialog .errorMessageDisplay,
         box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.16);
         -webkit-user-select: none;
 
+        &[data-menu_type="sortingMenu"] {
+            border: solid 1px var(--lightgrey);
+        }
 
         button {
             color: var(--bodyBackground);
@@ -2198,6 +2201,10 @@ p {
 
             .contextMenuButton {
                 padding: 0.5rem 1rem;
+            }
+
+            &[data-menu_type="sortingMenu"] {
+                border: unset;
             }
         }
 

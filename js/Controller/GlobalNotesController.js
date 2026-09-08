@@ -1,4 +1,4 @@
-import { SF_ID_TRASH, contextMenuEvent, globalItemsMultiSelectData } from "../index.js";
+import { MOBILE_VIEW_WIDTH, SF_ID_TRASH, contextMenuEvent, globalItemsMultiSelectData } from "../index.js";
 import GlobalNote from "../Model/GlobalNote.js";
 import GlobalNoteFolder from '../Model/GlobalNoteFolder.js';
 import View from "../View/GlobalNotesView.js";
@@ -12,19 +12,19 @@ export default class GlobalNotesController {
         View.toggleGlobalItemCreationButtons(!View.isInTrash())
     }
 
-    static async renderGlobalNoteIcons() {
+    static async renderGlobalNoteIcons(noteIdsToPreselect = null) {
         const globalNotes = await GlobalNote.getAllByParentFolderId(View.getDisplayedFolderId());
         const clipboardContent = GlobalNote.getClipboardContent();
 
-        View.renderGlobalNoteIcons(globalNotes, clipboardContent);
+        View.renderGlobalNoteIcons(globalNotes, clipboardContent, noteIdsToPreselect);
     }
 
-    static async renderFolderIcons() {
+    static async renderFolderIcons(folderIdsToPreselect = null) {
         const displayedFolder = View.getDisplayedFolderId();
         const allFolders = await GlobalNoteFolder.getAllByParentFolderId(displayedFolder);
         const clipboardContent = GlobalNoteFolder.getClipboardContent();
 
-        View.renderFolderIcons(allFolders, clipboardContent);
+        View.renderFolderIcons(allFolders, clipboardContent, folderIdsToPreselect);
 
         if (displayedFolder == 0) {
             View.renderTrashIcon(await GlobalNoteFolder.isTrashEmpty())
@@ -114,10 +114,10 @@ export default class GlobalNotesController {
         const globalNote = GlobalNote.writeDataToInstance(globalNoteData)
 
         await globalNote.save();
-        await this.renderGlobalNoteIcons();
+        await this.renderGlobalNoteIcons([globalNote.id]);
         View.showGlobalNoteSavedMessage();
         View.updateGlobalNoteDialog(globalNote);
-        View.toggleSaveDayNoteButton(false);
+        View.toggleSaveGlobalNoteButton(false);
     }
 
     static async batchSaveGlobalNotes(notesToSave, keepIds) {
@@ -130,9 +130,9 @@ export default class GlobalNotesController {
         const globalNote = GlobalNote.writeDataToInstance(globalNoteData)
 
         await globalNote.update();
-        await this.renderGlobalNoteIcons();
+        await this.renderGlobalNoteIcons([globalNote.id]);
         View.showGlobalNoteSavedMessage();
-        View.toggleSaveDayNoteButton(false);
+        View.toggleSaveGlobalNoteButton(false);
     }
 
     static async deleteGlobalNote(noteId) {
@@ -182,14 +182,14 @@ export default class GlobalNotesController {
         const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(noteFolderData);
 
         await globalNoteFolder.save();
-        await this.renderFolderIcons();
+        await this.renderFolderIcons([globalNoteFolder.id]);
     }
 
     static async updateGlobalNoteFolder(globalNoteFolderData) {
         const globalNoteFolder = GlobalNoteFolder.writeDataToInstance(globalNoteFolderData)
 
         await globalNoteFolder.update();
-        await this.renderFolderIcons();
+        await this.renderFolderIcons([globalNoteFolder.id]);
     }
 
     static cancelGlobalNotesFolderCreation(event) {
@@ -221,7 +221,7 @@ export default class GlobalNotesController {
 
         await globalNoteFolder.update();
 
-        View.removeFolderEditability(event);
+        await this.renderFolderIcons();
     }
 
     static cancelFolderEdit(event) {
@@ -263,7 +263,7 @@ export default class GlobalNotesController {
 
     static toggleSaveGlobalNoteButton(event) {
         if (event.target.id == 'globalNoteContentEditor' || event.target.id == 'globalNoteTitleInput') {
-            View.toggleSaveDayNoteButton(true);
+            View.toggleSaveGlobalNoteButton(true);
         }
     }
 
@@ -349,6 +349,9 @@ export default class GlobalNotesController {
         const selectedNotes = await this.getInstancesFromElements(selectedElements.notes);
 
         if (selectedElements.folders.length != 0) {
+            const trashIndex = selectedFolders.findIndex(folder => folder.id == SF_ID_TRASH);
+            if (trashIndex != -1) selectedFolders.splice(trashIndex, 1);
+
             await this.moveGlobalNoteFolderToTrash(selectedFolders);
             this.renderFolderIcons();
             this.closeAllContextMenus();
@@ -446,6 +449,10 @@ export default class GlobalNotesController {
     // multiple selection //
     ////////////////////////
 
+    static markItemAsSelected(element) {
+        View.markItemAsSelected(element);
+    }
+
     static selectMultipleOnMouseDrag(event) {
         globalItemsMultiSelectData.ignoreNextClickEvent = true;
 
@@ -458,6 +465,11 @@ export default class GlobalNotesController {
         this.closeAllContextMenus();
         View.drawSelectionRectangle(event);
         View.markItemsInRectangleSelected(event);
+    }
+
+    static selectAll() {
+        this.closeAllContextMenus();
+        View.selectAll();
     }
 
     static selectMultipleByTouch(event) {
@@ -513,6 +525,10 @@ export default class GlobalNotesController {
         return instanceArray;
     }
 
+    static sortItems(sortingMode) {
+        View.sortItems(sortingMode);
+    }
+
     ///////////////////
     // event hanlder //
     ///////////////////
@@ -554,6 +570,12 @@ export default class GlobalNotesController {
 
                 case (View.isCreateGlobalItemMenuOpen() && !target.closest('#createglobalItemsButtonContainer')):
                     View.closeCreateGlobalItemMenu();
+                    break;
+
+                // change selection
+                case (target.classList.contains('folderNameInput')):
+                    this.removeAllSelections();
+                    this.markItemAsSelected(target.closest('.folderIconContainer'));
                     break;
 
                 // keep selection
@@ -642,6 +664,27 @@ export default class GlobalNotesController {
 
                 case 'deleteAllTrashButton':
                     this.deleteAllTrashContent();
+                    break;
+
+                //sorting options menu
+                case 'openSortingMenuButton':
+                    if (window.innerWidth <= MOBILE_VIEW_WIDTH) this.closeAllContextMenus();
+                    this.openContextMenu(event);
+                    break;
+
+                case 'byNameButton':
+                    this.sortItems('byName');
+                    this.closeAllContextMenus();
+                    break;
+
+                case 'byCreatedButton':
+                    this.sortItems('byCreated');
+                    this.closeAllContextMenus();
+                    break;
+
+                case 'byLastEditedButton':
+                    this.sortItems('byLastEdited');
+                    this.closeAllContextMenus();
                     break;
             }
 
@@ -739,10 +782,19 @@ export default class GlobalNotesController {
                 case 'x':
                     this.cutGlobalItem();
                     break;
+
+                case 'a':
+                    event.preventDefault();
+                    this.selectAll();
+                    break;
+
+                case 'Backspace':
+                    this.moveGlobalItemToTrash();
+                    break;
             }
         }
 
-        if (event.key == 'Backspace' || event.key == 'Delete') {
+        if (event.key == 'Delete') {
             this.moveGlobalItemToTrash();
         }
     }
@@ -762,7 +814,7 @@ export default class GlobalNotesController {
                     if (target.closest('.folderIconContainer').classList.contains('new')) return;
                     if (target.closest('.folderIconContainer').classList.contains('editable')) return;
                     if ((View.getContextMenuInfo())?.menuType == 'folderClicked') return;
-                    
+
                     selectedItemsCount = this.selectMultipleByTouch(event);
 
                     if (selectedItemsCount.before < selectedItemsCount.after && selectedItemsCount.before == 1) {
