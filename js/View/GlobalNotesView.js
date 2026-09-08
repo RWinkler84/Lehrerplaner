@@ -473,7 +473,6 @@ export default class GlobalNotesView {
     }
 
     static getMenuToRender(sourceElement) {
-        console.log(sourceElement);
         let menuData = {
             menuType: 'itemClicked',
             menuToRender: this.#contextMenus.itemClicked
@@ -526,7 +525,7 @@ export default class GlobalNotesView {
             if (sortationInfo.order == 'normal') {
                 menuData.menuToRender = menuData.menuToRender.map(option => {
                     let text = option.text;
-                    console.log(option)
+                    
                     if (option.action == sortationInfo.mode) text = option.text + ' &#8593;';
 
                     return {
