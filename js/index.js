@@ -28,7 +28,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.080926';
+export const VERSION = '0.9.220926';
 
 export const SF_ID_ROOT = 0;
 export const SF_ID_TRASH = 1;
@@ -108,7 +108,7 @@ async function startApp() {
     });
 
     document.addEventListener('keydown', (event) => {
-        if (event.srcElement.closest('.editorContainer')) Editor.handleKeyDownEvents(event);
+        if (event.target.closest('.editorContainer')) Editor.handleKeyDownEvents(event);
         if (document.querySelector('#globalNotesContainer')?.style.display == 'block') GlobalNotesController.handleKeyboardShortcuts(event);
     });
 
@@ -149,6 +149,9 @@ async function startApp() {
     document.querySelector('#curriculumContainer').addEventListener('click', CurriculumController.handleClickEvents);
     document.querySelector('#yearContainer').addEventListener('pointerdown', CurriculumController.handleMouseDownOnDayElements);
 
+    //note search
+    document.querySelector('#globalNoteSearchResultContainer').addEventListener('change', GlobalNotesController.handleChangeEvents)
+
     //on site login
     document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('cancel', LoginController.dialogEventHandler));
 
@@ -157,10 +160,11 @@ async function startApp() {
 
     //text editor
     document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('click', Editor.handleClickEvents));
-    // document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('keydown', Editor.handleKeyDownEvents));
     document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
+        if (event.target.id == 'globalNoteSearchInput') GlobalNotesController.runSearch();
         if (!event.target.closest('.textEditor')) return;
+
         Editor.normalizeInput(event);
         LessonNoteController.toggleSaveLessonNoteButton(event);
         LessonController.toggleSaveCurriculumSpanNoteButton(event);
@@ -169,7 +173,7 @@ async function startApp() {
     });
 
     document.addEventListener('selectionchange', (event) => {
-        if (event.srcElement.tagName == 'TEXTAREA') return;
+        if (event.target.tagName == 'TEXTAREA') return;
         Editor.updateButtonStatus(event)
     });
 

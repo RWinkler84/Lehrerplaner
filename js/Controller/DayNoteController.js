@@ -81,6 +81,10 @@ export default class DayNoteController {
         this.renderDayNoteIcons();
     }
 
+    static async searchDayNotesByString(searchString) {
+        return await DayNote.searchDayNotesByString(searchString);
+    }
+
     static clickHandler(event) {
         const target = event.target;
 

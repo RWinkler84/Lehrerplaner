@@ -31,6 +31,10 @@ export default class LessonNoteController {
         return await LessonNote.getById(id);
     }
 
+    static async searchLessonNotesByString(searchString) {
+        return await LessonNote.searchLessonNotesByString(searchString);
+    }
+
     static async saveLessonNote() {
         let noteData = LessonNoteView.getNoteDataFromForm();
 

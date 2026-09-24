@@ -25,7 +25,7 @@ export default class AbstractModel {
 
             return { status: 'failed', error: 'unregistered user' }
         }
-        
+
         if (!allowedActionsPlusExpired.includes(action) && userInfo.plusActive == false) {
             return { status: 'failed', error: 'Plus licence expired' }
         }
@@ -177,7 +177,7 @@ export default class AbstractModel {
                     let transaction = db.transaction(store, 'readwrite').objectStore(store).put(entry);
                     transaction.onsuccess = () => {
                         this.markLocalDBUpdated(store);
-                        resolve({status: 'success'});
+                        resolve({ status: 'success' });
                         transaction.onerror = () => {
                             resolve({ status: 'failed' })
                         }
@@ -194,7 +194,7 @@ export default class AbstractModel {
         return new Promise(resolve => {
             transaction.onsuccess = () => {
                 this.markLocalDBUpdated(store)
-                resolve({status: 'success'});
+                resolve({ status: 'success' });
                 transaction.onerror = () => {
                     resolve({ status: 'failed' })
                 }
@@ -706,57 +706,110 @@ export default class AbstractModel {
                 });
         }
 
+        const unsyncedSubjects = await this.readAllFromLocalDB('unsyncedSubjects');
+        const unsyncedDeletedSubjects = await this.readAllFromLocalDB('unsyncedDeletedSubjects');
+
+        const unsyncedTimetables = await this.readAllFromLocalDB('unsyncedTimetables');
+
+        const unsyncedTimetableChanges = await this.readAllFromLocalDB('unsyncedTimetableChanges');
+        const unsyncedDeletedTimetableChanges = await this.readAllFromLocalDB('unsyncedDeletedTimetableChanges');
+
+        const unsyncedTasks = await this.readAllFromLocalDB('unsyncedTasks');
+        const unsyncedDeletedTasks = await this.readAllFromLocalDB('unsyncedDeletedTasks');
+
+        const unsyncedLessonNotes = await this.readAllFromLocalDB('unsyncedLessonNotes');
+        const unsyncedDeletedLessonNotes = await this.readAllFromLocalDB('unsyncedDeletedLessonNotes');
+
+        const unsyncedSchoolYears = await this.readAllFromLocalDB('unsyncedSchoolYears');
+        const unsyncedDeletedSchoolYears = await this.readAllFromLocalDB('unsyncedDeletedSchoolYears');
+
+        const unsyncedDayNotes = await this.readAllFromLocalDB('unsyncedDayNotes');
+        const unsyncedDeletedDayNotes = await this.readAllFromLocalDB('unsyncedDeletedDayNotes');
+
+        const unsyncedGlobalNotes = await this.readAllFromLocalDB('unsyncedGlobalNotes');
+        const unsyncedDeletedGlobalNotes = await this.readAllFromLocalDB('unsyncedDeletedGlobalNotes');
+
+        const unsyncedGlobalNoteFolders = await this.readAllFromLocalDB('unsyncedGlobalNoteFolders');
+        const unsyncedDeletedGlobalNoteFolders = await this.readAllFromLocalDB('unsyncedDeletedGlobalNoteFolders');
+
+
         //send data with differing timestamps
-        if (remoteTimestamps[0].subjects != localTimestamps.subjects) {
-            dataToSync['subjects'] = await this.readAllFromLocalDB('unsyncedSubjects');
-            dataToSync['deletedSubjects'] = await this.readAllFromLocalDB('unsyncedDeletedSubjects');
+        if (remoteTimestamps[0].subjects != localTimestamps.subjects ||
+            unsyncedSubjects.length != 0 ||
+            unsyncedDeletedSubjects.length != 0
+        ) {
+            dataToSync['subjects'] = unsyncedSubjects;
+            dataToSync['deletedSubjects'] = unsyncedDeletedSubjects;
             tablesToUpdate.subjects = true;
         }
 
-        if (remoteTimestamps[0].timetable != localTimestamps.timetable) {
-            dataToSync['timetable'] = await this.readAllFromLocalDB('unsyncedTimetables');
+        if (remoteTimestamps[0].timetable != localTimestamps.timetable ||
+            unsyncedTimetables.length != 0
+        ) {
+            dataToSync['timetable'] = unsyncedTimetables;
             tablesToUpdate.timetable = true;
         }
 
-        if (remoteTimestamps[0].timetableChanges != localTimestamps.timetableChanges) {
-            dataToSync['timetableChanges'] = await this.readAllFromLocalDB('unsyncedTimetableChanges');
-            dataToSync['deletedTimetableChanges'] = await this.readAllFromLocalDB('unsyncedDeletedTimetableChanges');
+        if (remoteTimestamps[0].timetableChanges != localTimestamps.timetableChanges ||
+            unsyncedTimetableChanges.length != 0 ||
+            unsyncedDeletedTimetableChanges.length != 0
+        ) {
+            dataToSync['timetableChanges'] = unsyncedTimetableChanges;
+            dataToSync['deletedTimetableChanges'] = unsyncedDeletedTimetableChanges;
             tablesToUpdate.timetableChanges = true;
         }
 
-        if (remoteTimestamps[0].tasks != localTimestamps.tasks) {
-            dataToSync['tasks'] = await this.readAllFromLocalDB('unsyncedTasks');
-            dataToSync['deletedTasks'] = await this.readAllFromLocalDB('unsyncedDeletedTasks');
+        if (remoteTimestamps[0].tasks != localTimestamps.tasks ||
+            unsyncedTasks.length != 0 ||
+            unsyncedDeletedTasks.length != 0
+        ) {
+            dataToSync['tasks'] = unsyncedTasks;
+            dataToSync['deletedTasks'] = unsyncedDeletedTasks;
             tablesToUpdate.tasks = true;
         }
 
-        if (remoteTimestamps[0].lessonNotes != localTimestamps.lessonNotes) {
-            dataToSync['lessonNotes'] = await this.readAllFromLocalDB('unsyncedLessonNotes');
-            dataToSync['deletedLessonNotes'] = await this.readAllFromLocalDB('unsyncedDeletedLessonNotes');
+        if (remoteTimestamps[0].lessonNotes != localTimestamps.lessonNotes ||
+            unsyncedLessonNotes.length != 0 ||
+            unsyncedDeletedLessonNotes.length != 0
+        ) {
+            dataToSync['lessonNotes'] = unsyncedLessonNotes;
+            dataToSync['deletedLessonNotes'] = unsyncedDeletedLessonNotes;
             tablesToUpdate.lessonNotes = true;
         }
 
-        if (remoteTimestamps[0].schoolYears != localTimestamps.schoolYears) {
-            dataToSync['schoolYears'] = await this.readAllFromLocalDB('unsyncedSchoolYears');
-            dataToSync['deletedSchoolYears'] = await this.readAllFromLocalDB('unsyncedDeletedSchoolYears');
+        if (remoteTimestamps[0].schoolYears != localTimestamps.schoolYears ||
+            unsyncedSchoolYears.length != 0 ||
+            unsyncedDeletedSchoolYears.length != 0
+        ) {
+            dataToSync['schoolYears'] = unsyncedSchoolYears;
+            dataToSync['deletedSchoolYears'] = unsyncedDeletedSchoolYears;
             tablesToUpdate.schoolYears = true;
         }
 
-        if (remoteTimestamps[0].dayNotes != localTimestamps.dayNotes) {
-            dataToSync['dayNotes'] = await this.readAllFromLocalDB('unsyncedDayNotes');
-            dataToSync['deletedDayNotes'] = await this.readAllFromLocalDB('unsyncedDeletedDayNotes');
+        if (remoteTimestamps[0].dayNotes != localTimestamps.dayNotes ||
+            unsyncedDayNotes.length != 0 ||
+            unsyncedDeletedDayNotes.length != 0
+        ) {
+            dataToSync['dayNotes'] = unsyncedDayNotes;
+            dataToSync['deletedDayNotes'] = unsyncedDeletedDayNotes;
             tablesToUpdate.dayNotes = true;
         }
 
-        if (remoteTimestamps[0].globalNotes != localTimestamps.globalNotes) {
-            dataToSync['globalNotes'] = await this.readAllFromLocalDB('unsyncedGlobalNotes');
-            dataToSync['deletedGlobalNotes'] = await this.readAllFromLocalDB('unsyncedDeletedGlobalNotes');
+        if (remoteTimestamps[0].globalNotes != localTimestamps.globalNotes ||
+            unsyncedGlobalNotes.length != 0 ||
+            unsyncedDeletedGlobalNotes.length != 0
+        ) {
+            dataToSync['globalNotes'] = unsyncedGlobalNotes;
+            dataToSync['deletedGlobalNotes'] = unsyncedDeletedGlobalNotes;
             tablesToUpdate.globalNotes = true;
         }
 
-        if (remoteTimestamps[0].globalNoteFolders != localTimestamps.globalNoteFolders) {
-            dataToSync['globalNoteFolders'] = await this.readAllFromLocalDB('unsyncedGlobalNoteFolders');
-            dataToSync['deletedGlobalNoteFolders'] = await this.readAllFromLocalDB('unsyncedDeletedGlobalNoteFolders');
+        if (remoteTimestamps[0].globalNoteFolders != localTimestamps.globalNoteFolders ||
+            unsyncedGlobalNoteFolders.length != 0 ||
+            unsyncedDeletedGlobalNoteFolders.length != 0
+        ) {
+            dataToSync['globalNoteFolders'] = unsyncedGlobalNoteFolders;
+            dataToSync['deletedGlobalNoteFolders'] = unsyncedDeletedGlobalNoteFolders;
             tablesToUpdate.globalNoteFolders = true;
         }
 
@@ -768,45 +821,63 @@ export default class AbstractModel {
         if (result.subjects.status && result.subjects.status == 'success') {
             this.clearObjectStore('unsyncedSubjects');
             this.clearObjectStore('unsyncedDeletedSubjects');
+        } else if (result.subjects.status && result.subjects.status == 'failed'){
+            tablesToUpdate.subjects = false;
         }
 
         if (result.timetable.status && result.timetable.status == 'success') {
             this.clearObjectStore('unsyncedTimetables');
+        } else if (result.timetable.status && result.timetable.status == 'failed'){
+            tablesToUpdate.timetable = false;
         }
 
         if (result.timetableChanges.status && result.timetableChanges.status == 'success') {
             this.clearObjectStore('unsyncedTimetableChanges');
             this.clearObjectStore('unsyncedDeletedTimetableChanges');
+        } else if (result.timetableChanges.status && result.timetableChanges.status == 'failed'){
+            tablesToUpdate.timetableChanges = false;
         }
 
         if (result.tasks.status && result.tasks.status == 'success') {
             this.clearObjectStore('unsyncedTasks');
             this.clearObjectStore('unsyncedDeletedTasks');
+        } else if (result.tasks.status && result.tasks.status == 'failed'){
+            tablesToUpdate.tasks = false;
         }
 
         if (result.lessonNotes.status && result.lessonNotes.status == 'success') {
             this.clearObjectStore('unsyncedLessonNotes');
             this.clearObjectStore('unsyncedDeletedLessonNotes');
+        } else if (result.lessonNotes.status && result.lessonNotes.status == 'failed'){
+            tablesToUpdate.lessonNotes = false;
         }
 
         if (result.schoolYears.status && result.schoolYears.status == 'success') {
             this.clearObjectStore('unsyncedSchoolYears');
             this.clearObjectStore('unsyncedDeletedSchoolYears');
+        } else if (result.schoolYears.status && result.schoolYears.status == 'failed'){
+            tablesToUpdate.schoolYears = false;
         }
 
         if (result.dayNotes.status && result.dayNotes.status == 'success') {
             this.clearObjectStore('unsyncedDayNotes');
             this.clearObjectStore('unsyncedDeletedDayNotes');
+        } else if (result.dayNotes.status && result.dayNotes.status == 'failed'){
+            tablesToUpdate.dayNotes = false;
         }
 
         if (result.globalNotes.status && result.globalNotes.status == 'success') {
             this.clearObjectStore('unsyncedGlobalNotes');
             this.clearObjectStore('unsyncedDeletedGlobalNotes');
+        } else if (result.globalNotes.status && result.globalNotes.status == 'failed'){
+            tablesToUpdate.globalNotes = false;
         }
 
         if (result.globalNoteFolders.status && result.globalNoteFolders.status == 'success') {
             this.clearObjectStore('unsyncedGlobalNoteFolders');
             this.clearObjectStore('unsyncedDeletedGlobalNoteFolders');
+        } else if (result.globalNoteFolders.status && result.globalNoteFolders.status == 'failed'){
+            tablesToUpdate.globalNoteFolders = false;
         }
 
         await this.updateLocalWithRemoteData(tablesToUpdate);

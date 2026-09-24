@@ -2,6 +2,8 @@ import { MOBILE_VIEW_WIDTH, SF_ID_TRASH, contextMenuEvent, globalItemsMultiSelec
 import GlobalNote from "../Model/GlobalNote.js";
 import GlobalNoteFolder from '../Model/GlobalNoteFolder.js';
 import View from "../View/GlobalNotesView.js";
+import DayNoteController from "./DayNoteController.js";
+import LessonNoteController from "./LessonNoteController.js";
 
 export default class GlobalNotesController {
     static async renderGlobalNotesView() {
@@ -529,8 +531,28 @@ export default class GlobalNotesController {
         View.sortItems(sortingMode);
     }
 
+    static async runSearch() {
+        const searchString = document.querySelector('#globalNoteSearchInput').value;
+        const notesToSearch = View.getNoteTypesToSearchThrough();
+        const displayedSearchString = View.getDisplayedSearchStrings();
+
+        let results = {
+            globalNotes: [],
+            dayNotes: [],
+            lessonNotes: []
+        };
+
+        if (searchString.trim() != '' && searchString.length >= 2) {
+            if (notesToSearch.globalNotes && searchString != displayedSearchString.globalNotes) results.globalNotes = await GlobalNote.searchGlobalNotesByString(searchString);
+            if (notesToSearch.dayNotes && searchString != displayedSearchString.dayNotes) results.dayNotes = await DayNoteController.searchDayNotesByString(searchString);
+            if (notesToSearch.lessonNotes && searchString != displayedSearchString.lessonNotes) results.lessonNotes = await LessonNoteController.searchLessonNotesByString(searchString);
+        }
+
+        View.showSearchResults(results, searchString);
+    }
+
     ///////////////////
-    // event hanlder //
+    // event handler //
     ///////////////////
 
     static clickHandler(event) {
@@ -594,6 +616,16 @@ export default class GlobalNotesController {
             }
 
             switch (target.id) {
+                //tab switching
+                case 'showGlobalNoteFiles':
+                    View.openFileOverviewTab();
+                    break;
+
+                case 'showGlobalNoteSearch':
+                    View.openSearchTab();
+                    break;
+
+                //note navigation and creation
                 case 'folderBackwardButton':
                     this.navigateFolderHistory('backward');
                     break;
@@ -858,8 +890,20 @@ export default class GlobalNotesController {
                     }
                     break;
             }
+        }
+    }
 
+    static async handleChangeEvents(event) {
+        if (!event.target.closest('#globalNoteSearchResultContainer')) return;
 
+        const target = event.target;
+
+        switch (target.id) {
+            case 'searchGlobalNotesCheckbox':
+            case 'searchDayNotesCheckbox':
+            case 'searchLessonNotesCheckbox':
+                await GlobalNotesController.runSearch();
+                break;
         }
     }
 }

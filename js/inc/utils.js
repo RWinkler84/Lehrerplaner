@@ -1,4 +1,4 @@
-import { ONEDAY } from "../index.js";
+import { ONEDAY, ALLOWEDTAGS } from "../index.js";
 
 export default class Utils {
 
@@ -230,5 +230,32 @@ export default class Utils {
         for (const i in object) return false;
 
         return true;
+    }
+
+    static getAllChildNodesOfElement(element) {
+        const childNodes = [];
+
+        element.childNodes.forEach(node => {
+            getChildNodes(node, childNodes);
+
+            function getChildNodes(node) {
+                if (node.nodeType == Node.TEXT_NODE && node.textContent.trim() != '') childNodes.push(node);
+                if (node.childNodes.length != 0) {
+                    node.childNodes.forEach(node => getChildNodes(node));
+                    childNodes.push(node);
+                }
+            }
+        });
+
+        return childNodes;
+    }
+
+    static removeHtmlTagsFromString(string) {
+        ALLOWEDTAGS.forEach(tag => {
+            string = string.replaceAll(`<${tag}>`, ' ');
+            string = string.replaceAll(`</${tag}>`, ' ');
+        })
+
+        return string;
     }
 }

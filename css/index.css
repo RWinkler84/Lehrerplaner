@@ -949,6 +949,7 @@ dialog .errorMessageDisplay,
     position: relative;
     flex-direction: column;
     padding-top: 0;
+    margin-top: 0.25rem;
 
     &[style="display: block;"] {
         display: flex !important;
@@ -1042,6 +1043,38 @@ dialog .errorMessageDisplay,
         }
     }
 
+    #globalNotesTabContainer {
+        margin: -0.25rem -2rem 0;
+
+        button {
+            width: 100%;
+            border: none;
+            border-radius: var(--standardRadius) var(--standardRadius) 0 0;
+            border-bottom: 0;
+            font-size: 1rem;
+            color: var(--bodyBackground);
+            padding: 0.25rem;
+            background-color: var(--lightgrey);
+
+            &.selected {
+                background-color: var(--contentContainerBackground);
+            }
+
+            &:not(.selected):hover {
+                background-color: var(--lightergrey);
+            }
+
+            &:first-child {
+                border-right: 1px solid var(--labelgrey);
+            }
+
+            &:last-child {
+                border-left: 1px solid var(--labelgrey);
+
+            }
+        }
+    }
+
     #globalNotesFileSystemDisplay {
         display: flex;
         flex-direction: column;
@@ -1059,7 +1092,7 @@ dialog .errorMessageDisplay,
             gap: 1rem;
             position: sticky;
             top: 2rem;
-            padding-top: 2rem;
+            padding-top: 1rem;
             padding-bottom: 0.5rem;
             background-color: var(--contentContainerBackground);
             z-index: 49;
@@ -1095,61 +1128,86 @@ dialog .errorMessageDisplay,
                 }
             }
         }
+    }
 
-        .folderIconContainer,
-        .noteIconContainer {
-            width: 6.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            padding: 0.25rem;
-            border: 0.25rem solid var(--contentContainerBackground);
-            /* border-radius: var(--standardRadius); */
-            border-radius: 10px;
-            align-items: center;
+    .folderIconContainer,
+    .noteIconContainer {
+        width: 6.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.25rem;
+        border: 0.25rem solid var(--contentContainerBackground);
+        border-radius: 10px;
+        align-items: center;
+        overflow: hidden;
+        -webkit-user-select: none;
+
+        &:focus-visible {
+            outline: none;
+        }
+
+        &.selected {
+            background-color: var(--lightBlue);
+        }
+
+        &.cut {
+            opacity: 0.5;
+        }
+
+        .fileIcon {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .folderNameWrapper,
+        .folderNameWrapperOnPath,
+        .fileNameWrapper {
+            max-width: 100%;
+            font-size: 0.8rem;
             overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            cursor: default;
+            user-select: none;
             -webkit-user-select: none;
+        }
 
-            &:focus-visible {
-                outline: none;
+        textarea {
+            font-size: 0.8rem;
+            resize: none;
+            field-sizing: content;
+            height: unset;
+        }
+
+        .alertRing {
+            width: 100%;
+        }
+    }
+
+    #globalNoteSearchContainer {
+        margin-top: 1rem;
+
+        #globalNoteSearchResultContainer {
+            margin-top: 1rem;
+
+            .highlightedText {
+                background-color: yellow;
             }
 
-            &.selected {
-                background-color: var(--lightBlue);
-            }
+            .searchResultWrapper {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
 
-            &.cut {
-                opacity: 0.5;
-            }
+                .noteIconContainer {
+                    min-width: 6.5rem;
+                }
 
-            .fileIcon {
-                width: 2rem;
-                height: 2rem;
-            }
-
-            .folderNameWrapper,
-            .folderNameWrapperOnPath,
-            .fileNameWrapper {
-                max-width: 100%;
-                font-size: 0.8rem;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                text-align: center;
-                cursor: default;
-                user-select: none;
-                -webkit-user-select: none;
-
-            }
-
-            textarea {
-                font-size: 0.8rem;
-                resize: none;
-                field-sizing: content;
-                height: unset;
-            }
-
-            .alertRing {
-                width: 100%;
+                .matchCountPara {
+                    margin-top: 1rem;
+                    font-style: italic;
+                }
             }
         }
     }
@@ -1551,6 +1609,10 @@ h4 {
 
 .marginTop {
     margin-top: 1rem;
+}
+
+.doubleMarginTop {
+    margin-top: 2rem;
 }
 
 .centeredText {
@@ -2182,8 +2244,11 @@ p {
         #globalNotesFileSystemDisplay {
             #folderNavigatonContainer {
                 padding-top: 1.5rem;
-
             }
+        }
+
+        #globalNotesTabContainer {
+            margin: -0.25rem -0.5rem 0;
         }
 
         button,

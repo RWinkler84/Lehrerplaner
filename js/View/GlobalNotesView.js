@@ -157,6 +157,22 @@ export default class GlobalNotesView {
 
     static #hideContextMenuTimerId = null;
 
+    static openSearchTab() {
+        document.querySelector('#globalNoteSearchContainer').classList.remove('notDisplayed');
+        document.querySelector('#showGlobalNoteSearch').classList.add('selected');
+
+        document.querySelector('#globalNotesFileContainer').classList.add('notDisplayed');
+        document.querySelector('#showGlobalNoteFiles').classList.remove('selected');
+    }
+
+    static openFileOverviewTab() {
+        document.querySelector('#globalNotesFileContainer').classList.remove('notDisplayed');
+        document.querySelector('#showGlobalNoteFiles').classList.add('selected');
+
+        document.querySelector('#globalNoteSearchContainer').classList.add('notDisplayed');
+        document.querySelector('#showGlobalNoteSearch').classList.remove('selected');
+    }
+
     static renderGlobalNoteIcons(notesArray, clipboardContent, noteIdsToPreselect = null) {
         const container = document.querySelector('#noteIconContainer')
         const fragment = document.createDocumentFragment();
@@ -350,6 +366,10 @@ export default class GlobalNotesView {
         }
     }
 
+    //////////////////
+    // context menu //
+    //////////////////
+
     static openContextMenu(event, clipboardContent, isTrashEmpty = true) {
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
         const sourceElement = this.getSourceElementOfContextMenu(event);
@@ -525,7 +545,7 @@ export default class GlobalNotesView {
             if (sortationInfo.order == 'normal') {
                 menuData.menuToRender = menuData.menuToRender.map(option => {
                     let text = option.text;
-                    
+
                     if (option.action == sortationInfo.mode) text = option.text + ' &#8593;';
 
                     return {
@@ -937,12 +957,340 @@ export default class GlobalNotesView {
     }
 
     static removeAllSelections() {
-        const globalNotesContainer = document.querySelector('#globalNotesContainer');
+        const globalNotesContainer = document.querySelector('#globalNotesFileSystemDisplay');
         globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
     }
 
     static removeSelectionRectangle(event) {
         document.querySelector('#selectionRectangle')?.remove();
+    }
+
+    //////////////////////
+    // search functions //
+    //////////////////////
+
+    static getNoteTypesToSearchThrough() {
+        return {
+            globalNotes: document.querySelector('#searchGlobalNotesCheckbox').checked,
+            dayNotes: document.querySelector('#searchDayNotesCheckbox').checked,
+            lessonNotes: document.querySelector('#searchLessonNotesCheckbox').checked
+        }
+    }
+
+    static getDisplayedSearchStrings() {
+        return {
+            globalNotes: document.querySelector('#globalNoteResults').dataset.result_for,
+            dayNotes: document.querySelector('#dayNoteResults').dataset.result_for,
+            lessonNotes: document.querySelector('#lessonNoteResults').dataset.result_for
+        }
+    }
+
+    static showSearchResults(results, searchString) {
+        const searchResultContainer = document.querySelector('#globalNoteSearchResultContainer');
+        const globalNoteContainer = searchResultContainer.querySelector('#globalNoteResults');
+        const dayNoteContainer = searchResultContainer.querySelector('#dayNoteResults');
+        const lessonNoteContainer = searchResultContainer.querySelector('#lessonNoteResults');
+        const notesToShow = this.getNoteTypesToSearchThrough();
+
+        if (!notesToShow.globalNotes || searchString != globalNoteContainer.dataset.result_for) {
+            while (globalNoteContainer.childElementCount != 0) {
+                globalNoteContainer.firstElementChild.remove();
+            }
+
+            globalNoteContainer.dataset.result_for = '';
+        }
+
+        if (!notesToShow.dayNotes || searchString != dayNoteContainer.dataset.result_for) {
+            while (dayNoteContainer.childElementCount != 0) {
+                dayNoteContainer.firstElementChild.remove();
+            }
+
+            dayNoteContainer.dataset.result_for = '';
+        }
+
+        if (!notesToShow.lessonNotes || searchString != lessonNoteContainer.dataset.result_for) {
+            while (lessonNoteContainer.childElementCount != 0) {
+                lessonNoteContainer.firstElementChild.remove();
+            }
+
+            lessonNoteContainer.dataset.result_for = '';
+        }
+
+        const noMatchesPara = document.createElement('p');
+
+        noMatchesPara.classList.add('matchCountPara');
+        noMatchesPara.textContent = 'Keine Treffer gefunden.';
+
+        if (notesToShow.globalNotes) {
+            const highlightedGlobalNotes = this.renderNoteSearchResult(results.globalNotes, searchString);
+
+            if (highlightedGlobalNotes.children.length != 0) {
+                globalNoteContainer.append(highlightedGlobalNotes);
+            } else if (searchString != globalNoteContainer.dataset.result_for) {
+                globalNoteContainer.append(noMatchesPara.cloneNode(true));
+            }
+
+            globalNoteContainer.dataset.result_for = searchString;
+        }
+
+        if (notesToShow.dayNotes) {
+            const highlightedDayNotes = this.renderNoteSearchResult(results.dayNotes, searchString, 'Tagesnotiz');
+
+            if (highlightedDayNotes.children.length != 0) {
+                dayNoteContainer.append(highlightedDayNotes);
+            } else if (searchString != dayNoteContainer.dataset.result_for) {
+                dayNoteContainer.append(noMatchesPara.cloneNode(true));
+            }
+
+
+            dayNoteContainer.dataset.result_for = searchString;
+        }
+
+        if (notesToShow.lessonNotes) {
+            const highlightedLessonNotes = this.renderNoteSearchResult(results.lessonNotes, searchString, 'Stundennotiz');
+
+            if (highlightedLessonNotes.children.length != 0) {
+                lessonNoteContainer.append(highlightedLessonNotes);
+            } else if (searchString != lessonNoteContainer.dataset.result_for) {
+                lessonNoteContainer.append(noMatchesPara.cloneNode(true));
+            }
+
+            lessonNoteContainer.dataset.result_for = searchString;
+        }
+    }
+
+    static renderNoteSearchResult(notesArray, searchString, noteType = null) {
+        const blankDiv = document.createElement('div');
+        const fragment = document.createDocumentFragment();
+
+        const resultContainer = blankDiv.cloneNode();
+        const noteContainer = blankDiv.cloneNode();
+        const iconWrapper = blankDiv.cloneNode();
+        const noteIcon = blankDiv.cloneNode();
+
+        noteIcon.classList.add('noteIcon', 'fileIcon');
+
+        iconWrapper.append(noteIcon);
+        noteContainer.append(iconWrapper);
+        noteContainer.classList.add('noteIconContainer');
+
+        resultContainer.classList.add('searchResultWrapper');
+
+        notesArray.forEach(note => {
+            const currentResultContainer = resultContainer.cloneNode();
+
+            //note icon and title
+            if (!note.title) {
+                let noteNameString = '';
+
+                if (noteType) { noteNameString = `${noteType} vom ` }
+
+                note.title = `${noteNameString}${Fn.formatDateWithFullYear(note.date)}`;
+            }
+
+            const highlightedTitle = this.highlightSearchResultInString(note.title, searchString);
+            const highlightedContent = this.highlightSearchResultInString(note.content, searchString, 250, true);
+
+            if (highlightedTitle.matchCount == 0 && highlightedContent.matchCount == 0) return;
+
+            const currentNoteContainer = noteContainer.cloneNode(true);
+            const noteTitle = blankDiv.cloneNode();
+
+            noteTitle.innerHTML = highlightedTitle.element.innerHTML;
+            noteTitle.classList.add('fileNameWrapper');
+
+            currentNoteContainer.append(noteTitle);
+            currentNoteContainer.setAttribute('tabindex', 0);
+            currentNoteContainer.dataset.note_id = note.id;
+            currentNoteContainer.dataset.created = note.created;
+            currentNoteContainer.dataset.last_edited = note.lastEdited;
+
+            //preview text
+            const previewTextContainer = fragment.cloneNode();
+            const matchCountPara = document.createElement('p');
+            let matchCountParaContent = `im Text insgesamt: ${highlightedContent.matchCount}`;
+
+            if (highlightedContent.matchCount == 0) matchCountParaContent = 'Keine Treffer im Text gefunden.';
+
+            matchCountPara.classList.add('matchCountPara');
+            matchCountPara.textContent = matchCountParaContent;
+
+            highlightedContent.element.append(matchCountPara);
+
+            previewTextContainer.append(highlightedContent.element);
+
+            currentResultContainer.append(currentNoteContainer);
+            currentResultContainer.append(previewTextContainer);
+
+            fragment.append(currentResultContainer);
+        })
+
+        return fragment;
+    }
+
+    static highlightSearchResultInString(htmlString, searchString, contextLength = 250, returnEmptyIfNoMatch = false) {
+        const div = document.createElement('div');
+        const regExp = new RegExp(searchString, 'gi');
+
+        div.innerHTML = htmlString;
+
+        let childNodes = Fn.getAllChildNodesOfElement(div);
+        let nodeCount = childNodes.length;
+
+        for (let i = 0; i < nodeCount; i++) {
+            if (childNodes[i].nodeType == Node.TEXT_NODE && !childNodes[i].parentElement.classList.contains('highlightedText')) {
+                highlightMatches(childNodes[i]);
+            }
+        }
+
+        if (!div.querySelector('.highlightedText')) {
+            return {
+                element: returnEmptyIfNoMatch ? document.createElement('div') : div,
+                matchCount: 0,
+            }
+        }
+
+        let allMatches = [...Fn.removeHtmlTagsFromString(div.innerHTML).matchAll(regExp)];
+        let firstMatchIndex = allMatches[0]?.index;
+
+        //cut the content down to contextLength
+        if (div.textContent.length > contextLength) {
+
+            //trim text before the match
+            if (firstMatchIndex && firstMatchIndex > contextLength / 2) {
+                const textNodes = [];
+                let highlightedNodeFound = false;
+
+                //get all text nodes before the first highlighted node
+                childNodes.forEach(node => {
+                    if (node.nodeType == Node.TEXT_NODE && !highlightedNodeFound) textNodes.push(node);
+                    if (!highlightedNodeFound && node.classList?.contains('highlightedText')) {
+                        highlightedNodeFound = true;
+                    }
+                })
+
+                let indexOfTextNode = textNodes.length - 1;
+                let textNodeToTrim = textNodes[indexOfTextNode];
+                let remainingCharsCount = Math.ceil(contextLength / 4) - textNodeToTrim.length;
+                
+                //get the textNode to trim
+                while (remainingCharsCount > 0 && textNodes[indexOfTextNode]) {
+                    indexOfTextNode--;
+
+                    if (textNodes[indexOfTextNode]) {
+                    textNodeToTrim = textNodes[indexOfTextNode];
+                    remainingCharsCount -= textNodeToTrim.textContent.length;
+                    }
+                }
+
+                console.log(textNodeToTrim);
+                console.log(remainingCharsCount)
+
+                let whiteSpaceIndex = textNodeToTrim.textContent.length - 1;
+                let i = Math.abs(remainingCharsCount);
+
+                while (whiteSpaceIndex == textNodeToTrim.textContent.length - 1) {
+                    if (textNodeToTrim.textContent[i].trim() == '') whiteSpaceIndex = i;
+
+                    i--;
+
+                    if (i == 0) {
+                        whiteSpaceIndex = 0;
+                        break;
+                    }
+                }
+
+                textNodeToTrim.textContent = '[...]' + textNodeToTrim.textContent.substring(whiteSpaceIndex + 1, textNodeToTrim.textContent.length);
+                textNodeToTrim.parentElement.dataset.trimmed = 'true';
+            }
+
+            //cut after the match
+            if (div.textContent.length > contextLength) {
+                firstMatchIndex = [...div.textContent.matchAll(regExp)][0]?.index;
+
+                const textNodes = [];
+                let highlightedNodeFound = false;
+
+                //get all text nodes after the first highlighted node
+                childNodes.forEach(node => {
+                    if (node.nodeType == Node.TEXT_NODE && highlightedNodeFound) textNodes.push(node);
+                    if (!highlightedNodeFound && node.classList?.contains('highlightedText')) {
+                        highlightedNodeFound = true;
+                    }
+                })
+
+                let textNodeToTrim = textNodes[0];
+                let textNodeIndex = 0;
+                let remainingCharsCount = contextLength - firstMatchIndex - searchString.length;
+
+                while (remainingCharsCount > 0 && textNodes[textNodeIndex]) {
+                    remainingCharsCount -= textNodes[textNodeIndex].textContent.length;
+                    textNodeToTrim = textNodes[textNodeIndex];
+                    textNodeIndex++;
+                }
+
+                const textNodeMaxLength = textNodeToTrim.textContent.length - Math.abs(remainingCharsCount);
+                let whiteSpaceIndex = textNodeToTrim.textContent.length - 1;
+                let i = textNodeToTrim.textContent.length - 1;
+                let shortenedIndicator = remainingCharsCount < 0 ? '[...]' : '';
+
+                while (i > textNodeMaxLength) {
+                    if (textNodeToTrim.textContent[i].trim() == '') whiteSpaceIndex = i;
+
+                    i--;
+
+                    if (i == 0) break;
+                }
+
+                textNodeToTrim.textContent = textNodeToTrim.textContent.substring(0, whiteSpaceIndex) + shortenedIndicator;
+                textNodeToTrim.parentElement.dataset.trimmed = 'true';
+
+                // //remove the remaining nodes end elements after the trimmed node
+                // let startRemoving = false;
+
+                // Array.from(div.children).forEach(element => {
+                //     if (startRemoving) element.remove();
+                //     if (element.dataset.trimmed == 'true' || element.querySelector('*[data-trimmed="true"]')) {
+                //         startRemoving = true
+
+                //         let removeNodes = false;
+
+                //         Fn.getAllChildNodesOfElement(element).forEach(node => {
+                //             if (removeNodes && node.nodeType != Node.TEXT_NODE) node.remove;
+                //             if (removeNodes && node.nodeType == Node.TEXT_NODE) node.textContent = '';
+                //             if (node == textNodeToTrim) removeNodes = true;
+                //         })
+                //     }
+                // })
+
+            }
+        }
+
+        return {
+            element: div,
+            matchCount: allMatches.length
+        };
+
+        function highlightMatches(textNode) {
+            const matches = [...textNode.textContent.matchAll(regExp)];
+
+            if (matches.length != 0) {
+                const newTextNode = textNode.splitText(matches[0].index);
+                const span = document.createElement('span');
+                span.classList.add('highlightedText');
+
+                const nextSibling = newTextNode.splitText(searchString.length);
+                const parentElement = newTextNode.parentElement;
+
+                span.append(newTextNode);
+
+                parentElement.insertBefore(span, nextSibling);
+            }
+
+            //reassign nodes and count to prolong the loop
+            childNodes = Fn.getAllChildNodesOfElement(div);
+            nodeCount = childNodes.length;
+        }
     }
 
     //////////
@@ -971,7 +1319,7 @@ export default class GlobalNotesView {
 
         fileContainer.dataset.sort_order = sortingOrder;
         fileContainer.dataset.sorted_by = sortingMode;
-        
+
         const allItems = this.getAllSelectableItems(false);
         allItems.folders.splice(allItems.folders.findIndex(item => item.dataset.folder_id == SF_ID_TRASH), 1); // remove trash element
 

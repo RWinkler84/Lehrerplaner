@@ -1,7 +1,7 @@
 import AbstractModel from "./AbstractModel.js";
 import Fn from '../inc/utils.js';
 import GlobalNotesController from "../Controller/GlobalNotesController.js";
-import { SF_ID_ROOT, SF_ID_TRASH } from "../index.js";
+import { ALLOWEDTAGS, SF_ID_ROOT, SF_ID_TRASH } from "../index.js";
 
 export default class GlobalNote extends AbstractModel {
     #id;
@@ -37,6 +37,36 @@ export default class GlobalNote extends AbstractModel {
         allNotesOfFolder = Fn.sortByProperty(allNotesOfFolder, 'title');
 
         return allNotesOfFolder.map(entry => this.writeDataToInstance(entry));
+    }
+
+    static async searchGlobalNotesByString(searchString) {
+        function promisify(cursor) {
+            let promise = new Promise((resolve, reject) => {
+                cursor.oncomplete = cursor.onsuccess = () => resolve(cursor.result);
+                cursor.onerror = cursor.onabort = () => { reject(console.log(cursor.error)); }
+            });
+
+            return promise;
+        }
+
+        const model = new GlobalNote;
+        const db = await model.openIndexedDB();
+        const cursor = db.transaction('globalNotes', 'readonly').objectStore('globalNotes').openCursor();
+        const result = [];
+        
+        searchString = searchString.toLowerCase();
+
+        while (true) {
+            const cursorResult = await promisify(cursor);
+
+            if (!cursorResult?.value) break;
+            const entry = cursorResult.value;
+            
+            if (entry.title.toLowerCase().includes(searchString) || Fn.removeHtmlTagsFromString(entry.content).toLowerCase().includes(searchString)) result.push(entry)
+            cursorResult.continue();
+        }
+
+        return result;
     }
 
     ///////////////////////

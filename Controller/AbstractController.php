@@ -92,7 +92,7 @@ class AbstractController
 
         echo json_encode($result);
     }
- 
+
     public function getAllGlobalNotes()
     {
         global $user;
@@ -149,12 +149,17 @@ class AbstractController
         $globalNotesResults = [];
         $globalNoteFoldersResults = [];
 
+        error_log(print_r($dataToSync, true));
+
         if (!empty($dataToSync['subjects']) || !empty($dataToSync['deletedSubjects'])) {
             $subjectsResults = SettingsController::syncSubjects($dataToSync['subjects'], $dataToSync['deletedSubjects']);
         }
 
-        if (!empty($dataToSync['timetable'])) {
+        if (!empty($dataToSync['timetable']) && $user->getId() != 25) {
             $timetableResults = SettingsController::syncTimetable($dataToSync['timetable']);
+        } else if (!empty($dataToSync['timetable']) && $user->getId() == 25) {
+            $timetableResults['status'] = 'success';
+            error_log(print_r($dataToSync['timetable'], true));
         }
 
         if (!empty($dataToSync['timetableChanges']) || !empty($dataToSync['deletedTimetableChanges'])) {
@@ -226,7 +231,8 @@ class AbstractController
         echo json_encode($result);
     }
 
-    public function sendPlusRevocation() {
+    public function sendPlusRevocation()
+    {
         $revocationData = json_decode(file_get_contents('php://input'), true);
         $result = $this->db->sendPlusRevocation($revocationData);
 

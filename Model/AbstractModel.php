@@ -66,6 +66,8 @@ class AbstractModel
                 $stmt->execute();
             } catch (PDOException $e) {
                 error_log(__FILE__ . __LINE__ . 'Fehler beim Speichern der Daten: ' . $e);
+                error_log(print_r($params, true));
+                
                 return [
                     'status' => 'failed',
                     'message' => 'Beim Speichern der Daten ist ein Fehler aufgetreten.',

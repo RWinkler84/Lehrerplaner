@@ -1,4 +1,4 @@
-import { ONEDAY } from "../index.js";
+import { ONEDAY, ONEMIN } from "../index.js";
 import AbstractView from "./AbstractView.js";
 import Controller from '../Controller/CurriculumController.js';
 import Editor from "../inc/editor.js";
@@ -503,6 +503,10 @@ export default class CurriculumView extends AbstractView {
 
             // add holiday class to every day in the holiday timespan and additionaly the a name container to mondays
             while (currentDay <= holiday.endDate.setHours(12)) {
+                if (!dayLookup[currentDay] && dayLookup[currentDay + ONEMIN * 60]) currentDay += ONEMIN * 60; //summer time
+                if (!dayLookup[currentDay] && dayLookup[currentDay - ONEMIN * 60]) currentDay -= ONEMIN * 60; //winter time
+                if (!dayLookup[currentDay]) break;
+
                 if (!dayLookup[currentDay]) break;
                 if (new Date(currentDay).getDay() == 1 && !dayLookup[currentDay].querySelector('.holidayNameWrapper')) {
                     dayLookup[currentDay].querySelector('.dateContainer').append(holidayNameWrapper.cloneNode(true));

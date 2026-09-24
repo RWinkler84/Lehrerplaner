@@ -66,8 +66,38 @@ export default class DayNote extends AbstractModel {
 
     static async getById(id) {
         const model = new AbstractModel;
-        
+
         return this.writeDataToInstance(await model.readFromLocalDB('dayNotes', id));
+    }
+
+    static async searchDayNotesByString(searchString) {
+        function promisify(cursor) {
+            let promise = new Promise((resolve, reject) => {
+                cursor.oncomplete = cursor.onsuccess = () => resolve(cursor.result);
+                cursor.onerror = cursor.onabort = () => { reject(console.log(cursor.error)); }
+            });
+
+            return promise;
+        }
+
+        const model = new DayNote;
+        const db = await model.openIndexedDB();
+        const cursor = db.transaction('dayNotes', 'readonly').objectStore('dayNotes').openCursor();
+        const result = [];
+
+        searchString = searchString.toLowerCase();
+
+        while (true) {
+            const cursorResult = await promisify(cursor);
+
+            if (!cursorResult?.value) break;
+            const entry = cursorResult.value;
+
+            if (Fn.removeHtmlTagsFromString(entry.content).toLowerCase().includes(searchString)) result.push(entry)
+            cursorResult.continue();
+        }
+
+        return result;
     }
 
     async save() {

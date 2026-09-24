@@ -676,6 +676,10 @@
 
     <!-- global notes -->
     <div id="globalNotesContainer" class="mainViewContainer" style="display: none">
+        <div id="globalNotesTabContainer" class="flex">
+            <button id="showGlobalNoteFiles" class="tabButton selected">Übersicht</button>
+            <button id="showGlobalNoteSearch" class="tabButton">Suchen</button>
+        </div>
         <div id="globalNotesFileContainer" data-folder_id="0" data-sorted_by="byName" data-sort_order="normal">
             <div id="globalNotesFileSystemDisplay">
                 <div id="folderNavigatonContainer" class="flex spaceBetween">
@@ -694,6 +698,27 @@
                 <button id="createGlobalNoteFolderButton" class="confirmationButton"><span
                         class="folderIcon icon"></span></button>
                 <button id="createGlobalItemButton" class="confirmationButton">+</button>
+            </div>
+        </div>
+        <div id="globalNoteSearchContainer" class="notDisplayed">
+            <div class="flex justifyEnd">
+                <input type="text" id="globalNoteSearchInput" placeholder="Suchbegriff eingeben">
+            </div>
+            <div id="globalNoteSearchResultContainer">
+                <label><input type="checkbox" id="searchGlobalNotesCheckbox" checked>allgemeine Notizen</label>
+                <hr>
+                <div id="globalNoteResults">
+                </div>
+                <div class="doubleMarginTop"></div>
+                <label><input type="checkbox" id="searchDayNotesCheckbox" checked>Tagesnotizen</label>
+                <hr>
+                <div id="dayNoteResults">
+                </div>
+                <div class="doubleMarginTop"></div>
+                <label><input type="checkbox" id="searchLessonNotesCheckbox" checked>Stundennotizen</label>
+                <hr>
+                <div id="lessonNoteResults">
+                </div>
             </div>
         </div>
     </div>
@@ -1233,7 +1258,7 @@
         </div>
     </dialog>
 
-        <dialog id="errorMessageDialog">
+    <dialog id="errorMessageDialog">
         <div class="headline flex spaceBetween">
             <h3>Etwas ist schiefgelaufen</h3><button class="closeErrorMessageDialogButton closeDialogButton"
                 style="width: 1.5rem" autofocus="false">×</button>
