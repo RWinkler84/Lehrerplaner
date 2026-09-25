@@ -4,12 +4,12 @@ import LessonNoteView from "../View/LessonNoteView.js";
 import LessonController from "./LessonController.js";
 
 export default class LessonNoteController {
-    static async renderLessonNote(event) {
-        let lessonData = LessonController.getLessonDataFromElement(event);
-        let noteId = LessonController.getLessonNoteIdFromLessonElement(event);
+    static async renderLessonNote(event = null, noteId = null) {
+        let lessonData = event ? LessonController.getLessonDataFromElement(event) : null;
+        let id = event ? LessonController.getLessonNoteIdFromLessonElement(event) : null;
         let note;
 
-        if (noteId) note = await this.getLessonNoteById(noteId);
+        if (id || noteId) note = await this.getLessonNoteById(noteId ?? id);
 
         await LessonNoteView.renderLessonNotesModal(note, lessonData);
         if (note) Editor.init(document.querySelector('#noteContentEditor'));

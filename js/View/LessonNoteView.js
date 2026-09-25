@@ -8,7 +8,7 @@ export default class LessonNoteView extends AbstractView {
     // handle rendering and saving //
     /////////////////////////////////
 
-    static async renderLessonNotesModal(note, lessonData) {
+    static async renderLessonNotesModal(note, lessonData = null) {
 
         const dialog = document.querySelector('#lessonNoteDialog');
         const headlineInfo = dialog.querySelector('#lessonNoteInfo');
@@ -16,15 +16,20 @@ export default class LessonNoteView extends AbstractView {
         const saveButton = dialog.querySelector('#saveLessonNotesButton');
         const fixedDateCheckbox = dialog.querySelector('#noteFixedDateCheckbox');
 
-        const lessonDate = Fn.formatDate(lessonData.date);
+        const lessonDate = Fn.formatDate(lessonData ? lessonData.date : note.date);
 
-        headlineInfo.textContent = `${lessonData.className}/${lessonData.subject} am ${lessonDate}`;
+        if (lessonData) {
+            headlineInfo.textContent = `${lessonData.className}/${lessonData.subject} am ${lessonDate}`;
+        }
+        else {
+            headlineInfo.textContent = `${note.class}/${note.subject} am ${lessonDate}`;
+        }
 
-        dialog.dataset.class = lessonData.className;
-        dialog.dataset.subject = lessonData.subject;
-        dialog.dataset.date = lessonData.date;
-        dialog.dataset.timeslot = lessonData.timeslot;
-        dialog.dataset.weekday = lessonData.weekday;
+        dialog.dataset.class = lessonData ? lessonData.className : note.class;
+        dialog.dataset.subject = lessonData ? lessonData.subject : note.subject;
+        dialog.dataset.date = lessonData ? lessonData.date : note.date;
+        dialog.dataset.timeslot = lessonData ? lessonData.timeslot : note.timeslot;
+        dialog.dataset.weekday = lessonData ? lessonData.weekday : note.weekday;
 
         if (note) {
             dialog.dataset.noteid = note.id;

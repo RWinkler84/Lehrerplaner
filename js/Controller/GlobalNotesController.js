@@ -730,6 +730,17 @@ export default class GlobalNotesController {
                         return;
                     }
 
+                    //clicked on search result site
+                    if (target.closest('#dayNoteResults')) {
+                        DayNoteController.openDayNote(null, target.closest('.noteIconContainer').dataset.note_id);
+                        return;
+                    }
+
+                    if (target.closest('#lessonNoteResults')) {
+                        LessonNoteController.renderLessonNote(null, target.closest('.noteIconContainer').dataset.note_id);
+                        return;
+                    }
+
                     this.openGlobalNoteDialog(target.closest('.noteIconContainer').dataset.note_id);
                     break;
 

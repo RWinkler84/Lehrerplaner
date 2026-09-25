@@ -10,14 +10,14 @@ export default class DayNoteController {
         View.renderDayNoteIcons(dayNotes);
     }
 
-    static async openDayNote(event) {
-        const id = event.target.dataset.note_id;
-        const weekdayElement = event.target.closest('.weekday');
+    static async openDayNote(event, noteId = null) {
+        const id = event ? event.target.dataset.note_id : noteId;
+        const weekdayElement = event ? event.target.closest('.weekday') : null;
 
         if (id) {
             const noteData = await DayNote.getById(id);
 
-            View.openDayNote(weekdayElement, noteData);
+            View.openDayNote(null, noteData);
 
             return;
         }

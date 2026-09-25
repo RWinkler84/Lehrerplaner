@@ -1172,36 +1172,38 @@ export default class GlobalNotesView {
                 let indexOfTextNode = textNodes.length - 1;
                 let textNodeToTrim = textNodes[indexOfTextNode];
                 let remainingCharsCount = Math.ceil(contextLength / 4) - textNodeToTrim.length;
-                
+
                 //get the textNode to trim
                 while (remainingCharsCount > 0 && textNodes[indexOfTextNode]) {
                     indexOfTextNode--;
 
                     if (textNodes[indexOfTextNode]) {
-                    textNodeToTrim = textNodes[indexOfTextNode];
-                    remainingCharsCount -= textNodeToTrim.textContent.length;
+                        textNodeToTrim = textNodes[indexOfTextNode];
+                        remainingCharsCount -= textNodeToTrim.textContent.length;
                     }
                 }
-
-                console.log(textNodeToTrim);
-                console.log(remainingCharsCount)
 
                 let whiteSpaceIndex = textNodeToTrim.textContent.length - 1;
                 let i = Math.abs(remainingCharsCount);
 
                 while (whiteSpaceIndex == textNodeToTrim.textContent.length - 1) {
-                    if (textNodeToTrim.textContent[i].trim() == '') whiteSpaceIndex = i;
-
-                    i--;
-
                     if (i == 0) {
                         whiteSpaceIndex = 0;
                         break;
                     }
+
+                    if (textNodeToTrim.textContent[i].trim() == '') whiteSpaceIndex = i;
+                    i--;
                 }
 
                 textNodeToTrim.textContent = '[...]' + textNodeToTrim.textContent.substring(whiteSpaceIndex + 1, textNodeToTrim.textContent.length);
                 textNodeToTrim.parentElement.dataset.trimmed = 'true';
+
+                //empty text nodes before the cut text 
+                while (indexOfTextNode > 0) {
+                    indexOfTextNode--;
+                    textNodes[indexOfTextNode].textContent = '';
+                }
             }
 
             //cut after the match
@@ -1235,41 +1237,39 @@ export default class GlobalNotesView {
                 let shortenedIndicator = remainingCharsCount < 0 ? '[...]' : '';
 
                 while (i > textNodeMaxLength) {
+                    if (i == 0) break;
                     if (textNodeToTrim.textContent[i].trim() == '') whiteSpaceIndex = i;
 
                     i--;
-
-                    if (i == 0) break;
                 }
 
                 textNodeToTrim.textContent = textNodeToTrim.textContent.substring(0, whiteSpaceIndex) + shortenedIndicator;
                 textNodeToTrim.parentElement.dataset.trimmed = 'true';
 
-                // //remove the remaining nodes end elements after the trimmed node
-                // let startRemoving = false;
+                //empty text nodes after the cut text 
+                while (textNodeIndex < textNodes.length) {
+                    textNodes[textNodeIndex].textContent = '';
+                    textNodeIndex++;
+                }
+            }
 
-                // Array.from(div.children).forEach(element => {
-                //     if (startRemoving) element.remove();
-                //     if (element.dataset.trimmed == 'true' || element.querySelector('*[data-trimmed="true"]')) {
-                //         startRemoving = true
+            Array.from(div.children).forEach(childElement => {
+                removeEmptyChildElements(childElement)
+            })
 
-                //         let removeNodes = false;
+            function removeEmptyChildElements(element) {
+                if (element.children.length != 0) {
+                    Array.from(element.children).forEach(childElement => removeEmptyChildElements(childElement));
+                }
 
-                //         Fn.getAllChildNodesOfElement(element).forEach(node => {
-                //             if (removeNodes && node.nodeType != Node.TEXT_NODE) node.remove;
-                //             if (removeNodes && node.nodeType == Node.TEXT_NODE) node.textContent = '';
-                //             if (node == textNodeToTrim) removeNodes = true;
-                //         })
-                //     }
-                // })
-
+                if (element.textContent.trim() == '') element.remove();
             }
         }
 
         return {
             element: div,
             matchCount: allMatches.length
-        };
+        }
 
         function highlightMatches(textNode) {
             const matches = [...textNode.textContent.matchAll(regExp)];
