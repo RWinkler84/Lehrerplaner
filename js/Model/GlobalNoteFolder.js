@@ -93,6 +93,23 @@ export default class GlobalNoteFolder extends AbstractModel {
         })
     }
 
+    static async getAllChildFoldersRecursively(parentFolderId) {
+        const allChildFolders = [];
+
+        await getChildFolders(parentFolderId);
+
+        return allChildFolders;
+        
+        async function getChildFolders(folderId) {
+            const childFolders = await GlobalNoteFolder.getAllByParentFolderId(folderId);
+
+            childFolders.forEach(folder => {
+                allChildFolders.push(folder);
+                getChildFolders(folder.id);
+            })
+        }
+    }
+
     ////////////////////////
     // navigation history //
     ////////////////////////

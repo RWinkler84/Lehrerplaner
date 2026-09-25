@@ -955,6 +955,10 @@ dialog .errorMessageDisplay,
         display: flex !important;
     }
 
+    .highlightedText {
+        background-color: yellow;
+    }
+
     .globalNoteContextMenu {
         display: flex;
         flex-direction: column;
@@ -993,12 +997,14 @@ dialog .errorMessageDisplay,
         background-color: var(--lightergrey);
         opacity: 0.5;
         pointer-events: none;
+        z-index: 49;
     }
 
 
     #globalNotesFileContainer {
         position: relative;
         flex-grow: 1;
+        margin-top: 1rem;
 
         #createGlobalItemsButtonContainer {
             position: fixed;
@@ -1092,10 +1098,9 @@ dialog .errorMessageDisplay,
             gap: 1rem;
             position: sticky;
             top: 2rem;
-            padding-top: 1rem;
             padding-bottom: 0.5rem;
             background-color: var(--contentContainerBackground);
-            z-index: 49;
+            z-index: 48;
 
             #folderPathContainer {
                 overflow: hidden;
@@ -1190,10 +1195,6 @@ dialog .errorMessageDisplay,
 
         #globalNoteSearchResultContainer {
             margin-top: 1rem;
-
-            .highlightedText {
-                background-color: yellow;
-            }
 
             .searchResultWrapper {
                 display: flex;

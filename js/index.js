@@ -28,7 +28,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.220926';
+export const VERSION = '0.9.250926';
 
 export const SF_ID_ROOT = 0;
 export const SF_ID_TRASH = 1;
@@ -163,6 +163,7 @@ async function startApp() {
     document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
         if (event.target.id == 'globalNoteSearchInput') GlobalNotesController.runSearch();
+        if (event.target.id == 'globalNoteFolderSearchInput') GlobalNotesController.runFolderSearch();
         if (!event.target.closest('.textEditor')) return;
 
         Editor.normalizeInput(event);

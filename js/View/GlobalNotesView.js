@@ -1059,6 +1059,16 @@ export default class GlobalNotesView {
         }
     }
 
+    static showFolderSearchResults(result, searchString) {
+        const noteElements = this.renderNoteSearchResult(result.notes, searchString)
+
+        const noteContainer = document.querySelector('#noteIconContainer');
+
+        while (noteContainer.firstChild) noteContainer.firstChild.remove();
+
+        noteContainer.append(noteElements);
+    }
+
     static renderNoteSearchResult(notesArray, searchString, noteType = null) {
         const blankDiv = document.createElement('div');
         const fragment = document.createDocumentFragment();

@@ -66,7 +66,16 @@ export default class GlobalNote extends AbstractModel {
             cursorResult.continue();
         }
 
-        return result;
+        return result.map(note => this.writeDataToInstance(note));
+    }
+
+    static async searchGlobalNotesByParentFolderAndString(searchString, parentFolderIdArray) {
+        const allMatchingNotes = await this.searchGlobalNotesByString(searchString);
+        const filteredNotes = [];
+
+        allMatchingNotes.forEach(note => {if (parentFolderIdArray.includes(note.parentFolderId)) filteredNotes.push(note)})
+
+        return filteredNotes;
     }
 
     ///////////////////////

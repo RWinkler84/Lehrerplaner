@@ -551,6 +551,27 @@ export default class GlobalNotesController {
         View.showSearchResults(results, searchString);
     }
 
+    static async runFolderSearch() {
+        const parentFolderId = View.getDisplayedFolderId();
+        const searchString = document.querySelector('#globalNoteFolderSearchInput').value;
+        const allChildFolders = await GlobalNoteFolder.getAllChildFoldersRecursively(parentFolderId);
+
+        const folderIds = [parentFolderId];
+        const result = {
+            folders: [],
+            notes: []
+        }
+
+        allChildFolders.forEach(folder => {
+            if (folder.name.toLowerCase().includes(searchString.toLowerCase())) result.folders.push(folder);
+            folderIds.push(folder.id);
+        })
+
+        result.notes = await GlobalNote.searchGlobalNotesByParentFolderAndString(searchString, folderIds);
+
+        View.showFolderSearchResults(result, searchString); 
+    }
+
     ///////////////////
     // event handler //
     ///////////////////
