@@ -161,11 +161,11 @@ export default class GlobalNotesController {
     // folder crud methods //
     /////////////////////////
 
-    static openFolder(folderId) {
+    static async openFolder(folderId) {
         const globalNotesFileContainer = document.querySelector('#globalNotesFileContainer');
         globalNotesFileContainer.dataset.folder_id = folderId;
 
-        this.renderGlobalNotesView();
+        await this.renderGlobalNotesView();
     }
 
     static createNewGlobalNoteFolder() {
@@ -245,21 +245,23 @@ export default class GlobalNotesController {
     ///////////////////////
 
     /**@param direction: 'forward' or 'backward' */
-    static navigateFolderHistory(direction) {
+    static async navigateFolderHistory(direction) {
         const currentNavigationStep = View.getCurrentNavigationStep();
 
         if (direction == 'backward') {
             const navigationData = GlobalNoteFolder.getPreviousFolderInHistory(currentNavigationStep);
 
             View.toggleNavigationButtons(navigationData);
-            this.openFolder(navigationData.folderToOpen);
+            await this.openFolder(navigationData.folderToOpen);
+            this.clearFolderSearchField();
         }
 
         if (direction == 'forward') {
             const navigationData = GlobalNoteFolder.getNextFolderInHistory(currentNavigationStep)
 
             View.toggleNavigationButtons(navigationData);
-            this.openFolder(navigationData.folderToOpen);
+            await this.openFolder(navigationData.folderToOpen);
+            this.clearFolderSearchField();
         }
     }
 
@@ -447,6 +449,17 @@ export default class GlobalNotesController {
         View.closeRestoreErrorMessage();
     };
 
+    static async openParentFolderOfSearchResult() {
+        const searchElementInfo = View.getSelectedSearchElementInfo();
+        View.removeAllSelections();
+
+        await this.openFolder(searchElementInfo.parentFolderId);
+        this.preselectItemInCurrentlyDisplayedFolder(searchElementInfo.itemId, searchElementInfo.itemType);
+        
+        this.clearFolderSearchField();
+        this.closeAllContextMenus();
+    }
+
     ////////////////////////
     // multiple selection //
     ////////////////////////
@@ -476,6 +489,11 @@ export default class GlobalNotesController {
 
     static selectMultipleByTouch(event) {
         return View.selectMultipleByTouch(event);
+    }
+
+    /** @param itemType 'folder', 'note' */
+    static preselectItemInCurrentlyDisplayedFolder(itemId, itemType) {
+        View.preselectItemInCurrentlyDisplayedFolder(itemId, itemType);
     }
 
     static removeAllSelections() {
@@ -554,29 +572,43 @@ export default class GlobalNotesController {
     static async runFolderSearch() {
         const parentFolderId = View.getDisplayedFolderId();
         const searchString = document.querySelector('#globalNoteFolderSearchInput').value;
-        const allChildFolders = await GlobalNoteFolder.getAllChildFoldersRecursively(parentFolderId);
-
-        const folderIds = [parentFolderId];
         const result = {
             folders: [],
             notes: []
         }
 
-        allChildFolders.forEach(folder => {
-            if (folder.name.toLowerCase().includes(searchString.toLowerCase())) result.folders.push(folder);
-            folderIds.push(folder.id);
-        })
+        if (searchString.length < 2) {
+            View.hideFolderSearchResultContainer();
+            View.showFileDisplayContainers();
+        }
 
-        result.notes = await GlobalNote.searchGlobalNotesByParentFolderAndString(searchString, folderIds);
+        if (searchString.trim() != '' && searchString.length >= 2) {
+            const allChildFolders = await GlobalNoteFolder.getAllChildFoldersRecursively(parentFolderId);
+            const folderIds = [parentFolderId];
 
-        View.showFolderSearchResults(result, searchString); 
+            allChildFolders.forEach(folder => {
+                if (folder.name.toLowerCase().includes(searchString.toLowerCase())) result.folders.push(folder);
+                folderIds.push(folder.id);
+            })
+
+            View.showFolderSearchResultContainer();
+            View.hideFileDisplayContainers();
+
+            result.notes = await GlobalNote.searchGlobalNotesByParentFolderAndString(searchString, folderIds);
+        }
+
+        View.showFolderSearchResults(result, searchString);
+    }
+
+    static clearFolderSearchField() {
+        View.clearFolderSearchField();
     }
 
     ///////////////////
     // event handler //
     ///////////////////
 
-    static clickHandler(event) {
+    static async clickHandler(event) {
         // prevents selected items from being deselected by the click event after mouse up
         if (globalItemsMultiSelectData.ignoreNextClickEvent) {
             globalItemsMultiSelectData.ignoreNextClickEvent = false;
@@ -638,11 +670,11 @@ export default class GlobalNotesController {
 
             switch (target.id) {
                 //tab switching
-                case 'showGlobalNoteFiles':
+                case 'showGlobalNoteFilesButton':
                     View.openFileOverviewTab();
                     break;
 
-                case 'showGlobalNoteSearch':
+                case 'showGlobalNoteSearchButton':
                     View.openSearchTab();
                     break;
 
@@ -700,6 +732,10 @@ export default class GlobalNotesController {
                 case 'newGlobalNoteFolderButton':
                     this.createNewGlobalNoteFolder();
                     this.closeAllContextMenus();
+                    break;
+
+                case 'openParentFolderButton':
+                    this.openParentFolderOfSearchResult();
                     break;
 
                 //trash context menus
@@ -769,11 +805,13 @@ export default class GlobalNotesController {
                 case target.classList.contains('folderNameWrapperOnPath'):
                     folderId = Number(target.closest('.folderPathItemContainer').dataset.folder_id);
 
-                    if (View.getDisplayedFolderId() == folderId) return;
+                    if (View.getDisplayedFolderId() == folderId && View.isFileSystemVisible()) return;
 
                     GlobalNoteFolder.updateNavigationHistory(folderId, currentStep);
                     this.updateHistoryNavigationButtons();
-                    this.openFolder(folderId);
+
+                    await this.openFolder(folderId);
+                    this.clearFolderSearchField();
                     break;
 
                 // open folder
@@ -800,7 +838,8 @@ export default class GlobalNotesController {
 
                     GlobalNoteFolder.updateNavigationHistory(folderId, currentStep);
                     this.updateHistoryNavigationButtons();
-                    this.openFolder(folderId);
+                    await this.openFolder(folderId);
+                    this.clearFolderSearchField();
                     break;
 
                 //create folder

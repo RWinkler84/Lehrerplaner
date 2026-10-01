@@ -103,10 +103,10 @@ export default class GlobalNoteFolder extends AbstractModel {
         async function getChildFolders(folderId) {
             const childFolders = await GlobalNoteFolder.getAllByParentFolderId(folderId);
 
-            childFolders.forEach(folder => {
+            for (let folder of childFolders) {
                 allChildFolders.push(folder);
-                getChildFolders(folder.id);
-            })
+                await getChildFolders(folder.id);
+            }
         }
     }
 

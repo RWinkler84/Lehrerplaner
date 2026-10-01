@@ -28,7 +28,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
-export const VERSION = '0.9.250926';
+export const VERSION = '0.9.011026';
 
 export const SF_ID_ROOT = 0;
 export const SF_ID_TRASH = 1;
@@ -197,19 +197,19 @@ async function startApp() {
 
     // global Notes
     // rectangle selection
-    document.querySelector('#globalNotesFileContainer').addEventListener('mousedown', (event) => {
+    document.querySelector('#globalNoteFolderAndNoteIconContainer').addEventListener('mousedown', (event) => {
         globalItemsMultiSelectData.mouseDown = true;
         globalItemsMultiSelectData.startX = event.clientX;
         globalItemsMultiSelectData.startY = event.clientY;
     })
 
-    document.querySelector('#globalNotesFileContainer').addEventListener('mousemove', (event) => {
+    document.querySelector('#globalNoteFolderAndNoteIconContainer').addEventListener('mousemove', (event) => {
         if (globalItemsMultiSelectData.mouseDown) {
             GlobalNotesController.selectMultipleOnMouseDrag(event);
         }
     });
 
-    document.querySelector('#globalNotesFileContainer').addEventListener('mouseup', (event) => {
+    document.querySelector('#globalNoteFolderAndNoteIconContainer').addEventListener('mouseup', (event) => {
         globalItemsMultiSelectData.mouseDown = false;
         globalItemsMultiSelectData.startX = null;
         globalItemsMultiSelectData.startY = null;

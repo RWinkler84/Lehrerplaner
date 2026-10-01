@@ -27,6 +27,13 @@ export default class GlobalNotesView {
                 text: 'löschen'
             },
         ],
+        //searchResults clicked
+        searchResultClicked: [
+            {
+                action: 'openParentFolder',
+                text: 'in Ordner anzeigen'
+            },
+        ],
         //context menu when a blank space is clicked
         folderClicked: [
             {
@@ -159,18 +166,18 @@ export default class GlobalNotesView {
 
     static openSearchTab() {
         document.querySelector('#globalNoteSearchContainer').classList.remove('notDisplayed');
-        document.querySelector('#showGlobalNoteSearch').classList.add('selected');
+        document.querySelector('#showGlobalNoteSearchButton').classList.add('selectedButton');
 
         document.querySelector('#globalNotesFileContainer').classList.add('notDisplayed');
-        document.querySelector('#showGlobalNoteFiles').classList.remove('selected');
+        document.querySelector('#showGlobalNoteFilesButton').classList.remove('selectedButton');
     }
 
     static openFileOverviewTab() {
         document.querySelector('#globalNotesFileContainer').classList.remove('notDisplayed');
-        document.querySelector('#showGlobalNoteFiles').classList.add('selected');
+        document.querySelector('#showGlobalNoteFilesButton').classList.add('selectedButton');
 
         document.querySelector('#globalNoteSearchContainer').classList.add('notDisplayed');
-        document.querySelector('#showGlobalNoteSearch').classList.remove('selected');
+        document.querySelector('#showGlobalNoteSearchButton').classList.remove('selectedButton');
     }
 
     static renderGlobalNoteIcons(notesArray, clipboardContent, noteIdsToPreselect = null) {
@@ -328,6 +335,7 @@ export default class GlobalNotesView {
         if (globalNote) {
             globalNoteEditorDialog.dataset.note_id = globalNote.id;
             globalNoteEditorDialog.dataset.created = globalNote.created;
+            globalNoteEditorDialog.dataset.parent_folder_id = globalNote.parentFolderId;
             globalNoteTitleInput.value = globalNote.title;
             globalNoteContentEditor.innerHTML = globalNote.content;
         } else {
@@ -351,17 +359,19 @@ export default class GlobalNotesView {
         const dialog = document.querySelector('#globalNoteDialog');
 
         dialog.dataset.note_id = globalNote.id;
+        dialog.dataset.parent_folder_id = globalNote.parentFolderId;
         dialog.dataset.created = globalNote.created;
     }
 
     static getDataFromGlobalNoteDialog() {
         const dialog = document.querySelector('#globalNoteDialog');
+        const parentFolderId = dialog.dataset.parent_folder_id ? Number(dialog.dataset.parent_folder_id) : this.getDisplayedFolderId();
 
         return {
             id: dialog.dataset.note_id,
             title: dialog.querySelector('#globalNoteTitleInput').value,
             content: Editor.getContent(dialog.querySelector('#globalNoteContentEditor')),
-            parentFolderId: this.getDisplayedFolderId(),
+            parentFolderId: parentFolderId,
             created: dialog.dataset.created
         }
     }
@@ -376,6 +386,8 @@ export default class GlobalNotesView {
 
         if (sourceElement.classList.contains('new')) return;
         if (sourceElement.classList.contains('cut')) return;
+        if (sourceElement.id == 'matchingFoldersContainer') return;
+        if (sourceElement.id == 'matchingNotesContainer') return;
         if (!sourceElement.classList.contains('selected')) {
             this.removeAllSelections();
         }
@@ -533,6 +545,14 @@ export default class GlobalNotesView {
                 menuData.menuToRender = this.#contextMenus.trashMultiSelect;
                 menuData.menuType = 'trashMultiSelect';
             }
+        }
+
+        // folder search results clicked
+        if ((sourceElement.classList.contains('folderIconContainer') && sourceElement.closest('#matchingFoldersContainer')) ||
+            (sourceElement.classList.contains('noteIconContainer') && sourceElement.closest('#matchingNotesContainer')) ||
+            (sourceElement.classList.contains('searchResultWrapper'))) {
+            menuData.menuType = 'searchResultClicked';
+            menuData.menuToRender = this.#contextMenus.searchResultClicked;
         }
 
         if (sourceElement.id == 'openSortingMenuButton') {
@@ -756,6 +776,7 @@ export default class GlobalNotesView {
     }
 
     static drawSelectionRectangle(event) {
+        event.preventDefault();
         const globalNotesContainer = document.querySelector('#globalNotesContainer');
 
         let selectionRect = globalNotesContainer.querySelector('#selectionRectangle');
@@ -876,6 +897,22 @@ export default class GlobalNotesView {
             if (item.dataset.folder_id == SF_ID_TRASH) return;
             item.classList.add('selected');
         })
+    }
+
+    static preselectItemInCurrentlyDisplayedFolder(itemId, itemType) {
+        let container;
+
+        switch (itemType) {
+            case 'note':
+                container = document.querySelector('#noteIconContainer');
+                container.querySelector(`.noteIconContainer[data-note_id="${itemId}"]`)?.classList.add('selected');
+                break;
+
+            case 'folder':
+                container = document.querySelector('#folderIconContainer');
+                container.querySelector(`.folderIconContainer[data-folder_id="${itemId}"]`)?.classList.add('selected');
+                break;
+        }
     }
 
     static editSelectedItemsKeyboardShortcuts(event) {
@@ -1060,13 +1097,50 @@ export default class GlobalNotesView {
     }
 
     static showFolderSearchResults(result, searchString) {
-        const noteElements = this.renderNoteSearchResult(result.notes, searchString)
+        const searchResultContainer = document.querySelector('#folderSearchResultsContainer');
+        const folderContainer = searchResultContainer.querySelector('#matchingFoldersContainer');
+        const noteContainer = searchResultContainer.querySelector('#matchingNotesContainer');
 
-        const noteContainer = document.querySelector('#noteIconContainer');
+        const noteElements = this.renderNoteSearchResult(result.notes, searchString);
+        const folderElements = this.renderFolderSearchResults(result.folders, searchString);
+
+        while (folderContainer.firstChild) folderContainer.firstChild.remove();
+        folderContainer.append(folderElements);
 
         while (noteContainer.firstChild) noteContainer.firstChild.remove();
-
         noteContainer.append(noteElements);
+    }
+
+    static renderFolderSearchResults(foldersArray, searchString) {
+        const blankDiv = document.createElement('div');
+        const fragment = document.createDocumentFragment();
+
+        const folderContainer = blankDiv.cloneNode();
+        const iconWrapper = blankDiv.cloneNode();
+        const folderIcon = blankDiv.cloneNode();
+
+        folderIcon.classList.add('folderIconSolid', 'fileIcon');
+
+        iconWrapper.append(folderIcon);
+        folderContainer.append(iconWrapper);
+        folderContainer.classList.add('folderIconContainer');
+
+        foldersArray.forEach(folder => {
+            const currentFolderContainer = folderContainer.cloneNode(true);
+
+            const currentFolderNameWrapper = (this.highlightSearchResultInString(folder.name, searchString)).element;
+            currentFolderNameWrapper.classList.add('folderNameWrapper');
+
+            currentFolderContainer.dataset.folder_id = folder.id;
+            currentFolderContainer.dataset.created = folder.created;
+            currentFolderContainer.dataset.last_edited = folder.lastEdited;
+            currentFolderContainer.dataset.parent_folder_id = folder.parentFolderId;
+
+            currentFolderContainer.append(currentFolderNameWrapper);
+            fragment.append(currentFolderContainer);
+        })
+
+        return fragment;
     }
 
     static renderNoteSearchResult(notesArray, searchString, noteType = null) {
@@ -1112,6 +1186,7 @@ export default class GlobalNotesView {
             currentNoteContainer.append(noteTitle);
             currentNoteContainer.setAttribute('tabindex', 0);
             currentNoteContainer.dataset.note_id = note.id;
+            currentNoteContainer.dataset.parent_folder_id = note.parentFolderId;
             currentNoteContainer.dataset.created = note.created;
             currentNoteContainer.dataset.last_edited = note.lastEdited;
 
@@ -1131,6 +1206,8 @@ export default class GlobalNotesView {
 
             currentResultContainer.append(currentNoteContainer);
             currentResultContainer.append(previewTextContainer);
+            currentResultContainer.dataset.note_id = note.id;
+            currentResultContainer.dataset.parent_folder_id = note.parentFolderId;
 
             fragment.append(currentResultContainer);
         })
@@ -1303,6 +1380,31 @@ export default class GlobalNotesView {
         }
     }
 
+    static showFolderSearchResultContainer() {
+        document.querySelector('#folderSearchResultsContainer').classList.remove('notDisplayed');
+    }
+
+    static hideFolderSearchResultContainer() {
+        document.querySelector('#folderSearchResultsContainer').classList.add('notDisplayed');
+    }
+
+    static showFileDisplayContainers() {
+        document.querySelector('#globalNoteFolderAndNoteIconContainer').classList.remove('notDisplayed');
+    }
+
+    static hideFileDisplayContainers() {
+        document.querySelector('#globalNoteFolderAndNoteIconContainer').classList.add('notDisplayed');
+    }
+
+    static clearFolderSearchField() {
+        const searchField = document.querySelector('#globalNoteFolderSearchInput')
+
+        if (searchField.value != '') {
+            searchField.value = '';
+            searchField.dispatchEvent(new Event('input', { bubbles: true })); //triggers hiding of search result containers
+        }
+    }
+
     //////////
     // misc //
     //////////
@@ -1401,9 +1503,11 @@ export default class GlobalNotesView {
     }
 
     static getSourceElementOfContextMenu(event) {
+        if (event.target.id == 'matchingFoldersContainer' || event.target.id == 'matchingNotesContainer') return event.target;
         if (event.target.id == 'openSortingMenuButton') return event.target;
-        if (event.srcElement.closest('.folderIconContainer')) return event.srcElement.closest('.folderIconContainer');
-        if (event.srcElement.closest('.noteIconContainer')) return event.srcElement.closest('.noteIconContainer');
+        if (event.target.closest('.folderIconContainer')) return event.target.closest('.folderIconContainer');
+        if (event.target.closest('.noteIconContainer')) return event.target.closest('.noteIconContainer');
+        if (event.target.closest('.searchResultWrapper')) return event.target.closest('.searchResultWrapper')
 
         return document.querySelector('#globalNotesFileContainer');
     }
@@ -1446,6 +1550,22 @@ export default class GlobalNotesView {
             folders: Array.from(foldersContainer.querySelectorAll('.selected')),
             notes: Array.from(notesContainer.querySelectorAll('.selected'))
         };
+    }
+
+    static getSelectedSearchElementInfo() {
+        const element = document.querySelector('#folderSearchResultsContainer').querySelector('.selected');
+
+        return {
+            itemType: element.dataset.folder_id ? 'folder' : 'note',
+            itemId: element.dataset.folder_id ?? element.dataset.note_id,
+            parentFolderId: element.dataset.parent_folder_id
+        }
+    }
+
+    static isFileSystemVisible() {
+        if (document.querySelector('#globalNoteFolderAndNoteIconContainer').classList.contains('notDisplayed')) return false;
+
+        return true;
     }
 
     /////////////
