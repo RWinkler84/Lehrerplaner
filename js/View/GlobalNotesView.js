@@ -34,6 +34,12 @@ export default class GlobalNotesView {
                 text: 'in Ordner anzeigen'
             },
         ],
+        dayOrLessonNoteSearchResultClicked: [
+            {
+                action: 'openNoteInEditor',
+                text: 'öffnen'
+            },
+        ],
         //context menu when a blank space is clicked
         folderClicked: [
             {
@@ -405,6 +411,7 @@ export default class GlobalNotesView {
         // set source element infos
         if (sourceElement.classList.contains('folderIconContainer')) menuContainer.dataset.folder_id = sourceElement.dataset.folder_id;
         if (sourceElement.classList.contains('noteIconContainer')) menuContainer.dataset.note_id = sourceElement.dataset.note_id;
+        if (sourceElement.classList.contains('searchResultWrapper')) menuContainer.dataset.note_id = sourceElement.dataset.note_id;
         if (sourceElement.id == 'globalNotesFileContainer') menuContainer.dataset.folder_id = sourceElement.dataset.folder_id;
 
         sourceElement.classList.add('selected');
@@ -555,6 +562,22 @@ export default class GlobalNotesView {
             menuData.menuToRender = this.#contextMenus.searchResultClicked;
         }
 
+        //all notes search results clicked
+        if (sourceElement.closest('#globalNoteSearchContainer')) {
+            //globalNotes can be displayed in their parent folder
+            if ((sourceElement.classList.contains('folderIconContainer') && sourceElement.closest('#globalNoteResults')) ||
+                (sourceElement.classList.contains('noteIconContainer') && sourceElement.closest('#globalNoteResults')) ||
+                (sourceElement.classList.contains('searchResultWrapper') && sourceElement.closest('#globalNoteResults'))) {
+                menuData.menuType = 'searchResultClicked';
+                menuData.menuToRender = this.#contextMenus.searchResultClicked;
+            } else {
+            //other notes will only get an option to open them
+                menuData.menuType = 'dayOrLessonNoteSearchResultClicked';
+                menuData.menuToRender = this.#contextMenus.dayOrLessonNoteSearchResultClicked;
+            }
+        }
+
+        // sorting submenu
         if (sourceElement.id == 'openSortingMenuButton') {
             menuData.menuToRender = this.#contextMenus.sortingMenu;
             menuData.menuType = 'sortingMenu';
@@ -994,7 +1017,7 @@ export default class GlobalNotesView {
     }
 
     static removeAllSelections() {
-        const globalNotesContainer = document.querySelector('#globalNotesFileSystemDisplay');
+        const globalNotesContainer = document.querySelector('#globalNotesContainer');
         globalNotesContainer.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
     }
 
@@ -1553,7 +1576,7 @@ export default class GlobalNotesView {
     }
 
     static getSelectedSearchElementInfo() {
-        const element = document.querySelector('#folderSearchResultsContainer').querySelector('.selected');
+        const element = document.querySelector('#globalNotesContainer').querySelector('.selected');
 
         return {
             itemType: element.dataset.folder_id ? 'folder' : 'note',
@@ -1564,8 +1587,26 @@ export default class GlobalNotesView {
 
     static isFileSystemVisible() {
         if (document.querySelector('#globalNoteFolderAndNoteIconContainer').classList.contains('notDisplayed')) return false;
+        if (document.querySelector('#globalNotesFileContainer').classList.contains('notDisplayed')) return false;
 
         return true;
+    }
+
+    /** Whenever a lesson note or a day note should be opened from the context menu of the search result on note search, this function determines, if the
+    note ID belongs to a day or lesson note. */
+    static getClickedSearchResultLessonOrDayNoteInfo() {
+        const contextMenuData = this.getContextMenuInfo();
+        const clickedSearchResult = document.querySelector(`.selected[data-note_id="${contextMenuData.noteId}"]`);
+
+        const noteData = {
+            noteId: contextMenuData.noteId,
+            noteType: ''
+        }
+
+        if (clickedSearchResult.closest('#lessonNoteResults')) noteData.noteType = 'lessonNote';
+        if (clickedSearchResult.closest('#dayNoteResults')) noteData.noteType = 'dayNote'; 
+
+        return noteData;
     }
 
     /////////////

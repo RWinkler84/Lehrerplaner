@@ -454,8 +454,13 @@ export default class GlobalNotesController {
         View.removeAllSelections();
 
         await this.openFolder(searchElementInfo.parentFolderId);
+
+        console.log(View.isFileSystemVisible())
+
+        if (!View.isFileSystemVisible()) View.openFileOverviewTab();
+
         this.preselectItemInCurrentlyDisplayedFolder(searchElementInfo.itemId, searchElementInfo.itemType);
-        
+
         this.clearFolderSearchField();
         this.closeAllContextMenus();
     }
@@ -550,7 +555,7 @@ export default class GlobalNotesController {
     }
 
     static async runSearch() {
-        const searchString = document.querySelector('#globalNoteSearchInput').value;
+        const searchString = document.querySelector('#allNotesSearchInput').value;
         const notesToSearch = View.getNoteTypesToSearchThrough();
         const displayedSearchString = View.getDisplayedSearchStrings();
 
@@ -602,6 +607,20 @@ export default class GlobalNotesController {
 
     static clearFolderSearchField() {
         View.clearFolderSearchField();
+    }
+
+    static openLessonOrDayNote() {
+        const clickedNoteInfo = View.getClickedSearchResultLessonOrDayNoteInfo();
+
+        if (clickedNoteInfo.noteType == 'lessonNote') {
+            this.closeAllContextMenus();
+            LessonNoteController.renderLessonNote(null, clickedNoteInfo.noteId);
+        }
+
+        if (clickedNoteInfo.noteType == 'dayNote') {
+            this.closeAllContextMenus();
+            DayNoteController.openDayNote(null, clickedNoteInfo.noteId);
+        }
     }
 
     ///////////////////
@@ -738,6 +757,10 @@ export default class GlobalNotesController {
                     this.openParentFolderOfSearchResult();
                     break;
 
+                case 'openNoteInEditorButton':
+                    this.openLessonOrDayNote(target)
+                    break;
+
                 //trash context menus
                 case 'restoreItemButton':
                     this.restoreItemsFromTrash();
@@ -865,6 +888,40 @@ export default class GlobalNotesController {
 
     static rightClickHandler(event) {
         const target = event.target;
+        let openCustomContextMenu = true;
+
+        //children should not trigger custom context menus
+        const elementsToIgnoreByParent = [
+            'globalNotesTabContainer',
+            'createGlobalItemsButtonContainer',
+            'folderNavigatonContainer',
+            'globalFolderSearchInputWrapper',
+            'allNotesSearchInputWrapper'
+        ];
+
+        //element itself should not trigger custom context menus
+        const elementsToIgnoreById = [
+            'globalNoteSearchResultContainer',
+            'globalNoteResults',
+            'lessonNoteResults',
+            'dayNoteResults',
+            'globalNoteResultsLabel',
+            'dayNoteResultsLabel',
+            'lessonNoteResultsLabel',
+        ]
+
+        if (elementsToIgnoreById.includes(target.id)) openCustomContextMenu = false;
+
+        elementsToIgnoreByParent.forEach(parentId => {
+            if (target.closest(`#${parentId}`)) openCustomContextMenu = false;
+        })
+
+        if (!openCustomContextMenu) {
+            if (View.isContextMenuOpen()) GlobalNotesController.closeAllContextMenus();
+
+            return;
+        }
+
         event.preventDefault();
 
         if (View.isContextMenuOpen()) GlobalNotesController.closeAllContextMenus();

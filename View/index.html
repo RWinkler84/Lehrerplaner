@@ -682,7 +682,7 @@
         </div>
         <div id="globalNotesFileContainer" data-folder_id="0" data-sorted_by="byName" data-sort_order="normal">
             <div id="globalNotesFileSystemDisplay">
-                <div class="flex justifyEnd">
+                <div class="flex justifyEnd" id="globalFolderSearchInputWrapper">
                     <input type="text" id="globalNoteFolderSearchInput" placeholder="Ordner durchsuchen">
                 </div>
                 <div id="folderNavigatonContainer" class="flex spaceBetween">
@@ -710,21 +710,21 @@
             </div>
         </div>
         <div id="globalNoteSearchContainer" class="notDisplayed">
-            <div class="flex justifyEnd">
-                <input type="text" id="globalNoteSearchInput" placeholder="Suchbegriff eingeben">
+            <div class="flex justifyEnd" id="allNotesSearchInputWrapper">
+                <input type="text" id="allNotesSearchInput" placeholder="Suchbegriff eingeben">
             </div>
             <div id="globalNoteSearchResultContainer">
-                <label><input type="checkbox" id="searchGlobalNotesCheckbox" checked>allgemeine Notizen</label>
+                <label id="globalNoteResultsLabel"><input type="checkbox" id="searchGlobalNotesCheckbox" checked>allgemeine Notizen</label>
                 <hr>
                 <div id="globalNoteResults">
                 </div>
                 <div class="doubleMarginTop"></div>
-                <label><input type="checkbox" id="searchDayNotesCheckbox" checked>Tagesnotizen</label>
+                <label id="dayNoteResultsLabel"><input type="checkbox" id="searchDayNotesCheckbox" checked>Tagesnotizen</label>
                 <hr>
                 <div id="dayNoteResults">
                 </div>
                 <div class="doubleMarginTop"></div>
-                <label><input type="checkbox" id="searchLessonNotesCheckbox" checked>Stundennotizen</label>
+                <label id="lessonNoteResultsLabel"><input type="checkbox" id="searchLessonNotesCheckbox" checked>Stundennotizen</label>
                 <hr>
                 <div id="lessonNoteResults">
                 </div>

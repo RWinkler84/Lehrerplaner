@@ -10,7 +10,7 @@ export default class DayNoteController {
         View.renderDayNoteIcons(dayNotes);
     }
 
-    static async openDayNote(event, noteId = null) {
+    static async openDayNote(event = null, noteId = null) {
         const id = event ? event.target.dataset.note_id : noteId;
         const weekdayElement = event ? event.target.closest('.weekday') : null;
 

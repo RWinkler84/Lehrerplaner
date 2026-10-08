@@ -30,7 +30,7 @@
     --labelgrey: rgb(106, 106, 106);
     --fadedgrey: rgb(240, 240, 240);
 
-    --lightBlue: rgb(227, 229, 235);
+    --lightBlue: rgb(235, 235, 239);
 
     --standardRadius: 5px;
     --smallRadius: 3px;
@@ -1224,6 +1224,18 @@ dialog .errorMessageDisplay,
         }
     }
 
+    .searchResultWrapper {
+        &.selected,
+        &:has(*.selected) {
+            background-color: var(--lightBlue);
+        }
+
+        &.selected .noteIconContainer,
+        .noteIconContainer.selected {
+            border-color: var(--lightBlue);
+        }
+    }
+
     #globalNoteSearchContainer {
         margin-top: 1rem;
 
@@ -2260,12 +2272,6 @@ p {
 
     #globalNotesContainer {
         padding-top: 0rem;
-
-        #globalNotesFileSystemDisplay {
-            #folderNavigatonContainer {
-                padding-top: 1.5rem;
-            }
-        }
 
         #globalNotesTabContainer {
             margin: -0.25rem -0.5rem 0;

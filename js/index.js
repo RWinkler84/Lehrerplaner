@@ -27,7 +27,7 @@ document.querySelector('#topMenuContainer').addEventListener('click', Tour.click
 export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
-export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br']
+export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br'];
 export const VERSION = '0.9.011026';
 
 export const SF_ID_ROOT = 0;
@@ -203,13 +203,13 @@ async function startApp() {
         globalItemsMultiSelectData.startY = event.clientY;
     })
 
-    document.querySelector('#globalNoteFolderAndNoteIconContainer').addEventListener('mousemove', (event) => {
+    document.querySelector('#globalNotesContainer').addEventListener('mousemove', (event) => {
         if (globalItemsMultiSelectData.mouseDown) {
             GlobalNotesController.selectMultipleOnMouseDrag(event);
         }
     });
 
-    document.querySelector('#globalNoteFolderAndNoteIconContainer').addEventListener('mouseup', (event) => {
+    document.querySelector('#globalNotesContainer').addEventListener('mouseup', (event) => {
         globalItemsMultiSelectData.mouseDown = false;
         globalItemsMultiSelectData.startX = null;
         globalItemsMultiSelectData.startY = null;
@@ -220,7 +220,7 @@ async function startApp() {
     })
 
     // context menu
-    document.querySelector('#globalNotesFileContainer').addEventListener('contextmenu', (event) => {
+    document.querySelector('#globalNotesContainer').addEventListener('contextmenu', (event) => {
         // touch context menus are handled by ios workaround on all plattforms to prevent event duplication
         if (event.pointerType == 'touch') {
             event.preventDefault();
