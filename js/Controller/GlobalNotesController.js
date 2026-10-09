@@ -2,6 +2,7 @@ import { MOBILE_VIEW_WIDTH, SF_ID_TRASH, contextMenuEvent, globalItemsMultiSelec
 import GlobalNote from "../Model/GlobalNote.js";
 import GlobalNoteFolder from '../Model/GlobalNoteFolder.js';
 import View from "../View/GlobalNotesView.js";
+import AbstractController from "./AbstractController.js";
 import DayNoteController from "./DayNoteController.js";
 import LessonNoteController from "./LessonNoteController.js";
 
@@ -587,6 +588,7 @@ export default class GlobalNotesController {
             View.showFileDisplayContainers();
         }
 
+
         if (searchString.trim() != '' && searchString.length >= 2) {
             const allChildFolders = await GlobalNoteFolder.getAllChildFoldersRecursively(parentFolderId);
             const folderIds = [parentFolderId];
@@ -609,16 +611,20 @@ export default class GlobalNotesController {
         View.clearFolderSearchField();
     }
 
-    static openLessonOrDayNote() {
+    static openNoteInWeekAndEditor() {
         const clickedNoteInfo = View.getClickedSearchResultLessonOrDayNoteInfo();
 
         if (clickedNoteInfo.noteType == 'lessonNote') {
             this.closeAllContextMenus();
+            AbstractController.switchToSelectedWeek(clickedNoteInfo.noteDate);
+            AbstractController.openWeekView();
             LessonNoteController.renderLessonNote(null, clickedNoteInfo.noteId);
         }
 
         if (clickedNoteInfo.noteType == 'dayNote') {
             this.closeAllContextMenus();
+            AbstractController.switchToSelectedWeek(clickedNoteInfo.noteDate);
+            AbstractController.openWeekView();
             DayNoteController.openDayNote(null, clickedNoteInfo.noteId);
         }
     }
@@ -757,8 +763,8 @@ export default class GlobalNotesController {
                     this.openParentFolderOfSearchResult();
                     break;
 
-                case 'openNoteInEditorButton':
-                    this.openLessonOrDayNote(target)
+                case 'openNoteInWeekAndEditorButton':
+                    this.openNoteInWeekAndEditor();
                     break;
 
                 //trash context menus

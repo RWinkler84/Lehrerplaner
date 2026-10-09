@@ -94,6 +94,7 @@ export default class GlobalNoteFolder extends AbstractModel {
     }
 
     static async getAllChildFoldersRecursively(parentFolderId) {
+
         const allChildFolders = [];
 
         await getChildFolders(parentFolderId);

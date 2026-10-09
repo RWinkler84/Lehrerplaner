@@ -11,7 +11,6 @@ import { ONEDAY, tourStatus, userStatus } from "../index.js";
 import Tour from "../tour.js";
 import DayNoteController from "./DayNoteController.js";
 import GlobalNotesController from "./GlobalNotesController.js";
-import LessonNoteController from "./LessonNoteController.js";
 
 export default class AbstractController {
 
@@ -275,8 +274,8 @@ export default class AbstractController {
         View.setDateOnWeekViewDatePicker();
     }
 
-    static async switchToSelectedWeek() {
-        const selectedDate = View.getDateFromWeekViewPicker();
+    static async switchToSelectedWeek(date = null) {
+        const selectedDate = date ?? View.getDateFromWeekViewPicker();
 
         AbstractController.setCalendarWeek(selectedDate);
         AbstractController.setDateForWeekdays(selectedDate);
@@ -312,6 +311,10 @@ export default class AbstractController {
 
     static hideWeekViewDateSelector() {
         View.hideWeekViewDateSelector();
+    }
+
+    static openWeekView() {
+        View.openWeekView();
     }
 
     static async clickEventHandler(event) {

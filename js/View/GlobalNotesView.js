@@ -36,8 +36,8 @@ export default class GlobalNotesView {
         ],
         dayOrLessonNoteSearchResultClicked: [
             {
-                action: 'openNoteInEditor',
-                text: 'öffnen'
+                action: 'openNoteInWeekAndEditor',
+                text: 'in Woche anzeigen'
             },
         ],
         //context menu when a blank space is clicked
@@ -571,7 +571,7 @@ export default class GlobalNotesView {
                 menuData.menuType = 'searchResultClicked';
                 menuData.menuToRender = this.#contextMenus.searchResultClicked;
             } else {
-            //other notes will only get an option to open them
+                //other notes will only get an option to open them
                 menuData.menuType = 'dayOrLessonNoteSearchResultClicked';
                 menuData.menuToRender = this.#contextMenus.dayOrLessonNoteSearchResultClicked;
             }
@@ -1212,6 +1212,7 @@ export default class GlobalNotesView {
             currentNoteContainer.dataset.parent_folder_id = note.parentFolderId;
             currentNoteContainer.dataset.created = note.created;
             currentNoteContainer.dataset.last_edited = note.lastEdited;
+            if (note.date) currentNoteContainer.dataset.date = note.date;
 
             //preview text
             const previewTextContainer = fragment.cloneNode();
@@ -1597,14 +1598,16 @@ export default class GlobalNotesView {
     static getClickedSearchResultLessonOrDayNoteInfo() {
         const contextMenuData = this.getContextMenuInfo();
         const clickedSearchResult = document.querySelector(`.selected[data-note_id="${contextMenuData.noteId}"]`);
+        const date = clickedSearchResult.dataset.date ? clickedSearchResult.dataset.date : clickedSearchResult.querySelector('.noteIconContainer').dataset.date
 
         const noteData = {
             noteId: contextMenuData.noteId,
+            noteDate: date,
             noteType: ''
         }
 
         if (clickedSearchResult.closest('#lessonNoteResults')) noteData.noteType = 'lessonNote';
-        if (clickedSearchResult.closest('#dayNoteResults')) noteData.noteType = 'dayNote'; 
+        if (clickedSearchResult.closest('#dayNoteResults')) noteData.noteType = 'dayNote';
 
         return noteData;
     }

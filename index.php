@@ -7,7 +7,7 @@ use Model\User;
 
 $version = [
     'status' => 'success',
-    'version' => '0.9.011026'
+    'version' => '0.9.091026'
     ];
 
 session_start(['cookie_secure' => true]);

@@ -28,7 +28,7 @@ export const ONEDAY = 86400000;
 export const ONEMIN = 60000;
 export const ANIMATIONRUNTIME = 300;
 export const ALLOWEDTAGS = ['div', 'span', 'ul', 'ol', 'li', 'b', 'p', 'br'];
-export const VERSION = '0.9.011026';
+export const VERSION = '0.9.091026';
 
 export const SF_ID_ROOT = 0;
 export const SF_ID_TRASH = 1;
@@ -128,7 +128,7 @@ async function startApp() {
     })
 
     //weekView datepicker
-    document.querySelector('#weekSwitcherDatePicker').addEventListener('change', AbstractController.switchToSelectedWeek);
+    document.querySelector('#weekSwitcherDatePicker').addEventListener('change', () => {AbstractController.switchToSelectedWeek()});
 
     //handler for task tables
     document.querySelector('#upcomingTasksTable tbody').addEventListener('click', TaskController.tasksTableEventHandler);
@@ -162,7 +162,7 @@ async function startApp() {
     document.querySelectorAll('.editorContainer').forEach(element => element.addEventListener('click', Editor.handleClickEvents));
     document.querySelectorAll('.editorButtonContainer').forEach(element => element.addEventListener('mousedown', event => event.preventDefault()));
     document.addEventListener('input', (event) => {
-        if (event.target.id == 'globalNoteSearchInput') GlobalNotesController.runSearch();
+        if (event.target.id == 'allNotesSearchInput') GlobalNotesController.runSearch();
         if (event.target.id == 'globalNoteFolderSearchInput') GlobalNotesController.runFolderSearch();
         if (!event.target.closest('.textEditor')) return;
 

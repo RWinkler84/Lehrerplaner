@@ -14,6 +14,8 @@ export default class AbstractView {
         document.querySelector('#timetableViewContainer').style.display = 'none';
         document.querySelector('#schoolYearViewContainer').style.display = 'none';
         document.querySelector('#globalNotesContainer').style.display = 'none';
+
+        window.scrollTo(top);
     }
 
     static openTimetableSettings() {
